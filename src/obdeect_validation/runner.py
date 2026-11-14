@@ -198,50 +198,48 @@ def _hash_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _git(root: Path, *args: str, timeout: float = 120) -> bytes | None:
+    """Raw git output, b"" on a git error and None on timeout (recorded as unknown)."""
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(root), *args], capture_output=True, timeout=timeout
+        )
+    except subprocess.TimeoutExpired:
+        return None
+    except OSError:
+        return b""
+    return proc.stdout if proc.returncode == 0 else b""
+
+
 def _git_provenance() -> list[dict[str, Any]]:
-    roots: set[Path] = set()
+    """HEAD, dirty flag and diff hash of the checkout around the working directory and its siblings."""
     here = Path.cwd().resolve()
     candidates = [here, *here.parents]
-    candidates.extend(child for child in here.parent.iterdir() if child.is_dir())
+    try:
+        candidates.extend(
+            child for child in here.parent.iterdir() if (child / ".git").exists()
+        )
+    except OSError:
+        pass
+    roots: set[Path] = set()
     for candidate in candidates:
-        try:
-            check = subprocess.run(
-                ["git", "-C", str(candidate), "rev-parse", "--show-toplevel"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
-            if check.returncode == 0:
-                roots.add(Path(check.stdout.strip()).resolve())
-        except (OSError, subprocess.TimeoutExpired):
-            continue
+        top = _git(candidate, "rev-parse", "--show-toplevel", timeout=5)
+        if top:
+            roots.add(Path(top.decode(errors="replace").strip()).resolve())
     result = []
     for root in sorted(roots):
-
-        def git(*args: str) -> str | None:
-            # Large checkouts (model repositories) can be slow; record unknown instead of failing.
-            try:
-                proc = subprocess.run(
-                    ["git", "-C", str(root), *args],
-                    capture_output=True,
-                    text=True,
-                    timeout=120,
-                )
-            except subprocess.TimeoutExpired:
-                return None
-            return proc.stdout.strip() if proc.returncode == 0 else ""
-
-        head = git("rev-parse", "HEAD")
-        status = git("status", "--porcelain")
-        diff = git("diff", "HEAD", "--binary") if status else ""
+        head = _git(root, "rev-parse", "HEAD")
+        status = _git(root, "status", "--porcelain")
+        # Binary diffs are not text: hash the raw bytes.
+        diff = _git(root, "diff", "HEAD", "--binary") if status else b""
         result.append(
             {
                 "path": str(root),
-                "head": head or None,
+                "head": head.decode().strip() or None if head is not None else None,
                 "dirty": None if status is None else bool(status),
                 "diff_sha256": None
                 if not status or diff is None
-                else hashlib.sha256(diff.encode()).hexdigest(),
+                else hashlib.sha256(diff).hexdigest(),
             }
         )
     return result
@@ -267,6 +265,7 @@ def _tool_fingerprints(
 
 
 def _missing_modules(environment: dict[str, Any]) -> list[str]:
+    """Modules of the environment that a fresh interpreter cannot import (one probe per module)."""
     missing = []
     env = {**os.environ, **environment["env"]}
     for module in environment["modules"]:
@@ -291,22 +290,28 @@ def _missing_modules(environment: dict[str, Any]) -> list[str]:
     return missing
 
 
+def _signal_group(process: subprocess.Popen[bytes], sig: int) -> bool:
+    """Signal the process group; False once it is gone.
+
+    macOS reports PermissionError instead of ProcessLookupError for a group that
+    only holds zombies.
+    """
+    try:
+        os.killpg(process.pid, sig)
+    except (ProcessLookupError, PermissionError):
+        return False
+    return True
+
+
 def _stop_process_group(process: subprocess.Popen[bytes]) -> None:
-    try:
-        os.killpg(process.pid, signal.SIGTERM)
-    except ProcessLookupError:
-        pass
-    deadline = time.monotonic() + 2
-    while time.monotonic() < deadline:
-        try:
-            os.killpg(process.pid, 0)
-        except ProcessLookupError:
-            break
-        time.sleep(0.05)
-    try:
-        os.killpg(process.pid, signal.SIGKILL)
-    except ProcessLookupError:
-        pass
+    if _signal_group(process, signal.SIGTERM):
+        deadline = time.monotonic() + 2
+        while time.monotonic() < deadline:
+            process.poll()  # reap the leader so the group can disappear
+            if not _signal_group(process, 0):
+                break
+            time.sleep(0.05)
+        _signal_group(process, signal.SIGKILL)
     process.wait()
 
 
@@ -438,10 +443,12 @@ def _run_case(
     output: Path,
     environment: dict[str, Any],
     provenance: dict[str, Any],
+    missing_modules: list[str] | None = None,
 ) -> dict[str, Any]:
     tools, missing = _tool_fingerprints(case, environment)
     fingerprint = _fingerprint(case, provenance, tools)
-    missing_modules = _missing_modules(environment)
+    if missing_modules is None:
+        missing_modules = _missing_modules(environment)
     missing_inputs = [str(path) for path in environment["inputs"] if not path.is_file()]
     result: dict[str, Any] = {
         "id": case["id"],
@@ -527,10 +534,12 @@ def _run_case(
             result["status"] = "ERROR"
             break
     if result["status"] == "PASS" and case.get("metrics"):
-        metric_files = [
-            case_dir / command.get("cwd", ".") / "metrics.json"
-            for command in case["commands"]
-        ]
+        metric_files = list(
+            dict.fromkeys(
+                case_dir / command.get("cwd", ".") / "metrics.json"
+                for command in case["commands"]
+            )
+        )
         values: dict[str, Any] = {}
         for metric_file in metric_files:
             if metric_file.exists():
@@ -565,6 +574,32 @@ def _run_case(
                 if not passed:
                     result["status"] = "FAIL"
     return result
+
+
+REPORT_STYLE = (
+    "body{font-family:sans-serif;margin:1.5rem}table{border-collapse:collapse}"
+    "td,th{border:1px solid #ccc;padding:.3rem .6rem;vertical-align:top;text-align:left}"
+    "img{max-width:28rem;margin:.3rem .3rem 0 0;border:1px solid #ddd}"
+    ".s{padding:0 .4rem;border-radius:.2rem;color:#fff;font-weight:bold}"
+    ".PASS{background:#2a7f3f}.FAIL{background:#b3261e}.ERROR{background:#7a1f7a}.BLOCKED{background:#8a6d00}"
+)
+
+
+def _badge(status: str) -> str:
+    return f"<span class='s {html.escape(status)}'>{html.escape(status)}</span>"
+
+
+def _figures(output: Path, case_id: str) -> list[Path]:
+    case_dir = output / _safe_id(case_id)
+    if not case_dir.is_dir():
+        return []
+    return sorted(p for p in case_dir.rglob("*") if p.suffix in (".png", ".svg"))
+
+
+def _overall(cases: list[dict[str, Any]]) -> str:
+    """Worst status first: ERROR, BLOCKED, FAIL, otherwise PASS."""
+    statuses = {case["status"] for case in cases}
+    return next((s for s in ("ERROR", "BLOCKED", "FAIL") if s in statuses), "PASS")
 
 
 def _write_reports(output: Path, summary: dict[str, Any]) -> None:
@@ -604,20 +639,34 @@ def _write_reports(output: Path, summary: dict[str, Any]) -> None:
             stdout = html.escape(step["stdout_log"])
             stderr = html.escape(step["stderr_log"])
             details.append(
-                f"<li>{html.escape(step['name'])}: {step['status']} (<a href='{stdout}'>stdout</a>, <a href='{stderr}'>stderr</a>)</li>"
+                f"<li>{html.escape(step['name'])}: {_badge(step['status'])} (<a href='{stdout}'>stdout</a>, <a href='{stderr}'>stderr</a>)</li>"
             )
         for metric in case.get("metrics", []):
             details.append(
-                f"<li>{html.escape(metric['metric'])}: {metric['actual']} ({metric['status']})</li>"
+                f"<li>{html.escape(metric['metric'])}: {metric['actual']} {_badge(metric['status'])}</li>"
             )
+        for key in ("reason", "error", "metric_error"):
+            if case.get(key):
+                details.append(f"<li>{key}: {html.escape(str(case[key]))}</li>")
+        for key in ("missing", "missing_modules", "missing_inputs"):
+            if case.get(key):
+                details.append(
+                    f"<li>{key.replace('_', ' ')}: {html.escape(', '.join(case[key]))}</li>"
+                )
+        figures = "".join(
+            f"<a href='{html.escape(str(path.relative_to(output)))}'><img loading='lazy' src='{html.escape(str(path.relative_to(output)))}' alt=''></a>"
+            for path in _figures(output, case["id"])
+        )
         rows.append(
-            f"<tr><td>{html.escape(case['id'])}</td><td>{html.escape(case['name'])}</td><td>{case['status']}</td><td><ul>{''.join(details)}</ul></td></tr>"
+            f"<tr><td>{html.escape(case['id'])}</td><td>{html.escape(case['name'])}</td>"
+            f"<td>{_badge(case['status'])}</td><td><ul>{''.join(details)}</ul>{figures}</td></tr>"
         )
     page = (
-        "<!doctype html><meta charset='utf-8'><title>Validation report</title><h1>"
+        "<!doctype html><meta charset='utf-8'><title>Validation report</title>"
+        f"<style>{REPORT_STYLE}</style><h1>"
         + html.escape(summary["suite"])
         + "</h1><p>Status: "
-        + summary["status"]
+        + _badge(summary["status"])
         + " · <a href='summary.json'>JSON summary</a></p><table><thead><tr><th>Case</th><th>Name</th><th>Status</th><th>Details</th></tr></thead><tbody>"
         + "\n".join(rows)
         + "</tbody></table>\n"
@@ -640,6 +689,7 @@ def run(
     environment = _environment(environment_path)
     output.mkdir(parents=True, exist_ok=True)
     provenance = _provenance(environment)
+    missing_modules = _missing_modules(environment)
     previous: dict[str, Any] = {}
     summary_path = output / "summary.json"
     if resume and summary_path.exists():
@@ -663,7 +713,9 @@ def run(
             case_result = cached
         else:
             try:
-                case_result = _run_case(case, output, environment, provenance)
+                case_result = _run_case(
+                    case, output, environment, provenance, missing_modules
+                )
             except KeyboardInterrupt:
                 case_result = {
                     "id": case["id"],
@@ -675,20 +727,11 @@ def run(
                     "metrics": [],
                 }
         results.append(case_result)
-        statuses = {item["status"] for item in results}
-        current_status = next(
-            (
-                candidate
-                for candidate in ("ERROR", "BLOCKED", "FAIL")
-                if candidate in statuses
-            ),
-            "PASS",
-        )
         _write_reports(
             output,
             {
                 "suite": suite["id"],
-                "status": current_status,
+                "status": _overall(results),
                 "provenance": provenance,
                 "cases": results,
             },
@@ -706,18 +749,9 @@ def run(
                     }
                 )
             break
-    statuses = {case["status"] for case in results}
-    status = next(
-        (
-            candidate
-            for candidate in ("ERROR", "BLOCKED", "FAIL")
-            if candidate in statuses
-        ),
-        "PASS",
-    )
     summary = {
         "suite": suite["id"],
-        "status": status,
+        "status": _overall(results),
         "provenance": provenance,
         "cases": results,
         "interrupted": any(case.get("interrupted") for case in results),

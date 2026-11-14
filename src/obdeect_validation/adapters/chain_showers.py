@@ -1,7 +1,6 @@
 """Real CORSIKA showers through the stream codec and sim_telarray camera."""
 
 import argparse
-import hashlib
 import json
 import os
 import shutil
@@ -12,28 +11,13 @@ import numpy as np
 from eventio import SimTelFile
 from eventio.iact import IACTFile
 
+from obdeect_validation.adapters import common
+from obdeect_validation.adapters.common import command  # noqa: F401  (re-exported for the adapters)
 
-def command(argv, log, cwd=None, stdout_file=None):
-    with Path(log).open("wb") as log_stream:
-        if stdout_file:
-            with Path(stdout_file).open("wb") as output:
-                process = subprocess.run(
-                    list(map(str, argv)),
-                    cwd=cwd,
-                    stdout=output,
-                    stderr=log_stream,
-                    check=False,
-                )
-        else:
-            process = subprocess.run(
-                list(map(str, argv)),
-                cwd=cwd,
-                stdout=log_stream,
-                stderr=subprocess.STDOUT,
-                check=False,
-            )
-    if process.returncode:
-        raise RuntimeError(f"{argv[0]} exited {process.returncode}; see {log}")
+PE_BIAS_FLOOR = 0.01  # mean p.e. per telescope-event within 1 % (plan step 5)
+TIME_BIAS_FLOOR_NS = 0.05
+SHAPE_CHI2_LIMIT = 2.0
+SIGMA = 5.0  # limit = max(floor, SIGMA * standard error)
 
 
 def generate(root, showers=20, zenith=20, energy_min=100, energy_max=3000):
@@ -60,9 +44,8 @@ def generate(root, showers=20, zenith=20, energy_min=100, energy_max=3000):
         }.get(name, name)
         if not destination.exists():
             destination.symlink_to(original)
-        hashes[name] = hashlib.sha256(original.read_bytes()).hexdigest()
-    reference = Path(os.environ.get("SIMTEL_REFERENCE_SOURCE", "/reference"))
-    shutil.copyfile(reference / "cfg/common/atmprof1.dat", root / "atmprof1.dat")
+        hashes[name] = common.sha256(original)
+    shutil.copyfile(common.REFERENCE / "cfg/common/atmprof1.dat", root / "atmprof1.dat")
     card = f"""RUNNR 1
 EVTNR 1
 NSHOW {showers}
@@ -148,53 +131,24 @@ def compare_photons(reference, candidate):
     return metrics, per_field
 
 
-def simulate(root, input_file, name, bypass=0, config=None, extra=None):
-    reference = Path(os.environ.get("SIMTEL_REFERENCE_SOURCE", "/reference"))
-    binary = os.environ.get(
-        "SIMTEL_BINARY", "/workdir/simulation_software/sim_telarray/bin/sim_telarray"
+def simulate(root, input_file, name, bypass=0, config=None, extra=None, runner=command):
+    """Three-telescope sim_telarray run of the CORSIKA showers (zenith 20 deg, azimuth 180 deg)."""
+    return common.sim_telarray(
+        root,
+        input_file,
+        name,
+        {
+            "maximum_telescopes": 3,
+            "altitude": 2156,
+            "telescope_theta": 20,
+            "telescope_phi": 180,
+            "Bypass_Optics": bypass,
+        },
+        config=config,
+        defines=("-DCTA_NORTH", "-DLST1", "-DNUM_TELESCOPES=3"),
+        extra=extra or (),
+        runner=runner,
     )
-    output = root / (name + ".simtel")
-    output.unlink(missing_ok=True)
-    (root / (name + ".hdata")).unlink(missing_ok=True)
-    argv = [
-        binary,
-        "-c",
-        config or str(reference / "cfg/CTA/CTA-PROD6-LST.cfg"),
-        "-I" + str(reference / "cfg/common"),
-        "-I" + str(reference / "cfg/CTA"),
-        "-DCTA_NORTH",
-        "-DLST1",
-        "-DNUM_TELESCOPES=3",
-        "-C",
-        "maximum_telescopes=3",
-        "-C",
-        "altitude=2156",
-        "-C",
-        "telescope_theta=20",
-        "-C",
-        "telescope_phi=180",
-        "-C",
-        f"Bypass_Optics={bypass}",
-        "-C",
-        f"histogram_file={root / name}.hdata",
-        "-C",
-        f"output_file={output}",
-        "-W",
-        "random_state=none",
-        "-C",
-        "random_seed=20261113",
-        "-C",
-        "save_photons=2",
-        "-C",
-        "store_photoelectrons=0",
-    ]
-    argv += extra or []
-    argv += [str(input_file)]
-    (root / (name + ".command.json")).write_text(json.dumps(argv, indent=2) + "\n")
-    command(argv, root / (name + ".log"), cwd=reference)
-    if not output.is_file():
-        raise RuntimeError(f"no sim_telarray output: {root / name}.log")
-    return output
 
 
 def camera_events(path):
@@ -205,7 +159,20 @@ def camera_events(path):
     return events
 
 
+def bias_exceeded(value, standard_error, floor):
+    """Integer flag: |value| above max(floor, SIGMA * standard_error)."""
+    return int(abs(value) > max(floor, SIGMA * standard_error))
+
+
+def _standard_error(values):
+    values = np.asarray(values, dtype=float)
+    if values.size < 2:
+        raise ValueError("camera comparison needs at least two matched samples")
+    return float(np.std(values, ddof=1) / np.sqrt(values.size))
+
+
 def compare_camera(left, right, output):
+    """Paired per-telescope comparison of two sim_telarray runs; writes the CSV and the figure."""
     if not left or not right:
         raise ValueError("camera comparison requires nonempty triggered event samples")
     keys = sorted(set(left) & set(right), key=int)
@@ -238,12 +205,12 @@ def compare_camera(left, right, output):
             adc.append(float(np.mean(bv - av)))
     if not pairs:
         raise ValueError("no matched photoelectron samples")
+    if not shape_chi2 or not times:
+        raise ValueError("no matched images or pixel times to compare")
     array = np.asarray(pairs)
     difference = array[:, 3] - array[:, 2]
     bias = float(difference.sum() / array[:, 2].sum())
-    se = float(
-        np.std(difference, ddof=1) / np.sqrt(len(difference)) / np.mean(array[:, 2])
-    )
+    se = _standard_error(difference) / float(np.mean(array[:, 2]))
     np.savetxt(
         output / "paired-photoelectrons.csv",
         array,
@@ -251,39 +218,85 @@ def compare_camera(left, right, output):
         header="event,telescope,reference,candidate",
         comments="",
     )
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-    axes[0].scatter(array[:, 2], array[:, 3], s=8)
-    limits = [0, float(max(array[:, 2].max(), array[:, 3].max()))]
-    axes[0].plot(limits, limits, color="black")
-    axes[0].set(xlabel="sim_telarray reference p.e.", ylabel="candidate p.e.")
-    axes[1].hist(difference, bins=30)
-    axes[1].set(xlabel="paired p.e. difference", ylabel="event/telescope samples")
-    fig.tight_layout()
-    fig.savefig(output / "camera-comparison.png", dpi=150)
-    plt.close(fig)
+    _plot_camera(array, difference, output / "camera-comparison.png")
+    mean_time = float(np.mean(times))
     return {
         "matched_event_telescope_samples": len(pairs),
         "photoelectron_relative_bias": bias,
         "photoelectron_relative_bias_se": se,
-        "photoelectron_bias_limit_exceeded": int(abs(bias) > max(0.01, 5 * se)),
+        "photoelectron_bias_limit_exceeded": bias_exceeded(bias, se, PE_BIAS_FLOOR),
         "mean_image_reduced_chi2": float(np.mean(shape_chi2)),
-        "image_shape_limit_exceeded": int(np.mean(shape_chi2) > 2),
-        "mean_arrival_time_difference_ns": float(np.mean(times)),
-        "arrival_time_bias_limit_exceeded": int(
-            abs(np.mean(times))
-            > max(0.05, 5 * np.std(times, ddof=1) / np.sqrt(len(times)))
+        "image_shape_limit_exceeded": int(np.mean(shape_chi2) > SHAPE_CHI2_LIMIT),
+        "mean_arrival_time_difference_ns": mean_time,
+        "arrival_time_bias_limit_exceeded": bias_exceeded(
+            mean_time, _standard_error(times), TIME_BIAS_FLOOR_NS
         ),
         "max_image_relative_l1_difference": max(images),
         "mean_image_relative_l1_difference": float(np.mean(images)),
-        "max_mean_arrival_time_difference_ns": max(map(abs, times), default=0),
+        "max_mean_arrival_time_difference_ns": max(map(abs, times)),
         "mean_adc_sample_difference": float(np.mean(adc)),
         "trigger_pattern_mismatches": int(trigger_changes),
     }
+
+
+def _plot_camera(array, difference, path):
+    """Paired p.e. (colour per telescope) against the identity line, and the relative differences."""
+    from obdeect_validation.adapters import plotting
+
+    fig, axes = plotting.figure(1, 2, (10, 4))
+    for i, tel in enumerate(sorted({int(t) for t in array[:, 1]})):
+        rows = array[:, 1] == tel
+        axes[0, 0].scatter(
+            array[rows, 2],
+            array[rows, 3],
+            s=14,
+            color=plotting.CYCLE[i % len(plotting.CYCLE)],
+            alpha=0.8,
+            label=f"telescope {tel}",
+        )
+    top = float(max(array[:, 2].max(), array[:, 3].max()))
+    axes[0, 0].plot(
+        [0, top], [0, top], color=plotting.ANALYTIC, linewidth=1, label="identity"
+    )
+    axes[0, 0].set(xlabel="sim_telarray reference p.e.", ylabel="candidate p.e.")
+    axes[0, 0].legend()
+    relative = difference / np.maximum(array[:, 2], 1.0)
+    axes[0, 1].hist(relative, bins=30, color=plotting.NATIVE, alpha=0.85)
+    axes[0, 1].axvline(0, color=plotting.ANALYTIC, linewidth=1)
+    axes[0, 1].set(
+        xlabel="(candidate - reference) / reference p.e.",
+        ylabel="event/telescope samples",
+    )
+    plotting.save(fig, path)
+
+
+def roundtrip(root, source):
+    """CORSIKA IACT -> stream -> sim_telarray input, compared bunch by bunch and in the camera.
+
+    Returns (native stream, metrics, per-field codec errors, reference events, candidate events).
+    """
+    native, converted = root / "showers.gst", root / "roundtrip.iact"
+    command(
+        ["obdeect", "stream", "from-corsika", source],
+        root / "from-corsika.log",
+        stdout_file=native,
+    )
+    command(
+        ["obdeect", "stream", "to-simtel", native, "-o", converted],
+        root / "to-simtel.log",
+    )
+    metrics, fields = compare_photons(source, converted)
+    a = camera_events(simulate(root, source, "direct"))
+    b = camera_events(simulate(root, converted, "roundtrip"))
+    metrics.update(
+        {
+            "reference_camera_events": len(a),
+            "candidate_camera_events": len(b),
+            "camera_event_id_delta": len(set(a) ^ set(b)),
+        }
+    )
+    metrics.update(compare_camera(a, b, root))
+    return native, metrics, fields, a, b
 
 
 def main():
@@ -301,41 +314,15 @@ def main():
             root, args.showers, energy_min=args.energy_min, energy_max=args.energy_max
         )
     )
-    native = root / "showers.gst"
-    roundtrip = root / "roundtrip.iact"
-    command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / "from-corsika.log",
-        stdout_file=native,
-    )
-    command(
-        ["obdeect", "stream", "to-simtel", native, "-o", roundtrip],
-        root / "to-simtel.log",
-    )
-    metrics, fields = compare_photons(source, roundtrip)
-    direct = simulate(root, source, "direct")
-    converted = simulate(root, roundtrip, "roundtrip")
-    a, b = camera_events(direct), camera_events(converted)
-    metrics.update(
+    _, metrics, fields, a, b = roundtrip(root, source)
+    common.write_results(
+        metrics,
         {
-            "reference_camera_events": len(a),
-            "candidate_camera_events": len(b),
-            "camera_event_id_delta": len(set(a) ^ set(b)),
-        }
-    )
-    metrics.update(compare_camera(a, b, root))
-    (root / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
-    (root / "details.json").write_text(
-        json.dumps(
-            {
-                "codec_per_field_normalized_error": fields,
-                "reference_event_ids": list(a),
-                "candidate_event_ids": list(b),
-                "camera_event_keys": list(next(iter(a.values())).keys()) if a else [],
-            },
-            indent=2,
-        )
-        + "\n"
+            "codec_per_field_normalized_error": fields,
+            "reference_event_ids": list(a),
+            "candidate_event_ids": list(b),
+            "camera_event_keys": list(next(iter(a.values())).keys()) if a else [],
+        },
     )
 
 

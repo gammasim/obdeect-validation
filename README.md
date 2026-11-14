@@ -31,6 +31,12 @@ obdeect-validate run --case cases/chain/optics-bypass1.json --environment enviro
 Case files are JSON. Each has an id, executable requirements, commands (argument
 arrays, without shell expansion), and metrics with metric/expected/atol.
 Commands run inside an isolated case output directory and write metrics.json.
+Adapters also write details.json and PNG figures; `report.html` links them per case.
+Figures use one palette (`adapters/plotting.py`): obdeect blue, reference program
+orange, analytic expectation black dashed, one colour per telescope or zenith angle.
+Shared helpers (commands, sim_telarray, photon readers, output files) are in
+`adapters/common.py` and `adapters/readers.py`. `VALIDATION_MODELS` overrides the
+simulation-models location (default `/models`).
 Suites select case files. Keep inputs and seeds explicit. Never change a reference
 or tolerance simply to make a failing comparison pass.
 

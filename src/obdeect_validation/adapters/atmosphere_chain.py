@@ -10,7 +10,6 @@ and biases the candidate high.
 """
 
 import argparse
-import json
 import math
 import re
 from pathlib import Path
@@ -167,9 +166,13 @@ def read_bunches(path, fraction, seed):
                 total += float(bunches["photons"].astype(float).sum())
                 keep = rng.random(len(bunches)) < fraction
                 cz = np.sqrt(
-                    1.0
-                    - bunches["cx"][keep].astype(float) ** 2
-                    - bunches["cy"][keep].astype(float) ** 2
+                    np.clip(
+                        1.0
+                        - bunches["cx"][keep].astype(float) ** 2
+                        - bunches["cy"][keep].astype(float) ** 2,
+                        1e-12,
+                        None,
+                    )
                 )
                 sample.extend(
                     zip(
@@ -183,19 +186,21 @@ def read_bunches(path, fraction, seed):
 
 def main():
     import numpy as np
+
     from obdeect_validation.adapters import chain_showers as cs
-    from obdeect_validation.adapters.extinction_reference import _table_reference
+    from obdeect_validation.adapters import common
+    from obdeect_validation.adapters.extinction_reference import table_reference
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--showers",
         type=Path,
-        default=Path("/validation/inputs/gamma-20deg-100-3000GeV.iact"),
+        default=common.SHOWERS,
     )
     parser.add_argument(
         "--transmission",
         type=Path,
-        default=Path("/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"),
+        default=common.TRANSMISSION_TABLE,
     )
     parser.add_argument("--site-altitude", type=float, default=SITE_ALTITUDE_M)
     parser.add_argument("--pathlen", type=float, default=PATHLEN_M)
@@ -215,12 +220,12 @@ def main():
 
     native = root / "showers.gst"
     propagated = root / "propagated.gst"
-    cs.command(
+    common.command(
         ["obdeect", "stream", "from-corsika", source],
         root / "from-corsika.log",
         stdout_file=native,
     )
-    cs.command(
+    common.command(
         [
             "obdeect",
             "propagation",
@@ -246,14 +251,14 @@ def main():
         root / "propagate.log",
     )
     candidate_input = root / "propagated.iact"
-    cs.command(
+    common.command(
         ["obdeect", "stream", "to-simtel", propagated, "-o", candidate_input],
         root / "to-simtel.log",
     )
 
     summary = propagation_summary((root / "propagate.log").read_text(errors="replace"))
     input_weight, sample = read_bunches(source, SAMPLE_FRACTION, args.seed)
-    depth = _table_reference(cut_path)[1]
+    depth = table_reference(cut_path)[1]
     draws = np.random.default_rng(args.seed).random(len(sample)).tolist()
     expected, expected_se = expected_transmission(sample, depth, band, draws)
     observed = summary["weight_out"] / input_weight
@@ -312,11 +317,9 @@ def main():
         "direct_photon_statistics": stats_direct,
         "candidate_photon_statistics": stats_candidate,
     }
-    (root / "details.json").write_text(
-        json.dumps(details, indent=2, default=str) + "\n"
+    common.write_results(
+        {key: float(value) for key, value in metrics.items()}, details, root
     )
-    flat = {key: float(value) for key, value in metrics.items()}
-    (root / "metrics.json").write_text(json.dumps(flat, indent=2) + "\n")
 
 
 if __name__ == "__main__":

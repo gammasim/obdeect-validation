@@ -17,23 +17,22 @@ and no camera metric is written.
 
 from __future__ import annotations
 
-import json
 import os
 import shutil
-import subprocess
 import sys
 import traceback
 from pathlib import Path
 
 import numpy as np
 from eventio import SimTelFile
-from eventio.iact import IACTFile
-from obdeect.stream import Reader
 
-from obdeect_validation.adapters import chain_showers
+from obdeect_validation.adapters import common, readers
 
 C_M_NS = 0.299792458
 TIME_RADIUS_CM = 1500.0
+MIN_CAMERA_EVENTS = (
+    1  # with one event the standard error is the Poisson error of the total
+)
 KEYS = ("cx", "cy", "cz", "t", "z", "w", "wavelength", "x", "y")
 
 # Matched parameter sets. Flasher cases follow obdeect/validation/sources/compare_*.sh; point
@@ -201,61 +200,15 @@ CASES = {
 
 
 def _read_native(path):
-    counts, cols = [], {k: [] for k in KEYS}
-    for record in Reader(str(path)):
-        if record["type"] == "event":
-            counts.append(0.0)
-        elif record["type"] == "photons":
-            columns = record["columns"]
-            if not counts:
-                raise ValueError("photons before the first event record")
-            if "cz" not in columns:
-                columns = {
-                    **columns,
-                    "cz": -np.sqrt(
-                        np.clip(1 - columns["cx"] ** 2 - columns["cy"] ** 2, 0, None)
-                    ),
-                }
-            w = np.asarray(columns["w"], dtype=np.float64)
-            counts[-1] += float(np.sum(w))
-            for key in KEYS:
-                if key in columns:
-                    cols[key].append(np.asarray(columns[key], dtype=np.float64))
-                elif key == "z":
-                    cols[key].append(np.zeros(len(w)))
-    return counts, {k: np.concatenate(v) if v else np.empty(0) for k, v in cols.items()}
+    counts, columns = readers.read_native(path, KEYS)
+    return counts, columns
 
 
 def _read_reference(path):
-    counts, cols = [], {k: [] for k in ("cx", "cy", "t", "w", "wavelength", "r")}
-    with IACTFile(str(path)) as stream:
-        for event in stream:
-            total = 0.0
-            for bunches in event.photon_bunches.values():
-                photons = np.asarray(bunches["photons"], dtype=np.float64)
-                total += float(np.sum(photons))
-                cols["cx"].append(np.asarray(bunches["cx"], dtype=np.float64))
-                cols["cy"].append(np.asarray(bunches["cy"], dtype=np.float64))
-                # Bunch position [cm] from the telescope axis, for the camera acceptance cut.
-                cols["r"].append(
-                    np.hypot(
-                        np.asarray(bunches["x"], dtype=np.float64),
-                        np.asarray(bunches["y"], dtype=np.float64),
-                    )
-                )
-                # Reference times are relative to the event time offset; restore the origin.
-                cols["t"].append(
-                    np.asarray(bunches["time"], dtype=np.float64)
-                    + float(event.time_offset)
-                )
-                cols["w"].append(photons)
-                cols["wavelength"].append(
-                    np.asarray(bunches["wavelength"], dtype=np.float64)
-                )
-            counts.append(total)
-    out = {k: np.concatenate(v) if v else np.empty(0) for k, v in cols.items()}
-    out["cz"] = -np.sqrt(np.clip(1.0 - out["cx"] ** 2 - out["cy"] ** 2, 0.0, None))
-    return counts, out
+    counts, columns = readers.read_iact(path)
+    # Bunch distance [cm] from the telescope axis, for the camera acceptance cut.
+    columns["r"] = 100.0 * np.hypot(columns["x"], columns["y"])
+    return counts, columns
 
 
 def _weighted_mean(x, w):
@@ -306,7 +259,7 @@ ATMPROF_OBSLEV_M = 2150.0
 
 
 def atmprof_path():
-    config = os.environ.get("SIMTEL_CONFIG_PATH", "/reference/cfg/common")
+    config = os.environ.get("SIMTEL_CONFIG_PATH", common.REFERENCE / "cfg/common")
     return Path(config) / ATMPROF_FILE
 
 
@@ -547,8 +500,8 @@ def emission_metrics(
     return metrics
 
 
-def camera_events(path):
-    """Per-event photoelectron totals and images: {telescope: (n_pe list, image sum, n_pixels)}."""
+def camera_totals(path):
+    """Per telescope: (p.e. per triggered event, summed image) of a sim_telarray file."""
     totals, images = {}, {}
     with SimTelFile(str(path)) as stream:
         for event in stream:
@@ -569,12 +522,16 @@ def _relative_mean_error(per_event, mean):
 
 def camera_metrics(reference, candidate):
     """Independent samples: mean p.e. ratio with standard error and summed image chi2 per pixel."""
-    common = sorted(set(reference) & set(candidate))
-    if not common:
+    shared = sorted(set(reference) & set(candidate))
+    if not shared:
         raise ValueError("no telescope with photoelectrons in both samples")
-    tel = common[0]
+    tel = shared[0]
     na, ima = reference[tel]
     nb, imb = candidate[tel]
+    if min(na.size, nb.size) < MIN_CAMERA_EVENTS:
+        raise ValueError(
+            f"camera comparison needs at least {MIN_CAMERA_EVENTS} triggered events per sample"
+        )
     mean_a, mean_b = na.mean(), nb.mean()
     ratio = float(mean_b / mean_a)
     se = float(
@@ -606,48 +563,20 @@ def camera_metrics(reference, candidate):
 
 
 def _plot(native, ref, output):
-    import matplotlib
+    from obdeect_validation.adapters import plotting
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    fig, axes = plt.subplots(2, 2, figsize=(9, 7))
-    for ax, key in zip(axes.flat, ("cx", "cy", "t", "wavelength")):
-        a, b = native[key], ref[key]
-        if a.size and b.size:
-            lo, hi = np.quantile(np.concatenate((a, b)), [0.001, 0.999])
-            hi = hi if hi > lo else lo + 1e-6
-            ax.hist(
-                a,
-                bins=60,
-                range=(lo, hi),
-                histtype="step",
-                density=True,
-                label="obdeect",
-            )
-            ax.hist(
-                b,
-                bins=60,
-                range=(lo, hi),
-                histtype="step",
-                density=True,
-                label="LightEmission",
-            )
-        ax.set(xlabel=key)
-    axes[0, 0].legend()
-    fig.tight_layout()
-    fig.savefig(output, dpi=120)
-    plt.close(fig)
-
-
-def _run(argv, log):
-    with Path(log).open("wb") as handle:
-        result = subprocess.run(
-            [str(a) for a in argv], stdout=handle, stderr=subprocess.STDOUT, check=False
+    fig, axes = plotting.figure(2, 2, (9, 7))
+    for axis, key in zip(axes.flat, ("cx", "cy", "t", "wavelength")):
+        plotting.histograms(
+            axis,
+            [
+                ("obdeect", native[key], plotting.NATIVE),
+                ("LightEmission", ref[key], plotting.REFERENCE),
+            ],
+            key,
+            clip=(0.001, 0.999),
         )
-    if result.returncode:
-        tail = Path(log).read_text(errors="replace").strip().splitlines()[-3:]
-        raise RuntimeError(f"{argv[0]} exited {result.returncode}: {' | '.join(tail)}")
+    plotting.save(fig, output)
 
 
 def _simtel(
@@ -661,50 +590,28 @@ def _simtel(
     atmospheric_transmission=None,
 ):
     """sim_telarray with the options of simtools' light-emission step (released binary)."""
-    binary = os.environ.get(
-        "SIMTEL_BINARY", "/workdir/simulation_software/sim_telarray/bin/sim_telarray"
+    return common.sim_telarray(
+        root,
+        input_file,
+        name,
+        {
+            "altitude": altitude,
+            **(
+                {"atmospheric_transmission": atmospheric_transmission}
+                if atmospheric_transmission
+                else {}
+            ),
+            "TRIGGER_TELESCOPES": 1,
+            "TELTRIG_MIN_SIGSUM": 2,
+            "PULSE_ANALYSIS": -30,
+            "MAXIMUM_TELESCOPES": 1,
+            "telescope_theta": 0,
+            "telescope_phi": 0,
+            "Bypass_Optics": bypass,
+        },
+        config=common.REFERENCE / "cfg" / cfg,
+        defines=(*defines, "-DNUM_TELESCOPES=1"),
     )
-    reference = Path(os.environ.get("SIMTEL_REFERENCE_SOURCE", "/reference"))
-    output = root / f"{name}.simtel"
-    output.unlink(missing_ok=True)
-    options = {
-        "altitude": altitude,
-        **(
-            {"atmospheric_transmission": atmospheric_transmission}
-            if atmospheric_transmission
-            else {}
-        ),
-        "TRIGGER_TELESCOPES": 1,
-        "TELTRIG_MIN_SIGSUM": 2,
-        "PULSE_ANALYSIS": -30,
-        "MAXIMUM_TELESCOPES": 1,
-        "telescope_theta": 0,
-        "telescope_phi": 0,
-        "Bypass_Optics": bypass,
-        "output_file": output,
-        "histogram_file": root / f"{name}.hdata",
-        "random_seed": 20261113,
-        "save_photons": 2,
-        "store_photoelectrons": 0,
-    }
-    argv = [
-        binary,
-        f"-I{reference / 'cfg/common'}",
-        f"-I{reference / 'cfg/CTA'}",
-        "-c",
-        reference / "cfg" / cfg,
-        *defines,
-        "-DNUM_TELESCOPES=1",
-        "-W",
-        "random_state=none",
-    ]
-    for key, value in options.items():
-        argv += ["-C", f"{key}={value}"]
-    argv.append(input_file)
-    chain_showers.command(argv, root / f"{name}.log", cwd=reference)
-    if not output.is_file():
-        raise RuntimeError(f"no sim_telarray output: {name}.log")
-    return output
 
 
 def _camera_stage(root, native_gst, reference_file, stage2):
@@ -712,7 +619,7 @@ def _camera_stage(root, native_gst, reference_file, stage2):
     candidate = root / "candidate.iact"
     if stage2["path"] == "propagate":
         propagated = root / "propagated.gst"
-        _run(
+        common.command(
             [
                 "obdeect",
                 "propagation",
@@ -732,7 +639,7 @@ def _camera_stage(root, native_gst, reference_file, stage2):
             ],
             root / "propagation.log",
         )
-        _run(
+        common.command(
             ["obdeect", "stream", "to-simtel", "-o", candidate, propagated],
             root / "to-simtel.log",
         )
@@ -742,7 +649,7 @@ def _camera_stage(root, native_gst, reference_file, stage2):
             # Telescope 1 of the reference program as a dual-mirror (class 2) telescope in the telescope frame.
             (root / "camera-map.txt").write_text("1 2 0.0\n", encoding="utf-8")
             argv += ["--camera-map", root / "camera-map.txt"]
-        _run([*argv, native_gst], root / "to-simtel.log")
+        common.command([*argv, native_gst], root / "to-simtel.log")
     cfg = stage2.get("cfg", "CTA/CTA-PROD6-LST.cfg")
     defines = stage2.get("defines", ["-DCTA_NORTH", "-DLST1"])
     site = {
@@ -755,11 +662,13 @@ def _camera_stage(root, native_gst, reference_file, stage2):
     cand_out = _simtel(
         root, candidate, "candidate", stage2["bypass"], cfg, defines, **site
     )
-    a, b = camera_events(ref_out), camera_events(cand_out)
+    a, b = camera_totals(ref_out), camera_totals(cand_out)
     if (
         not a
         or not b
-        or any(len(v[0]) == 0 for v in list(a.values()) + list(b.values()))
+        or any(
+            len(v[0]) < MIN_CAMERA_EVENTS for v in list(a.values()) + list(b.values())
+        )
     ):
         return None, {
             "reference_triggered_telescopes": {
@@ -774,7 +683,7 @@ def _camera_stage(root, native_gst, reference_file, stage2):
 
 def _reference_argv(argv, root):
     """LightEmission command with the configuration directory the program needs."""
-    config = os.environ.get("SIMTEL_CONFIG_PATH", "/reference/cfg/common")
+    config = common.reference_config_dir()
     argv = list(argv)
     if argv[0] in ("ff-1m", "ff-gct", "xyzls"):
         argv.insert(1, f"-I{config}")
@@ -790,8 +699,8 @@ def main(case):
     spec = CASES[case]
     root = Path.cwd()
     native_gst, reference_file = root / "native.gst", root / "reference.dat.gz"
-    _run([*spec["native"], "-o", native_gst], root / "native.log")
-    _run(
+    common.command([*spec["native"], "-o", native_gst], root / "native.log")
+    common.command(
         [*_reference_argv(spec["reference"], root), "-o", reference_file],
         root / "reference.log",
     )
@@ -831,8 +740,8 @@ def main(case):
             root / "stage2-native.gst",
             root / "stage2-reference.dat.gz",
         )
-        _run([*stage2["native"], "-o", native2], root / "stage2-native.log")
-        _run(
+        common.command([*stage2["native"], "-o", native2], root / "stage2-native.log")
+        common.command(
             [*_reference_argv(stage2["reference"], root), "-o", reference2],
             root / "stage2-reference.log",
         )
@@ -840,7 +749,7 @@ def main(case):
         if camera is None:
             details["stage2"] = {
                 "status": "BLOCKED",
-                "reason": "no triggered telescope events in sim_telarray for one input",
+                "reason": f"fewer than {MIN_CAMERA_EVENTS} triggered events per telescope in sim_telarray for one input",
                 **reason,
             }
         else:
@@ -868,12 +777,7 @@ def main(case):
                 "stage 1 uses the matched stage 1 counts",
             }
         )
-    (root / "metrics.json").write_text(
-        json.dumps(metrics, indent=2, allow_nan=False) + "\n", encoding="utf-8"
-    )
-    (root / "details.json").write_text(
-        json.dumps(details, indent=2) + "\n", encoding="utf-8"
-    )
+    common.write_results(metrics, details, root)
 
 
 if __name__ == "__main__":

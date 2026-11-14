@@ -1,7 +1,5 @@
 """Check stream-to-sim_telarray conversion with the independent eventio reader."""
 
-import hashlib
-import json
 import os
 import shutil
 import subprocess
@@ -12,6 +10,8 @@ from eventio import EventIOFile
 from eventio.exceptions import WrongType
 from eventio.iact import IACTFile
 from obdeect.stream import Reader, Writer
+
+from obdeect_validation.adapters import common
 
 FIXTURE = Path(__file__).with_name("compare-led-camera.txt")
 HEADER_ORDER = [
@@ -156,14 +156,7 @@ def main():
     ) as exc:  # The reference reader rejects the emitted EventIO block order.
         reference_counts = []
         reader_error = f"{type(exc).__name__}: {exc}"
-    deltas = [
-        abs(source_counts[i] - reference_counts[i])
-        if i < len(source_counts) and i < len(reference_counts)
-        else source_counts[i]
-        if i < len(source_counts)
-        else reference_counts[i]
-        for i in range(max(len(source_counts), len(reference_counts)))
-    ]
+    deltas = common.event_deltas(source_counts, reference_counts)
     metrics = {
         "eventio_readable": int(reader_error is None),
         "source_event_count": len(source_counts),
@@ -177,9 +170,6 @@ def main():
             object_types[: len(HEADER_ORDER)] == HEADER_ORDER
         ),
     }
-    Path("metrics.json").write_text(
-        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
-    )
     provenance = {
         "eventio_reader_error": reader_error,
         "converted_object_types": object_types,
@@ -187,12 +177,10 @@ def main():
         "seed": 17,
         "source_event_photons": source_counts,
         "eventio_event_photons": reference_counts,
-        "camera_sha256": hashlib.sha256(camera.read_bytes()).hexdigest(),
-        "atmosphere_sha256": hashlib.sha256(profile.read_bytes()).hexdigest(),
+        "camera_sha256": common.sha256(camera),
+        "atmosphere_sha256": common.sha256(profile),
     }
-    Path("details.json").write_text(
-        json.dumps(provenance, indent=2) + "\n", encoding="utf-8"
-    )
+    common.write_results(metrics, provenance)
 
 
 if __name__ == "__main__":

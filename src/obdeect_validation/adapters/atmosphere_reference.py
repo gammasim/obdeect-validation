@@ -2,13 +2,44 @@
 
 from __future__ import annotations
 
-import json
 import math
 import os
 import subprocess
 from pathlib import Path
 
 import numpy as np
+
+from obdeect_validation.adapters import common
+
+
+def _plot(samples, path) -> None:
+    """obdeect minus CORSIKA against emission height, one colour per zenith angle."""
+    from obdeect_validation.adapters import plotting
+
+    panels = (
+        ("candidate_cx", "corsika_cx", "direction cosine cx"),
+        ("candidate_dx_m", "corsika_dx_m", "displacement dx [m]"),
+        ("candidate_dt_ns", "corsika_dt_ns", "travel time dt [ns]"),
+    )
+    fig, axes = plotting.figure(1, 3, (13, 3.6))
+    for i, zenith in enumerate(sorted({s["zenith_deg"] for s in samples})):
+        rows = sorted(
+            (s for s in samples if s["zenith_deg"] == zenith),
+            key=lambda s: s["height_m"],
+        )
+        color = plotting.CYCLE[i % len(plotting.CYCLE)]
+        for column, (candidate, reference, label) in enumerate(panels):
+            axes[0, column].plot(
+                [s["height_m"] / 1000 for s in rows],
+                [s[candidate] - s[reference] for s in rows],
+                "o-",
+                color=color,
+                label=f"{zenith:g} deg",
+            )
+            axes[0, column].set(xlabel="emission height [km]", ylabel=label)
+    axes[0, 0].legend(title="zenith")
+    fig.suptitle("obdeect - CORSIKA", fontsize="small")
+    plotting.save(fig, path)
 
 
 def main() -> None:
@@ -90,9 +121,8 @@ def main() -> None:
                 "bent": bool(bent[i]),
             }
         )
-    Path("samples.json").write_text(
-        json.dumps(samples, indent=2) + "\n", encoding="utf-8"
-    )
+    common.write_json("samples.json", samples)
+    _plot(samples, Path("atmosphere-reference.png"))
     dx_error = max(abs(s["candidate_dx_m"] - s["corsika_dx_m"]) for s in samples)
     cx_error = max(abs(s["candidate_cx"] - s["corsika_cx"]) for s in samples)
     dt_error = max(abs(s["candidate_dt_ns"] - s["corsika_dt_ns"]) for s in samples)
@@ -103,9 +133,7 @@ def main() -> None:
         "max_displacement_absolute_error_m": dx_error,
         "max_travel_time_absolute_error_ns": dt_error,
     }
-    Path("metrics.json").write_text(
-        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
-    )
+    common.write_results(metrics)
 
 
 if __name__ == "__main__":
