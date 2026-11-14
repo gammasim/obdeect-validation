@@ -217,37 +217,47 @@ def _summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
 def _plot(
     rows: list[dict[str, Any]], limits: dict[str, float], path: Path, label: str
 ) -> None:
-    import matplotlib
+    """Relative obd/sim difference per metric against off-axis angle.
 
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    Colour is the telescope (same colour in every figure), marker and line the offset
+    direction; the shaded band is the provisional limit.
+    """
+    from obdeect_validation.adapters import plotting
 
-    fig, axes = plt.subplots(len(METRICS), 1, sharex=True, figsize=(6, 8))
-    for axis, metric in zip(axes, METRICS, strict=True):
+    color = plotting.case_color(label)
+    fig, axes = plotting.figure(len(METRICS), 1, (6, 8))
+    for axis, metric in zip(axes[:, 0], METRICS, strict=True):
+        axis.axhspan(
+            -100 * limits[metric],
+            100 * limits[metric],
+            color=plotting.LIMIT,
+            alpha=0.18,
+            label=f"limit ±{100 * limits[metric]:g} %",
+        )
+        axis.axhline(0, color=plotting.ANALYTIC, linewidth=0.6)
         points = [row for row in rows if row[metric] is not None]
-        for direction, marker in (("x", "o"), ("y", "s")):
-            selected = [
-                row
-                for row in points
-                if (abs(row["off_y_deg"]) < 1e-9) == (direction == "x")
-            ]
+        for east_west, marker, style, name in (
+            (True, "o", "-", "E/W"),
+            (False, "s", "--", "N/S"),
+        ):
+            selected = sorted(
+                (row for row in points if (abs(row["off_y_deg"]) < 1e-9) == east_west),
+                key=lambda row: row["angle_deg"],
+            )
             axis.plot(
                 [row["angle_deg"] for row in selected],
                 [100 * row[metric]["delta"] for row in selected],
-                marker,
-                linestyle="none",
-                label=f"{'E/W' if direction == 'x' else 'N/S'}",
+                marker=marker,
+                linestyle=style,
+                color=color,
+                markerfacecolor=color if east_west else "white",
+                label=name,
             )
-        axis.axhline(100 * limits[metric], color="grey", linestyle="--")
-        axis.axhline(-100 * limits[metric], color="grey", linestyle="--")
-        axis.axhline(0, color="black", linewidth=0.5)
         axis.set_ylabel(f"{metric} obd/sim - 1 [%]")
-        axis.legend(fontsize="small")
-    axes[-1].set_xlabel("off-axis angle [deg]")
-    fig.suptitle(f"{label}: dashed lines = provisional limits", fontsize="small")
-    fig.tight_layout()
-    fig.savefig(path, dpi=110)
-    plt.close(fig)
+        axis.legend(ncols=3)
+    axes[-1, 0].set_xlabel("off-axis angle [deg]")
+    fig.suptitle(f"{label}: shaded band = provisional limit", fontsize="small")
+    plotting.save(fig, path)
 
 
 def _versions() -> dict[str, str | None]:

@@ -1,7 +1,6 @@
 """Check stream-to-sim_telarray conversion with the independent eventio reader."""
 
-import hashlib
-import json
+import itertools
 import os
 import shutil
 import subprocess
@@ -12,6 +11,8 @@ from eventio import EventIOFile
 from eventio.exceptions import WrongType
 from eventio.iact import IACTFile
 from obdeect.stream import Reader, Writer
+
+from obdeect_validation.adapters import common
 
 FIXTURE = Path(__file__).with_name("compare-led-camera.txt")
 HEADER_ORDER = [
@@ -49,7 +50,7 @@ def _reorder_input_card(path, output_path):
     if (
         spans[0][1] != 0
         or spans[-1][2] != len(data)
-        or any(a[2] != b[1] for a, b in zip(spans, spans[1:]))
+        or any(a[2] != b[1] for a, b in itertools.pairwise(spans))
     ):
         raise ValueError("top-level EventIO objects do not cover the file contiguously")
     head = [
@@ -184,14 +185,7 @@ def main():
     reordered = root / "reordered.dat"
     _reorder_input_card(converted, reordered)
     reordered_counts = _read_eventio(reordered)
-    deltas = [
-        abs(source_counts[i] - reference_counts[i])
-        if i < len(source_counts) and i < len(reference_counts)
-        else source_counts[i]
-        if i < len(source_counts)
-        else reference_counts[i]
-        for i in range(max(len(source_counts), len(reference_counts)))
-    ]
+    deltas = common.event_deltas(source_counts, reference_counts)
     metrics = {
         "eventio_readable": int(reader_error is None),
         "source_event_count": len(source_counts),
@@ -205,9 +199,6 @@ def main():
         "reordered_photon_count": sum(reordered_counts),
         "reordered_photon_count_delta": abs(sum(source_counts) - sum(reordered_counts)),
     }
-    Path("metrics.json").write_text(
-        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
-    )
     provenance = {
         "eventio_reader_error": reader_error,
         "converted_object_types": object_types,
@@ -216,12 +207,10 @@ def main():
         "seed": 17,
         "source_event_photons": source_counts,
         "eventio_event_photons": reference_counts,
-        "camera_sha256": hashlib.sha256(camera.read_bytes()).hexdigest(),
-        "atmosphere_sha256": hashlib.sha256(profile.read_bytes()).hexdigest(),
+        "camera_sha256": common.sha256(camera),
+        "atmosphere_sha256": common.sha256(profile),
     }
-    Path("details.json").write_text(
-        json.dumps(provenance, indent=2) + "\n", encoding="utf-8"
-    )
+    common.write_results(metrics, provenance)
 
 
 if __name__ == "__main__":

@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-import json
 import math
 import os
 from pathlib import Path
 
 import numpy as np
 
+from obdeect_validation.adapters import common
 
-def _table_reference(path: Path):
+
+def table_reference(path: Path):
     """Read the documented sim_telarray table and interpolate optical depth independently."""
     lines = path.read_text(encoding="utf-8").splitlines()
     header = next(line for line in lines if "H2=" in line and "H1=" in line)
@@ -64,7 +65,7 @@ def main() -> None:
     normalized_path = Path("simtel_atm_transmission_0_999nm.dat")
     normalized_path.write_text("\n".join(normalized_lines) + "\n", encoding="utf-8")
     table = TransmissionTable(str(normalized_path), 2158.0)
-    site_m, depth = _table_reference(normalized_path)
+    site_m, depth = table_reference(normalized_path)
     wavelengths = [300, 350, 400, 450, 500, 550, 600, 700, 850]
     heights = [3000.0, 4000.0, 6000.0, 12000.0, 20000.0]
     zeniths = [0.0, 20.0, 40.0, 60.0]
@@ -108,7 +109,7 @@ def main() -> None:
         )
     expected = np.repeat(np.asarray(expected_by_group), repetitions)
 
-    common = dict(
+    options = dict(
         table=table,
         envelope_wavelength=[200.0, 999.0],
         envelope_value=[1.0, 1.0],
@@ -136,14 +137,14 @@ def main() -> None:
                 weighted=True,
                 telescope_altitude_m=elevation,
                 pathlen_m=path,
-                **common,
+                **options,
             )
             thinned = apply_extinction(
                 subset,
                 weighted=False,
                 telescope_altitude_m=elevation,
                 pathlen_m=path,
-                **common,
+                **options,
             )
             actual_p.append(weighted["p"].astype(np.float64))
             actual_w.append(weighted["w"].astype(np.float64))
@@ -187,33 +188,50 @@ def main() -> None:
         "telescope_depth_max_absolute_error": telescope_error,
         "thinning_count_residual_sigma": thinning_sigma,
     }
-    Path("extinction-samples.json").write_text(
-        json.dumps(
-            {
-                "source_table": str(table_path),
-                "table_used": str(normalized_path),
-                "ignored_rows_above_999_nm": ignored_rows,
-                "site_altitude_m": site_m,
-                "cases": [
-                    dict(
-                        wavelength_nm=w,
-                        emission_height_m=h,
-                        zenith_deg=z,
-                        telescope_altitude_m=e,
-                        telescope_path_m=p,
-                        transmission=expected_by_group[i],
-                    )
-                    for i, (w, h, z, e, p) in enumerate(cases)
-                ],
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
+    common.write_json(
+        "extinction-samples.json",
+        {
+            "source_table": str(table_path),
+            "table_used": str(normalized_path),
+            "ignored_rows_above_999_nm": ignored_rows,
+            "site_altitude_m": site_m,
+            "cases": [
+                {
+                    "wavelength_nm": w,
+                    "emission_height_m": h,
+                    "zenith_deg": z,
+                    "telescope_altitude_m": e,
+                    "telescope_path_m": p,
+                    "transmission": expected_by_group[i],
+                }
+                for i, (w, h, z, e, p) in enumerate(cases)
+            ],
+        },
     )
-    Path("metrics.json").write_text(
-        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
+    _plot(
+        expected,
+        candidate_p,
+        [c[0] for c in cases],
+        repetitions,
+        Path("extinction-weighted.png"),
     )
+    common.write_results(metrics)
+
+
+def _plot(expected, weighted, wavelengths, repetitions, path):
+    """obdeect weighted transmission against the table expectation, coloured by wavelength."""
+    from obdeect_validation.adapters import plotting
+
+    # Rows follow the (elevation, path) grouping, so wavelengths repeat per group.
+    colors = np.resize(np.repeat(wavelengths, repetitions), expected.size).astype(float)
+    fig, axes = plotting.figure(1, 2, (10, 3.8))
+    points = axes[0, 0].scatter(expected, weighted, c=colors, s=6, cmap="viridis")
+    axes[0, 0].plot([0, 1], [0, 1], color=plotting.ANALYTIC, linewidth=1)
+    axes[0, 0].set(xlabel="table expectation", ylabel="obdeect weighted p")
+    fig.colorbar(points, ax=axes[0, 0], label="wavelength [nm]")
+    axes[0, 1].hist(weighted - expected, bins=50, color=plotting.NATIVE, alpha=0.85)
+    axes[0, 1].set(xlabel="obdeect - expectation", ylabel="photons")
+    plotting.save(fig, path)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,6 @@ event and telescope (canonical digest of photons sorted by all columns, bit-exac
 
 import argparse
 import hashlib
-import json
 import subprocess
 from pathlib import Path
 
@@ -16,6 +15,7 @@ import numpy as np
 from obdeect.stream import Reader
 
 from obdeect_validation.adapters import chain_showers as chain
+from obdeect_validation.adapters import common
 
 
 def run_stdin(argv, stdin_path, stdout_path, log):
@@ -123,8 +123,7 @@ def variants(root, source, native):
         "codec_bounds_exceeded"
     ]
     metrics["variant_to_simtel_stdin_bytes_differ"] = int(
-        hashlib.sha256(to_simtel_file.read_bytes()).digest()
-        != hashlib.sha256(to_simtel_stdin.read_bytes()).digest()
+        common.sha256(to_simtel_file) != common.sha256(to_simtel_stdin)
     )
     return metrics
 
@@ -135,49 +134,22 @@ def main():
     args = parser.parse_args()
     root = Path.cwd().resolve()
     source = args.input.resolve()
-    native = root / "showers.gst"
-    roundtrip = root / "roundtrip.iact"
-    chain.command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / "from-corsika.log",
-        stdout_file=native,
-    )
-    chain.command(
-        ["obdeect", "stream", "to-simtel", native, "-o", roundtrip],
-        root / "to-simtel.log",
-    )
-    metrics, fields = chain.compare_photons(source, roundtrip)
-    direct = chain.simulate(root, source, "direct")
-    converted = chain.simulate(root, roundtrip, "roundtrip")
-    a, b = chain.camera_events(direct), chain.camera_events(converted)
-    metrics.update(
-        {
-            "reference_camera_events": len(a),
-            "candidate_camera_events": len(b),
-            "camera_event_id_delta": len(set(a) ^ set(b)),
-        }
-    )
-    metrics.update(chain.compare_camera(a, b, root))
+    native, metrics, fields, a, b = chain.roundtrip(root, source)
     metrics.update(variants(root, source, native))
-    (root / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
-    (root / "details.json").write_text(
-        json.dumps(
-            {
-                "codec_per_field_normalized_error": fields,
-                "reference_event_ids": list(a),
-                "candidate_event_ids": list(b),
-                "chunk_size_options": [],
-                "variant_commands": [
-                    "stream cat FILE",
-                    "stream cat -",
-                    "stream tee FILE",
-                    "stream from-corsika -",
-                    "stream to-simtel -o FILE -",
-                ],
-            },
-            indent=2,
-        )
-        + "\n"
+    common.write_results(
+        metrics,
+        {
+            "codec_per_field_normalized_error": fields,
+            "reference_event_ids": list(a),
+            "candidate_event_ids": list(b),
+            "variant_commands": [
+                "stream cat FILE",
+                "stream cat -",
+                "stream tee FILE",
+                "stream from-corsika -",
+                "stream to-simtel -o FILE -",
+            ],
+        },
     )
 
 

@@ -1,9 +1,7 @@
 """Compare the native LED stream writer with sim_telarray pixled."""
 
-import hashlib
-import json
-from importlib.metadata import version
 import os
+from importlib.metadata import version
 import shutil
 import subprocess
 from pathlib import Path
@@ -11,6 +9,8 @@ from pathlib import Path
 import numpy as np
 from eventio.iact import IACTFile
 from obdeect.stream import Reader
+
+from obdeect_validation.adapters import common
 
 FIXTURE = Path(__file__).with_name("compare-led-camera.txt")
 
@@ -66,10 +66,6 @@ def read_reference(path):
     return event_counts, total_weight, x_weight / total_weight, y_weight / total_weight
 
 
-def _sha256(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def main():
     obdeect = shutil.which("obdeect")
     sim_telarray = os.environ.get("SIMTOOLS_SIM_TELARRAY_PATH")
@@ -93,7 +89,7 @@ def main():
     reference_output = Path.cwd() / "reference.dat.gz"
     shutil.copyfile(FIXTURE, camera)
     seed = 17
-    common = ["--use", "0 1 2", "--require", "2", "--photons", "10"]
+    shared = ["--use", "0 1 2", "--require", "2", "--photons", "10"]
     subprocess.run(
         [
             obdeect,
@@ -101,7 +97,7 @@ def main():
             "led",
             "--camera-file",
             str(camera),
-            *common,
+            *shared,
             "--seed",
             str(seed),
             "-o",
@@ -115,7 +111,7 @@ def main():
             "-I" + config,
             "-c",
             str(camera),
-            *common,
+            *shared,
             "-o",
             str(reference_output),
         ],
@@ -129,14 +125,7 @@ def main():
     process.check_returncode()
     native_metrics = read_stream(native_output)
     reference_metrics = read_reference(reference_output)
-    event_deltas = [
-        abs(native_metrics[0][i] - reference_metrics[0][i])
-        if i < len(native_metrics[0]) and i < len(reference_metrics[0])
-        else native_metrics[0][i]
-        if i < len(native_metrics[0])
-        else reference_metrics[0][i]
-        for i in range(max(len(native_metrics[0]), len(reference_metrics[0])))
-    ]
+    event_deltas = common.event_deltas(native_metrics[0], reference_metrics[0])
     metrics = {
         "native_event_count": len(native_metrics[0]),
         "reference_event_count": len(reference_metrics[0]),
@@ -152,23 +141,18 @@ def main():
             )
         ),
     }
-    Path("metrics.json").write_text(
-        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
-    )
     profile = Path(config) / "atm_profile_model_1.dat"
     provenance = {
         "seed": seed,
         "events_native_photons": native_metrics[0],
         "events_reference_photons": reference_metrics[0],
-        "camera_sha256": _sha256(camera),
-        "atmosphere_sha256": _sha256(profile),
-        "pixled_sha256": _sha256(Path(pixled)),
+        "camera_sha256": common.sha256(camera),
+        "atmosphere_sha256": common.sha256(profile),
+        "pixled_sha256": common.sha256(Path(pixled)),
         "obdeect_sources_version": version("obdeect-sources"),
         "obdeect_stream_version": version("obdeect-stream"),
     }
-    Path("details.json").write_text(
-        json.dumps(provenance, indent=2) + "\n", encoding="utf-8"
-    )
+    common.write_results(metrics, provenance)
 
 
 if __name__ == "__main__":
