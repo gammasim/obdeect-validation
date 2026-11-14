@@ -1,7 +1,6 @@
 """Per-stage throughput of the obdeect chain on the fixed CORSIKA IACT input (report only)."""
 
 import argparse
-import json
 import os
 import platform
 import re
@@ -14,12 +13,11 @@ from pathlib import Path
 import numpy as np
 from eventio.iact import IACTFile
 
-from obdeect_validation.adapters import chain_showers
+from obdeect_validation.adapters import chain_showers, common
 
 REPS = 3
-INPUT = Path("/validation/inputs/gamma-20deg-100-3000GeV.iact")
-TRANSMISSION = Path("/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat")
-MODELS = Path("/models/simulation-models")
+INPUT = common.SHOWERS
+TRANSMISSION = common.TRANSMISSION_TABLE
 RUSAGE = []
 
 
@@ -157,6 +155,44 @@ def measure(
     return True
 
 
+def _plot(path, stages, metrics):
+    """Throughput per stage (one colour per stage), with the per-stage CPU and wall-time medians."""
+    from obdeect_validation.adapters import plotting
+
+    fig, axes = plotting.figure(1, 2, (11, 3.8))
+    colors = [plotting.CYCLE[i % len(plotting.CYCLE)] for i in range(len(stages))]
+    values = [metrics[f"{name}_photons_per_s"] for name in stages]
+    bars = axes[0, 0].barh(stages, values, color=colors, height=0.6)
+    axes[0, 0].set_xscale("log")
+    axes[0, 0].set_xlabel("photons per second (log scale, median of repetitions)")
+    axes[0, 0].invert_yaxis()
+    axes[0, 0].grid(axis="y", visible=False)
+    for bar, value in zip(bars, values, strict=True):
+        axes[0, 0].text(
+            value * 1.05,
+            bar.get_y() + bar.get_height() / 2,
+            f"{value:.3g}",
+            va="center",
+            fontsize=9,
+        )
+    axes[0, 0].set_xlim(right=max(values) * 10)
+    wall = [metrics[f"{name}_wall_s_median"] for name in stages]
+    cpu = [metrics[f"{name}_cpu_s_median"] for name in stages]
+    rows = range(len(stages))
+    axes[0, 1].barh(
+        [r - 0.2 for r in rows], wall, height=0.4, color=colors, label="wall"
+    )
+    axes[0, 1].barh(
+        [r + 0.2 for r in rows], cpu, height=0.4, color=colors, alpha=0.45, label="CPU"
+    )
+    axes[0, 1].set_yticks(list(rows), stages)
+    axes[0, 1].invert_yaxis()
+    axes[0, 1].set_xlabel("seconds (median)")
+    axes[0, 1].grid(axis="y", visible=False)
+    axes[0, 1].legend()
+    plotting.save(fig, path)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=INPUT)
@@ -166,9 +202,6 @@ def main():
     work = root / "work"
     work.mkdir(exist_ok=True)
     source = args.input.resolve()
-    chain_showers.command = (
-        run_timed  # sim_telarray reference runs through the same timed runner
-    )
     table = work / "transmission-below-1000nm.dat"
     restrict_table(TRANSMISSION, table)
     metrics = {}
@@ -291,7 +324,7 @@ def main():
                     "ray-tracing",
                     "compile",
                     "--simulation-models",
-                    str(MODELS),
+                    str(common.models_root()),
                     "--model",
                     "LSTN-design",
                     "--version",
@@ -346,7 +379,7 @@ def main():
 
     done["simtel_direct"] = measure(
         "simtel_direct",
-        lambda: chain_showers.simulate(work, source, "direct"),
+        lambda: chain_showers.simulate(work, source, "direct", runner=run_timed),
         iact_in,
         source,
         work / "direct.simtel",
@@ -362,33 +395,9 @@ def main():
     details["stage_order"] = list(done)
 
     if completed:
-        import matplotlib
+        _plot(root / "photons-per-second.png", completed, metrics)
 
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
-
-        values = [metrics[f"{name}_photons_per_s"] for name in completed]
-        fig, axis = plt.subplots(figsize=(7, 3.6))
-        bars = axis.barh(completed, values, color="#2f6f9f", height=0.6)
-        axis.set_xscale("log")
-        axis.set_xlabel("photons per second (log scale, median of repetitions)")
-        axis.invert_yaxis()
-        for bar, value in zip(bars, values):
-            axis.text(
-                value * 1.05,
-                bar.get_y() + bar.get_height() / 2,
-                f"{value:.3g}",
-                va="center",
-                fontsize=9,
-            )
-        axis.set_xlim(right=max(values) * 10)
-        axis.spines[["top", "right"]].set_visible(False)
-        fig.tight_layout()
-        fig.savefig(root / "photons-per-second.png", dpi=150)
-        plt.close(fig)
-
-    (root / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
-    (root / "details.json").write_text(json.dumps(details, indent=2) + "\n")
+    common.write_results(metrics, details, root)
 
     for path in (
         work / "showers.gst",

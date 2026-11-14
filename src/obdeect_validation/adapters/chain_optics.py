@@ -6,7 +6,6 @@ Both runs use a unit atmosphere (optical depth 0). Factors and where they are ap
 """
 
 import argparse
-import json
 import re
 import shutil
 from pathlib import Path
@@ -15,17 +14,13 @@ import numpy as np
 from eventio.iact import IACTFile
 
 from obdeect_validation.adapters import chain_showers as cs
+from obdeect_validation.adapters import common
 
-SHOWERS = "/validation/inputs/gamma-20deg-100-3000GeV.iact"
-UNIT_ATMOSPHERE = "/validation/fixtures/unit-transmission.dat"
-MODELS = "/models"
+UNIT_ATMOSPHERE = common.VALIDATION / "fixtures/unit-transmission.dat"
 MODEL, VERSION = "LSTN-01", "7.0.0"
-SEED = 20261113
+SEED = common.SIMTEL_SEED
 TELESCOPES = (1,)
 ZENITH_DEG, AZIMUTH_DEG = 20, 180
-PHYSICS_BIAS_LIMIT = (
-    0.01  # mean p.e. per telescope-event within 1 % (plan step 5 target)
-)
 
 
 def cfg_value(text, key, default=None):
@@ -133,19 +128,6 @@ def centroid_offsets(reference, candidate):
     }
 
 
-def write_stub_plot(path, text):
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    fig, axis = plt.subplots(figsize=(8, 3))
-    axis.axis("off")
-    axis.text(0.02, 0.5, text, va="center", wrap=True)
-    fig.savefig(path, dpi=120)
-    plt.close(fig)
-
-
 def camera_map(root, rotation):
     camera = root / "camera-map.txt"
     camera.write_text(
@@ -159,18 +141,18 @@ def candidate_stream(root, source, rotation):
     """showers.iact -> candidate.iact (camera frame, sim_telarray Bypass_Optics=1 input). No atmosphere."""
     native, traced = root / "showers.gst", root / "traced.gst"
     model, iact = root / "lst.model", root / "candidate.iact"
-    cs.command(
+    common.command(
         ["obdeect", "stream", "from-corsika", source],
         root / "from-corsika.log",
         stdout_file=native,
     )
-    cs.command(
+    common.command(
         [
             "obdeect",
             "ray-tracing",
             "compile",
             "--simulation-models",
-            MODELS,
+            common.models_root(),
             "--model",
             MODEL,
             "--version",
@@ -182,7 +164,7 @@ def candidate_stream(root, source, rotation):
         ],
         root / "compile.log",
     )
-    cs.command(
+    common.command(
         [
             "obdeect",
             "ray-tracing",
@@ -208,7 +190,7 @@ def candidate_stream(root, source, rotation):
         ],
         root / "trace.log",
     )
-    cs.command(
+    common.command(
         [
             "obdeect",
             "stream",
@@ -226,7 +208,7 @@ def candidate_stream(root, source, rotation):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, default=Path(SHOWERS))
+    parser.add_argument("--input", type=Path, default=common.SHOWERS)
     parser.add_argument(
         "--config",
         type=Path,
@@ -260,7 +242,7 @@ def main():
         "factors": factors,
         "config": str(config),
         "physics_limits": {
-            "photoelectron_relative_bias": PHYSICS_BIAS_LIMIT,
+            "photoelectron_relative_bias": f"max({cs.PE_BIAS_FLOOR}, {cs.SIGMA:g} se)",
             "trigger_probability": "paired |mean| > 5 se per telescope",
         },
     }
@@ -274,11 +256,12 @@ def main():
         metrics["candidate_pipeline_complete"] = 1
     except RuntimeError as error:
         details["candidate_blocked"] = str(error)
-        write_stub_plot(
+        from obdeect_validation.adapters import plotting
+
+        plotting.message(
             root / "camera-comparison.png", "candidate pipeline blocked:\n" + str(error)
         )
-        (root / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
-        (root / "details.json").write_text(json.dumps(details, indent=2) + "\n")
+        common.write_results(metrics, details, root)
         return
     output = cs.simulate(
         root, iact, "bypass1", bypass=1, config=str(config), extra=extra
@@ -293,18 +276,13 @@ def main():
     )
     comparison = cs.compare_camera(a, b, root)
     metrics.update(comparison)
-    metrics["photoelectron_bias_limit_exceeded"] = int(
-        abs(comparison["photoelectron_relative_bias"])
-        > max(PHYSICS_BIAS_LIMIT, 5 * comparison["photoelectron_relative_bias_se"])
-    )  # same limit as compare_camera
     triggers = trigger_difference(a, b, shower_ids)
     details["trigger_probability_per_telescope"] = triggers
     metrics["trigger_probability_limit_exceeded"] = int(
         any(row["flag"] for row in triggers.values())
     )
     metrics.update(centroid_offsets(a, b))
-    (root / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
-    (root / "details.json").write_text(json.dumps(details, indent=2) + "\n")
+    common.write_results(metrics, details, root)
 
 
 if __name__ == "__main__":

@@ -1,53 +1,28 @@
 """Compare obdeect light sources with sim_telarray LightEmission and analytic models.
 
 Each invocation writes metrics.json, details.json and one PNG plot into the current
-case directory. Cases: laser-beam, night-sky, muon-track (own functions) and the
-legacy flasher-dish, flasher-secondary, point-source, beam-scan (generic path).
+case directory. Cases: muon-track (fake-muon), night-sky (nsbls), laser-beam (ls-beam).
+The flasher, point-source and beam-scan cases are in source_camera.
 """
 
 from __future__ import annotations
 
-import json
 import math
-import os
 import re
-import shutil
 import sys
 from pathlib import Path
 
 import numpy as np
-from eventio.iact import IACTFile
-from obdeect.stream import Reader
 
-from obdeect_validation.adapters.chain_showers import camera_events, command, simulate
+from obdeect_validation.adapters import common, readers
+from obdeect_validation.adapters.chain_showers import camera_events, simulate
+from obdeect_validation.adapters.common import REFERENCE, run_tool, tool
 
-C_CM_NS = 29.9792458
 C_M_NS = 0.299792458
 ALPHA = 0.0072973526
 KS_ALPHA = 1e-3
 RATIO_FLOOR = 0.01
-REFERENCE = Path(os.environ.get("SIMTEL_REFERENCE_SOURCE", "/reference"))
 FWHM_TO_SIGMA = 2.35482004503095
-
-# Legacy generic cases: (reference executable, native sources arguments, reference arguments).
-LEGACY = {
-    "flasher-dish": (
-        "ff-1m",
-        ["--type", "dish"],
-        ["--events", "30", "--photons", "100000"],
-    ),
-    "flasher-secondary": (
-        "ff-gct",
-        ["--type", "secondary"],
-        ["--events", "30", "--photons", "100000"],
-    ),
-    "point-source": (
-        "xyzls",
-        ["-N", "30", "-n", "100000", "-z", "100000", "-a", "isotropic", "--seed", "17"],
-        ["-N", "30", "-n", "100000", "-z", "100000", "-a", "isotropic"],
-    ),
-    "beam-scan": ("xyls", [], []),
-}
 
 # Physical configuration shared by obdeect and sim_telarray (see details.json for the mapping).
 MUON = {
@@ -66,6 +41,7 @@ NIGHT = {
     "altitude_m": 2150.0,
     "viewcone_deg": 10.0,
     "spectrum_nm": 400.0,
+    "band_nm": (300.0, 650.0),
     "rate_per_sr_ns_cm2": 0.24,
     "pulse_fwhm_ns": FWHM_TO_SIGMA,
     "events": 4,
@@ -85,6 +61,7 @@ LASER = {
     "step_m": 0.1,
     "brightness_per_m": 1000.0,
     "seed": 17,
+    "altitude_m": 2150.0,
 }
 
 
@@ -168,56 +145,15 @@ def impact_parameter(q, d):
 # ---------------------------------------------------------------- data readers
 
 
-def _concatenate(chunks):
-    return {k: np.concatenate(v) if v else np.empty(0) for k, v in chunks.items()}
-
-
 def read_native(path):
     """obdeect photon stream: positions m, times ns, wavelengths nm, weights (missing columns empty)."""
-    keys = ("x", "y", "z", "cx", "cy", "cz", "t", "zem", "w", "wavelength")
-    chunks = {k: [] for k in keys}
-    for record in Reader(str(path)):
-        if record["type"] == "photons":
-            for key in keys:
-                if key in record["columns"]:
-                    chunks[key].append(
-                        np.asarray(record["columns"][key], dtype=np.float64)
-                    )
-    return _concatenate(chunks)
+    # Only the columns are used here, not the per-event weights.
+    return readers.read_native(path, require_events=False)[1]
 
 
 def read_reference(path):
     """EventIO IACT photon bunches: positions cm -> m, zem absolute m, time includes the event offset."""
-    keys = ("x", "y", "zem", "cx", "cy", "t", "wavelength", "w")
-    chunks = {k: [] for k in keys}
-    scale = {"x": 0.01, "y": 0.01, "zem": 0.01}
-    with IACTFile(str(path)) as stream:
-        for event in stream:
-            for bunches in event.photon_bunches.values():
-                names = bunches.dtype.names or ()
-                for key, field in (
-                    ("x", "x"),
-                    ("y", "y"),
-                    ("zem", "zem"),
-                    ("cx", "cx"),
-                    ("cy", "cy"),
-                    ("t", "time"),
-                    ("wavelength", "wavelength"),
-                    ("w", "photons"),
-                ):
-                    if field in names:
-                        values = np.asarray(
-                            bunches[field], dtype=np.float64
-                        ) * scale.get(key, 1.0)
-                        if key == "t":
-                            values = values + float(event.time_offset)
-                        chunks[key].append(values)
-    data = _concatenate(chunks)
-    if data["cx"].size:
-        data["cz"] = -np.sqrt(
-            np.clip(1.0 - data["cx"] ** 2 - data["cy"] ** 2, 0.0, None)
-        )
-    return data
+    return readers.read_iact(path)[1]
 
 
 def positions_n(data):
@@ -226,19 +162,6 @@ def positions_n(data):
 
 def unit_vectors(data):
     return np.stack([data["cx"], data["cy"], data["cz"]], axis=1)
-
-
-def run_tool(argv, log):
-    """Run an executable in the current directory; stdout and stderr go to log."""
-    command(argv, log)
-    return Path(log).read_text(encoding="utf-8", errors="replace")
-
-
-def tool(name):
-    path = shutil.which(name)
-    if path is None:
-        raise RuntimeError(f"{name} not found on PATH")
-    return path
 
 
 def fake_muon_argv(output, events):
@@ -388,40 +311,81 @@ def ks_flags(metrics, name, statistic, critical):
     metrics[f"{name}_ks_limit_exceeded"] = int(statistic > critical)
 
 
-def write_outputs(metrics, details, plot, plot_path):
+def write_outputs(metrics, details, plot, plot_path, rows=2, columns=2):
+    """metrics.json, details.json and the figure; plot(axes) draws on rows x columns axes."""
+    from obdeect_validation.adapters import plotting
+
     metrics = {
         k: (int(v) if isinstance(v, (bool, np.bool_)) else v)
         for k, v in metrics.items()
     }
-    Path("metrics.json").write_text(
-        json.dumps(metrics, indent=2, allow_nan=False) + "\n", encoding="utf-8"
-    )
-    Path("details.json").write_text(
-        json.dumps(details, indent=2, allow_nan=False) + "\n", encoding="utf-8"
-    )
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    fig, axes = plt.subplots(2, 2, figsize=(10, 7))
+    common.write_results(metrics, details)
+    fig, axes = plotting.figure(rows, columns, (5 * columns, 3.6 * rows))
     plot(axes)
-    fig.tight_layout()
-    fig.savefig(plot_path, dpi=120)
-    plt.close(fig)
+    plotting.save(fig, plot_path)
+
+
+def time_difference(native_times, reference_times):
+    """Mean native - reference time and its standard error [ns]."""
+    mean = float(np.mean(native_times) - np.mean(reference_times))
+    se = math.sqrt(
+        np.var(native_times) / len(native_times)
+        + np.var(reference_times) / len(reference_times)
+    )
+    return mean, se
+
+
+def centre_plane_time(native):
+    """Arrival time at the plane through the sphere centre: t + (-P.d) / c."""
+    along = np.sum(positions_n(native) * unit_vectors(native), axis=1)
+    return native["t"] - along / C_M_NS
+
+
+def propagate_to_simtel(work, native_file, altitude_m, wavelength_nm, seed):
+    """obdeect propagation without extinction, then stream to-simtel; returns the sim_telarray input."""
+    cfg_dir = REFERENCE / "cfg/common"
+    propagated, camera_input = work / "native_prop.gst", work / "native.iact"
+    run_tool(
+        [
+            tool("obdeect"),
+            "propagation",
+            "run",
+            "--no-extinction",
+            "--site-altitude",
+            str(altitude_m),
+            "--wavelength-range",
+            *map(str, wavelength_nm),
+            "--seed",
+            str(seed),
+            "-i",
+            str(native_file),
+            "-o",
+            str(propagated),
+        ],
+        work / "propagate.log",
+    )
+    run_tool(
+        [
+            tool("obdeect"),
+            "stream",
+            "to-simtel",
+            "--atmprof",
+            str(cfg_dir / "atmprof1.dat"),
+            "-o",
+            str(camera_input),
+            str(propagated),
+        ],
+        work / "to-simtel.log",
+    )
+    return camera_input
 
 
 # ---------------------------------------------------------------- muon-track
 
 
 def muon_track(work):
-    cfg_dir = REFERENCE / "cfg/common"
     table = index_table(work)
-    native_file, prop_file, camera_native = (
-        work / "native_sources.gst",
-        work / "native_prop.gst",
-        work / "native.iact",
-    )
+    native_file = work / "native_sources.gst"
     run_tool(
         [
             tool("obdeect"),
@@ -456,38 +420,8 @@ def muon_track(work):
         ],
         work / "native-sources.log",
     )
-    run_tool(
-        [
-            tool("obdeect"),
-            "propagation",
-            "run",
-            "--no-extinction",
-            "--site-altitude",
-            str(MUON["altitude_m"]),
-            "--wavelength-range",
-            str(MUON["wavelength_nm"][0]),
-            str(MUON["wavelength_nm"][1]),
-            "--seed",
-            str(MUON["seed"]),
-            "-i",
-            str(native_file),
-            "-o",
-            str(prop_file),
-        ],
-        work / "propagate.log",
-    )
-    run_tool(
-        [
-            tool("obdeect"),
-            "stream",
-            "to-simtel",
-            "--atmprof",
-            str(cfg_dir / "atmprof1.dat"),
-            "-o",
-            str(camera_native),
-            str(prop_file),
-        ],
-        work / "to-simtel.log",
+    camera_native = propagate_to_simtel(
+        work, native_file, MUON["altitude_m"], MUON["wavelength_nm"], MUON["seed"]
     )
     reference_file = work / "reference.iact.gz"
     run_tool(
@@ -596,9 +530,7 @@ def muon_track(work):
 
     # Positions: IACT x, y are the crossing of each photon with the observation plane z = 0 (checked here:
     # the crossing of the native rays reproduces the reference x, y radii). Native rays start at the emission point.
-    crossing = observation_crossing(
-        np.stack([native["x"], native["y"], native["z"]], 1), dirs_n
-    )
+    crossing = observation_crossing(positions_n(native), dirs_n)
     radial_n = np.hypot(crossing[:, 0], crossing[:, 1])
     radial_r = np.hypot(reference["x"], reference["y"])
     ks_flags(
@@ -609,19 +541,8 @@ def muon_track(work):
     )
 
     # Time: wavefront arrival at the plane through the sphere centre (closest approach) vs reference time.
-    t_centre = (
-        native["t"]
-        + (
-            -np.sum(
-                np.stack([native["x"], native["y"], native["z"]], 1) * dirs_n, axis=1
-            )
-        )
-        / C_M_NS
-    )
-    mean_diff = float(np.mean(t_centre) - np.mean(reference["t"]))
-    se_diff = math.sqrt(
-        np.var(t_centre) / t_centre.size + np.var(reference["t"]) / reference["t"].size
-    )
+    t_centre = centre_plane_time(native)
+    mean_diff, se_diff = time_difference(t_centre, reference["t"])
     metrics["time_centre_native_mean_ns"] = float(np.mean(t_centre))
     metrics["time_centre_native_sd_ns"] = float(np.std(t_centre))
     metrics["time_reference_mean_ns"] = float(np.mean(reference["t"]))
@@ -634,7 +555,7 @@ def muon_track(work):
         ks_critical(t_centre.size, reference["t"].size),
     )
     # Diagnostic only: arrival at the observation-plane crossing (the x, y convention above).
-    t_obs = native["t"] + (-positions_n(native)[:, 2] / dirs_n[:, 2]) / C_M_NS
+    t_obs = native["t"] + (-native["z"] / dirs_n[:, 2]) / C_M_NS
     metrics["time_obs_plane_mean_difference_ns"] = float(
         np.mean(t_obs) - np.mean(reference["t"])
     )
@@ -658,7 +579,7 @@ def muon_track(work):
                 "obdeect gets the same n(h) through --index-profile (index.txt from fake-muon printout)",
                 "spectrum": "Cherenkov 1/lambda^2, 300-600 nm in both",
                 "photons": "fake-muon -b 1 (single photons); obdeect muon-track emits single photons",
-                "positions": "IACT x, y are the observation-plane crossing (z=0) of each ray; native rays crossed at z=0 (KS 0.0006 with the reference radii)",
+                "positions": "IACT x, y are the observation-plane crossing (z=0) of each ray; native rays crossed at z=0 (compared in obs_plane_xy_radius_native_vs_reference)",
                 "time_origin": "native t: emission time, t=0 at observation-level arrival; reference: IACT time + event time_offset",
                 "time_convention": "main check: plane through the sphere centre, t + (-P.d)/c; diagnostic: observation-plane arrival t - P_z/(c d_z)",
                 "sim_telarray": "propagate --no-extinction then obdeect stream to-simtel; both with the same chain settings, telescope_theta=0, trigger_telescopes=1",
@@ -673,8 +594,8 @@ def muon_track(work):
             "limit_setting": "Set before the first run: yield, Cherenkov angle, wavelength, azimuth, camera ratio. "
             "Set after exploratory runs: the cz check (KS replaced by a mean check, cz is float32 at "
             "6e-8 resolution against a 2e-5 spread), the position convention (observation plane) and the "
-            "time convention (centre plane). The time flags are a FAIL: neither convention reproduces the "
-            "reference spread (0.30 ns vs 0.15 ns native).",
+            "time convention (centre plane). The time flags report whether either convention reproduces the "
+            "reference time spread (see time_*_sd_ns).",
             "analytic": "numerical integral of dN/ds x (fraction of Cherenkov azimuths hitting the sphere) over the track",
             "reproducibility": "fake-muon has no seed option: the reference sample changes between runs at the 1e-4 level in yield; the native run is seeded (17)",
             "index_table": table.tolist(),
@@ -684,41 +605,43 @@ def muon_track(work):
     )
 
     def plot(axes):
-        axes[0, 0].hist(
-            native["wavelength"],
-            bins=60,
-            histtype="step",
-            label="obdeect",
-            density=True,
+        from obdeect_validation.adapters import plotting as pl
+
+        span = np.linspace(wl1, wl2, 200)
+        axes[0, 0].plot(
+            span,
+            1.0 / span**2 / (1.0 / wl1 - 1.0 / wl2),
+            color=pl.ANALYTIC,
+            linestyle="--",
+            label="1/lambda^2",
         )
-        axes[0, 0].hist(
-            reference["wavelength"],
-            bins=60,
-            histtype="step",
-            label="fake-muon",
-            density=True,
-        )
-        axes[0, 0].set(xlabel="wavelength [nm]", ylabel="density")
-        axes[0, 0].legend()
-        axes[0, 1].hist(res_native, bins=60, histtype="step", label="obdeect")
-        axes[0, 1].hist(res_reference, bins=60, histtype="step", label="fake-muon")
-        axes[0, 1].set(xlabel="cos(angle to track) - 1/(n beta)")
-        axes[0, 1].legend()
-        axes[1, 0].hist(
-            t_centre, bins=80, histtype="step", label="obdeect, centre plane"
-        )
-        axes[1, 0].hist(reference["t"], bins=80, histtype="step", label="fake-muon")
-        axes[1, 0].set(xlabel="time [ns]")
-        axes[1, 0].legend()
-        axes[1, 1].bar(
-            ["obdeect", "fake-muon"],
-            [camera_native_pe.mean(), camera_reference_pe.mean()],
-            yerr=[
-                camera_native_pe.std(ddof=1) / math.sqrt(camera_native_pe.size),
-                camera_reference_pe.std(ddof=1) / math.sqrt(camera_reference_pe.size),
+        pl.histograms(
+            axes[0, 0],
+            [
+                ("obdeect", native["wavelength"], pl.NATIVE),
+                ("fake-muon", reference["wavelength"], pl.REFERENCE),
             ],
+            "wavelength [nm]",
+            clip=None,
         )
-        axes[1, 1].set(ylabel="mean p.e. per triggered event")
+        pl.histograms(
+            axes[0, 1],
+            [
+                ("obdeect", res_native, pl.NATIVE),
+                ("fake-muon", res_reference, pl.REFERENCE),
+            ],
+            "cos(angle to track) - 1/(n beta)",
+        )
+        pl.histograms(
+            axes[1, 0],
+            [
+                ("obdeect, centre plane", t_centre, pl.NATIVE),
+                ("fake-muon", reference["t"], pl.REFERENCE),
+            ],
+            "time [ns]",
+            bins=80,
+        )
+        pl.camera_bars(axes[1, 1], camera_native_pe, camera_reference_pe, "fake-muon")
 
     write_outputs(metrics, details, plot, Path("muon-track.png"))
     return metrics
@@ -751,8 +674,7 @@ def night_sky(work):
             window_ns,
         )
     )
-    native_file, prop_file = work / "native_sources.gst", work / "native_prop.gst"
-    camera_native = work / "native.iact"
+    native_file = work / "native_sources.gst"
     run_tool(
         [
             tool("obdeect"),
@@ -813,38 +735,8 @@ def night_sky(work):
         ],
         work / "nsbls.log",
     )
-    run_tool(
-        [
-            tool("obdeect"),
-            "propagation",
-            "run",
-            "--no-extinction",
-            "--site-altitude",
-            str(NIGHT["altitude_m"]),
-            "--wavelength-range",
-            "300",
-            "650",
-            "--seed",
-            str(NIGHT["seed"]),
-            "-i",
-            str(native_file),
-            "-o",
-            str(prop_file),
-        ],
-        work / "propagate.log",
-    )
-    run_tool(
-        [
-            tool("obdeect"),
-            "stream",
-            "to-simtel",
-            "--atmprof",
-            str(cfg_dir / "atmprof1.dat"),
-            "-o",
-            str(camera_native),
-            str(prop_file),
-        ],
-        work / "to-simtel.log",
+    camera_native = propagate_to_simtel(
+        work, native_file, NIGHT["altitude_m"], NIGHT["band_nm"], NIGHT["seed"]
     )
 
     native, reference = read_native(native_file), read_reference(reference_file)
@@ -931,7 +823,7 @@ def night_sky(work):
     # Native positions are already the sphere entry points (|X| = R); no ray intersection needed.
     # Native: impact parameter of each ray from the sphere point (convention-free). Reference: from the
     # observation-plane crossing (x, y, 0) of the same ray (IACT convention).
-    entry_n = np.stack([native["x"], native["y"], native["z"]], 1)
+    entry_n = positions_n(native)
     b_n = impact_parameter(entry_n, dirs_n)
     b_r = impact_parameter(
         np.stack([reference["x"], reference["y"], np.zeros(reference["x"].size)], 1),
@@ -964,7 +856,7 @@ def night_sky(work):
     )
 
     # Time: centre-plane arrival (native) against reference time; pulse is uniform over window_ns.
-    t_centre = native["t"] + (-np.sum(entry_n * dirs_n, axis=1)) / C_M_NS
+    t_centre = centre_plane_time(native)
 
     def pulse_cdf(x):
         return np.clip(x / window_ns + 0.5, 0.0, 1.0)
@@ -987,10 +879,7 @@ def night_sky(work):
         ks_statistic(t_centre, reference["t"]),
         ks_critical(t_centre.size, reference["t"].size),
     )
-    mean_diff = float(np.mean(t_centre) - np.mean(reference["t"]))
-    se_diff = math.sqrt(
-        np.var(t_centre) / t_centre.size + np.var(reference["t"]) / reference["t"].size
-    )
+    mean_diff, se_diff = time_difference(t_centre, reference["t"])
     flag(metrics, "time_mean_difference_ns", mean_diff, max(0.05, 5 * se_diff))
     metrics["time_reference_sd_ns"] = float(np.std(reference["t"]))
     metrics["time_native_sd_ns"] = float(np.std(t_centre))
@@ -1040,7 +929,7 @@ def night_sky(work):
             "reproducibility": "nsbls has no seed option: the reference sample is not reproducible; the native run is seeded (17)",
             "limit_setting": "Limits set before the first run. The projected-area check is an analytic check of the declared "
             "isotropic flux (rho^2 uniform). Native impact parameters follow the declared sampler "
-            "(1 - sqrt(U), KS passes); the flux is not area-uniform, and nsbls differs from obdeect (KS 0.18).",
+            "(1 - sqrt(U)); see impact_parameter_native_vs_sampler and impact_parameter_native_vs_reference.",
             "camera_status": camera_status,
             "camera_pe_native": camera_native_pe.tolist(),
             "camera_pe_reference": camera_reference_pe.tolist(),
@@ -1048,40 +937,53 @@ def night_sky(work):
     )
 
     def plot(axes):
-        axes[0, 0].hist(
-            uniform_n, bins=50, histtype="step", label="obdeect", density=True
-        )
-        axes[0, 0].hist(
-            uniform_r, bins=50, histtype="step", label="nsbls", density=True
-        )
-        axes[0, 0].set(xlabel="(1-cos theta)/(1-cos v)")
-        axes[0, 0].legend()
-        axes[0, 1].hist(rho2_n, bins=50, histtype="step", label="obdeect", density=True)
-        axes[0, 1].hist(rho2_r, bins=50, histtype="step", label="nsbls", density=True)
-        axes[0, 1].axhline(1.0, color="black", linestyle="--", label="uniform")
-        axes[0, 1].set(xlabel="rho^2 (projected area fraction)")
-        axes[0, 1].legend()
-        axes[1, 0].hist(
-            t_centre, bins=60, histtype="step", label="obdeect, centre plane"
-        )
-        axes[1, 0].hist(reference["t"], bins=60, histtype="step", label="nsbls")
-        axes[1, 0].set(xlabel="time [ns]")
-        axes[1, 0].legend()
-        axes[1, 1].bar(
-            ["obdeect", "nsbls"],
-            [camera_native_pe.mean(), camera_reference_pe.mean()],
-            yerr=[
-                camera_native_pe.std(ddof=1) / math.sqrt(camera_native_pe.size),
-                camera_reference_pe.std(ddof=1) / math.sqrt(camera_reference_pe.size),
+        from obdeect_validation.adapters import plotting as pl
+
+        sides = (("obdeect", pl.NATIVE), ("nsbls", pl.REFERENCE))
+        pl.histograms(
+            axes[0, 0],
+            [
+                (sides[0][0], uniform_n, pl.NATIVE),
+                (sides[1][0], uniform_r, pl.REFERENCE),
             ],
+            "(1-cos theta)/(1-cos v)",
+            bins=50,
+            clip=None,
         )
-        axes[1, 1].set(ylabel="mean p.e. per triggered event")
+        pl.histograms(
+            axes[0, 1],
+            [(sides[0][0], rho2_n, pl.NATIVE), (sides[1][0], rho2_r, pl.REFERENCE)],
+            "rho^2 (projected area fraction)",
+            bins=50,
+            clip=None,
+        )
+        axes[0, 1].axhline(1.0, color=pl.ANALYTIC, linestyle="--", label="uniform")
+        axes[0, 1].legend()
+        pl.histograms(
+            axes[1, 0],
+            [
+                ("obdeect, centre plane", t_centre, pl.NATIVE),
+                ("nsbls", reference["t"], pl.REFERENCE),
+            ],
+            "time [ns]",
+        )
+        pl.camera_bars(axes[1, 1], camera_native_pe, camera_reference_pe, "nsbls")
 
     write_outputs(metrics, details, plot, Path("night-sky.png"))
     return metrics
 
 
 # ---------------------------------------------------------------- laser-beam (geometry only)
+
+
+def _ls_beam_point(label, point, text):
+    """Position [m] ls-beam prints for the beam crossing the field of view."""
+    match = re.search(label + point, text)
+    if match is None:
+        raise RuntimeError(
+            f"ls-beam printed no field-of-view point for {label.strip()!r}"
+        )
+    return np.array([float(v) for v in match.groups()]) / 100.0
 
 
 def laser_beam(work):
@@ -1158,15 +1060,12 @@ def laser_beam(work):
         work / "ls-beam.log",
     )
     point = r"SpaceVect: x=([-0-9.e+]+), y=([-0-9.e+]+), z=([-0-9.e+]+) cm"
-    entry = re.search(r"beam enters FoV at \{ " + point, ls_text)
-    exit_ = re.search(
-        r"Laser exits enters FoV at \{ " + point, ls_text
-    )  # sic: ls-beam wording
-    ls_entry = np.array([float(v) for v in entry.groups()]) / 100.0
-    ls_exit = np.array([float(v) for v in exit_.groups()]) / 100.0
+    # "Laser exits enters FoV" is ls-beam's own wording.
+    ls_entry = _ls_beam_point(r"beam enters FoV at \{ ", point, ls_text)
+    ls_exit = _ls_beam_point(r"Laser exits enters FoV at \{ ", point, ls_text)
 
     native = read_native(native_file)
-    positions = np.stack([native["x"], native["y"], native["z"]], 1)
+    positions = positions_n(native)
     direction = unit_vectors(native)
     metrics, details = {}, {}
     order = np.argsort(positions[:, 2])
@@ -1208,7 +1107,7 @@ def laser_beam(work):
     metrics["primary_count"] = int(native["w"].size)
 
     # ls-beam emission altitudes lie on the same beam segment.
-    zem = read_reference_altitudes(reference_file)
+    zem = read_reference(reference_file)["zem"] - LASER["altitude_m"]
     lo_z, hi_z = min(lo_ref[2], hi_ref[2]), max(lo_ref[2], hi_ref[2])
     metrics["ls_beam_emission_count"] = int(zem.size)
     metrics["ls_beam_outside_segment_count"] = int(
@@ -1242,200 +1141,38 @@ def laser_beam(work):
     )
 
     def plot(axes):
+        from obdeect_validation.adapters import plotting as pl
+
         axes[0, 0].scatter(
-            positions[:, 0], positions[:, 2], s=2, label="obdeect primaries"
+            positions[:, 0],
+            positions[:, 2],
+            s=3,
+            color=pl.NATIVE,
+            label="obdeect primaries",
         )
         axes[0, 0].scatter(
             [lo_ref[0], hi_ref[0]],
             [lo_ref[2], hi_ref[2]],
             marker="x",
-            color="black",
+            s=60,
+            color=pl.REFERENCE,
             label="ls-beam FoV",
         )
         axes[0, 0].set(xlabel="x [m]", ylabel="z [m]")
         axes[0, 0].legend()
-        axes[0, 1].hist(
-            zem, bins=60, histtype="step", label="ls-beam emission altitude"
-        )
-        axes[0, 1].hist(
-            positions[:, 2], bins=60, histtype="step", label="obdeect primaries"
-        )
-        axes[0, 1].set(xlabel="z [m]")
-        axes[0, 1].legend()
-        for ax in axes[1]:
-            ax.axis("off")
-
-    write_outputs(metrics, details, plot, Path("laser-beam.png"))
-    return metrics
-
-
-def read_reference_altitudes(path):
-    """Emission altitudes above the observation level [m] of an IACT file."""
-    return read_reference(path)["zem"] - LASER_ALTITUDE_M
-
-
-LASER_ALTITUDE_M = 2150.0
-
-
-# ---------------------------------------------------------------- legacy generic path
-
-
-def weighted_stats(data):
-    weights = data["w"]
-    total = float(np.sum(weights))
-    if not total:
-        raise ValueError("source produced zero total photon weight")
-    result = {"rows": len(weights), "photon_weight": total}
-    for key in ("x", "y", "z", "cx", "cy", "cz", "t", "wavelength"):
-        values = data.get(key, np.empty(0))
-        if len(values):
-            mean = float(np.average(values, weights=weights))
-            result[f"{key}_mean"] = mean
-            result[f"{key}_rms"] = float(
-                np.sqrt(np.average((values - mean) ** 2, weights=weights))
-            )
-            result[f"{key}_q05"] = float(np.quantile(values, 0.05))
-            result[f"{key}_q50"] = float(np.quantile(values, 0.50))
-            result[f"{key}_q95"] = float(np.quantile(values, 0.95))
-    return result
-
-
-def distribution_comparison(a, b):
-    comparisons = {}
-    for key in ("cx", "cy", "cz", "t", "wavelength"):
-        x, y = a[key], b[key]
-        if not len(x) or not len(y):
-            continue
-        wx, wy = a["w"], b["w"]
-        mx, my = np.average(x, weights=wx), np.average(y, weights=wy)
-        vx = np.average((x - mx) ** 2, weights=wx)
-        vy = np.average((y - my) ** 2, weights=wy)
-        nx = float(np.sum(wx) ** 2 / np.sum(wx**2))
-        ny = float(np.sum(wy) ** 2 / np.sum(wy**2))
-        se = float(np.sqrt(vx / max(nx, 1) + vy / max(ny, 1)))
-        comparisons[key] = {
-            "mean_delta": float(mx - my),
-            "mean_delta_standard_error": se,
-            "mean_delta_sigma": float((mx - my) / se) if se else 0.0,
-            "ks_distance": ks_statistic(x, y),
-            "q05_delta": float(np.quantile(x, 0.05) - np.quantile(y, 0.05)),
-            "q50_delta": float(np.quantile(x, 0.50) - np.quantile(y, 0.50)),
-            "q95_delta": float(np.quantile(x, 0.95) - np.quantile(y, 0.95)),
-        }
-    return comparisons
-
-
-def svg_plot(a, b, output):
-    keys = [
-        key
-        for key in ("cx", "cy", "cz", "t", "wavelength")
-        if len(a[key]) and len(b[key])
-    ]
-    width, height, pad = 760, 170 * len(keys), 34
-    rows = []
-    for index, key in enumerate(keys):
-        low, high = np.quantile(np.concatenate((a[key], b[key])), [0.01, 0.99])
-        if high <= low:
-            high = low + 1
-        ha, _ = np.histogram(a[key], bins=48, range=(low, high), density=True)
-        hb, _ = np.histogram(b[key], bins=48, range=(low, high), density=True)
-        peak = max(float(np.max(ha)), float(np.max(hb)), 1e-12)
-        x0, y0, w, h = pad, index * 170 + 28, width - 2 * pad, 120
-        points_a = " ".join(
-            f"{x0 + i * w / 47:.1f},{y0 + h * (1 - v / peak):.1f}"
-            for i, v in enumerate(ha)
-        )
-        points_b = " ".join(
-            f"{x0 + i * w / 47:.1f},{y0 + h * (1 - v / peak):.1f}"
-            for i, v in enumerate(hb)
-        )
-        rows.append(
-            f'<text x="{pad}" y="{y0 - 8}" font-size="14">{key} [{low:.4g}, {high:.4g}]</text>'
-            f'<polyline fill="none" stroke="#2769aa" points="{points_a}"/>'
-            f'<polyline fill="none" stroke="#d36c28" points="{points_b}"/>'
-        )
-    output.write_text(
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">'
-        f'<rect width="100%" height="100%" fill="white"/>'
-        f'<text x="{width - 210}" y="18" fill="#2769aa">obdeect</text>'
-        f'<text x="{width - 130}" y="18" fill="#d36c28">LightEmission</text>{"".join(rows)}</svg>\n',
-        encoding="utf-8",
-    )
-
-
-def legacy(case):
-    """Flasher, point-source and beam-scan: one obdeect command, one LightEmission reference run."""
-    reference_name, native_args, reference_args = LEGACY[case]
-    light_emission = (
-        Path(os.environ.get("SIMTOOLS_SIM_TELARRAY_PATH", "")) / "LightEmission"
-    )
-    if not (light_emission / reference_name).is_file():
-        light_emission = Path(os.environ.get("SIMTOOLS_SIM_TELARRAY_PATH", "."))
-    out = Path.cwd()
-    native_file, legacy_file = out / "native.gst", out / "reference.iact.gz"
-    command_name = "flasher" if case.startswith("flasher") else case
-    run_tool(
-        [
-            tool("obdeect"),
-            "sources",
-            command_name,
-            *native_args,
-            "-o",
-            str(native_file),
-        ],
-        out / "native-sources.log",
-    )
-    if case == "beam-scan":
-        # xyls has no include option: it reads the atmosphere profile from the working directory.
-        profile = out / "atm_profile_model_1.dat"
-        if not profile.exists():
-            profile.symlink_to(REFERENCE / "cfg/common/atm_profile_model_1.dat")
-        run_tool(
-            [str(light_emission / reference_name), "-o", str(legacy_file)],
-            out / "light-emission.log",
-        )
-    else:
-        config_dir = os.environ.get("SIMTEL_CONFIG_PATH")
-        config_args = ["-I" + config_dir] if config_dir else []
-        run_tool(
+        pl.histograms(
+            axes[0, 1],
             [
-                str(light_emission / reference_name),
-                *config_args,
-                *reference_args,
-                "-o",
-                str(legacy_file),
+                ("ls-beam emission altitude", zem, pl.REFERENCE),
+                ("obdeect primaries", positions[:, 2], pl.NATIVE),
             ],
-            out / "light-emission.log",
+            "z [m]",
+            density=False,
+            clip=None,
         )
-    native, reference = read_native(native_file), read_reference(legacy_file)
-    time_correction_ns = 0.0
-    if case == "point-source":
-        time_correction_ns = 100000.0 / C_CM_NS
-    if case == "flasher-dish":
-        time_correction_ns = 1600.0 / C_CM_NS
-    metrics = {
-        "case": case,
-        "reference_tool": reference_name,
-        "native": weighted_stats(native),
-        "reference": weighted_stats(reference),
-        "distributions": distribution_comparison(native, reference),
-        "normalised_weight_ratio": weighted_stats(native)["photon_weight"]
-        / weighted_stats(reference)["photon_weight"],
-        "time_correction_ns_added_to_native": time_correction_ns,
-        "time_mean_difference_ns_corrected": float(
-            weighted_stats(native).get("t_mean", 0.0)
-            + time_correction_ns
-            - weighted_stats(reference).get("t_mean", 0.0)
-        ),
-        "position_frame_native": "source stream frame; per source type",
-        "position_frame_reference": "IACT telescope sphere / observation plane (positions in m)",
-        "reference_equivalence": "matched source generator",
-        "seed_note": "Native seed is fixed; LightEmission uses its own RNG. Distribution comparison is statistical, not paired-photon replay.",
-    }
-    (out / "metrics.json").write_text(
-        json.dumps(metrics, indent=2, allow_nan=False) + "\n", encoding="utf-8"
-    )
-    svg_plot(native, reference, out / "distributions.svg")
+
+    write_outputs(metrics, details, plot, Path("laser-beam.png"), rows=1)
+    return metrics
 
 
 # ---------------------------------------------------------------- entry point
@@ -1449,8 +1186,6 @@ def main(case):
         night_sky(work)
     elif case == "laser-beam":
         laser_beam(work)
-    elif case in LEGACY:
-        legacy(case)
     else:
         raise ValueError(f"unknown source case: {case}")
 
