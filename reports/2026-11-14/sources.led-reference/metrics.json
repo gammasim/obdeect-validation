@@ -1,0 +1,10 @@
+{
+  "native_event_count": 3,
+  "reference_event_count": 3,
+  "event_count_delta": 0,
+  "native_photon_count": 60.0,
+  "reference_photon_count": 60.0,
+  "photon_count_delta": 0.0,
+  "max_event_photon_delta": 0.0,
+  "position_centroid_delta_cm": 1.0536712127723509e-08
+}

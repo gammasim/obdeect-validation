@@ -1,0 +1,42 @@
+{
+  "case": "night-sky versus nsbls (LightEmission)",
+  "impact_parameter": "closest-approach distance of the ray line to the origin, |P x d| for unit d. Native: point on the sphere (entry point). Reference: observation-plane crossing (x, y, 0). Same ray, same value.",
+  "mapping": {
+    "geometry": "telescope sphere radius 15 m at origin, viewing cone 10 deg about (0,0,-1), altitude 2150 m (both)",
+    "spectrum": "fixed 400 nm (both); inside the 300-650 nm band of the configured rate",
+    "rate": "configured 2.4 ph/(sr ns cm^2) (10 x the nsbls help-text rate 0.24, raised so that the camera triggers; same on both sides) -> photons per event = rate x Omega x pi R^2 x window",
+    "window": "uniform pulse of FWHM 2.35482 ns, i.e. width 1 ns (both)",
+    "bunch": "bunch size 2 photons (both)",
+    "time_convention": "both at the sphere-centre plane (through the origin, perpendicular to the ray): t - (X.d)/c with X the sample point (native: sphere point; reference: observation-plane crossing (x, y, 0) with the IACT time including the event time_offset); c = vacuum speed (native uses c too)",
+    "atmosphere": "nsbls -A 1 and obdeect -A 1 (recorded; profile for air speed only)",
+    "sim_telarray": "propagate --no-extinction then obdeect stream to-simtel; telescope_theta=0, trigger_telescopes=1"
+  },
+  "physics_limits": {
+    "yield_and_rate": "max(0.01, 5 se) with se=0: fixed photon count per event in both",
+    "cone_and_direction": "KS alpha=1e-3",
+    "projected_area": "for a fixed direction an isotropic flux is uniform over the disc perpendicular to d, so b^2 is uniform on [0, R^2] (checked with a numpy toy MC: KS 0.002 at 2e5 rays); KS alpha=1e-3. Impact parameter native vs sampler: analytic CDF of b/R is r^2",
+    "time_mean": "max(0.05 ns, 5 se)",
+    "camera": "max(0.01, 5 se) on the relative p.e. per event ratio (task rule)"
+  },
+  "reproducibility": "nsbls has no seed option: the reference sample is not reproducible; the native run is seeded (17)",
+  "limit_setting": "Limits set before the first run and not changed. Same definitions for native and reference (closest-approach distance, centre-plane time). The projected-area expectation is the physical one (b^2 uniform), which is the obdeect sampler after the 2026-11-14 fix (ri = sqrt(U), docs/sources/spec/background.md).",
+  "judged_and_recorded": "Judged: yield, rate, cone, cz, camera p.e. ratio, projected area and time of obdeect against physics, impact parameter of obdeect against the sampler. Recorded only (values in metrics.json, no limit): impact_parameter_native_vs_reference, projected_area_uniform_reference_vs_analytic, time_reference_vs_pulse, time_native_vs_reference, time_mean_difference_ns. The nsbls values are not judged because nsbls has the two issues in reference_findings.",
+  "reference_findings": [
+    "(a) nsbls samples ri = 1 - sqrt(U) (copied from sim_telarray nsbls; the same sampler as obdeect before 2026-11-14). An isotropic flux needs ri = sqrt(U): with 1 - sqrt(U), b^2 is not uniform (toy MC KS 0.50), so projected_area_uniform_reference_vs_analytic fails and the impact-parameter distribution is wrong. Recorded only.",
+    "(b) nsbls (IactLightEmission.cc ~l.1395) rotates the sphere point with az = d.Azimuth() instead of the azimuth of -d. The z axis then maps to (cx, cy, -cz), not to -d, so about 0.03 % of the entry points are on the wrong side (away from the source). Impact parameters and centre-plane arrival times are then wrong: the dt time correction is wrong. A numpy replica reproduces the nsbls impact-parameter quantiles and the centre-plane time SD (3.6 ns); with az = atan2(-d.y, -d.x) the SD is 0. Recorded only."
+  ],
+  "camera_status_note": "2026-11-13 run at 1x rate: 0 triggered events in both samples (BLOCKED)",
+  "camera_status": "run",
+  "camera_pe_native": [
+    8739.0,
+    8779.0,
+    8651.0,
+    8494.0
+  ],
+  "camera_pe_reference": [
+    10828.0,
+    10926.0,
+    10779.0,
+    10852.0
+  ]
+}

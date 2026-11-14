@@ -1,0 +1,46 @@
+{
+  "case": "flasher-dish",
+  "native_command": [
+    "obdeect",
+    "sources",
+    "flasher",
+    "--type",
+    "dish",
+    "--events",
+    "20"
+  ],
+  "reference_command": [
+    "ff-1m",
+    "--events",
+    "20"
+  ],
+  "frames": {
+    "native": "sky (emission at flasher, z = 16 m)",
+    "reference": "observation plane z = 0"
+  },
+  "time_correction": "geometric",
+  "time_correction_rule": "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset",
+  "stage2": {
+    "status": "OK",
+    "native_command": [
+      "obdeect",
+      "sources",
+      "flasher",
+      "--type",
+      "dish",
+      "--events",
+      "5",
+      "--photons",
+      "150000000"
+    ],
+    "reference_command": [
+      "ff-1m",
+      "--events",
+      "5",
+      "--photons",
+      "150000000"
+    ],
+    "photon_factor": 60,
+    "photon_factor_note": "same factor applied to native and reference; stage 1 uses the matched stage 1 counts"
+  }
+}

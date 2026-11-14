@@ -84,14 +84,22 @@ CASES = {
             "native": "telescope (T)",
             "reference": "ff-gct photon bunches (no cz)",
         },
-        "time_correction": "geometric",
+        "time_correction": "none",
+        # Replaces the time keys of emission_metrics (see ff_gct_time_metrics).
+        "time_model": "ff_gct",
+        "time_rule": "ff-gct model: t + |z/cz|/c for all photons (impact at the signed path); "
+        "|cz| >= 0.3 on both sides; ref times + time_offset",
         "native_frame": "telescope",
         "stage2": {
             "path": "direct",
-            "bypass": 2,
-            "cfg": "CTA/CTA-PROD6-SST.cfg",
+            # ff-gct documentation: Bypass_Optics=1 skips the primary only; the secondary
+            # reflection stays (Bypass_Optics=2 would skip both mirrors).
+            "bypass": 1,
+            "cfg": "CTA/CTA-ULTRA6-SST-GCT-S.cfg",
+            "altitude": 2100,
+            "atmospheric_transmission": "atm_trans_2100_1_10_0_0_2100.dat",
             "camera_map": True,
-            "defines": ["-DCTA_NORTH", "-DSST1"],
+            "defines": [],
             "native": [
                 "obdeect",
                 "sources",
@@ -99,12 +107,14 @@ CASES = {
                 "--type",
                 "secondary",
                 "--photons",
-                "10000000",
+                "1000000",
                 "--events",
                 "1",
             ],
-            "reference": ["ff-gct", "--photons", "10000000", "--events", "1"],
-            "photon_factor": 100,
+            # 1e6 per flasher: ~57000 p.e. per event. At 1e7 the to-simtel file exceeds 1 GB, which
+            # sim_telarray reads with extended block headers as 'Error reading photon bunches'.
+            "reference": ["ff-gct", "--photons", "1000000", "--events", "1"],
+            "photon_factor": 10,
         },
     },
     "point-source": {
@@ -138,7 +148,7 @@ CASES = {
             "native": "sky (emission at source, z = 1000 m)",
             "reference": "plane through telescope sphere centre",
         },
-        "time_correction": "geometric",
+        "time_correction": "geometric_air",
         "native_frame": "sky",
         # Native emits into a cone of 1.02 R (deliberate margin), xyzls into R: compare the photons
         # crossing the plane z = 0 within the same radius, inside both cones.
@@ -290,10 +300,134 @@ def accepted_ratio(native, n_events, ref, r_events, radius_cm):
     return ratio, float(se)
 
 
+ATMPROF_FILE = "atmprof1.dat"  # xyzls default -A 1
+# xyzls default -h: observation level of the point-source plane.
+ATMPROF_OBSLEV_M = 2150.0
+
+
+def atmprof_path():
+    config = os.environ.get("SIMTEL_CONFIG_PATH", "/reference/cfg/common")
+    return Path(config) / ATMPROF_FILE
+
+
+def load_atmprof(path):
+    """Heights [m] and n-1 of a sim_telarray atmprof table (columns: alt km, rho, thick, n-1)."""
+    rows = [
+        line.split()
+        for line in Path(path).read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    table = np.array([[float(r[0]), float(r[3])] for r in rows])
+    return table[:, 0] * 1000.0, table[:, 1]
+
+
+def index_integral_m(heights_m, index_minus_one, low_m, high_m):
+    """Integral of (n-1) dh [m] between two heights; n-1 is log-linear between table levels."""
+    h = np.asarray(heights_m, dtype=np.float64)
+    y = np.asarray(index_minus_one, dtype=np.float64)
+    if not low_m <= high_m or low_m < h[0] or high_m > h[-1]:
+        raise ValueError(
+            "index integral: heights must lie inside the table, low <= high"
+        )
+    total = 0.0
+    for i in range(h.size - 1):
+        a, b = max(low_m, h[i]), min(high_m, h[i + 1])
+        if b <= a:
+            continue
+        k = np.log(y[i + 1] / y[i]) / (h[i + 1] - h[i])
+        ya, yb = y[i] * np.exp(k * (a - h[i])), y[i] * np.exp(k * (b - h[i]))
+        total += (b - a) * ya if abs(k) * (b - a) < 1e-12 else (yb - ya) / k
+    return float(total)
+
+
+def air_delay_ns(z_m, cz, heights_m, index_minus_one, obslev_m):
+    """Extra light time of straight paths in air compared with vacuum, for photons heading to the
+    plane (cz < 0) from height z_m above it: (1/c) integral of (n-1) dl, dl = dh / |cz|."""
+    z, cz = np.asarray(z_m, dtype=np.float64), np.asarray(cz, dtype=np.float64)
+    delay = np.zeros(cz.shape)
+    toward = cz < 0
+    for z_value in np.unique(z[toward]):
+        sel = toward & (z == z_value)
+        integral = index_integral_m(
+            heights_m, index_minus_one, obslev_m, obslev_m + float(z_value)
+        )
+        delay[sel] = integral / (C_M_NS * -cz[sel])
+    return delay
+
+
+# flasher-secondary (ff-gct) time model. ff-gct writes every photon at its impact on the plane
+# z = 0, including photons heading away from it (impact on the backward extension), with time
+# t_em + |z/cz|/c (atmo.c raybnd_: dz / |w| / c). Its raybnd_ also adds a refraction term
+# -(t s)^2 / c^3 that does not scale with the 0.5 m path: about -4 ns at |cz| = 0.04, about
+# -0.01 ns at |cz| = 0.3. Both samples are therefore compared for |cz| >= FF_GCT_MIN_ABS_CZ.
+FF_GCT_MIN_ABS_CZ = 0.3
+
+
+def _time_block(native_t, native_w, ref_t, ref_w, tol=0.05):
+    """Weighted mean and rms of two time samples with their limit flags (as in emission_metrics)."""
+    mn, sn = _weighted_mean(native_t, native_w)
+    mr, sr = _weighted_mean(ref_t, ref_w)
+    se = float(np.hypot(sn, sr))
+    rn, rr = _weighted_rms(native_t, native_w), _weighted_rms(ref_t, ref_w)
+    se_rms = float(max(rn, rr) / np.sqrt(2 * max(len(native_t), len(ref_t))))
+    return {
+        "t_mean_native": mn,
+        "t_mean_reference": mr,
+        "t_mean_delta": mn - mr,
+        "t_mean_delta_se": se,
+        "t_mean_limit_exceeded": _flag(abs(mn - mr), max(tol, 5 * se)),
+        "t_rms_native": rn,
+        "t_rms_reference": rr,
+        "t_rms_delta": rn - rr,
+        "t_rms_limit_exceeded": _flag(abs(rn - rr), max(tol, 5 * se_rms)),
+    }
+
+
+def ff_gct_time_metrics(native, ref, min_abs_cz=FF_GCT_MIN_ABS_CZ):
+    """Time keys of stage 1 for the ff-gct time model; both samples use the same selection:
+    impact within TIME_RADIUS_CM of the axis and |cz| >= min_abs_cz (cz of the reference from cx, cy).
+    """
+    cz = native["cz"]
+    if np.any(cz == 0):
+        raise ValueError("native photons parallel to the plane z = 0")
+    # Impact on the plane along the signed path (as ff-gct), arrival time |path| / c (as ff-gct).
+    path = -native["z"] / cz  # m, negative for photons heading away from the plane
+    t_native = native["t"] + np.abs(path) / C_M_NS
+    xp, yp = native["x"] + path * native["cx"], native["y"] + path * native["cy"]
+    native_ok = (100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM) & (np.abs(cz) >= min_abs_cz)
+    ref_cz = np.abs(ref["cz"])
+    ref_ok = (ref["r"] < TIME_RADIUS_CM) & (ref_cz >= min_abs_cz)
+    if not native_ok.any() or not ref_ok.any():
+        raise ValueError("no photons left for the time comparison")
+    metrics = {
+        "time_correction_ns_mean": float(np.mean((t_native - native["t"])[native_ok])),
+        "native_photons_moving_away_fraction": float(np.mean(cz >= 0)),
+        "t_native_outside_radius_fraction": float(
+            1.0 - np.mean(100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM)
+        ),
+        "t_native_excluded_fraction": float(1.0 - np.mean(native_ok)),
+        "t_reference_outside_radius_fraction": float(
+            1.0 - np.mean(ref["r"] < TIME_RADIUS_CM)
+        ),
+        "t_reference_excluded_fraction": float(1.0 - np.mean(ref_ok)),
+        "t_min_abs_cz": float(min_abs_cz),
+    }
+    metrics.update(
+        _time_block(
+            t_native[native_ok],
+            native["w"][native_ok],
+            ref["t"][ref_ok],
+            ref["w"][ref_ok],
+        )
+    )
+    return metrics
+
+
 def emission_metrics(
     native_counts, native, ref_counts, ref, time_correction, acceptance_radius_cm=None
 ):
-    """Stage 1 numbers and integer limit flags. time_correction is 'geometric' or 'none'."""
+    """Stage 1 numbers and integer limit flags. time_correction is 'geometric' (vacuum path),
+    'geometric_air' (vacuum path plus air delay of the atmprof table) or 'none'."""
     n_ev, r_ev = len(native_counts), len(ref_counts)
     metrics = {
         "native_event_count": n_ev,
@@ -338,7 +472,7 @@ def emission_metrics(
     wn, wr = native["w"], ref["w"]
     t_native = native["t"].copy()
     native_ok = np.ones(t_native.size, dtype=bool)
-    if time_correction == "geometric":
+    if time_correction in ("geometric", "geometric_air"):
         cz = native["cz"]
         if np.any(cz == 0):
             raise ValueError("native photons parallel to the plane z = 0")
@@ -347,6 +481,12 @@ def emission_metrics(
         toward = cz < 0
         path = np.where(toward, -native["z"] / np.where(toward, cz, -1.0), 0.0)  # m
         t_native = t_native + path / C_M_NS
+        if time_correction == "geometric_air":
+            # xyzls adds the light time in air (raybnd_); obdeect emits at the source, no air delay.
+            heights, index_minus_one = load_atmprof(atmprof_path())
+            t_native = t_native + air_delay_ns(
+                native["z"], cz, heights, index_minus_one, ATMPROF_OBSLEV_M
+            )
         # Same camera acceptance as the reference: arrival position within TIME_RADIUS_CM.
         xp, yp = native["x"] + path * native["cx"], native["y"] + path * native["cy"]
         native_ok = toward & (100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM)
@@ -419,6 +559,14 @@ def camera_events(path):
     return {tel: (np.asarray(totals[tel]), images[tel]) for tel in totals}
 
 
+def _relative_mean_error(per_event, mean):
+    """Relative standard error of a mean over events; with one event, the Poisson error of the
+    total photoelectron count (the event-to-event scatter is then unknown)."""
+    if per_event.size > 1:
+        return per_event.std(ddof=1) / np.sqrt(per_event.size) / mean
+    return float(1.0 / np.sqrt(per_event.sum()))
+
+
 def camera_metrics(reference, candidate):
     """Independent samples: mean p.e. ratio with standard error and summed image chi2 per pixel."""
     common = sorted(set(reference) & set(candidate))
@@ -432,8 +580,8 @@ def camera_metrics(reference, candidate):
     se = float(
         ratio
         * np.hypot(
-            na.std(ddof=1) / np.sqrt(na.size) / mean_a,
-            nb.std(ddof=1) / np.sqrt(nb.size) / mean_b,
+            _relative_mean_error(na, mean_a),
+            _relative_mean_error(nb, mean_b),
         )
     )
     # Pixel shapes normalised to unit sum; variance of a normalised Poisson count.
@@ -509,6 +657,8 @@ def _simtel(
     bypass,
     cfg="CTA/CTA-PROD6-LST.cfg",
     defines=("-DCTA_NORTH", "-DLST1"),
+    altitude=2150,
+    atmospheric_transmission=None,
 ):
     """sim_telarray with the options of simtools' light-emission step (released binary)."""
     binary = os.environ.get(
@@ -518,7 +668,12 @@ def _simtel(
     output = root / f"{name}.simtel"
     output.unlink(missing_ok=True)
     options = {
-        "altitude": 2150,
+        "altitude": altitude,
+        **(
+            {"atmospheric_transmission": atmospheric_transmission}
+            if atmospheric_transmission
+            else {}
+        ),
         "TRIGGER_TELESCOPES": 1,
         "TELTRIG_MIN_SIGSUM": 2,
         "PULSE_ANALYSIS": -30,
@@ -590,8 +745,16 @@ def _camera_stage(root, native_gst, reference_file, stage2):
         _run([*argv, native_gst], root / "to-simtel.log")
     cfg = stage2.get("cfg", "CTA/CTA-PROD6-LST.cfg")
     defines = stage2.get("defines", ["-DCTA_NORTH", "-DLST1"])
-    ref_out = _simtel(root, reference_file, "reference", stage2["bypass"], cfg, defines)
-    cand_out = _simtel(root, candidate, "candidate", stage2["bypass"], cfg, defines)
+    site = {
+        "altitude": stage2.get("altitude", 2150),
+        "atmospheric_transmission": stage2.get("atmospheric_transmission"),
+    }
+    ref_out = _simtel(
+        root, reference_file, "reference", stage2["bypass"], cfg, defines, **site
+    )
+    cand_out = _simtel(
+        root, candidate, "candidate", stage2["bypass"], cfg, defines, **site
+    )
     a, b = camera_events(ref_out), camera_events(cand_out)
     if (
         not a
@@ -642,6 +805,8 @@ def main(case):
         spec["time_correction"],
         spec.get("acceptance_radius_cm"),
     )
+    if "time_model" in spec:
+        metrics.update(ff_gct_time_metrics(native, ref))
     _plot(native, ref, root / "stage1.png")
     details = {
         "case": case,
@@ -649,7 +814,13 @@ def main(case):
         "reference_command": spec["reference"],
         "frames": spec["frame"],
         "time_correction": spec["time_correction"],
-        "time_correction_rule": "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset",
+        "time_correction_rule": (
+            spec["time_rule"]
+            if "time_rule" in spec
+            else "t_arrival = t + (-z/cz)/c + (1/c) int(n-1) dh/|cz| over atmprof1 at 2150 m (z in m, cz<0); ref times + time_offset"
+            if spec["time_correction"] == "geometric_air"
+            else "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset"
+        ),
         "stage2": {"status": "BLOCKED", "reason": "not attempted"},
     }
     stage2 = spec["stage2"]

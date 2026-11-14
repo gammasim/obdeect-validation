@@ -1,0 +1,38 @@
+{
+  "case": "laser-beam versus ls-beam: geometry only (BLOCKED for yield, direction, time, camera)",
+  "blocked": {
+    "reason": "obdeect laser-beam emits primary beam photons; ls-beam emits light scattered from the beam (Rayleigh/aerosol). obdeect propagation has no scattering yet (plan step 6b: beta_s(355 nm) aerosol, single-scattering albedo and phase asymmetry missing), so scattered yield, direction, wavelength, time and camera p.e. cannot be compared."
+  },
+  "mapping": {
+    "geometry": "laser (1000,0,0) m, theta 60, phi 180 (astronomical), telescope theta 30 phi 0, radius 12.5 m, FoV 15 deg, step 0.1 m (both)",
+    "spectrum": "355 nm (both; not used in the geometry check)",
+    "compared": "FoV entry and exit printed by ls-beam: endpoint offsets to the primary extremes (one step) and perpendicular distance to the primary line (1 cm); emission altitudes inside the primary segment"
+  },
+  "physics_limits": {
+    "endpoints": "one step (0.1 m): primary sampling at the ends",
+    "off_line": "1 cm: ls-beam writes cm with float precision"
+  },
+  "limit_setting": "Limits set before the first run.",
+  "ls_beam_entry_m": [
+    307.007,
+    8.48671e-14,
+    400.1
+  ],
+  "ls_beam_exit_m": [
+    192.993,
+    9.88299e-14,
+    465.926
+  ],
+  "native_endpoints_m": [
+    [
+      307.0072021484375,
+      8.486713800248333e-14,
+      400.0995788574219
+    ],
+    [
+      193.0382537841797,
+      9.882430973811446e-14,
+      465.8995666503906
+    ]
+  ]
+}

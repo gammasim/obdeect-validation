@@ -1,0 +1,11 @@
+{
+  "eventio_readable": 1,
+  "source_event_count": 3,
+  "eventio_event_count": 3,
+  "event_count_delta": 0,
+  "source_photon_count": 60.0,
+  "eventio_photon_count": 60.0,
+  "photon_count_delta": 0.0,
+  "max_event_photon_delta": 0.0,
+  "header_order_matches_corsika": 1
+}

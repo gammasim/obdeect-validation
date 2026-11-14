@@ -1,0 +1,22 @@
+{
+  "photon_event_telescope_key_delta": 0,
+  "bunch_count_delta": 0,
+  "max_codec_normalized_error": 0.07629382307660793,
+  "codec_bounds_exceeded": 0,
+  "reference_camera_events": 97,
+  "candidate_camera_events": 97,
+  "camera_event_id_delta": 0,
+  "matched_event_telescope_samples": 291,
+  "photoelectron_relative_bias": 0.0,
+  "photoelectron_relative_bias_se": 0.0,
+  "photoelectron_bias_limit_exceeded": 0,
+  "mean_image_reduced_chi2": 0.0,
+  "image_shape_limit_exceeded": 0,
+  "mean_arrival_time_difference_ns": 3.8609881581309737e-08,
+  "arrival_time_bias_limit_exceeded": 0,
+  "max_image_relative_l1_difference": 0.0,
+  "mean_image_relative_l1_difference": 0.0,
+  "max_mean_arrival_time_difference_ns": 3.814697265625e-06,
+  "mean_adc_sample_difference": 0.0,
+  "trigger_pattern_mismatches": 0
+}

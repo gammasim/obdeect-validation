@@ -1,0 +1,318 @@
+{
+  "backends": {
+    "obdeect": {
+      "dir": "/results/full-2026-11-14/optics.mst-6.0.2/obdeect",
+      "returncode": 0
+    },
+    "sim_telarray": {
+      "dir": "/results/full-2026-11-14/optics.mst-6.0.2/sim_telarray",
+      "returncode": 0
+    }
+  },
+  "configuration": {
+    "instrument_seed": 11,
+    "max_offset": 4,
+    "max_workers": 2,
+    "model_version": "6.0.2",
+    "offset_directions": "N,E",
+    "offset_step": 1,
+    "simulation_models_path": "/models",
+    "simulation_seed": [
+      11
+    ],
+    "site": "North",
+    "source_distance": 10,
+    "telescope": "MSTN-01",
+    "zenith_angle": 20
+  },
+  "exceeded_rule": "abs(obd/sim - 1) > max(limit, 3 * rel_se) per offset",
+  "limits": {
+    "eff_area": 0.01,
+    "eff_flen": 0.002,
+    "psf_cm": 0.02
+  },
+  "limits_basis": "phase1.md 0-4 deg maxima: D80 1.1%, effective area 0.45%, effective focal length 0.1%; limits are about 2x these maxima",
+  "rows": [
+    {
+      "angle_deg": 0.0,
+      "eff_area": {
+        "delta": 0.0015275646227175255,
+        "exceeded": false,
+        "obd": 89.49340686104095,
+        "rel_se": null,
+        "sim": 89.35690840896001,
+        "threshold": 0.01
+      },
+      "eff_flen": null,
+      "off_x_deg": 0.0,
+      "off_y_deg": 0.0,
+      "psf_cm": {
+        "delta": -0.006531601572817292,
+        "exceeded": false,
+        "obd": 1.8985664434737295,
+        "rel_se": null,
+        "sim": 1.911048651853909,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 1.0,
+      "eff_area": {
+        "delta": 0.001586237509676458,
+        "exceeded": false,
+        "obd": 89.44880141446511,
+        "rel_se": null,
+        "sim": 89.30713908057362,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.0005869529198989643,
+        "exceeded": false,
+        "obd": 1645.2115075039435,
+        "rel_se": 4.142818355677255e-05,
+        "sim": 1644.2464122712274,
+        "threshold": 0.002
+      },
+      "off_x_deg": 0.0,
+      "off_y_deg": 1.0,
+      "psf_cm": {
+        "delta": -0.008912225988302547,
+        "exceeded": false,
+        "obd": 2.5705291134040804,
+        "rel_se": null,
+        "sim": 2.593644257157128,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 2.0,
+      "eff_area": {
+        "delta": 0.001271388777125626,
+        "exceeded": false,
+        "obd": 89.14161318039403,
+        "rel_se": null,
+        "sim": 89.02842344198471,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.0003011973611983798,
+        "exceeded": false,
+        "obd": 1644.6520325792742,
+        "rel_se": 3.5350464820243424e-05,
+        "sim": 1644.1568168846322,
+        "threshold": 0.002
+      },
+      "off_x_deg": 0.0,
+      "off_y_deg": 2.0,
+      "psf_cm": {
+        "delta": -0.013184419050696783,
+        "exceeded": false,
+        "obd": 3.944032402502428,
+        "rel_se": null,
+        "sim": 3.9967269251143382,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 3.0,
+      "eff_area": {
+        "delta": 0.0012192570241384981,
+        "exceeded": false,
+        "obd": 88.69368080775865,
+        "rel_se": null,
+        "sim": 88.58567210480685,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.00019341858582189175,
+        "exceeded": false,
+        "obd": 1643.9612768632878,
+        "rel_se": 3.5727659763561524e-05,
+        "sim": 1643.6433656879008,
+        "threshold": 0.002
+      },
+      "off_x_deg": 0.0,
+      "off_y_deg": 3.0,
+      "psf_cm": {
+        "delta": -0.01318891554604551,
+        "exceeded": false,
+        "obd": 5.509456558374996,
+        "rel_se": null,
+        "sim": 5.583091480395782,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 4.0,
+      "eff_area": {
+        "delta": 0.0017844431835258856,
+        "exceeded": false,
+        "obd": 87.98826383699411,
+        "rel_se": null,
+        "sim": 87.83153345582024,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.00014703739474986044,
+        "exceeded": false,
+        "obd": 1643.1023644731176,
+        "rel_se": 3.7731240330857275e-05,
+        "sim": 1642.8608025007813,
+        "threshold": 0.002
+      },
+      "off_x_deg": 0.0,
+      "off_y_deg": 4.0,
+      "psf_cm": {
+        "delta": -0.012165939115462043,
+        "exceeded": false,
+        "obd": 7.257770267018965,
+        "rel_se": null,
+        "sim": 7.3471553112069525,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 1.0,
+      "eff_area": {
+        "delta": 0.0012930760289873167,
+        "exceeded": false,
+        "obd": 89.31389496996438,
+        "rel_se": null,
+        "sim": 89.19855445737522,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.0004143300152876783,
+        "exceeded": false,
+        "obd": 1649.0289950652034,
+        "rel_se": 4.4617191663485325e-05,
+        "sim": 1648.34603582698,
+        "threshold": 0.002
+      },
+      "off_x_deg": 1.0,
+      "off_y_deg": 0.0,
+      "psf_cm": {
+        "delta": -0.009881243862183475,
+        "exceeded": false,
+        "obd": 2.637736619165655,
+        "rel_se": null,
+        "sim": 2.6640608541290005,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 2.0,
+      "eff_area": {
+        "delta": 0.0011960164132200912,
+        "exceeded": false,
+        "obd": 89.02672366474117,
+        "rel_se": null,
+        "sim": 88.92037343863889,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.0002688403256840832,
+        "exceeded": false,
+        "obd": 1648.7993043985236,
+        "rel_se": 3.87911998362191e-05,
+        "sim": 1648.3561597916819,
+        "threshold": 0.002
+      },
+      "off_x_deg": 2.0,
+      "off_y_deg": 0.0,
+      "psf_cm": {
+        "delta": -0.0035037641401149955,
+        "exceeded": false,
+        "obd": 4.119093825410389,
+        "rel_se": null,
+        "sim": 4.13357690393681,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 3.0,
+      "eff_area": {
+        "delta": 0.0011988588030253933,
+        "exceeded": false,
+        "obd": 88.64340152504893,
+        "rel_se": null,
+        "sim": 88.53725785407484,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.00022102749681529588,
+        "exceeded": false,
+        "obd": 1648.8610650254634,
+        "rel_se": 3.932883197341161e-05,
+        "sim": 1648.4967019259286,
+        "threshold": 0.002
+      },
+      "off_x_deg": 3.0,
+      "off_y_deg": 0.0,
+      "psf_cm": {
+        "delta": -0.0005539832729276606,
+        "exceeded": false,
+        "obd": 5.785524723150789,
+        "rel_se": null,
+        "sim": 5.788731583619582,
+        "threshold": 0.02
+      }
+    },
+    {
+      "angle_deg": 4.0,
+      "eff_area": {
+        "delta": 0.0009438872001024112,
+        "exceeded": false,
+        "obd": 88.01358331994092,
+        "rel_se": null,
+        "sim": 87.93058676459633,
+        "threshold": 0.01
+      },
+      "eff_flen": {
+        "delta": 0.00018403650328435717,
+        "exceeded": false,
+        "obd": 1649.0763058071188,
+        "rel_se": 4.148191720785691e-05,
+        "sim": 1648.772871413154,
+        "threshold": 0.002
+      },
+      "off_x_deg": 4.0,
+      "off_y_deg": 0.0,
+      "psf_cm": {
+        "delta": -0.0014405331517786113,
+        "exceeded": false,
+        "obd": 7.674611087185665,
+        "rel_se": null,
+        "sim": 7.685682567718511,
+        "threshold": 0.02
+      }
+    }
+  ],
+  "statistical_uncertainty": {
+    "eff_area": "not available: simtools output has no effective-area uncertainty",
+    "eff_flen": "eff_flen_err (centroid-propagated) per backend, combined in quadrature",
+    "psf_cm": "not available: simtools output has no D80 uncertainty"
+  },
+  "status": "provisional, from obdeect-validation-org docs/phase1.md measured maxima, pending scientific approval",
+  "summary": {
+    "eff_area": {
+      "exceeded_offsets": [],
+      "max_abs_delta": 0.0017844431835258856,
+      "signed_delta_at_max": 0.0017844431835258856
+    },
+    "eff_flen": {
+      "exceeded_offsets": [],
+      "max_abs_delta": 0.0005869529198989643,
+      "signed_delta_at_max": 0.0005869529198989643
+    },
+    "psf_cm": {
+      "exceeded_offsets": [],
+      "max_abs_delta": 0.01318891554604551,
+      "signed_delta_at_max": -0.01318891554604551
+    }
+  },
+  "versions": {
+    "gammasimtools": "0.39.1.dev101+g76e0d3b91.d20261113",
+    "obdeect": "0.8.1.dev30+gd2170362b.d20261114"
+  }
+}

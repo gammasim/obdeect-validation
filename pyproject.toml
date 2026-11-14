@@ -23,4 +23,5 @@ package-data.obdeect_validation = [ "adapters/*.txt" ]
 
 [tool.pytest]
 ini_options.testpaths = [ "tests" ]
+ini_options.pythonpath = [ "src" ]
 ini_options.addopts = "-ra"

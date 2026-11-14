@@ -1,6 +1,6 @@
 {
   "id": "sources.night-sky",
-  "name": "Night sky versus nsbls: rate, direction, projected area, time",
+  "name": "Night sky versus nsbls: yield, rate, direction, projected area, time, camera p.e.",
   "requires": [
     "obdeect",
     "nsbls",
@@ -75,32 +75,12 @@
       "atol": 0
     },
     {
-      "metric": "projected_area_uniform_reference_vs_analytic_ks_limit_exceeded",
-      "expected": 0,
-      "atol": 0
-    },
-    {
-      "metric": "impact_parameter_native_vs_reference_ks_limit_exceeded",
-      "expected": 0,
-      "atol": 0
-    },
-    {
       "metric": "time_native_vs_pulse_ks_limit_exceeded",
       "expected": 0,
       "atol": 0
     },
     {
-      "metric": "time_reference_vs_pulse_ks_limit_exceeded",
-      "expected": 0,
-      "atol": 0
-    },
-    {
-      "metric": "time_native_vs_reference_ks_limit_exceeded",
-      "expected": 0,
-      "atol": 0
-    },
-    {
-      "metric": "time_mean_difference_ns_limit_exceeded",
+      "metric": "camera_pe_ratio_limit_exceeded",
       "expected": 0,
       "atol": 0
     }

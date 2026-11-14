@@ -1,0 +1,50 @@
+{
+  "case": "flasher-secondary",
+  "native_command": [
+    "obdeect",
+    "sources",
+    "flasher",
+    "--type",
+    "secondary",
+    "--photons",
+    "1e5",
+    "--events",
+    "1"
+  ],
+  "reference_command": [
+    "ff-gct",
+    "--photons",
+    "1e5",
+    "--events",
+    "1"
+  ],
+  "frames": {
+    "native": "telescope (T)",
+    "reference": "ff-gct photon bunches (no cz)"
+  },
+  "time_correction": "none",
+  "time_correction_rule": "ff-gct model: t + |z/cz|/c for all photons (impact at the signed path); |cz| >= 0.3 on both sides; ref times + time_offset",
+  "stage2": {
+    "status": "OK",
+    "native_command": [
+      "obdeect",
+      "sources",
+      "flasher",
+      "--type",
+      "secondary",
+      "--photons",
+      "1000000",
+      "--events",
+      "1"
+    ],
+    "reference_command": [
+      "ff-gct",
+      "--photons",
+      "1000000",
+      "--events",
+      "1"
+    ],
+    "photon_factor": 10,
+    "photon_factor_note": "same factor applied to native and reference; stage 1 uses the matched stage 1 counts"
+  }
+}

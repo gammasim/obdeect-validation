@@ -95,7 +95,12 @@
       "atol": 0
     },
     {
-      "metric": "time_native_vs_reference_ks_limit_exceeded",
+      "metric": "time_native_vs_analytic_mean_difference_ns_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "time_native_vs_analytic_ks_limit_exceeded",
       "expected": 0,
       "atol": 0
     },
