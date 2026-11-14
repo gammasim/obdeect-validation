@@ -92,6 +92,23 @@ def run_tool(argv, log) -> str:
     return Path(log).read_text(encoding="utf-8", errors="replace")
 
 
+# sim_telarray log lines that mean input was dropped although the run exits 0.
+SIMTEL_DROPPED_INPUT = (
+    "I/O block is skipped",
+    "Cannot extend I/O buffer",
+    "Error reading",
+)
+
+
+def simtel_dropped_input(log_text: str) -> list[str]:
+    """Lines of a sim_telarray log that report skipped or unreadable input blocks."""
+    return [
+        line.strip()
+        for line in log_text.splitlines()
+        if any(marker in line for marker in SIMTEL_DROPPED_INPUT)
+    ]
+
+
 def sim_telarray(
     root: Path,
     input_file,
@@ -133,9 +150,15 @@ def sim_telarray(
     argv += [*extra, input_file]
     argv = [str(arg) for arg in argv]
     (root / f"{name}.command.json").write_text(json.dumps(argv, indent=2) + "\n")
-    runner(argv, root / f"{name}.log", cwd=REFERENCE)
+    log = root / f"{name}.log"
+    runner(argv, log, cwd=REFERENCE)
+    dropped = (
+        simtel_dropped_input(log.read_text(errors="replace")) if log.is_file() else []
+    )
+    if dropped:
+        raise RuntimeError(f"sim_telarray dropped input ({dropped[0]}); see {log}")
     if not output.is_file():
-        raise RuntimeError(f"no sim_telarray output: {root / name}.log")
+        raise RuntimeError(f"no sim_telarray output: {log}")
     return output
 
 

@@ -183,3 +183,34 @@ def test_extinction_figure_colours_follow_the_photon_wavelengths(tmp_path):
         tmp_path / "e.png",
     )
     assert (tmp_path / "e.png").is_file() and plotting.CYCLE
+
+
+def test_sim_telarray_fails_when_input_block_is_skipped(tmp_path):
+    def runner(argv, log, cwd=None):
+        (tmp_path / "run.simtel").write_bytes(b"")
+        log.write_text(
+            "Cannot extend I/O buffer of length 32768 by another 1279967280 bytes\n"
+            "I/O buffer too small; I/O block is skipped\n"
+            "Run(s) completed as expected after 1 events (1 showers).\n"
+        )
+
+    with pytest.raises(RuntimeError, match="dropped input"):
+        common.sim_telarray(tmp_path, "in.iact", "run", {}, runner=runner)
+
+
+@pytest.mark.parametrize("create_output", [False, True])
+def test_sim_telarray_reports_error_reading_input(tmp_path, create_output):
+    def runner(argv, log, cwd=None):
+        if create_output:
+            (tmp_path / "run.simtel").write_bytes(b"")
+        log.write_text("Error reading input block\n")
+
+    with pytest.raises(RuntimeError, match="dropped input.*Error reading input block"):
+        common.sim_telarray(tmp_path, "in.iact", "run", {}, runner=runner)
+
+
+def test_simtel_dropped_input_ignores_normal_logs():
+    text = (
+        "I/O block extended by 122878 to 1122878 bytes\nRun(s) completed as expected\n"
+    )
+    assert common.simtel_dropped_input(text) == []

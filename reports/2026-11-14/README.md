@@ -38,8 +38,10 @@ Reference findings (recorded, not judged; details in each `details.json`):
   (`IactLightEmission.cc` ~l.1395), which breaks impact parameters and times. With the same
   sampler in both programs (2026-11-13 run) the camera ratio was 0.998 ± 0.009.
 - ff-gct: near-horizontal photons (\|cz\| < 0.3) carry a refraction time term of up to 4 ns.
-- sim_telarray reads 0 photons from a 1.28 GB obdeect stream written with extended block
-  headers; the flasher-secondary camera stage uses 1e6 photons per flasher.
+- sim_telarray skips an event block larger than its input buffer (default limits) and still
+  exits 0; the flasher-secondary camera stage therefore uses 1e6 photons per flasher. Not an
+  obdeect format problem: with `CORSIKA_IO_BUFFER=2GiB MAX_BUNCHES=50000000` the 1.28 GB
+  stream is read completely (568833 p.e., 10x the 1e6 run).
 
 Limits are set before the runs and recorded in each `details.json`; optics and source limits
 are provisional and need scientific approval.

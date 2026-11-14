@@ -110,8 +110,8 @@ CASES = {
                 "--events",
                 "1",
             ],
-            # 1e6 per flasher: ~57000 p.e. per event. At 1e7 the to-simtel file exceeds 1 GB, which
-            # sim_telarray reads with extended block headers as 'Error reading photon bunches'.
+            # 1e6 per flasher: ~57000 p.e. per event. At 1e7 the 1.28 GB event block exceeds the
+            # default sim_telarray input buffer (CORSIKA_IO_BUFFER, MAX_BUNCHES), which skips the block.
             "reference": ["ff-gct", "--photons", "1000000", "--events", "1"],
             "photon_factor": 10,
         },
