@@ -1,0 +1,14 @@
+{
+  "wavelength_count": 9,
+  "height_count": 5,
+  "zenith_count": 4,
+  "telescope_elevation_count": 2,
+  "path_length_count": 2,
+  "source_rows_ignored_above_api_wavelength_range": 1,
+  "weighted_photon_count": 368640,
+  "thinned_photon_count": 303748,
+  "weighted_table_max_absolute_error": 4.4971047552522236e-08,
+  "weighted_column_max_absolute_error": 4.4971047552522236e-08,
+  "telescope_depth_max_absolute_error": 4.336808689942018e-19,
+  "thinning_count_residual_sigma": 2.767575682903425
+}

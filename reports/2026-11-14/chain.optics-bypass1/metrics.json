@@ -1,0 +1,23 @@
+{
+  "candidate_pipeline_complete": 1,
+  "reference_camera_events": 100,
+  "candidate_camera_events": 100,
+  "camera_event_id_delta": 0,
+  "matched_event_telescope_samples": 100,
+  "photoelectron_relative_bias": 0.0006343778265125327,
+  "photoelectron_relative_bias_se": 0.0018691641692230954,
+  "photoelectron_bias_limit_exceeded": 0,
+  "mean_image_reduced_chi2": 0.993633259537621,
+  "image_shape_limit_exceeded": 0,
+  "mean_arrival_time_difference_ns": 0.022108665890991686,
+  "arrival_time_bias_limit_exceeded": 0,
+  "max_image_relative_l1_difference": 0.3830155979202773,
+  "mean_image_relative_l1_difference": 0.25014477462192947,
+  "max_mean_arrival_time_difference_ns": 0.2530193328857422,
+  "mean_adc_sample_difference": -0.015749191374663078,
+  "trigger_pattern_mismatches": 0,
+  "trigger_probability_limit_exceeded": 0,
+  "centroid_matched_samples": 100,
+  "centroid_mean_index_offset": 0.2545320134437475,
+  "centroid_max_abs_index_offset": 18.612334543062843
+}

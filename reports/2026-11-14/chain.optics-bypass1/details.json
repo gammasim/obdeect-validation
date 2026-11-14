@@ -1,0 +1,52 @@
+{
+  "factors": {
+    "mirror_reflectivity": {
+      "file": "mirror_reflectivity-1.0.0-LSTN-01.dat",
+      "reference": "sim_telarray ray tracing (Bypass_Optics=0)",
+      "candidate": "obdeect compiled mirror response (trace-stream); sim_telarray not applied"
+    },
+    "mirror_degraded_reflection": {
+      "value": "0.784",
+      "reference": "sim_telarray ray tracing (sim_absorb mirror_degraded)",
+      "candidate": "obdeect compiled mirror response (compiler.py); sim_telarray Bypass_Optics=1 only warns"
+    },
+    "telescope_transmission": {
+      "value": "0.969 0.0 0.0 0.0 0.0 0.0",
+      "reference": "sim_telarray ray tracing (t0 kept)",
+      "candidate": "obdeect trace-stream --telescope-transmission full (t0 and t(theta)); sim_telarray forces t0=1 under bypass"
+    },
+    "camera_transmission": {
+      "value": "1.0",
+      "reference": "sim_telarray",
+      "candidate": "sim_telarray (Bypass_Optics=1, same value)"
+    },
+    "camera_degraded_efficiency": {
+      "value": "1.0",
+      "reference": "sim_telarray",
+      "candidate": "sim_telarray (same value)"
+    },
+    "quantum_efficiency": {
+      "file": "quantum_efficiency-1.0.0-LSTN-01.dat",
+      "reference": "sim_telarray",
+      "candidate": "sim_telarray (Bypass_Optics=1 first cut and second cut)"
+    },
+    "atmosphere": {
+      "reference": "unit table (optical depth 0)",
+      "candidate": "unit table (optical depth 0), no obdeect atmosphere stage"
+    },
+    "camera_rotation_deg": 10.893,
+    "mirror_class": "0"
+  },
+  "config": "/results/full-2026-11-14/chain.optics-bypass1/cfg/model/7.0.0/CTAO.cfg",
+  "physics_limits": {
+    "photoelectron_relative_bias": 0.01,
+    "trigger_probability": "paired |mean| > 5 se per telescope"
+  },
+  "trigger_probability_per_telescope": {
+    "1": {
+      "difference": 0.0,
+      "se": 0.0,
+      "flag": 0
+    }
+  }
+}

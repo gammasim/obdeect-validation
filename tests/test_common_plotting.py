@@ -162,13 +162,13 @@ def test_native_reader_counts_weight_per_event(monkeypatch):
     assert readers.read_native("x")[0] == [3.0, 1.0]
 
 
-def test_camera_metrics_need_two_events_per_sample():
+def test_camera_metrics_need_an_event_per_sample():
     from obdeect_validation.adapters import source_camera as sc
 
-    one = {1: (np.array([5.0]), np.ones(4))}
+    none = {1: (np.array([]), np.ones(4))}
     two = {1: (np.array([5.0, 6.0]), np.ones(4))}
-    with pytest.raises(ValueError, match="at least 2"):
-        sc.camera_metrics(one, two)
+    with pytest.raises(ValueError, match="at least 1"):
+        sc.camera_metrics(none, two)
 
 
 def test_extinction_figure_colours_follow_the_photon_wavelengths(tmp_path):

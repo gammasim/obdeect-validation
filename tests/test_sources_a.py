@@ -106,3 +106,34 @@ def test_accepted_ratio_ignores_photons_outside_the_radius():
     ratio, se = sc.accepted_ratio(native, 1, reference, 1, 1400.0)
     assert ratio == pytest.approx(1.0)
     assert se > 0
+
+
+def test_air_index_integral_flat_and_log_linear_profiles():
+    flat = sc.index_integral_m([0.0, 1000.0, 2000.0], [2e-4, 2e-4, 2e-4], 0.0, 1000.0)
+    assert flat == pytest.approx(0.2)
+    # n-1 from 1e-4 to 1e-3 over 1000 m, log-linear: (y1 - y0) / k with k = ln(10) / 1000 m.
+    loglin = sc.index_integral_m([0.0, 1000.0], [1e-4, 1e-3], 0.0, 1000.0)
+    assert loglin == pytest.approx(9e-4 * 1000.0 / np.log(10.0), rel=1e-12)
+    with pytest.raises(ValueError):
+        sc.index_integral_m([0.0, 1000.0], [1e-4, 1e-3], 0.0, 1500.0)
+
+
+def test_air_delay_scales_with_inverse_cosine_and_ignores_upward_photons():
+    heights, nm1 = [0.0, 1000.0, 2000.0], [2e-4, 2e-4, 2e-4]
+    cz = np.array([-1.0, -0.5, 0.5])
+    delay = sc.air_delay_ns(np.full(3, 1000.0), cz, heights, nm1, 0.0)
+    # 0.2 m of air at n-1 = 2e-4 takes 0.2 / c = 0.667 ns at vertical incidence; slanted paths
+    # are longer by 1/|cz|.
+    assert delay[0] == pytest.approx(0.2 / sc.C_M_NS)
+    assert delay[1] == pytest.approx(2 * 0.2 / sc.C_M_NS)
+    assert delay[2] == 0.0
+
+
+def test_load_atmprof_reads_altitude_and_index_columns(tmp_path):
+    table = tmp_path / "atmprof.dat"
+    table.write_text(
+        "# comment\n 0.000 0.1E-02 0.1E+04 0.27E-03\n 1.000 0.1E-02 0.9E+03 0.25E-03\n"
+    )
+    heights, nm1 = sc.load_atmprof(table)
+    assert heights.tolist() == pytest.approx([0.0, 1000.0])
+    assert nm1.tolist() == pytest.approx([2.7e-4, 2.5e-4])

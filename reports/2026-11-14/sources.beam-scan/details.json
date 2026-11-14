@@ -1,0 +1,28 @@
+{
+  "case": "beam-scan",
+  "native_command": [
+    "obdeect",
+    "sources",
+    "beam-scan",
+    "-r",
+    "123",
+    "--seed",
+    "1"
+  ],
+  "reference_command": [
+    "xyls",
+    "-r",
+    "123"
+  ],
+  "frames": {
+    "native": "sky (beam at z = 6.15 cm)",
+    "reference": "plane z = 0"
+  },
+  "time_correction": "geometric",
+  "time_correction_rule": "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset",
+  "stage2": {
+    "status": "BLOCKED",
+    "reason": "no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per position, so the flat-field intensity cannot be matched between the two",
+    "traceback": "Traceback (most recent call last):\n  File \"/validation/src/obdeect_validation/adapters/source_camera.py\", line 819, in main\n    raise RuntimeError(stage2[\"blocked\"])\nRuntimeError: no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per position, so the flat-field intensity cannot be matched between the two\n"
+  }
+}

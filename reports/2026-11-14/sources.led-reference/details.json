@@ -1,0 +1,18 @@
+{
+  "seed": 17,
+  "events_native_photons": [
+    20.0,
+    20.0,
+    20.0
+  ],
+  "events_reference_photons": [
+    20.0,
+    20.0,
+    20.0
+  ],
+  "camera_sha256": "b658af7886389a66f8be55034dad07030041fa02de0ba07c8d96c7c62c3f0280",
+  "atmosphere_sha256": "e45f3b9ef051e79accb6715b0521d09be6e306417456135be8476e8b71b93ebd",
+  "pixled_sha256": "dc5d5d052af90542c0cd85c61d4d7ef2dc681ec368061bc77cc50f9e94b3ad2c",
+  "obdeect_sources_version": "0.8.1.dev31+g320a6e74b.d20261114",
+  "obdeect_stream_version": "0.8.1.dev31+g320a6e74b.d20261114"
+}

@@ -1,6 +1,5 @@
 """Check stream-to-sim_telarray conversion with the independent eventio reader."""
 
-import itertools
 import os
 import shutil
 import subprocess
@@ -38,30 +37,6 @@ def _top_level_spans(path):
 
 def _object_types(path):
     return [span[0] for span in _top_level_spans(path)]
-
-
-def _reorder_input_card(path, output_path):
-    """Write a copy whose header blocks follow CORSIKA's order (HEADER_ORDER), rest unchanged.
-
-    Diagnostic only: the converted file itself is not changed.
-    """
-    data = Path(path).read_bytes()
-    spans = _top_level_spans(path)
-    if (
-        spans[0][1] != 0
-        or spans[-1][2] != len(data)
-        or any(a[2] != b[1] for a, b in itertools.pairwise(spans))
-    ):
-        raise ValueError("top-level EventIO objects do not cover the file contiguously")
-    head = [
-        next(i for i, span in enumerate(spans) if span[0] == block_type)
-        for block_type in HEADER_ORDER
-        if any(span[0] == block_type for span in spans)
-    ]
-    order = head + [i for i in range(len(spans)) if i not in head]
-    Path(output_path).write_bytes(
-        b"".join(data[spans[i][1] : spans[i][2]] for i in order)
-    )
 
 
 def _read_stream(path):
@@ -181,10 +156,6 @@ def main():
     ) as exc:  # The reference reader rejects the emitted EventIO block order.
         reference_counts = []
         reader_error = f"{type(exc).__name__}: {exc}"
-    # Diagnostic: the same photons with INPUTCFG moved to CORSIKA's position (after RUNH).
-    reordered = root / "reordered.dat"
-    _reorder_input_card(converted, reordered)
-    reordered_counts = _read_eventio(reordered)
     deltas = common.event_deltas(source_counts, reference_counts)
     metrics = {
         "eventio_readable": int(reader_error is None),
@@ -195,15 +166,14 @@ def main():
         "eventio_photon_count": sum(reference_counts),
         "photon_count_delta": abs(sum(source_counts) - sum(reference_counts)),
         "max_event_photon_delta": max(deltas),
-        "reordered_event_count": len(reordered_counts),
-        "reordered_photon_count": sum(reordered_counts),
-        "reordered_photon_count_delta": abs(sum(source_counts) - sum(reordered_counts)),
+        "header_order_matches_corsika": int(
+            object_types[: len(HEADER_ORDER)] == HEADER_ORDER
+        ),
     }
     provenance = {
         "eventio_reader_error": reader_error,
         "converted_object_types": object_types,
         "corsika_reference_order": "1200 RunHeader, 1212 InputCard, 1216 AtmProfile, 1201 TelDef",
-        "reordered_object_types": _object_types(reordered),
         "seed": 17,
         "source_event_photons": source_counts,
         "eventio_event_photons": reference_counts,

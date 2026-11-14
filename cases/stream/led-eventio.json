@@ -24,6 +24,7 @@
     {"metric": "eventio_photon_count", "expected": 60, "atol": 0},
     {"metric": "event_count_delta", "expected": 0, "atol": 0},
     {"metric": "photon_count_delta", "expected": 0, "atol": 0},
-    {"metric": "max_event_photon_delta", "expected": 0, "atol": 0}
+    {"metric": "max_event_photon_delta", "expected": 0, "atol": 0},
+    {"metric": "header_order_matches_corsika", "expected": 1, "atol": 0}
   ]
 }
