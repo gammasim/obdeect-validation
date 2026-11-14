@@ -7,8 +7,10 @@ and night-sky sampler fixes (stream and sources packages), sim_telarray v2025-11
 (limits, parameter mapping, reference findings) and its figure. Signed values are
 obdeect / reference − 1. Supersedes 2026-11-13.
 
-**Result: 18 PASS, 1 FAIL.** The failure is the night-sky camera ratio against nsbls, which
-uses a non-isotropic entry-point sampler (see below).
+**Result: 18 PASS, 1 FAIL as run.** The failure is the night-sky camera ratio against nsbls, which
+uses a non-isotropic entry-point sampler (see below). After this run the night-sky camera ratio
+was made recorded-only (it is no longer a required metric); the suite was not rerun, so the
+table below still shows the run as executed.
 
 | Stage | Case | Agreement | Verdict |
 |---|---|---|---|

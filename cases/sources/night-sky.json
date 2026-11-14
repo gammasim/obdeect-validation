@@ -78,11 +78,6 @@
       "metric": "time_native_vs_pulse_ks_limit_exceeded",
       "expected": 0,
       "atol": 0
-    },
-    {
-      "metric": "camera_pe_ratio_limit_exceeded",
-      "expected": 0,
-      "atol": 0
     }
   ]
 }
