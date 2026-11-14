@@ -1,0 +1,8 @@
+{
+  "id": "propagation",
+  "cases": [
+    "../cases/propagation/extinction-analytic.json",
+    "../cases/propagation/extinction-simtel-table.json",
+    "../cases/propagation/atmosphere-corsika.json"
+  ]
+}

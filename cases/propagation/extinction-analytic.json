@@ -1,0 +1,10 @@
+{
+  "id": "propagation.extinction-analytic",
+  "name": "Beer-Lambert constant optical depth (analytic reference)",
+  "requires": ["obdeect"],
+  "commands": [{"name": "beer-lambert", "argv": ["{python}", "-m", "obdeect_validation.adapters.extinction_analytic"]}],
+  "metrics": [
+    {"metric": "sample_count", "expected": 16, "atol": 0},
+    {"metric": "max_transmission_absolute_error", "expected": 0, "atol": 1e-12}
+  ]
+}

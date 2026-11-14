@@ -1,0 +1,8 @@
+{
+  "id": "chain",
+  "cases": [
+    "../cases/chain/stream-roundtrip-threshold.json",
+    "../cases/chain/atmosphere-substitution.json",
+    "../cases/chain/optics-bypass1.json"
+  ]
+}

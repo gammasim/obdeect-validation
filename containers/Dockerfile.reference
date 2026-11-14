@@ -1,0 +1,26 @@
+# Build after Dockerfile.simtools-prod; local reference includes mode 3 and path-length fixes.
+ARG VALIDATION_IMAGE=localhost/obdeect-validation:local
+FROM ${VALIDATION_IMAGE}
+USER root
+ARG HESSIO_REVISION=604578331f4696703001e4af3b95a19cdcaa3852
+RUN git clone https://gitlab.cta-observatory.org/cta-computing/dpps/simpipe/simulation_software/hessio.git /opt/hessio-source && \
+    git -C /opt/hessio-source checkout "${HESSIO_REVISION}"
+RUN cd /opt/hessio-source && \
+    sed -i 's|hessioxxx-prepare: build-doc doc/eventio_en.pdf doc/hessio_refman.pdf|hessioxxx-prepare:|' Makefile && \
+    touch Makefile.LaTeX Makefile.Common ChangeLog && mkdir -p doc && \
+    touch doc/eventio_en.pdf doc/hessio_refman.pdf && \
+    make hessioxxx-prepare && cd hessioxxx && make -j2
+RUN wget -q https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz -O /tmp/gsl.tar.gz && \
+    echo '6a99eeed15632c6354895b1dd542ed5a855c0f15d9ad1326c6fe2b2c9e423190  /tmp/gsl.tar.gz' | sha256sum -c - && \
+    mkdir -p /tmp/gsl-source /opt/gsl-include/gsl && tar -xzf /tmp/gsl.tar.gz -C /tmp/gsl-source && \
+    find /tmp/gsl-source -name 'gsl*.h' -exec cp '{}' /opt/gsl-include/gsl/ \;
+COPY sim_telarray /opt/reference
+RUN cd /opt/reference && find common corsika hess -name '*.o' -delete && \
+    make -j2 sim_telarray HESSIO_PATH=/opt/hessio-source/hessioxxx \
+    EXTRA_DEFINES='-DCTA_PROD6 -DMAXIMUM_TELESCOPES=99 -DWITH_GSL -DWITH_GSL_RNG' \
+    EXTRA_CFLAGS=-I/opt/gsl-include CDEBUGFLAGS=-O2 && \
+    cp /workdir/simulation_software/sim_telarray/bin/pfp /opt/reference/pfp
+ENV SIMTEL_BINARY=/opt/reference/sim_telarray
+ENV SIMTEL_REFERENCE_SOURCE=/reference
+ENV LD_LIBRARY_PATH=/opt/hessio-source/hessioxxx/lib:/usr/local/lib:/workdir/simulation_software/stdtools/lib
+USER 1000:1000

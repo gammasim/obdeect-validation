@@ -1,0 +1,93 @@
+{
+  "id": "sources.flasher-dish",
+  "name": "Dish flasher versus ff-1m (emission; camera stage in details.json)",
+  "commands": [
+    {
+      "name": "compare-flasher-dish",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.source_camera",
+        "flasher-dish"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "requires": [
+    "obdeect",
+    "ff-1m",
+    "python3"
+  ],
+  "metrics": [
+    {
+      "metric": "native_event_count",
+      "expected": 20,
+      "atol": 0
+    },
+    {
+      "metric": "reference_event_count",
+      "expected": 20,
+      "atol": 0
+    },
+    {
+      "metric": "event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "photon_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cx_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cy_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cx_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cy_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "t_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "t_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "wavelength_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "wavelength_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "camera_pe_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "camera_image_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

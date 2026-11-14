@@ -1,0 +1,52 @@
+{
+  "case": "flasher-secondary",
+  "native_command": [
+    "obdeect",
+    "sources",
+    "flasher",
+    "--type",
+    "secondary",
+    "--photons",
+    "1e5",
+    "--events",
+    "1"
+  ],
+  "reference_command": [
+    "ff-gct",
+    "--photons",
+    "1e5",
+    "--events",
+    "1"
+  ],
+  "frames": {
+    "native": "telescope (T)",
+    "reference": "ff-gct photon bunches (no cz)"
+  },
+  "time_correction": "geometric",
+  "time_correction_rule": "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset",
+  "stage2": {
+    "status": "BLOCKED",
+    "reason": "",
+    "traceback": "imtelfile.py\", line 264, in _parse_next_object\n    o = next(self._file)\n  File \"/workdir/env/lib64/python3.14/site-packages/eventio/base.py\", line 124, in __next__\n    return self._read_next_object()\n           ~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/workdir/env/lib64/python3.14/site-packages/eventio/base.py\", line 128, in _read_next_object\n    read_sync_marker(self._filehandle)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"/workdir/env/lib64/python3.14/site-packages/eventio/base.py\", line 210, in read_sync_marker\n    check_size_or_raise(sync, constants.SYNC_MARKER_SIZE, zero_ok=True)\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workdir/env/lib64/python3.14/site-packages/eventio/base.py\", line 193, in check_size_or_raise\n    raise StopIteration\nStopIteration\n",
+    "native_command": [
+      "obdeect",
+      "sources",
+      "flasher",
+      "--type",
+      "secondary",
+      "--photons",
+      "10000000",
+      "--events",
+      "1"
+    ],
+    "reference_command": [
+      "ff-gct",
+      "--photons",
+      "10000000",
+      "--events",
+      "1"
+    ],
+    "photon_factor": 100,
+    "photon_factor_note": "same factor applied to native and reference; stage 1 uses the matched stage 1 counts"
+  }
+}

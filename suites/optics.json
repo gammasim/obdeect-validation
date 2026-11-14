@@ -1,0 +1,8 @@
+{
+  "id": "optics",
+  "cases": [
+    "../cases/optics/optics-lst.json",
+    "../cases/optics/optics-mst.json",
+    "../cases/optics/optics-sst.json"
+  ]
+}

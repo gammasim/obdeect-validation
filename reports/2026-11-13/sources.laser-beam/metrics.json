@@ -1,0 +1,17 @@
+{
+  "fov_entry_offset_m": 0.00046714565384962334,
+  "fov_entry_offset_m_limit_exceeded": 0,
+  "fov_exit_offset_m": 0.052408271810402064,
+  "fov_exit_offset_m_limit_exceeded": 0,
+  "fov_path_native_m": 131.59999842252924,
+  "fov_path_reference_m": 131.6520203870795,
+  "fov_path_offset_m": -0.05202196455024932,
+  "fov_path_offset_m_limit_exceeded": 0,
+  "primary_direction_spread": 0.0,
+  "primary_off_line_max_m": 1.8618226022226736e-05,
+  "ls_beam_fov_points_off_primary_line_max_m": 0.0002636459459976328,
+  "ls_beam_fov_points_off_primary_line_max_m_limit_exceeded": 0,
+  "primary_count": 43938,
+  "ls_beam_emission_count": 22,
+  "ls_beam_outside_segment_count": 0
+}

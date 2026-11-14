@@ -1,0 +1,53 @@
+{
+  "id": "sources.laser-beam",
+  "name": "Laser beam versus ls-beam: FoV crossing geometry only (yield, direction, time, camera BLOCKED)",
+  "requires": [
+    "obdeect",
+    "ls-beam",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "compare-laser-beam",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.source_comparison",
+        "laser-beam"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "ls_beam_outside_segment_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "primary_count",
+      "expected": 43938,
+      "atol": 0
+    },
+    {
+      "metric": "fov_entry_offset_m_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fov_exit_offset_m_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fov_path_offset_m_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "ls_beam_fov_points_off_primary_line_max_m_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

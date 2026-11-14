@@ -1,0 +1,66 @@
+{
+  "case": "point-source",
+  "native_command": [
+    "obdeect",
+    "sources",
+    "point-source",
+    "-N",
+    "30",
+    "-n",
+    "10000000",
+    "-z",
+    "100000",
+    "-a",
+    "isotropic",
+    "--seed",
+    "17"
+  ],
+  "reference_command": [
+    "xyzls",
+    "-N",
+    "30",
+    "-n",
+    "10000000",
+    "-z",
+    "100000",
+    "-a",
+    "isotropic"
+  ],
+  "frames": {
+    "native": "sky (emission at source, z = 1000 m)",
+    "reference": "plane through telescope sphere centre"
+  },
+  "time_correction": "geometric",
+  "time_correction_rule": "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset",
+  "stage2": {
+    "status": "OK",
+    "native_command": [
+      "obdeect",
+      "sources",
+      "point-source",
+      "-N",
+      "2",
+      "-n",
+      "3000000000",
+      "-z",
+      "100000",
+      "-a",
+      "isotropic",
+      "--seed",
+      "17"
+    ],
+    "reference_command": [
+      "xyzls",
+      "-N",
+      "2",
+      "-n",
+      "3000000000",
+      "-z",
+      "100000",
+      "-a",
+      "isotropic"
+    ],
+    "photon_factor": 300,
+    "photon_factor_note": "same factor applied to native and reference; stage 1 uses the matched stage 1 counts"
+  }
+}

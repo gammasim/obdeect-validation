@@ -1,0 +1,10 @@
+{
+  "id": "smoke",
+  "cases": [
+    "../cases/sources/led-reference.json",
+    "../cases/stream/corsika-roundtrip.json",
+    "../cases/propagation/extinction-analytic.json",
+    "../cases/propagation/atmosphere-corsika.json",
+    "../cases/chain/stream-roundtrip-threshold.json"
+  ]
+}

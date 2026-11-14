@@ -1,0 +1,108 @@
+{
+  "id": "sources.night-sky",
+  "name": "Night sky versus nsbls: rate, direction, projected area, time",
+  "requires": [
+    "obdeect",
+    "nsbls",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "compare-night-sky",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.source_comparison",
+        "night-sky"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "wavelength_mismatch_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "yield_ratio_native_reference_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "rate_native_relative_error_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "rate_reference_relative_error_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "yield_native_expected_relative_error_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "yield_reference_expected_relative_error_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cone_uniform_native_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cone_uniform_reference_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cz_native_vs_reference_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "impact_parameter_native_vs_sampler_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "projected_area_uniform_native_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "projected_area_uniform_reference_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "impact_parameter_native_vs_reference_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "time_native_vs_pulse_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "time_reference_vs_pulse_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "time_native_vs_reference_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "time_mean_difference_ns_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

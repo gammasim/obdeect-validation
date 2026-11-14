@@ -1,0 +1,18 @@
+{
+  "id": "propagation.atmosphere-corsika",
+  "name": "Atmosphere refraction against compiled CORSIKA IACT/atmo",
+  "requires": ["cc"],
+  "commands": [
+    {
+      "name": "corsika-reference-and-obdeect",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.atmosphere_reference"]
+    }
+  ],
+  "metrics": [
+    {"metric": "sample_count", "expected": 24, "atol": 0},
+    {"metric": "bent_count", "expected": 24, "atol": 0},
+    {"metric": "max_direction_cosine_absolute_error", "expected": 0, "atol": 1e-10},
+    {"metric": "max_displacement_absolute_error_m", "expected": 0, "atol": 0.001},
+    {"metric": "max_travel_time_absolute_error_ns", "expected": 0, "atol": 0.003}
+  ]
+}

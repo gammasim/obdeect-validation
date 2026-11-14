@@ -1,0 +1,27 @@
+{
+  "id": "chain.atmosphere-substitution",
+  "name": "obdeect atmosphere substitution vs sim_telarray atmosphere (20 deg, CORSIKA band)",
+  "requires": ["obdeect", "/workdir/simulation_software/sim_telarray/bin/sim_telarray"],
+  "commands": [
+    {
+      "name": "zenith-20-substitution",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.atmosphere_chain",
+               "--showers", "/validation/inputs/gamma-20deg-100-3000GeV.iact"],
+      "timeout": 3600
+    }
+  ],
+  "metrics": [
+    {"metric": "reference_camera_events", "expected": 100, "atol": 0},
+    {"metric": "candidate_camera_events", "expected": 100, "atol": 0},
+    {"metric": "camera_event_id_delta", "expected": 0, "atol": 0},
+    {"metric": "matched_event_telescope_samples", "expected": 300, "atol": 0},
+    {"metric": "propagation_dropped_photons", "expected": 0, "atol": 0},
+    {"metric": "transmission_mean_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "not_absorbed_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "detected_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "photoelectron_bias_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "image_shape_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "arrival_time_bias_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "trigger_pattern_mismatches", "expected": 0, "atol": 0}
+  ]
+}

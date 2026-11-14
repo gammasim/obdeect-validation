@@ -1,0 +1,13 @@
+{
+  "note": "Shower inputs are not in Git. Regenerate with CORSIKA 7.8010 (corsika_qgs2_urqmd_flat, simtools-prod image) from the cards, or copy them to inputs/; checked by sha256. Each shower file needs its CORSIKA log as <name>.corsika.log (wavelength band for the atmosphere case).",
+  "files": {
+    "gamma-20deg-100-3000GeV.iact": {
+      "sha256": "c6ade29bc6e7d0741e976a242cea3083aa253a659c2642ccf9941fc6e310883c",
+      "card": "corsika/gamma-20deg-100-3000GeV.card"
+    },
+    "gamma-20deg-20-100GeV.iact": {
+      "sha256": "a95cbc538d5af51ce2d04afea4d258e3db3d08f6d6f85f32a0ab6dbbe2426acd",
+      "card": "corsika/gamma-20deg-20-100GeV.card"
+    }
+  }
+}

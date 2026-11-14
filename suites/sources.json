@@ -1,0 +1,13 @@
+{
+  "id": "sources",
+  "cases": [
+    "../cases/sources/led-reference.json",
+    "../cases/sources/flasher-dish.json",
+    "../cases/sources/flasher-secondary.json",
+    "../cases/sources/point-source.json",
+    "../cases/sources/beam-scan.json",
+    "../cases/sources/laser-beam.json",
+    "../cases/sources/night-sky.json",
+    "../cases/sources/muon-track.json"
+  ]
+}
