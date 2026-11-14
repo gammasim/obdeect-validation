@@ -14,7 +14,7 @@ classifiers = [
 ]
 dependencies = [ "eventio", "numpy>=2.3" ]
 optional-dependencies.dev = [ "pytest>=8" ]
-optional-dependencies.references = [ "astropy>=7", "eventio>=2", "numpy>=2" ]
+optional-dependencies.references = [ "astropy>=7", "eventio>=2", "numpy>=2", "scipy" ]
 scripts.obdeect-validate = "obdeect_validation.cli:main"
 
 [tool.setuptools]
