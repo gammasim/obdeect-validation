@@ -45,8 +45,12 @@ def metric_case(value: float = 2.0, *, case_id: str = "sample") -> dict:
 
 def suite_file(tmp_path: Path, case: dict | str) -> Path:
     cases_dir = tmp_path / "cases"
-    case_file = write_json(cases_dir / "sample.json", case) if isinstance(case, dict) else case
-    return write_json(tmp_path / "suite.json", {"id": "unit", "cases": [str(case_file)]})
+    case_file = (
+        write_json(cases_dir / "sample.json", case) if isinstance(case, dict) else case
+    )
+    return write_json(
+        tmp_path / "suite.json", {"id": "unit", "cases": [str(case_file)]}
+    )
 
 
 def test_list_and_doctor_json(tmp_path: Path) -> None:
@@ -56,14 +60,20 @@ def test_list_and_doctor_json(tmp_path: Path) -> None:
     assert listed.returncode == 0, listed.stderr
     assert "sample" in listed.stdout
 
-    environment = write_json(tmp_path / "environment.json", {"env": {}, "requires": [PYTHON]})
-    diagnosed = invoke("doctor", "--environment", str(environment), "--json", cwd=tmp_path)
+    environment = write_json(
+        tmp_path / "environment.json", {"env": {}, "requires": [PYTHON]}
+    )
+    diagnosed = invoke(
+        "doctor", "--environment", str(environment), "--json", cwd=tmp_path
+    )
     assert diagnosed.returncode == 0, diagnosed.stderr
     assert PYTHON in diagnosed.stdout
 
 
 def test_run_pass_and_report_html_escapes_case_text(tmp_path: Path) -> None:
-    suite = suite_file(tmp_path, metric_case(case_id="x</title><script>alert(1)</script>"))
+    suite = suite_file(
+        tmp_path, metric_case(case_id="x</title><script>alert(1)</script>")
+    )
     output = tmp_path / "run"
     result = invoke("run", "--suite", str(suite), "--output", str(output), cwd=tmp_path)
     assert result.returncode == 0, result.stderr
@@ -78,7 +88,9 @@ def test_run_pass_and_report_html_escapes_case_text(tmp_path: Path) -> None:
 
 def test_metric_mismatch_returns_one(tmp_path: Path) -> None:
     suite = suite_file(tmp_path, metric_case(value=3.0))
-    result = invoke("run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path)
+    result = invoke(
+        "run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path
+    )
     assert result.returncode == 0, result.stderr
 
     # Change the expected value while keeping the produced measurement fixed.
@@ -86,7 +98,14 @@ def test_metric_mismatch_returns_one(tmp_path: Path) -> None:
     case = metric_case(value=2.0)
     case["metrics"][0]["expected"] = 3.0
     write_json(case_path, case)
-    result = invoke("run", "--case", str(case_path), "--output", str(tmp_path / "failed"), cwd=tmp_path)
+    result = invoke(
+        "run",
+        "--case",
+        str(case_path),
+        "--output",
+        str(tmp_path / "failed"),
+        cwd=tmp_path,
+    )
     assert result.returncode == 1
 
 
@@ -94,18 +113,27 @@ def test_missing_prerequisite_returns_three(tmp_path: Path) -> None:
     case = metric_case()
     case["requires"] = ["no-such-obdeect-validation-tool"]
     suite = suite_file(tmp_path, case)
-    result = invoke("run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path)
+    result = invoke(
+        "run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path
+    )
     assert result.returncode == 3
-    summary = json.loads((tmp_path / "run" / "summary.json").read_text(encoding="utf-8"))
+    summary = json.loads(
+        (tmp_path / "run" / "summary.json").read_text(encoding="utf-8")
+    )
     assert "BLOCKED" in json.dumps(summary)
 
 
-def test_missing_environment_input_and_module_block_before_command(tmp_path: Path) -> None:
+def test_missing_environment_input_and_module_block_before_command(
+    tmp_path: Path,
+) -> None:
     marker = tmp_path / "launched"
     case = {
         "id": "environment-check",
         "commands": [
-            {"name": "mark-launch", "argv": [PYTHON, "-c", f"open({str(marker)!r}, 'w').write('started')"]}
+            {
+                "name": "mark-launch",
+                "argv": [PYTHON, "-c", f"open({str(marker)!r}, 'w').write('started')"],
+            }
         ],
     }
     suite = suite_file(tmp_path, case)
@@ -118,7 +146,14 @@ def test_missing_environment_input_and_module_block_before_command(tmp_path: Pat
     )
     output = tmp_path / "run"
     result = invoke(
-        "run", "--suite", str(suite), "--environment", str(environment), "--output", str(output), cwd=tmp_path
+        "run",
+        "--suite",
+        str(suite),
+        "--environment",
+        str(environment),
+        "--output",
+        str(output),
+        cwd=tmp_path,
     )
     assert result.returncode == 3
     assert not marker.exists()
@@ -127,17 +162,23 @@ def test_missing_environment_input_and_module_block_before_command(tmp_path: Pat
     assert blocked["status"] == "BLOCKED"
     assert blocked["steps"] == []
     assert "obdeect_validation_module_missing_for_test" in blocked["missing_modules"]
-    assert any(path.endswith("required-input.dat") for path in blocked["missing_inputs"])
+    assert any(
+        path.endswith("required-input.dat") for path in blocked["missing_inputs"]
+    )
 
 
 def test_timeout_returns_execution_error(tmp_path: Path) -> None:
     case = {
         "id": "timeout",
         "timeout": 0.05,
-        "commands": [{"name": "wait", "argv": [PYTHON, "-c", "import time; time.sleep(5)"]}],
+        "commands": [
+            {"name": "wait", "argv": [PYTHON, "-c", "import time; time.sleep(5)"]}
+        ],
     }
     suite = suite_file(tmp_path, case)
-    result = invoke("run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path)
+    result = invoke(
+        "run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path
+    )
     assert result.returncode == 2
 
 
@@ -151,7 +192,9 @@ def test_timeout_terminates_command_descendants(tmp_path: Path) -> None:
         "commands": [{"name": "spawn", "argv": [PYTHON, "-c", parent]}],
     }
     suite = suite_file(tmp_path, case)
-    result = invoke("run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path)
+    result = invoke(
+        "run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path
+    )
     assert result.returncode == 2
     subprocess.run([PYTHON, "-c", "import time; time.sleep(1.0)"], check=True)
     assert not marker.exists()
@@ -175,13 +218,27 @@ def test_sigint_writes_partial_reports_and_stops_process_group(tmp_path: Path) -
         "id": "interrupt-me",
         "commands": [{"name": "spawn-child", "argv": [PYTHON, "-c", parent_code]}],
     }
-    second = {"id": "must-not-start", "commands": [{"name": "noop", "argv": [PYTHON, "-c", "pass"]}]}
-    suite = write_json(tmp_path / "suite.json", {"id": "interrupt", "cases": [case, second]})
+    second = {
+        "id": "must-not-start",
+        "commands": [{"name": "noop", "argv": [PYTHON, "-c", "pass"]}],
+    }
+    suite = write_json(
+        tmp_path / "suite.json", {"id": "interrupt", "cases": [case, second]}
+    )
     output = tmp_path / "run"
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT / "src")
     runner = subprocess.Popen(
-        [PYTHON, "-m", "obdeect_validation", "run", "--suite", str(suite), "--output", str(output)],
+        [
+            PYTHON,
+            "-m",
+            "obdeect_validation",
+            "run",
+            "--suite",
+            str(suite),
+            "--output",
+            str(output),
+        ],
         cwd=tmp_path,
         env=env,
         text=True,
@@ -190,9 +247,15 @@ def test_sigint_writes_partial_reports_and_stops_process_group(tmp_path: Path) -
     )
     deadline = time.monotonic() + 10
     try:
-        while not child_pid_file.exists() and runner.poll() is None and time.monotonic() < deadline:
+        while (
+            not child_pid_file.exists()
+            and runner.poll() is None
+            and time.monotonic() < deadline
+        ):
             time.sleep(0.05)
-        assert child_pid_file.exists(), "runner never started the command's child process"
+        assert child_pid_file.exists(), (
+            "runner never started the command's child process"
+        )
         time.sleep(0.2)
         runner.send_signal(signal.SIGINT)
         stdout, stderr = runner.communicate(timeout=10)
@@ -215,7 +278,9 @@ def test_sigint_writes_partial_reports_and_stops_process_group(tmp_path: Path) -
     proc_stat = Path(f"/proc/{child_pid}/stat")
     if proc_stat.exists():
         state = proc_stat.read_text(encoding="utf-8").rsplit(")", 1)[1].split()[0]
-        assert state == "Z", f"child process {child_pid} is still running (state {state})"
+        assert state == "Z", (
+            f"child process {child_pid} is still running (state {state})"
+        )
     else:
         with pytest.raises(ProcessLookupError):
             os.kill(child_pid, 0)
@@ -223,18 +288,30 @@ def test_sigint_writes_partial_reports_and_stops_process_group(tmp_path: Path) -
 
 def test_suite_loads_sibling_cases_through_parent_path(tmp_path: Path) -> None:
     write_json(tmp_path / "cases" / "sample.json", metric_case())
-    suite = write_json(tmp_path / "suites" / "suite.json", {"id": "siblings", "cases": ["../cases/sample.json"]})
+    suite = write_json(
+        tmp_path / "suites" / "suite.json",
+        {"id": "siblings", "cases": ["../cases/sample.json"]},
+    )
     result = invoke("list", "--suite", str(suite), "--json", cwd=tmp_path)
     assert result.returncode == 0, result.stderr
     assert "sample" in result.stdout
 
 
-def test_command_only_infrastructure_case_passes_without_scientific_metrics(tmp_path: Path) -> None:
-    case = {"id": "tool-probe", "commands": [{"name": "version", "argv": [PYTHON, "--version"]}]}
+def test_command_only_infrastructure_case_passes_without_scientific_metrics(
+    tmp_path: Path,
+) -> None:
+    case = {
+        "id": "tool-probe",
+        "commands": [{"name": "version", "argv": [PYTHON, "--version"]}],
+    }
     suite = suite_file(tmp_path, case)
-    result = invoke("run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path)
+    result = invoke(
+        "run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path
+    )
     assert result.returncode == 0, result.stderr
-    summary = json.loads((tmp_path / "run" / "summary.json").read_text(encoding="utf-8"))
+    summary = json.loads(
+        (tmp_path / "run" / "summary.json").read_text(encoding="utf-8")
+    )
     assert summary["cases"][0]["status"] == "PASS"
     assert summary["cases"][0]["metrics"] == []
 
@@ -247,17 +324,25 @@ def test_resume_reuses_pass_but_invalidates_changed_case(tmp_path: Path) -> None
     output = tmp_path / "run"
     first = invoke("run", "--suite", str(suite), "--output", str(output), cwd=tmp_path)
     assert first.returncode == 0, first.stderr
-    second = invoke("run", "--suite", str(suite), "--output", str(output), "--resume", cwd=tmp_path)
+    second = invoke(
+        "run", "--suite", str(suite), "--output", str(output), "--resume", cwd=tmp_path
+    )
     assert second.returncode == 0, second.stderr
     assert marker.read_text(encoding="utf-8").splitlines() == ["run"]
 
     case_path = tmp_path / "cases" / "sample.json"
     changed = metric_case()
     changed["name"] = "changed fingerprint"
-    changed["commands"][0]["argv"][-1] += f"; open({str(marker)!r}, 'a').write('run\\n')"
+    changed["commands"][0]["argv"][-1] += (
+        f"; open({str(marker)!r}, 'a').write('run\\n')"
+    )
     write_json(case_path, changed)
-    suite = write_json(tmp_path / "suite.json", {"id": "unit", "cases": ["cases/sample.json"]})
-    third = invoke("run", "--suite", str(suite), "--output", str(output), "--resume", cwd=tmp_path)
+    suite = write_json(
+        tmp_path / "suite.json", {"id": "unit", "cases": ["cases/sample.json"]}
+    )
+    third = invoke(
+        "run", "--suite", str(suite), "--output", str(output), "--resume", cwd=tmp_path
+    )
     assert third.returncode == 0, third.stderr
     assert marker.read_text(encoding="utf-8").splitlines() == ["run", "run"]
     summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
@@ -285,7 +370,9 @@ def test_resume_invalidates_when_tracked_source_changes(tmp_path: Path) -> None:
     assert first.returncode == 0, first.stderr
 
     source.write_text("after\n", encoding="utf-8")
-    resumed = invoke("run", "--suite", str(suite), "--output", str(output), "--resume", cwd=tmp_path)
+    resumed = invoke(
+        "run", "--suite", str(suite), "--output", str(output), "--resume", cwd=tmp_path
+    )
     assert resumed.returncode == 0, resumed.stderr
     assert marker.read_text(encoding="utf-8").splitlines() == ["run", "run"]
 
@@ -306,6 +393,10 @@ def test_rerun_does_not_accept_stale_metrics(tmp_path: Path) -> None:
 
 
 def test_invalid_config_returns_two(tmp_path: Path) -> None:
-    suite = write_json(tmp_path / "suite.json", {"id": "bad", "cases": [{"id": "broken"}]})
-    result = invoke("run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path)
+    suite = write_json(
+        tmp_path / "suite.json", {"id": "bad", "cases": [{"id": "broken"}]}
+    )
+    result = invoke(
+        "run", "--suite", str(suite), "--output", str(tmp_path / "run"), cwd=tmp_path
+    )
     assert result.returncode == 2

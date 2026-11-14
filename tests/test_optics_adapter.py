@@ -6,10 +6,10 @@ from types import SimpleNamespace
 import pytest
 
 astropy = pytest.importorskip("astropy")
-import astropy.units as u
-from astropy.table import QTable
+import astropy.units as u  # noqa: E402
+from astropy.table import QTable  # noqa: E402
 
-from obdeect_validation.adapters import simtools_validate_optics as adapter
+from obdeect_validation.adapters import simtools_validate_optics as adapter  # noqa: E402
 
 LIMITS = {"psf_cm": 0.02, "eff_area": 0.01, "eff_flen": 0.002}
 
@@ -40,11 +40,14 @@ def side(psf, area, flen, flen_err=None, off_x=None):
         "psf_cm": psf,
         "eff_area": area,
         "eff_flen": flen,
-        "eff_flen_err": flen_err or [None if flen[i] is None else 0.0 for i in range(n)],
+        "eff_flen_err": flen_err
+        or [None if flen[i] is None else 0.0 for i in range(n)],
     }
 
 
-def test_table_converts_units_and_preserves_on_axis_undefined_flen(tmp_path: Path) -> None:
+def test_table_converts_units_and_preserves_on_axis_undefined_flen(
+    tmp_path: Path,
+) -> None:
     table_file(tmp_path)
     values = adapter._table(tmp_path)
     assert values["off_x"] == pytest.approx([0, 1])
@@ -61,7 +64,9 @@ def test_table_rejects_missing_units(tmp_path: Path) -> None:
         adapter._table(tmp_path)
 
 
-def test_table_rejects_nonfinite_offsets_and_infinite_focal_length(tmp_path: Path) -> None:
+def test_table_rejects_nonfinite_offsets_and_infinite_focal_length(
+    tmp_path: Path,
+) -> None:
     target = table_file(tmp_path)
     table = QTable.read(target, format="ascii.ecsv")
     table["off_x"][0] = float("nan") * u.arcmin
@@ -116,16 +121,27 @@ def test_rows_reject_one_sided_undefined_and_zero_reference() -> None:
 
 
 def test_summary_reports_worst_offset_and_sign() -> None:
-    sim = side([1.0, 2.0, 4.0], [1.0, 1.0, 1.0], [None, 28.0, 28.0], flen_err=[None, 0.0, 0.0])
-    obd = side([1.0, 2.2, 3.6], [1.0, 1.0, 1.0], [None, 28.0, 28.0], flen_err=[None, 0.0, 0.0])
+    sim = side(
+        [1.0, 2.0, 4.0], [1.0, 1.0, 1.0], [None, 28.0, 28.0], flen_err=[None, 0.0, 0.0]
+    )
+    obd = side(
+        [1.0, 2.2, 3.6], [1.0, 1.0, 1.0], [None, 28.0, 28.0], flen_err=[None, 0.0, 0.0]
+    )
     summary = adapter._summary(adapter._rows(sim, obd, LIMITS))
     assert summary["psf_cm"]["max_abs_delta"] == pytest.approx(0.1)
-    assert summary["psf_cm"]["signed_delta_at_max"] == pytest.approx(0.1)  # first of the two equal maxima
-    assert [entry["angle_deg"] for entry in summary["psf_cm"]["exceeded_offsets"]] == [1.0, 2.0]
+    assert summary["psf_cm"]["signed_delta_at_max"] == pytest.approx(
+        0.1
+    )  # first of the two equal maxima
+    assert [entry["angle_deg"] for entry in summary["psf_cm"]["exceeded_offsets"]] == [
+        1.0,
+        2.0,
+    ]
     assert summary["eff_area"]["exceeded_offsets"] == []
 
 
-def test_execute_writes_application_config_outputs_and_compares_paired_offsets(monkeypatch, tmp_path: Path) -> None:
+def test_execute_writes_application_config_outputs_and_compares_paired_offsets(
+    monkeypatch, tmp_path: Path
+) -> None:
     pytest.importorskip("matplotlib")
     config = tmp_path / "input.json"
     config.write_text(
@@ -161,17 +177,30 @@ def test_execute_writes_application_config_outputs_and_compares_paired_offsets(m
         },
     )
     metrics = adapter.execute(config, tmp_path / "output")
-    assert [entry["applications"][0]["configuration"]["ray_tracing_backend"] for entry in configs] == [
+    assert [
+        entry["applications"][0]["configuration"]["ray_tracing_backend"]
+        for entry in configs
+    ] == [
         "sim_telarray",
         "obdeect",
     ]
-    assert all(entry["applications"][0]["configuration"]["model_version"] == "6.0.2" for entry in configs)
+    assert all(
+        entry["applications"][0]["configuration"]["model_version"] == "6.0.2"
+        for entry in configs
+    )
     assert metrics["n_offsets"] == 2
     assert metrics["max_rel_eff_flen"] == 0
     assert metrics["exceeded_limits"] == 0
-    assert json.loads((tmp_path / "output" / "metrics.json").read_text(encoding="utf-8")) == metrics
-    details = json.loads((tmp_path / "output" / "details.json").read_text(encoding="utf-8"))
-    assert details["status"].startswith("provisional, from obdeect-validation-org docs/phase1.md")
+    assert (
+        json.loads((tmp_path / "output" / "metrics.json").read_text(encoding="utf-8"))
+        == metrics
+    )
+    details = json.loads(
+        (tmp_path / "output" / "details.json").read_text(encoding="utf-8")
+    )
+    assert details["status"].startswith(
+        "provisional, from obdeect-validation-org docs/phase1.md"
+    )
     assert (tmp_path / "output" / "optics_relative_difference.png").stat().st_size > 0
 
 
@@ -191,13 +220,29 @@ def test_execute_rejects_mismatched_offset_pairing(monkeypatch, tmp_path: Path) 
     )
     result_tables = iter(
         [
-            {"off_x": [0.0], "off_y": [0.0], "psf_cm": [1.0], "eff_area": [1.0], "eff_flen": [2.0],
-             "eff_flen_err": [0.0]},
-            {"off_x": [1.0], "off_y": [0.0], "psf_cm": [1.0], "eff_area": [1.0], "eff_flen": [2.0],
-             "eff_flen_err": [0.0]},
+            {
+                "off_x": [0.0],
+                "off_y": [0.0],
+                "psf_cm": [1.0],
+                "eff_area": [1.0],
+                "eff_flen": [2.0],
+                "eff_flen_err": [0.0],
+            },
+            {
+                "off_x": [1.0],
+                "off_y": [0.0],
+                "psf_cm": [1.0],
+                "eff_area": [1.0],
+                "eff_flen": [2.0],
+                "eff_flen_err": [0.0],
+            },
         ]
     )
-    monkeypatch.setattr(adapter.subprocess, "run", lambda *_args, **_kwargs: SimpleNamespace(returncode=0))
+    monkeypatch.setattr(
+        adapter.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(returncode=0),
+    )
     monkeypatch.setattr(adapter, "_table", lambda _path: next(result_tables))
     with pytest.raises(adapter.AdapterError, match="offset rows do not align"):
         adapter.execute(config, tmp_path / "output")

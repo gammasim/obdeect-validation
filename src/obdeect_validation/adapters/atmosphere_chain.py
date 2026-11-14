@@ -20,17 +20,37 @@ SITE_ALTITUDE_M = 2156.0
 PATHLEN_M = 28.0
 SEED = 123
 SAMPLE_FRACTION = 0.02
-BAND_PATTERN = re.compile(r"CHERENKOV WAVELENGTH BAND FROM\s+([\d.]+)\s+TO\s+([\d.]+)\s+NANOMETER")
+BAND_PATTERN = re.compile(
+    r"CHERENKOV WAVELENGTH BAND FROM\s+([\d.]+)\s+TO\s+([\d.]+)\s+NANOMETER"
+)
 STAGE_KEYS = {"Not absorbed/max. Q.E.": "not_absorbed", "Detected": "detected"}
 
 # Limits fixed before looking at results. Each entry: (rule, justification).
 LIMITS = {
-    "photoelectron_bias": ("max(0.01, 5 se)", "1 % agreement of the photon chain; 5 se covers event sampling."),
-    "arrival_time_bias": ("max(0.05 ns, 5 se)", "well below the 1 ns camera sample; 5 se covers event sampling."),
-    "image_shape": ("mean reduced chi2 <= 2", "equal Poisson images give about 1; above 2 the shape differs."),
-    "stage_counts": ("max(0.01, 5 sqrt(1/N_ref + 1/N_cand))", "1 % floor plus Poisson error of the stage counts."),
-    "transmission_mean": ("max(0.01, 5 se)", "obdeect weight loss must match the table expectation at 1 %."),
-    "trigger": ("0 mismatches", "trigger decisions must not change under unit-transmission substitution."),
+    "photoelectron_bias": (
+        "max(0.01, 5 se)",
+        "1 % agreement of the photon chain; 5 se covers event sampling.",
+    ),
+    "arrival_time_bias": (
+        "max(0.05 ns, 5 se)",
+        "well below the 1 ns camera sample; 5 se covers event sampling.",
+    ),
+    "image_shape": (
+        "mean reduced chi2 <= 2",
+        "equal Poisson images give about 1; above 2 the shape differs.",
+    ),
+    "stage_counts": (
+        "max(0.01, 5 sqrt(1/N_ref + 1/N_cand))",
+        "1 % floor plus Poisson error of the stage counts.",
+    ),
+    "transmission_mean": (
+        "max(0.01, 5 se)",
+        "obdeect weight loss must match the table expectation at 1 %.",
+    ),
+    "trigger": (
+        "0 mismatches",
+        "trigger decisions must not change under unit-transmission substitution.",
+    ),
 }
 
 
@@ -72,7 +92,7 @@ def photon_statistics(log_text):
     lines = log_text.splitlines()
     start = lines.index("Photon statistics:")
     stats = {}
-    for line in lines[start + 1:]:
+    for line in lines[start + 1 :]:
         if not line.startswith("  "):
             break
         name, _, values = line.strip().partition(":")
@@ -81,12 +101,18 @@ def photon_statistics(log_text):
 
 
 def propagation_summary(log_text):
-    match = re.search(r"photons in (\d+), out (\d+) \(weight ([\d.e+-]+)\), dropped (\d+)", log_text)
+    match = re.search(
+        r"photons in (\d+), out (\d+) \(weight ([\d.e+-]+)\), dropped (\d+)", log_text
+    )
     if not match:
         raise ValueError("no propagation summary in propagate log")
     photons_in, photons_out, weight, dropped = match.groups()
-    return {"photons_in": int(photons_in), "photons_out": int(photons_out),
-            "weight_out": float(weight), "dropped": int(dropped)}
+    return {
+        "photons_in": int(photons_in),
+        "photons_out": int(photons_out),
+        "weight_out": float(weight),
+        "dropped": int(dropped),
+    }
 
 
 def limit_exceeded(bias, limit):
@@ -109,12 +135,17 @@ def expected_transmission(samples, table_depth, band, rng_draws):
     total = 0.0
     for (zem_m, cz_abs, photons), u in zip(samples, rng_draws):
         wavelength = math.floor(1.0 / (1.0 / lo - u * (1.0 / lo - 1.0 / hi)))
-        probability = 0.0 if wavelength >= MAX_LAMBDA_NM else math.exp(
-            -abs(table_depth(max(wavelength, 200), zem_m)) / cz_abs)
+        probability = (
+            0.0
+            if wavelength >= MAX_LAMBDA_NM
+            else math.exp(-abs(table_depth(max(wavelength, 200), zem_m)) / cz_abs)
+        )
         values.append(photons * probability)
         total += photons
     mean = sum(values) / total
-    deviation = [value - mean * photons for value, (_, _, photons) in zip(values, samples)]
+    deviation = [
+        value - mean * photons for value, (_, _, photons) in zip(values, samples)
+    ]
     standard_error = math.sqrt(sum(d * d for d in deviation)) / total
     return mean, standard_error
 
@@ -135,9 +166,18 @@ def read_bunches(path, fraction, seed):
                     continue
                 total += float(bunches["photons"].astype(float).sum())
                 keep = rng.random(len(bunches)) < fraction
-                cz = np.sqrt(1.0 - bunches["cx"][keep].astype(float) ** 2 - bunches["cy"][keep].astype(float) ** 2)
-                sample.extend(zip(bunches["zem"][keep].astype(float) / 100.0, cz,
-                                  bunches["photons"][keep].astype(float)))
+                cz = np.sqrt(
+                    1.0
+                    - bunches["cx"][keep].astype(float) ** 2
+                    - bunches["cy"][keep].astype(float) ** 2
+                )
+                sample.extend(
+                    zip(
+                        bunches["zem"][keep].astype(float) / 100.0,
+                        cz,
+                        bunches["photons"][keep].astype(float),
+                    )
+                )
     return total, sample
 
 
@@ -147,9 +187,16 @@ def main():
     from obdeect_validation.adapters.extinction_reference import _table_reference
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--showers", type=Path, default=Path("/validation/inputs/gamma-20deg-100-3000GeV.iact"))
-    parser.add_argument("--transmission", type=Path,
-                        default=Path("/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"))
+    parser.add_argument(
+        "--showers",
+        type=Path,
+        default=Path("/validation/inputs/gamma-20deg-100-3000GeV.iact"),
+    )
+    parser.add_argument(
+        "--transmission",
+        type=Path,
+        default=Path("/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"),
+    )
     parser.add_argument("--site-altitude", type=float, default=SITE_ALTITUDE_M)
     parser.add_argument("--pathlen", type=float, default=PATHLEN_M)
     parser.add_argument("--seed", type=int, default=SEED)
@@ -157,7 +204,9 @@ def main():
 
     root = Path.cwd().resolve()
     source = args.showers.resolve()
-    band = cherenkov_band(source.with_suffix(".corsika.log").read_text(errors="replace"))
+    band = cherenkov_band(
+        source.with_suffix(".corsika.log").read_text(errors="replace")
+    )
     table_text = args.transmission.read_text(encoding="utf-8")
     cut_path = root / "transmission-below-1000nm.dat"
     cut_path.write_text(cut_table(table_text, MAX_LAMBDA_NM), encoding="utf-8")
@@ -166,14 +215,41 @@ def main():
 
     native = root / "showers.gst"
     propagated = root / "propagated.gst"
-    cs.command(["obdeect", "stream", "from-corsika", source], root / "from-corsika.log", stdout_file=native)
-    cs.command(["obdeect", "propagation", "run", "--transmission", cut_path,
-                "--site-altitude", args.site_altitude, "--pathlen", args.pathlen, "--seed", args.seed,
-                "--mode", "weighted", "--wavelength-range", band[0], band[1],
-                "-i", native, "-o", propagated], root / "propagate.log")
+    cs.command(
+        ["obdeect", "stream", "from-corsika", source],
+        root / "from-corsika.log",
+        stdout_file=native,
+    )
+    cs.command(
+        [
+            "obdeect",
+            "propagation",
+            "run",
+            "--transmission",
+            cut_path,
+            "--site-altitude",
+            args.site_altitude,
+            "--pathlen",
+            args.pathlen,
+            "--seed",
+            args.seed,
+            "--mode",
+            "weighted",
+            "--wavelength-range",
+            band[0],
+            band[1],
+            "-i",
+            native,
+            "-o",
+            propagated,
+        ],
+        root / "propagate.log",
+    )
     candidate_input = root / "propagated.iact"
-    cs.command(["obdeect", "stream", "to-simtel", propagated, "-o", candidate_input],
-               root / "to-simtel.log")
+    cs.command(
+        ["obdeect", "stream", "to-simtel", propagated, "-o", candidate_input],
+        root / "to-simtel.log",
+    )
 
     summary = propagation_summary((root / "propagate.log").read_text(errors="replace"))
     input_weight, sample = read_bunches(source, SAMPLE_FRACTION, args.seed)
@@ -183,39 +259,62 @@ def main():
     observed = summary["weight_out"] / input_weight
 
     direct = cs.simulate(root, source, "direct", bypass=0)
-    candidate = cs.simulate(root, candidate_input, "candidate", bypass=0,
-                            extra=["-C", f"atmospheric_transmission={zero_path}"])
+    candidate = cs.simulate(
+        root,
+        candidate_input,
+        "candidate",
+        bypass=0,
+        extra=["-C", f"atmospheric_transmission={zero_path}"],
+    )
     stats_direct = photon_statistics((root / "direct.log").read_text(errors="replace"))
-    stats_candidate = photon_statistics((root / "candidate.log").read_text(errors="replace"))
+    stats_candidate = photon_statistics(
+        (root / "candidate.log").read_text(errors="replace")
+    )
     stage_metrics = {}
     for stage, key in STAGE_KEYS.items():
         reference = sum(stats_direct[stage])
         candidate_count = sum(stats_candidate[stage])
         bias = candidate_count / reference - 1.0
         stage_metrics[f"{key}_relative_bias"] = bias
-        stage_metrics[f"{key}_limit_exceeded"] = limit_exceeded(bias, ratio_limit(reference, candidate_count))
+        stage_metrics[f"{key}_limit_exceeded"] = limit_exceeded(
+            bias, ratio_limit(reference, candidate_count)
+        )
 
     a, b = cs.camera_events(direct), cs.camera_events(candidate)
-    metrics = {"reference_camera_events": len(a), "candidate_camera_events": len(b),
-               "camera_event_id_delta": len(set(a) ^ set(b))}
+    metrics = {
+        "reference_camera_events": len(a),
+        "candidate_camera_events": len(b),
+        "camera_event_id_delta": len(set(a) ^ set(b)),
+    }
     metrics.update(cs.compare_camera(a, b, root))
     metrics.update(stage_metrics)
-    metrics.update({
-        "propagation_dropped_photons": summary["dropped"],
-        "weight_ratio_observed": observed,
-        "weight_ratio_expected": expected,
-        "transmission_mean_difference": observed - expected,
-        "transmission_mean_limit_exceeded": limit_exceeded(
-            observed - expected, max(0.01, 5 * expected_se)),
-    })
+    metrics.update(
+        {
+            "propagation_dropped_photons": summary["dropped"],
+            "weight_ratio_observed": observed,
+            "weight_ratio_expected": expected,
+            "transmission_mean_difference": observed - expected,
+            "transmission_mean_limit_exceeded": limit_exceeded(
+                observed - expected, max(0.01, 5 * expected_se)
+            ),
+        }
+    )
     details = {
-        "band_nm": list(band), "site_altitude_m": args.site_altitude, "pathlen_m": args.pathlen,
-        "seed": args.seed, "input_photon_weight": input_weight, "propagation": summary,
-        "expected_transmission_standard_error": expected_se, "sample_bunches": len(sample),
-        "limits": LIMITS, "direct_photon_statistics": stats_direct,
+        "band_nm": list(band),
+        "site_altitude_m": args.site_altitude,
+        "pathlen_m": args.pathlen,
+        "seed": args.seed,
+        "input_photon_weight": input_weight,
+        "propagation": summary,
+        "expected_transmission_standard_error": expected_se,
+        "sample_bunches": len(sample),
+        "limits": LIMITS,
+        "direct_photon_statistics": stats_direct,
         "candidate_photon_statistics": stats_candidate,
     }
-    (root / "details.json").write_text(json.dumps(details, indent=2, default=str) + "\n")
+    (root / "details.json").write_text(
+        json.dumps(details, indent=2, default=str) + "\n"
+    )
     flat = {key: float(value) for key, value in metrics.items()}
     (root / "metrics.json").write_text(json.dumps(flat, indent=2) + "\n")
 

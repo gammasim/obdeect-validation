@@ -24,7 +24,9 @@ def test_ks_one_sample_uniform_grid():
 
 def test_ks_critical_alpha_1e3():
     assert sc.ks_critical(10000) == pytest.approx(1.9486 / 100.0, rel=1e-3)
-    assert sc.ks_critical(100, 100) == pytest.approx(1.9486 * math.sqrt(2.0 / 100.0), rel=1e-3)
+    assert sc.ks_critical(100, 100) == pytest.approx(
+        1.9486 * math.sqrt(2.0 / 100.0), rel=1e-3
+    )
 
 
 def test_ratio_limit_floor_and_statistical_part():
@@ -43,7 +45,9 @@ def test_frank_tamm_matches_closed_form_and_magnitude():
 
 def test_cherenkov_cos_threshold_and_beta():
     assert sc.cherenkov_cos(0.0) == 1.0
-    assert sc.cherenkov_cos(2.9e-4, beta=0.5) == pytest.approx(2.0 / (1.00029), rel=1e-12)
+    assert sc.cherenkov_cos(2.9e-4, beta=0.5) == pytest.approx(
+        2.0 / (1.00029), rel=1e-12
+    )
 
 
 def test_night_sky_photons_reproduce_configured_rate():

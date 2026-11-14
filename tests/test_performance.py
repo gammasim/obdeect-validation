@@ -21,7 +21,9 @@ def test_restrict_table_keeps_non_numeric_lines(tmp_path: Path) -> None:
 
 def test_stream_weight_parses_obdeect_summary(tmp_path: Path, monkeypatch) -> None:
     class Result:
-        stdout = "records:\n  photons 3\ntotal: 10888516 photons, weight sum 54210207.61\n"
+        stdout = (
+            "records:\n  photons 3\ntotal: 10888516 photons, weight sum 54210207.61\n"
+        )
 
     monkeypatch.setattr(performance.subprocess, "run", lambda *args, **kwargs: Result())
     assert performance.stream_weight(tmp_path / "x.gst") == (10888516, 54210207.61)

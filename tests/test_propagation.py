@@ -53,7 +53,11 @@ def test_photon_statistics_parses_block_up_to_trigger_section():
 def test_propagation_summary_parses_obdeect_message():
     log = "obdeect propagation run: photons in 10888516, out 5391964 (weight 1.32392e+07), dropped 0\n"
     assert chain.propagation_summary(log) == {
-        "photons_in": 10888516, "photons_out": 5391964, "weight_out": 1.32392e7, "dropped": 0}
+        "photons_in": 10888516,
+        "photons_out": 5391964,
+        "weight_out": 1.32392e7,
+        "dropped": 0,
+    }
 
 
 def test_limits_use_five_sigma_or_floor():
@@ -66,7 +70,9 @@ def test_limits_use_five_sigma_or_floor():
 def test_expected_transmission_with_constant_depth_is_exponential_in_airmass():
     samples = [(0.0, 1.0, 2.0), (0.0, 0.5, 3.0)]  # zem_m, |cz|, photons
     draws = [0.3, 0.7]
-    mean, se = chain.expected_transmission(samples, lambda wavelength, height: 0.2, (250.0, 700.0), draws)
+    mean, se = chain.expected_transmission(
+        samples, lambda wavelength, height: 0.2, (250.0, 700.0), draws
+    )
     expected = (2.0 * math.exp(-0.2) + 3.0 * math.exp(-0.4)) / 5.0
     assert mean == pytest.approx(expected)
     assert se >= 0.0
@@ -74,5 +80,7 @@ def test_expected_transmission_with_constant_depth_is_exponential_in_airmass():
 
 def test_expected_transmission_zero_above_max_lambda():
     samples = [(0.0, 1.0, 1.0)]
-    mean, _ = chain.expected_transmission(samples, lambda wavelength, height: 0.0, (1000.0, 2000.0), [0.0])
+    mean, _ = chain.expected_transmission(
+        samples, lambda wavelength, height: 0.0, (1000.0, 2000.0), [0.0]
+    )
     assert mean == 0.0

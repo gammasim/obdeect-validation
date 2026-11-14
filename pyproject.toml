@@ -1,27 +1,26 @@
 [build-system]
-requires = ["setuptools>=75"]
 build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=75" ]
 
 [project]
 name = "obdeect-validation"
 version = "0.1.0"
 description = "Reproducible validation cases for obdeect simulation components"
 requires-python = ">=3.14"
-dependencies = ["numpy>=2.3", "eventio"]
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+]
+dependencies = [ "eventio", "numpy>=2.3" ]
+optional-dependencies.dev = [ "pytest>=8" ]
+optional-dependencies.references = [ "astropy>=7", "eventio>=2", "numpy>=2" ]
+scripts.obdeect-validate = "obdeect_validation.cli:main"
 
-[project.scripts]
-obdeect-validate = "obdeect_validation.cli:main"
+[tool.setuptools]
+packages.find.where = [ "src" ]
+package-data.obdeect_validation = [ "adapters/*.txt" ]
 
-[project.optional-dependencies]
-dev = ["pytest>=8"]
-references = ["numpy>=2", "eventio>=2", "astropy>=7"]
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-ra"
-
-[tool.setuptools.package-data]
-obdeect_validation = ["adapters/*.txt"]
+[tool.pytest]
+ini_options.testpaths = [ "tests" ]
+ini_options.addopts = "-ra"

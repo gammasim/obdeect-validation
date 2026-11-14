@@ -93,8 +93,15 @@ def test_camera_requires_common_telescope():
 def test_accepted_ratio_ignores_photons_outside_the_radius():
     # Native photons from z = 1000 m on axis land at r = 1000 m * |cx|; half land beyond 14 m.
     cx = np.r_[np.full(500, 0.010), np.full(500, 0.0150)]
-    native = {"x": np.zeros(1000), "y": np.zeros(1000), "z": np.full(1000, 1000.0), "cx": cx,
-              "cy": np.zeros(1000), "cz": -np.sqrt(1 - cx**2), "w": np.ones(1000)}
+    native = {
+        "x": np.zeros(1000),
+        "y": np.zeros(1000),
+        "z": np.full(1000, 1000.0),
+        "cx": cx,
+        "cy": np.zeros(1000),
+        "cz": -np.sqrt(1 - cx**2),
+        "w": np.ones(1000),
+    }
     reference = {"r": np.full(500, 1000.0), "w": np.ones(500)}
     ratio, se = sc.accepted_ratio(native, 1, reference, 1, 1400.0)
     assert ratio == pytest.approx(1.0)

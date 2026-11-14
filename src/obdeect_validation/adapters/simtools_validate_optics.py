@@ -36,23 +36,39 @@ def _config(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict) or set(value) != {"simtools_config", "limits"}:
         raise AdapterError("config must contain exactly simtools_config and limits")
     app = value["simtools_config"]
-    if not isinstance(app, dict) or app.get("application") != "simtools-validate-optics":
-        raise AdapterError("simtools_config.application must be simtools-validate-optics")
+    if (
+        not isinstance(app, dict)
+        or app.get("application") != "simtools-validate-optics"
+    ):
+        raise AdapterError(
+            "simtools_config.application must be simtools-validate-optics"
+        )
     options = app.get("configuration")
     if not isinstance(options, dict) or any(not isinstance(k, str) for k in options):
         raise AdapterError("simtools_config.configuration must be an object")
     if "ray_tracing_backend" in options or "output_path" in options:
-        raise AdapterError("configuration must omit ray_tracing_backend and output_path; adapter sets them per backend")
+        raise AdapterError(
+            "configuration must omit ray_tracing_backend and output_path; adapter sets them per backend"
+        )
     limits = value["limits"]
     if not isinstance(limits, dict) or set(limits) != set(METRICS):
-        raise AdapterError("limits must define psf_cm, eff_area, and eff_flen relative limits")
+        raise AdapterError(
+            "limits must define psf_cm, eff_area, and eff_flen relative limits"
+        )
     for key, limit in limits.items():
-        if isinstance(limit, bool) or not isinstance(limit, (int, float)) or not math.isfinite(limit) or limit < 0:
+        if (
+            isinstance(limit, bool)
+            or not isinstance(limit, (int, float))
+            or not math.isfinite(limit)
+            or limit < 0
+        ):
             raise AdapterError(f"limits.{key} must be a finite non-negative number")
     return value
 
 
-def _column(table, name: str, unit, path: Path, offsets: list[float]) -> list[float | None]:
+def _column(
+    table, name: str, unit, path: Path, offsets: list[float]
+) -> list[float | None]:
     """Return column values in ``unit``; NaN is allowed only on axis (eff_flen and its error)."""
     import astropy.units as u
 
@@ -60,20 +76,30 @@ def _column(table, name: str, unit, path: Path, offsets: list[float]) -> list[fl
     if getattr(column, "unit", None) is None:
         if name not in ("eff_flen", "eff_flen_err"):
             raise AdapterError(f"{path} column {name} has no unit")
-        values = [float(v) for v in column]  # simtools stores eff_flen as plain cm (ray_tracing.py)
+        values = [
+            float(v) for v in column
+        ]  # simtools stores eff_flen as plain cm (ray_tracing.py)
     else:
         try:
             values = [float(v) for v in column.to_value(unit)]
         except u.UnitConversionError as exc:
-            raise AdapterError(f"{path} column {name} cannot be converted to {unit}") from exc
+            raise AdapterError(
+                f"{path} column {name} cannot be converted to {unit}"
+            ) from exc
     normalized: list[float | None] = []
     for index, value in enumerate(values):
         if math.isfinite(value):
             normalized.append(value)
-        elif name in ("eff_flen", "eff_flen_err") and math.isnan(value) and offsets[index] <= 1e-12:
+        elif (
+            name in ("eff_flen", "eff_flen_err")
+            and math.isnan(value)
+            and offsets[index] <= 1e-12
+        ):
             normalized.append(None)
         else:
-            raise AdapterError(f"{path} has undefined {name} at row {index} (offset {offsets[index]:.3g} deg)")
+            raise AdapterError(
+                f"{path} has undefined {name} at row {index} (offset {offsets[index]:.3g} deg)"
+            )
     return normalized
 
 
@@ -82,15 +108,21 @@ def _table(path: Path) -> dict[str, list[float | None]]:
         from astropy.table import QTable
         import astropy.units as u
     except ImportError as exc:
-        raise AdapterError("astropy is required to compare simtools ECSV output") from exc
+        raise AdapterError(
+            "astropy is required to compare simtools ECSV output"
+        ) from exc
     files = sorted(path.glob("results/*.ecsv"))
     if len(files) != 1:
-        raise AdapterError(f"expected exactly one results/*.ecsv under {path}; found {len(files)}")
+        raise AdapterError(
+            f"expected exactly one results/*.ecsv under {path}; found {len(files)}"
+        )
     table = QTable.read(files[0], format="ascii.ecsv")
     required = {"off_x", "off_y", "psf_cm", "eff_area", "eff_flen"}
     missing = required - set(table.colnames)
     if missing:
-        raise AdapterError(f"{files[0]} is missing columns: {', '.join(sorted(missing))}")
+        raise AdapterError(
+            f"{files[0]} is missing columns: {', '.join(sorted(missing))}"
+        )
     if len(table) == 0:
         raise AdapterError(f"{files[0]} has no rows")
     off_x = _column(table, "off_x", u.deg, files[0], [0.0] * len(table))
@@ -101,14 +133,17 @@ def _table(path: Path) -> dict[str, list[float | None]]:
     for name, unit in units.items():
         columns[name] = _column(table, name, unit, files[0], offsets)
     columns["eff_flen_err"] = (
-        _column(table, "eff_flen_err", u.cm, files[0], offsets) if "eff_flen_err" in table.colnames
+        _column(table, "eff_flen_err", u.cm, files[0], offsets)
+        if "eff_flen_err" in table.colnames
         else [None] * len(table)
     )
     return columns
 
 
 def _sorted(table: dict[str, list[float | None]]) -> dict[str, list[float | None]]:
-    order = sorted(range(len(table["off_x"])), key=lambda i: (table["off_x"][i], table["off_y"][i]))
+    order = sorted(
+        range(len(table["off_x"])), key=lambda i: (table["off_x"][i], table["off_y"][i])
+    )
     return {key: [values[i] for i in order] for key, values in table.items()}
 
 
@@ -117,25 +152,41 @@ def _rows(sim: dict, obd: dict, limits: dict[str, float]) -> list[dict[str, Any]
     rows = []
     for index in range(len(sim["off_x"])):
         off_x, off_y = sim["off_x"][index], sim["off_y"][index]
-        row: dict[str, Any] = {"off_x_deg": off_x, "off_y_deg": off_y,
-                               "angle_deg": math.hypot(off_x, off_y)}
+        row: dict[str, Any] = {
+            "off_x_deg": off_x,
+            "off_y_deg": off_y,
+            "angle_deg": math.hypot(off_x, off_y),
+        }
         for metric in METRICS:
             left, right = sim[metric][index], obd[metric][index]
             if left is None and right is None:
                 row[metric] = None
                 continue
             if left is None or right is None:
-                raise AdapterError(f"{metric} undefined for only one backend at aligned row {index}")
+                raise AdapterError(
+                    f"{metric} undefined for only one backend at aligned row {index}"
+                )
             if left == 0:
-                raise AdapterError(f"reference {metric} is zero at aligned row {index}; relative difference is undefined")
+                raise AdapterError(
+                    f"reference {metric} is zero at aligned row {index}; relative difference is undefined"
+                )
             delta = right / left - 1.0
             se = None
             if metric == "eff_flen":
-                err_sim, err_obd = sim["eff_flen_err"][index], obd["eff_flen_err"][index]
+                err_sim, err_obd = (
+                    sim["eff_flen_err"][index],
+                    obd["eff_flen_err"][index],
+                )
                 se = math.hypot(err_obd, err_sim * right / left) / abs(left)
             threshold = max(limits[metric], SIGMA_FACTOR * (se or 0.0))
-            row[metric] = {"sim": left, "obd": right, "delta": delta, "rel_se": se,
-                           "threshold": threshold, "exceeded": abs(delta) > threshold}
+            row[metric] = {
+                "sim": left,
+                "obd": right,
+                "delta": delta,
+                "rel_se": se,
+                "threshold": threshold,
+                "exceeded": abs(delta) > threshold,
+            }
         rows.append(row)
     return rows
 
@@ -149,15 +200,23 @@ def _summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "max_abs_delta": abs(worst["delta"]),
             "signed_delta_at_max": worst["delta"],
             "exceeded_offsets": [
-                {"angle_deg": row["angle_deg"], "off_x_deg": row["off_x_deg"], "off_y_deg": row["off_y_deg"],
-                 "delta": row[metric]["delta"], "threshold": row[metric]["threshold"]}
-                for row in rows if row[metric] is not None and row[metric]["exceeded"]
+                {
+                    "angle_deg": row["angle_deg"],
+                    "off_x_deg": row["off_x_deg"],
+                    "off_y_deg": row["off_y_deg"],
+                    "delta": row[metric]["delta"],
+                    "threshold": row[metric]["threshold"],
+                }
+                for row in rows
+                if row[metric] is not None and row[metric]["exceeded"]
             ],
         }
     return summary
 
 
-def _plot(rows: list[dict[str, Any]], limits: dict[str, float], path: Path, label: str) -> None:
+def _plot(
+    rows: list[dict[str, Any]], limits: dict[str, float], path: Path, label: str
+) -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -167,11 +226,18 @@ def _plot(rows: list[dict[str, Any]], limits: dict[str, float], path: Path, labe
     for axis, metric in zip(axes, METRICS, strict=True):
         points = [row for row in rows if row[metric] is not None]
         for direction, marker in (("x", "o"), ("y", "s")):
-            selected = [row for row in points
-                        if (abs(row["off_y_deg"]) < 1e-9) == (direction == "x")]
-            axis.plot([row["angle_deg"] for row in selected],
-                      [100 * row[metric]["delta"] for row in selected],
-                      marker, linestyle="none", label=f"{'E/W' if direction == 'x' else 'N/S'}")
+            selected = [
+                row
+                for row in points
+                if (abs(row["off_y_deg"]) < 1e-9) == (direction == "x")
+            ]
+            axis.plot(
+                [row["angle_deg"] for row in selected],
+                [100 * row[metric]["delta"] for row in selected],
+                marker,
+                linestyle="none",
+                label=f"{'E/W' if direction == 'x' else 'N/S'}",
+            )
         axis.axhline(100 * limits[metric], color="grey", linestyle="--")
         axis.axhline(-100 * limits[metric], color="grey", linestyle="--")
         axis.axhline(0, color="black", linewidth=0.5)
@@ -205,21 +271,34 @@ def execute(config_path: Path, output: Path) -> dict[str, float | int]:
     for backend in ("sim_telarray", "obdeect"):
         backend_dir = output / backend
         backend_dir.mkdir(parents=True, exist_ok=True)
-        app_config = {"application": "simtools-validate-optics", "configuration": {
-            **config["simtools_config"]["configuration"],
-            "ray_tracing_backend": backend,
-            "output_path": str(backend_dir),
-        }}
+        app_config = {
+            "application": "simtools-validate-optics",
+            "configuration": {
+                **config["simtools_config"]["configuration"],
+                "ray_tracing_backend": backend,
+                "output_path": str(backend_dir),
+            },
+        }
         config_file = backend_dir / "simtools-config.json"
-        config_file.write_text(json.dumps({"applications": [app_config]}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        config_file.write_text(
+            json.dumps({"applications": [app_config]}, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
         command = ["simtools-validate-optics", "--config", str(config_file)]
         try:
-            with (backend_dir / "stdout.log").open("wb") as stdout, (backend_dir / "stderr.log").open("wb") as stderr:
-                proc = subprocess.run(command, stdout=stdout, stderr=stderr, check=False)
+            with (
+                (backend_dir / "stdout.log").open("wb") as stdout,
+                (backend_dir / "stderr.log").open("wb") as stderr,
+            ):
+                proc = subprocess.run(
+                    command, stdout=stdout, stderr=stderr, check=False
+                )
         except OSError as exc:
             raise AdapterError(f"cannot run {command[0]}: {exc}") from exc
         if proc.returncode:
-            raise AdapterError(f"{command[0]} ({backend}) exited {proc.returncode}; see {backend_dir}")
+            raise AdapterError(
+                f"{command[0]} ({backend}) exited {proc.returncode}; see {backend_dir}"
+            )
         backends[backend] = {"dir": str(backend_dir), "returncode": proc.returncode}
         result_tables[backend] = _table(backend_dir)
 
@@ -228,7 +307,10 @@ def execute(config_path: Path, output: Path) -> dict[str, float | int]:
     if len(sim["off_x"]) != len(obd["off_x"]):
         raise AdapterError("backend offset rows do not align in length")
     for key in ("off_x", "off_y"):
-        if any(not math.isclose(a, b, rel_tol=0, abs_tol=1e-10) for a, b in zip(sim[key], obd[key], strict=True)):
+        if any(
+            not math.isclose(a, b, rel_tol=0, abs_tol=1e-10)
+            for a, b in zip(sim[key], obd[key], strict=True)
+        ):
             raise AdapterError("backend offset rows do not align")
 
     rows = _rows(sim, obd, limits)
@@ -236,8 +318,12 @@ def execute(config_path: Path, output: Path) -> dict[str, float | int]:
     metrics: dict[str, float | int] = {"n_offsets": len(rows)}
     for metric in METRICS:
         metrics[f"max_rel_{metric}"] = summary[metric]["max_abs_delta"]
-        metrics[f"{metric}_limit_exceeded"] = int(bool(summary[metric]["exceeded_offsets"]))
-    metrics["exceeded_limits"] = sum(metrics[f"{metric}_limit_exceeded"] for metric in METRICS)
+        metrics[f"{metric}_limit_exceeded"] = int(
+            bool(summary[metric]["exceeded_offsets"])
+        )
+    metrics["exceeded_limits"] = sum(
+        metrics[f"{metric}_limit_exceeded"] for metric in METRICS
+    )
 
     details = {
         "status": LIMIT_STATUS,
@@ -251,10 +337,18 @@ def execute(config_path: Path, output: Path) -> dict[str, float | int]:
         "summary": summary,
         "rows": rows,
     }
-    (output / "details.json").write_text(json.dumps(details, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    _plot(rows, limits, output / "optics_relative_difference.png",
-          config["simtools_config"]["configuration"].get("telescope", "optics"))
-    (output / "metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (output / "details.json").write_text(
+        json.dumps(details, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    _plot(
+        rows,
+        limits,
+        output / "optics_relative_difference.png",
+        config["simtools_config"]["configuration"].get("telescope", "optics"),
+    )
+    (output / "metrics.json").write_text(
+        json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     return metrics
 
 

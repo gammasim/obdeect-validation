@@ -23,8 +23,14 @@ def test_centroid_offset_sign():
 
 def test_trigger_difference_paired(monkeypatch):
     monkeypatch.setattr(chain_optics, "TELESCOPES", (1, 2))
-    reference = {"100": {"telescope_events": {"1": {}}}, "101": {"telescope_events": {}}}
-    candidate = {"100": {"telescope_events": {"1": {}, "2": {}}}, "101": {"telescope_events": {"1": {}}}}
+    reference = {
+        "100": {"telescope_events": {"1": {}}},
+        "101": {"telescope_events": {}},
+    }
+    candidate = {
+        "100": {"telescope_events": {"1": {}, "2": {}}},
+        "101": {"telescope_events": {"1": {}}},
+    }
     rows = chain_optics.trigger_difference(reference, candidate, ["100", "101"])
     assert rows[1]["difference"] == pytest.approx(0.5)
     assert rows[2]["difference"] == pytest.approx(0.5)

@@ -42,7 +42,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "list":
             suite = load_suite(args.suite)
-            cases = [{"id": c["id"], "name": c.get("name", c["id"])} for c in suite["cases"]]
+            cases = [
+                {"id": c["id"], "name": c.get("name", c["id"])} for c in suite["cases"]
+            ]
             if args.as_json:
                 _json({"suite": suite["id"], "cases": cases})
             else:
@@ -58,7 +60,9 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"{item['status']}\t{item['name']}: {item['detail']}")
             return 0 if result["status"] == "PASS" else 3
         if args.command == "run":
-            result = run(args.suite, args.case, args.output, args.environment, args.resume)
+            result = run(
+                args.suite, args.case, args.output, args.environment, args.resume
+            )
             _json(brief(result, args.output))
             if result.get("interrupted"):
                 return 130

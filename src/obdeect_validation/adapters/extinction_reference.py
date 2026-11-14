@@ -16,7 +16,9 @@ def _table_reference(path: Path):
     header = next(line for line in lines if "H2=" in line and "H1=" in line)
     h2_text, h1_text = header.split("H2=", 1)[1].split("H1=", 1)
     h2_km = float(h2_text.strip().split()[0].rstrip(","))
-    heights_km = np.asarray([float(value) for value in h1_text.split()], dtype=np.float64)
+    heights_km = np.asarray(
+        [float(value) for value in h1_text.split()], dtype=np.float64
+    )
     rows = []
     for line in lines:
         fields = line.split()
@@ -27,7 +29,9 @@ def _table_reference(path: Path):
     tau = data[:, 1:]
 
     def depth(wavelength, height_m):
-        row = int(np.clip(int(wavelength), wavelengths[0], wavelengths[-1]) - wavelengths[0])
+        row = int(
+            np.clip(int(wavelength), wavelengths[0], wavelengths[-1]) - wavelengths[0]
+        )
         if height_m <= h2_km * 1000.0:
             return 0.0
         log_grid = np.log10(heights_km * 1000.0)
@@ -76,7 +80,9 @@ def main() -> None:
     ]
     repetitions = 512
     group_ids = np.repeat(np.arange(len(cases), dtype=np.float32), repetitions)
-    wavelength_col = np.repeat([case[0] for case in cases], repetitions).astype(np.float32)
+    wavelength_col = np.repeat([case[0] for case in cases], repetitions).astype(
+        np.float32
+    )
     height_col = np.repeat([case[1] for case in cases], repetitions).astype(np.float32)
     zenith_col = np.repeat([case[2] for case in cases], repetitions)
     cx = np.sin(np.deg2rad(zenith_col)).astype(np.float32)
@@ -119,7 +125,9 @@ def main() -> None:
     for elevation in elevations:
         for path in paths_m:
             selected_groups = [
-                i for i, case in enumerate(cases) if case[3] == elevation and case[4] == path
+                i
+                for i, case in enumerate(cases)
+                if case[3] == elevation and case[4] == path
             ]
             rows = np.isin(group_ids, selected_groups)
             subset = {name: value[rows] for name, value in columns.items()}
@@ -203,7 +211,9 @@ def main() -> None:
         + "\n",
         encoding="utf-8",
     )
-    Path("metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
+    Path("metrics.json").write_text(
+        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

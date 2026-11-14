@@ -24,7 +24,9 @@ def _write(path, order, shift=0.0):
 
 def test_canonical_ignores_photon_order(tmp_path):
     ordered = _write(tmp_path / "ordered.gst", np.arange(12))
-    shuffled = _write(tmp_path / "shuffled.gst", np.random.default_rng(3).permutation(12))
+    shuffled = _write(
+        tmp_path / "shuffled.gst", np.random.default_rng(3).permutation(12)
+    )
     digests = stream_chain.canonical(ordered)
     assert list(digests) == ["0:1"]
     assert stream_chain.differing(digests, stream_chain.canonical(shuffled)) == 0
@@ -32,8 +34,12 @@ def test_canonical_ignores_photon_order(tmp_path):
 
 def test_canonical_detects_changed_photon(tmp_path):
     reference = stream_chain.canonical(_write(tmp_path / "a.gst", np.arange(12)))
-    shifted = stream_chain.canonical(_write(tmp_path / "b.gst", np.arange(12), shift=1.0))
-    assert stream_chain.differing(reference, shifted) == 2  # changed key counts on both sides
+    shifted = stream_chain.canonical(
+        _write(tmp_path / "b.gst", np.arange(12), shift=1.0)
+    )
+    assert (
+        stream_chain.differing(reference, shifted) == 2
+    )  # changed key counts on both sides
 
 
 def test_differing_counts_missing_keys():

@@ -34,7 +34,12 @@ def read_stream(path):
             total_weight += float(np.sum(weights))
     if total_weight == 0:
         raise ValueError("obdeect produced no photons")
-    return event_counts, total_weight, 100.0 * x_weight / total_weight, 100.0 * y_weight / total_weight
+    return (
+        event_counts,
+        total_weight,
+        100.0 * x_weight / total_weight,
+        100.0 * y_weight / total_weight,
+    )
 
 
 def read_reference(path):
@@ -48,8 +53,12 @@ def read_reference(path):
             for bunches in event.photon_bunches.values():
                 weights = np.asarray(bunches["photons"], dtype=np.float64)
                 event_weight += float(np.sum(weights))
-                x_weight += float(np.dot(np.asarray(bunches["x"], dtype=np.float64), weights))
-                y_weight += float(np.dot(np.asarray(bunches["y"], dtype=np.float64), weights))
+                x_weight += float(
+                    np.dot(np.asarray(bunches["x"], dtype=np.float64), weights)
+                )
+                y_weight += float(
+                    np.dot(np.asarray(bunches["y"], dtype=np.float64), weights)
+                )
                 total_weight += float(np.sum(weights))
             event_counts.append(event_weight)
     if total_weight == 0:
@@ -73,7 +82,9 @@ def main():
     if obdeect is None or pixled is None:
         raise RuntimeError("obdeect and pixled must be installed")
     if not config or not Path(config).is_dir():
-        raise RuntimeError("SIMTEL_CONFIG_PATH must name the sim_telarray configuration directory")
+        raise RuntimeError(
+            "SIMTEL_CONFIG_PATH must name the sim_telarray configuration directory"
+        )
     if not (Path(config) / "atm_profile_model_1.dat").is_file():
         raise RuntimeError("SIMTEL_CONFIG_PATH must contain atm_profile_model_1.dat")
 
@@ -84,11 +95,30 @@ def main():
     seed = 17
     common = ["--use", "0 1 2", "--require", "2", "--photons", "10"]
     subprocess.run(
-        [obdeect, "sources", "led", "--camera-file", str(camera), *common, "--seed", str(seed), "-o", str(native_output)],
+        [
+            obdeect,
+            "sources",
+            "led",
+            "--camera-file",
+            str(camera),
+            *common,
+            "--seed",
+            str(seed),
+            "-o",
+            str(native_output),
+        ],
         check=True,
     )
     process = subprocess.run(
-        [pixled, "-I" + config, "-c", str(camera), *common, "-o", str(reference_output)],
+        [
+            pixled,
+            "-I" + config,
+            "-c",
+            str(camera),
+            *common,
+            "-o",
+            str(reference_output),
+        ],
         check=False,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -102,7 +132,9 @@ def main():
     event_deltas = [
         abs(native_metrics[0][i] - reference_metrics[0][i])
         if i < len(native_metrics[0]) and i < len(reference_metrics[0])
-        else native_metrics[0][i] if i < len(native_metrics[0]) else reference_metrics[0][i]
+        else native_metrics[0][i]
+        if i < len(native_metrics[0])
+        else reference_metrics[0][i]
         for i in range(max(len(native_metrics[0]), len(reference_metrics[0])))
     ]
     metrics = {
@@ -114,10 +146,15 @@ def main():
         "photon_count_delta": abs(native_metrics[1] - reference_metrics[1]),
         "max_event_photon_delta": max(event_deltas),
         "position_centroid_delta_cm": float(
-            np.hypot(native_metrics[2] - reference_metrics[2], native_metrics[3] - reference_metrics[3])
+            np.hypot(
+                native_metrics[2] - reference_metrics[2],
+                native_metrics[3] - reference_metrics[3],
+            )
         ),
     }
-    Path("metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
+    Path("metrics.json").write_text(
+        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
+    )
     profile = Path(config) / "atm_profile_model_1.dat"
     provenance = {
         "seed": seed,
@@ -129,7 +166,9 @@ def main():
         "obdeect_sources_version": version("obdeect-sources"),
         "obdeect_stream_version": version("obdeect-stream"),
     }
-    Path("details.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
+    Path("details.json").write_text(
+        json.dumps(provenance, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

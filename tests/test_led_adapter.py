@@ -82,15 +82,21 @@ def test_mismatched_event_counts_do_not_write_metrics(monkeypatch, tmp_path):
     monkeypatch.setenv("SIMTEL_CONFIG_PATH", str(config))
     pixled = tmp_path / "pixled"
     pixled.write_text("fixture binary placeholder\n", encoding="utf-8")
-    monkeypatch.setattr(adapter.shutil, "which", lambda name: str(pixled) if name == "pixled" else name)
+    monkeypatch.setattr(
+        adapter.shutil, "which", lambda name: str(pixled) if name == "pixled" else name
+    )
     monkeypatch.setattr(
         adapter.subprocess,
         "run",
-        lambda *_args, **_kwargs: SimpleNamespace(stdout="pixled log", returncode=0, check_returncode=lambda: None),
+        lambda *_args, **_kwargs: SimpleNamespace(
+            stdout="pixled log", returncode=0, check_returncode=lambda: None
+        ),
     )
     monkeypatch.setattr(adapter, "version", lambda _name: "0.0.test")
     monkeypatch.setattr(adapter, "read_stream", lambda _path: ([10.0], 10.0, 0.0, 0.0))
-    monkeypatch.setattr(adapter, "read_reference", lambda _path: ([5.0, 5.0], 10.0, 0.0, 0.0))
+    monkeypatch.setattr(
+        adapter, "read_reference", lambda _path: ([5.0, 5.0], 10.0, 0.0, 0.0)
+    )
 
     adapter.main()
     metrics = json.loads((tmp_path / "metrics.json").read_text(encoding="utf-8"))

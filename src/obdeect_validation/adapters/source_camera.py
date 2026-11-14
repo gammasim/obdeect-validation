@@ -44,34 +44,100 @@ CASES = {
         "native": ["obdeect", "sources", "flasher", "--type", "dish", "--events", "20"],
         "reference": ["ff-1m", "--events", "20"],
         "stage2": {
-            "path": "propagate", "bypass": 1,
-            "native": ["obdeect", "sources", "flasher", "--type", "dish", "--events", "5", "--photons", "150000000"],
+            "path": "propagate",
+            "bypass": 1,
+            "native": [
+                "obdeect",
+                "sources",
+                "flasher",
+                "--type",
+                "dish",
+                "--events",
+                "5",
+                "--photons",
+                "150000000",
+            ],
             "reference": ["ff-1m", "--events", "5", "--photons", "150000000"],
             "photon_factor": 60,
         },
-        "frame": {"native": "sky (emission at flasher, z = 16 m)", "reference": "observation plane z = 0"},
+        "frame": {
+            "native": "sky (emission at flasher, z = 16 m)",
+            "reference": "observation plane z = 0",
+        },
         "time_correction": "geometric",
         "native_frame": "sky",
     },
     "flasher-secondary": {
-        "native": ["obdeect", "sources", "flasher", "--type", "secondary", "--photons", "1e5", "--events", "1"],
+        "native": [
+            "obdeect",
+            "sources",
+            "flasher",
+            "--type",
+            "secondary",
+            "--photons",
+            "1e5",
+            "--events",
+            "1",
+        ],
         "reference": ["ff-gct", "--photons", "1e5", "--events", "1"],
-        "frame": {"native": "telescope (T)", "reference": "ff-gct photon bunches (no cz)"},
+        "frame": {
+            "native": "telescope (T)",
+            "reference": "ff-gct photon bunches (no cz)",
+        },
         "time_correction": "geometric",
         "native_frame": "telescope",
         "stage2": {
-            "path": "direct", "bypass": 2, "cfg": "CTA/CTA-PROD6-SST.cfg", "camera_map": True,
+            "path": "direct",
+            "bypass": 2,
+            "cfg": "CTA/CTA-PROD6-SST.cfg",
+            "camera_map": True,
             "defines": ["-DCTA_NORTH", "-DSST1"],
-            "native": ["obdeect", "sources", "flasher", "--type", "secondary", "--photons", "10000000", "--events", "1"],
+            "native": [
+                "obdeect",
+                "sources",
+                "flasher",
+                "--type",
+                "secondary",
+                "--photons",
+                "10000000",
+                "--events",
+                "1",
+            ],
             "reference": ["ff-gct", "--photons", "10000000", "--events", "1"],
             "photon_factor": 100,
         },
     },
     "point-source": {
-        "native": ["obdeect", "sources", "point-source", "-N", "30", "-n", "10000000", "-z", "100000",
-                   "-a", "isotropic", "--seed", "17"],
-        "reference": ["xyzls", "-N", "30", "-n", "10000000", "-z", "100000", "-a", "isotropic"],
-        "frame": {"native": "sky (emission at source, z = 1000 m)", "reference": "plane through telescope sphere centre"},
+        "native": [
+            "obdeect",
+            "sources",
+            "point-source",
+            "-N",
+            "30",
+            "-n",
+            "10000000",
+            "-z",
+            "100000",
+            "-a",
+            "isotropic",
+            "--seed",
+            "17",
+        ],
+        "reference": [
+            "xyzls",
+            "-N",
+            "30",
+            "-n",
+            "10000000",
+            "-z",
+            "100000",
+            "-a",
+            "isotropic",
+        ],
+        "frame": {
+            "native": "sky (emission at source, z = 1000 m)",
+            "reference": "plane through telescope sphere centre",
+        },
         "time_correction": "geometric",
         "native_frame": "sky",
         # Native emits into a cone of 1.02 R (deliberate margin), xyzls into R: compare the photons
@@ -79,18 +145,44 @@ CASES = {
         "acceptance_radius_cm": 1400.0,
         "stage2": {
             # Photons reach the telescope sphere, not the camera: full optics (simtools: bypass only for flat fielding).
-            "path": "propagate", "bypass": 0,
-            "native": ["obdeect", "sources", "point-source", "-N", "2", "-n", "3000000000", "-z", "100000",
-                       "-a", "isotropic", "--seed", "17"],
-            "reference": ["xyzls", "-N", "2", "-n", "3000000000", "-z", "100000", "-a", "isotropic"],
+            "path": "propagate",
+            "bypass": 0,
+            "native": [
+                "obdeect",
+                "sources",
+                "point-source",
+                "-N",
+                "2",
+                "-n",
+                "3000000000",
+                "-z",
+                "100000",
+                "-a",
+                "isotropic",
+                "--seed",
+                "17",
+            ],
+            "reference": [
+                "xyzls",
+                "-N",
+                "2",
+                "-n",
+                "3000000000",
+                "-z",
+                "100000",
+                "-a",
+                "isotropic",
+            ],
             "photon_factor": 300,
         },
     },
     "beam-scan": {
         "native": ["obdeect", "sources", "beam-scan", "-r", "123", "--seed", "1"],
         "reference": ["xyls", "-r", "123"],
-        "stage2": {"blocked": "no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per "
-                              "position, so the flat-field intensity cannot be matched between the two"},
+        "stage2": {
+            "blocked": "no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per "
+            "position, so the flat-field intensity cannot be matched between the two"
+        },
         "frame": {"native": "sky (beam at z = 6.15 cm)", "reference": "plane z = 0"},
         "time_correction": "geometric",
         "native_frame": "sky",
@@ -108,7 +200,12 @@ def _read_native(path):
             if not counts:
                 raise ValueError("photons before the first event record")
             if "cz" not in columns:
-                columns = {**columns, "cz": -np.sqrt(np.clip(1 - columns["cx"] ** 2 - columns["cy"] ** 2, 0, None))}
+                columns = {
+                    **columns,
+                    "cz": -np.sqrt(
+                        np.clip(1 - columns["cx"] ** 2 - columns["cy"] ** 2, 0, None)
+                    ),
+                }
             w = np.asarray(columns["w"], dtype=np.float64)
             counts[-1] += float(np.sum(w))
             for key in KEYS:
@@ -130,12 +227,21 @@ def _read_reference(path):
                 cols["cx"].append(np.asarray(bunches["cx"], dtype=np.float64))
                 cols["cy"].append(np.asarray(bunches["cy"], dtype=np.float64))
                 # Bunch position [cm] from the telescope axis, for the camera acceptance cut.
-                cols["r"].append(np.hypot(np.asarray(bunches["x"], dtype=np.float64),
-                                          np.asarray(bunches["y"], dtype=np.float64)))
+                cols["r"].append(
+                    np.hypot(
+                        np.asarray(bunches["x"], dtype=np.float64),
+                        np.asarray(bunches["y"], dtype=np.float64),
+                    )
+                )
                 # Reference times are relative to the event time offset; restore the origin.
-                cols["t"].append(np.asarray(bunches["time"], dtype=np.float64) + float(event.time_offset))
+                cols["t"].append(
+                    np.asarray(bunches["time"], dtype=np.float64)
+                    + float(event.time_offset)
+                )
                 cols["w"].append(photons)
-                cols["wavelength"].append(np.asarray(bunches["wavelength"], dtype=np.float64))
+                cols["wavelength"].append(
+                    np.asarray(bunches["wavelength"], dtype=np.float64)
+                )
             counts.append(total)
     out = {k: np.concatenate(v) if v else np.empty(0) for k, v in cols.items()}
     out["cz"] = -np.sqrt(np.clip(1.0 - out["cx"] ** 2 - out["cy"] ** 2, 0.0, None))
@@ -171,7 +277,9 @@ def accepted_ratio(native, n_events, ref, r_events, radius_cm):
     """Photons per event crossing z = 0 within radius_cm of the telescope axis, native / reference."""
     cz = native["cz"]
     path = np.where(cz < 0, -native["z"] / np.where(cz < 0, cz, -1.0), np.inf)  # m
-    radius = 100.0 * np.hypot(native["x"] + path * native["cx"], native["y"] + path * native["cy"])
+    radius = 100.0 * np.hypot(
+        native["x"] + path * native["cx"], native["y"] + path * native["cy"]
+    )
     wn = native["w"][np.isfinite(radius) & (radius < radius_cm)]
     wr = ref["w"][ref["r"] < radius_cm]
     if not wn.size or not wr.size:
@@ -182,11 +290,16 @@ def accepted_ratio(native, n_events, ref, r_events, radius_cm):
     return ratio, float(se)
 
 
-def emission_metrics(native_counts, native, ref_counts, ref, time_correction, acceptance_radius_cm=None):
+def emission_metrics(
+    native_counts, native, ref_counts, ref, time_correction, acceptance_radius_cm=None
+):
     """Stage 1 numbers and integer limit flags. time_correction is 'geometric' or 'none'."""
     n_ev, r_ev = len(native_counts), len(ref_counts)
-    metrics = {"native_event_count": n_ev, "reference_event_count": r_ev,
-               "event_count_delta": abs(n_ev - r_ev)}
+    metrics = {
+        "native_event_count": n_ev,
+        "reference_event_count": r_ev,
+        "event_count_delta": abs(n_ev - r_ev),
+    }
     nc, rc = np.asarray(native_counts), np.asarray(ref_counts)
     if nc.size == 0 or rc.size == 0 or nc.mean() == 0 or rc.mean() == 0:
         raise ValueError("stage 1 needs photons in both streams")
@@ -198,15 +311,30 @@ def emission_metrics(native_counts, native, ref_counts, ref, time_correction, ac
     else:
         se_native, se_reference = 1 / np.sqrt(nc.sum()), 1 / np.sqrt(rc.sum())
     se_ratio = float(ratio * np.hypot(se_native, se_reference))
-    metrics.update({"photons_per_event_native": float(nc.mean()),
-                    "photons_per_event_reference": float(rc.mean()),
-                    "photon_ratio": ratio, "photon_ratio_se": se_ratio,
-                    "photon_ratio_limit_exceeded": _flag(abs(ratio - 1), max(0.005, 5 * se_ratio))})
+    metrics.update(
+        {
+            "photons_per_event_native": float(nc.mean()),
+            "photons_per_event_reference": float(rc.mean()),
+            "photon_ratio": ratio,
+            "photon_ratio_se": se_ratio,
+            "photon_ratio_limit_exceeded": _flag(
+                abs(ratio - 1), max(0.005, 5 * se_ratio)
+            ),
+        }
+    )
     if acceptance_radius_cm:
-        accepted, se_accepted = accepted_ratio(native, n_ev, ref, r_ev, acceptance_radius_cm)
-        metrics.update({"photon_ratio_accepted": accepted, "photon_ratio_accepted_se": se_accepted,
-                        "photon_ratio_accepted_limit_exceeded":
-                            _flag(abs(accepted - 1), max(0.005, 5 * se_accepted))})
+        accepted, se_accepted = accepted_ratio(
+            native, n_ev, ref, r_ev, acceptance_radius_cm
+        )
+        metrics.update(
+            {
+                "photon_ratio_accepted": accepted,
+                "photon_ratio_accepted_se": se_accepted,
+                "photon_ratio_accepted_limit_exceeded": _flag(
+                    abs(accepted - 1), max(0.005, 5 * se_accepted)
+                ),
+            }
+        )
     wn, wr = native["w"], ref["w"]
     t_native = native["t"].copy()
     native_ok = np.ones(t_native.size, dtype=bool)
@@ -230,16 +358,27 @@ def emission_metrics(native_counts, native, ref_counts, ref, time_correction, ac
         mr, sr = _weighted_mean(ref[key], wr)
         se = float(np.hypot(sn, sr))
         d_ks, p_ks = _ks(native[key], ref[key])
-        metrics.update({f"{key}_native": mn, f"{key}_reference": mr, f"{key}_delta": mn - mr,
-                        f"{key}_delta_sigma": float((mn - mr) / se) if se else 0.0,
-                        f"{key}_mean_limit_exceeded": _flag(abs(mn - mr) / se if se else 0.0, 5),
-                        f"{key}_ks_distance": d_ks, f"{key}_ks_pvalue": p_ks,
-                        f"{key}_ks_limit_exceeded": int(d_ks >= 0.01 and p_ks <= 1e-3)})
+        metrics.update(
+            {
+                f"{key}_native": mn,
+                f"{key}_reference": mr,
+                f"{key}_delta": mn - mr,
+                f"{key}_delta_sigma": float((mn - mr) / se) if se else 0.0,
+                f"{key}_mean_limit_exceeded": _flag(
+                    abs(mn - mr) / se if se else 0.0, 5
+                ),
+                f"{key}_ks_distance": d_ks,
+                f"{key}_ks_pvalue": p_ks,
+                f"{key}_ks_limit_exceeded": int(d_ks >= 0.01 and p_ks <= 1e-3),
+            }
+        )
     # Time moments use reference bunches within the fiducial radius of 1500 cm (xyzls -r default).
     # Bunches beyond it (flasher-secondary: 3.6 %, incl. times near -2e8 ns) are not camera photons;
     # their fraction is reported, not compared.
     good = ref["r"] < TIME_RADIUS_CM
-    metrics["t_reference_outside_radius_fraction"] = float(1.0 - np.mean(good)) if good.size else 0.0
+    metrics["t_reference_outside_radius_fraction"] = (
+        float(1.0 - np.mean(good)) if good.size else 0.0
+    )
     for key, tol in (("t", 0.05), ("wavelength", 0.01)):
         if key == "t":
             xn, wn_t = t_native[native_ok], wn[native_ok]
@@ -252,12 +391,19 @@ def emission_metrics(native_counts, native, ref_counts, ref, time_correction, ac
         se = float(np.hypot(sn, sr))
         rn, rr = _weighted_rms(xn, wn_k), _weighted_rms(xr, wr_)
         se_rms = float(max(rn, rr) / np.sqrt(2 * max(len(xn), len(xr))))
-        metrics.update({f"{key}_mean_native": mn, f"{key}_mean_reference": mr,
-                        f"{key}_mean_delta": mn - mr, f"{key}_mean_delta_se": se,
-                        f"{key}_mean_limit_exceeded": _flag(abs(mn - mr), max(tol, 5 * se)),
-                        f"{key}_rms_native": rn, f"{key}_rms_reference": rr,
-                        f"{key}_rms_delta": rn - rr,
-                        f"{key}_rms_limit_exceeded": _flag(abs(rn - rr), max(tol, 5 * se_rms))})
+        metrics.update(
+            {
+                f"{key}_mean_native": mn,
+                f"{key}_mean_reference": mr,
+                f"{key}_mean_delta": mn - mr,
+                f"{key}_mean_delta_se": se,
+                f"{key}_mean_limit_exceeded": _flag(abs(mn - mr), max(tol, 5 * se)),
+                f"{key}_rms_native": rn,
+                f"{key}_rms_reference": rr,
+                f"{key}_rms_delta": rn - rr,
+                f"{key}_rms_limit_exceeded": _flag(abs(rn - rr), max(tol, 5 * se_rms)),
+            }
+        )
     return metrics
 
 
@@ -283,8 +429,13 @@ def camera_metrics(reference, candidate):
     nb, imb = candidate[tel]
     mean_a, mean_b = na.mean(), nb.mean()
     ratio = float(mean_b / mean_a)
-    se = float(ratio * np.hypot(na.std(ddof=1) / np.sqrt(na.size) / mean_a,
-                                nb.std(ddof=1) / np.sqrt(nb.size) / mean_b))
+    se = float(
+        ratio
+        * np.hypot(
+            na.std(ddof=1) / np.sqrt(na.size) / mean_a,
+            nb.std(ddof=1) / np.sqrt(nb.size) / mean_b,
+        )
+    )
     # Pixel shapes normalised to unit sum; variance of a normalised Poisson count.
     pa, pb = ima / ima.sum(), imb / imb.sum()
     var = ima / ima.sum() ** 2 + imb / imb.sum() ** 2
@@ -292,11 +443,18 @@ def camera_metrics(reference, candidate):
     chi2 = float(np.sum((pa[used] - pb[used]) ** 2 / var[used]))
     ndof = max(int(np.count_nonzero(used)) - 1, 1)
     reduced = chi2 / ndof
-    return {"telescope": int(tel), "reference_events": int(na.size), "candidate_events": int(nb.size),
-            "pe_per_event_reference": float(mean_a), "pe_per_event_candidate": float(mean_b),
-            "pe_ratio": ratio, "pe_ratio_se": se,
-            "pe_ratio_limit_exceeded": _flag(abs(ratio - 1), max(0.01, 5 * se)),
-            "image_reduced_chi2": reduced, "image_chi2_limit_exceeded": _flag(reduced, 2.0)}
+    return {
+        "telescope": int(tel),
+        "reference_events": int(na.size),
+        "candidate_events": int(nb.size),
+        "pe_per_event_reference": float(mean_a),
+        "pe_per_event_candidate": float(mean_b),
+        "pe_ratio": ratio,
+        "pe_ratio_se": se,
+        "pe_ratio_limit_exceeded": _flag(abs(ratio - 1), max(0.01, 5 * se)),
+        "image_reduced_chi2": reduced,
+        "image_chi2_limit_exceeded": _flag(reduced, 2.0),
+    }
 
 
 def _plot(native, ref, output):
@@ -311,8 +469,22 @@ def _plot(native, ref, output):
         if a.size and b.size:
             lo, hi = np.quantile(np.concatenate((a, b)), [0.001, 0.999])
             hi = hi if hi > lo else lo + 1e-6
-            ax.hist(a, bins=60, range=(lo, hi), histtype="step", density=True, label="obdeect")
-            ax.hist(b, bins=60, range=(lo, hi), histtype="step", density=True, label="LightEmission")
+            ax.hist(
+                a,
+                bins=60,
+                range=(lo, hi),
+                histtype="step",
+                density=True,
+                label="obdeect",
+            )
+            ax.hist(
+                b,
+                bins=60,
+                range=(lo, hi),
+                histtype="step",
+                density=True,
+                label="LightEmission",
+            )
         ax.set(xlabel=key)
     axes[0, 0].legend()
     fig.tight_layout()
@@ -322,24 +494,55 @@ def _plot(native, ref, output):
 
 def _run(argv, log):
     with Path(log).open("wb") as handle:
-        result = subprocess.run([str(a) for a in argv], stdout=handle, stderr=subprocess.STDOUT, check=False)
+        result = subprocess.run(
+            [str(a) for a in argv], stdout=handle, stderr=subprocess.STDOUT, check=False
+        )
     if result.returncode:
         tail = Path(log).read_text(errors="replace").strip().splitlines()[-3:]
         raise RuntimeError(f"{argv[0]} exited {result.returncode}: {' | '.join(tail)}")
 
 
-def _simtel(root, input_file, name, bypass, cfg="CTA/CTA-PROD6-LST.cfg", defines=("-DCTA_NORTH", "-DLST1")):
+def _simtel(
+    root,
+    input_file,
+    name,
+    bypass,
+    cfg="CTA/CTA-PROD6-LST.cfg",
+    defines=("-DCTA_NORTH", "-DLST1"),
+):
     """sim_telarray with the options of simtools' light-emission step (released binary)."""
-    binary = os.environ.get("SIMTEL_BINARY", "/workdir/simulation_software/sim_telarray/bin/sim_telarray")
+    binary = os.environ.get(
+        "SIMTEL_BINARY", "/workdir/simulation_software/sim_telarray/bin/sim_telarray"
+    )
     reference = Path(os.environ.get("SIMTEL_REFERENCE_SOURCE", "/reference"))
     output = root / f"{name}.simtel"
     output.unlink(missing_ok=True)
-    options = {"altitude": 2150, "TRIGGER_TELESCOPES": 1, "TELTRIG_MIN_SIGSUM": 2, "PULSE_ANALYSIS": -30,
-               "MAXIMUM_TELESCOPES": 1, "telescope_theta": 0, "telescope_phi": 0, "Bypass_Optics": bypass,
-               "output_file": output, "histogram_file": root / f"{name}.hdata",
-               "random_seed": 20261113, "save_photons": 2, "store_photoelectrons": 0}
-    argv = [binary, f"-I{reference / 'cfg/common'}", f"-I{reference / 'cfg/CTA'}",
-            "-c", reference / "cfg" / cfg, *defines, "-DNUM_TELESCOPES=1", "-W", "random_state=none"]
+    options = {
+        "altitude": 2150,
+        "TRIGGER_TELESCOPES": 1,
+        "TELTRIG_MIN_SIGSUM": 2,
+        "PULSE_ANALYSIS": -30,
+        "MAXIMUM_TELESCOPES": 1,
+        "telescope_theta": 0,
+        "telescope_phi": 0,
+        "Bypass_Optics": bypass,
+        "output_file": output,
+        "histogram_file": root / f"{name}.hdata",
+        "random_seed": 20261113,
+        "save_photons": 2,
+        "store_photoelectrons": 0,
+    }
+    argv = [
+        binary,
+        f"-I{reference / 'cfg/common'}",
+        f"-I{reference / 'cfg/CTA'}",
+        "-c",
+        reference / "cfg" / cfg,
+        *defines,
+        "-DNUM_TELESCOPES=1",
+        "-W",
+        "random_state=none",
+    ]
     for key, value in options.items():
         argv += ["-C", f"{key}={value}"]
     argv.append(input_file)
@@ -354,9 +557,30 @@ def _camera_stage(root, native_gst, reference_file, stage2):
     candidate = root / "candidate.iact"
     if stage2["path"] == "propagate":
         propagated = root / "propagated.gst"
-        _run(["obdeect", "propagation", "run", "--no-extinction", "--site-altitude", "2150", "--seed", "1",
-              "--wavelength-range", "300", "800", "-i", native_gst, "-o", propagated], root / "propagation.log")
-        _run(["obdeect", "stream", "to-simtel", "-o", candidate, propagated], root / "to-simtel.log")
+        _run(
+            [
+                "obdeect",
+                "propagation",
+                "run",
+                "--no-extinction",
+                "--site-altitude",
+                "2150",
+                "--seed",
+                "1",
+                "--wavelength-range",
+                "300",
+                "800",
+                "-i",
+                native_gst,
+                "-o",
+                propagated,
+            ],
+            root / "propagation.log",
+        )
+        _run(
+            ["obdeect", "stream", "to-simtel", "-o", candidate, propagated],
+            root / "to-simtel.log",
+        )
     else:
         argv = ["obdeect", "stream", "to-simtel", "-o", candidate]
         if stage2.get("camera_map"):
@@ -369,9 +593,19 @@ def _camera_stage(root, native_gst, reference_file, stage2):
     ref_out = _simtel(root, reference_file, "reference", stage2["bypass"], cfg, defines)
     cand_out = _simtel(root, candidate, "candidate", stage2["bypass"], cfg, defines)
     a, b = camera_events(ref_out), camera_events(cand_out)
-    if not a or not b or any(len(v[0]) == 0 for v in list(a.values()) + list(b.values())):
-        return None, {"reference_triggered_telescopes": {str(k): int(len(v[0])) for k, v in a.items()},
-                      "candidate_triggered_telescopes": {str(k): int(len(v[0])) for k, v in b.items()}}
+    if (
+        not a
+        or not b
+        or any(len(v[0]) == 0 for v in list(a.values()) + list(b.values()))
+    ):
+        return None, {
+            "reference_triggered_telescopes": {
+                str(k): int(len(v[0])) for k, v in a.items()
+            },
+            "candidate_triggered_telescopes": {
+                str(k): int(len(v[0])) for k, v in b.items()
+            },
+        }
     return camera_metrics(a, b), {}
 
 
@@ -383,7 +617,9 @@ def _reference_argv(argv, root):
         argv.insert(1, f"-I{config}")
     elif argv[0] == "xyls":
         # xyls has no configuration option and reads the atmosphere table from the working directory.
-        shutil.copyfile(Path(config) / "atm_profile_model_1.dat", root / "atm_profile_model_1.dat")
+        shutil.copyfile(
+            Path(config) / "atm_profile_model_1.dat", root / "atm_profile_model_1.dat"
+        )
     return argv
 
 
@@ -392,41 +628,81 @@ def main(case):
     root = Path.cwd()
     native_gst, reference_file = root / "native.gst", root / "reference.dat.gz"
     _run([*spec["native"], "-o", native_gst], root / "native.log")
-    _run([*_reference_argv(spec["reference"], root), "-o", reference_file], root / "reference.log")
+    _run(
+        [*_reference_argv(spec["reference"], root), "-o", reference_file],
+        root / "reference.log",
+    )
     native_counts, native = _read_native(native_gst)
     ref_counts, ref = _read_reference(reference_file)
-    metrics = emission_metrics(native_counts, native, ref_counts, ref, spec["time_correction"],
-                               spec.get("acceptance_radius_cm"))
+    metrics = emission_metrics(
+        native_counts,
+        native,
+        ref_counts,
+        ref,
+        spec["time_correction"],
+        spec.get("acceptance_radius_cm"),
+    )
     _plot(native, ref, root / "stage1.png")
-    details = {"case": case, "native_command": spec["native"], "reference_command": spec["reference"],
-               "frames": spec["frame"], "time_correction": spec["time_correction"],
-               "time_correction_rule": "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset",
-               "stage2": {"status": "BLOCKED", "reason": "not attempted"}}
+    details = {
+        "case": case,
+        "native_command": spec["native"],
+        "reference_command": spec["reference"],
+        "frames": spec["frame"],
+        "time_correction": spec["time_correction"],
+        "time_correction_rule": "t_arrival = t + (-z/cz)/c (z in m, cz<0); ref times + time_offset",
+        "stage2": {"status": "BLOCKED", "reason": "not attempted"},
+    }
     stage2 = spec["stage2"]
     try:
         if "blocked" in stage2:
             raise RuntimeError(stage2["blocked"])
-        native2, reference2 = root / "stage2-native.gst", root / "stage2-reference.dat.gz"
+        native2, reference2 = (
+            root / "stage2-native.gst",
+            root / "stage2-reference.dat.gz",
+        )
         _run([*stage2["native"], "-o", native2], root / "stage2-native.log")
-        _run([*_reference_argv(stage2["reference"], root), "-o", reference2], root / "stage2-reference.log")
+        _run(
+            [*_reference_argv(stage2["reference"], root), "-o", reference2],
+            root / "stage2-reference.log",
+        )
         camera, reason = _camera_stage(root, native2, reference2, stage2)
         if camera is None:
-            details["stage2"] = {"status": "BLOCKED",
-                                 "reason": "no triggered telescope events in sim_telarray for one input",
-                                 **reason}
+            details["stage2"] = {
+                "status": "BLOCKED",
+                "reason": "no triggered telescope events in sim_telarray for one input",
+                **reason,
+            }
         else:
             details["stage2"] = {"status": "OK"}
-            metrics.update({f"camera_{k}": v for k, v in camera.items() if isinstance(v, (int, float))})
+            metrics.update(
+                {
+                    f"camera_{k}": v
+                    for k, v in camera.items()
+                    if isinstance(v, (int, float))
+                }
+            )
     except Exception as exc:  # stage 2 is reported, not hidden
-        details["stage2"] = {"status": "BLOCKED", "reason": str(exc)[:400],
-                             "traceback": traceback.format_exc()[-800:]}
+        details["stage2"] = {
+            "status": "BLOCKED",
+            "reason": str(exc)[:400],
+            "traceback": traceback.format_exc()[-800:],
+        }
     if "native" in stage2:
-        details["stage2"].update({"native_command": stage2["native"], "reference_command": stage2["reference"],
-                                  "photon_factor": stage2["photon_factor"],
-                                  "photon_factor_note": "same factor applied to native and reference; "
-                                                        "stage 1 uses the matched stage 1 counts"})
-    (root / "metrics.json").write_text(json.dumps(metrics, indent=2, allow_nan=False) + "\n", encoding="utf-8")
-    (root / "details.json").write_text(json.dumps(details, indent=2) + "\n", encoding="utf-8")
+        details["stage2"].update(
+            {
+                "native_command": stage2["native"],
+                "reference_command": stage2["reference"],
+                "photon_factor": stage2["photon_factor"],
+                "photon_factor_note": "same factor applied to native and reference; "
+                "stage 1 uses the matched stage 1 counts",
+            }
+        )
+    (root / "metrics.json").write_text(
+        json.dumps(metrics, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+    )
+    (root / "details.json").write_text(
+        json.dumps(details, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

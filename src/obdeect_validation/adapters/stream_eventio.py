@@ -14,7 +14,12 @@ from eventio.iact import IACTFile
 from obdeect.stream import Reader, Writer
 
 FIXTURE = Path(__file__).with_name("compare-led-camera.txt")
-HEADER_ORDER = [1200, 1212, 1216, 1201]  # RUNH, INPUTCFG, ATMPROF, TELPOS as CORSIKA writes them
+HEADER_ORDER = [
+    1200,
+    1212,
+    1216,
+    1201,
+]  # RUNH, INPUTCFG, ATMPROF, TELPOS as CORSIKA writes them
 
 
 def _top_level_spans(path):
@@ -24,7 +29,9 @@ def _top_level_spans(path):
         for obj in file:
             header = obj.header
             start = header.content_address - header.header_size
-            spans.append((header.type, start, header.content_address + header.content_size))
+            spans.append(
+                (header.type, start, header.content_address + header.content_size)
+            )
     return spans
 
 
@@ -39,8 +46,10 @@ def _reorder_input_card(path, output_path):
     """
     data = Path(path).read_bytes()
     spans = _top_level_spans(path)
-    if spans[0][1] != 0 or spans[-1][2] != len(data) or any(
-        a[2] != b[1] for a, b in zip(spans, spans[1:])
+    if (
+        spans[0][1] != 0
+        or spans[-1][2] != len(data)
+        or any(a[2] != b[1] for a, b in zip(spans, spans[1:]))
     ):
         raise ValueError("top-level EventIO objects do not cover the file contiguously")
     head = [
@@ -49,7 +58,9 @@ def _reorder_input_card(path, output_path):
         if any(span[0] == block_type for span in spans)
     ]
     order = head + [i for i in range(len(spans)) if i not in head]
-    Path(output_path).write_bytes(b"".join(data[spans[i][1] : spans[i][2]] for i in order))
+    Path(output_path).write_bytes(
+        b"".join(data[spans[i][1] : spans[i][2]] for i in order)
+    )
 
 
 def _read_stream(path):
@@ -79,7 +90,9 @@ def _read_eventio(path):
 
 def _add_zem(input_path, output_path):
     """Add the required zero emission-height field to camera-frame LED photons."""
-    with Writer(str(output_path), "obdeect validation stream interoperability") as writer:
+    with Writer(
+        str(output_path), "obdeect validation stream interoperability"
+    ) as writer:
         for record in Reader(str(input_path)):
             if record["type"] == "stream":
                 continue
@@ -94,7 +107,9 @@ def _add_zem(input_path, output_path):
                     columns,
                 )
             elif record["type"] == "blob":
-                writer.write_blob(record["eventio_type"], record["eventio_id"], record["data"])
+                writer.write_blob(
+                    record["eventio_type"], record["eventio_id"], record["data"]
+                )
             else:
                 writer.write(record["type"], record["metadata"])
 
@@ -160,7 +175,9 @@ def main():
     try:
         reference_counts = _read_eventio(converted)
         reader_error = None
-    except WrongType as exc:  # The reference reader rejects the emitted EventIO block order.
+    except (
+        WrongType
+    ) as exc:  # The reference reader rejects the emitted EventIO block order.
         reference_counts = []
         reader_error = f"{type(exc).__name__}: {exc}"
     # Diagnostic: the same photons with INPUTCFG moved to CORSIKA's position (after RUNH).
@@ -170,7 +187,9 @@ def main():
     deltas = [
         abs(source_counts[i] - reference_counts[i])
         if i < len(source_counts) and i < len(reference_counts)
-        else source_counts[i] if i < len(source_counts) else reference_counts[i]
+        else source_counts[i]
+        if i < len(source_counts)
+        else reference_counts[i]
         for i in range(max(len(source_counts), len(reference_counts)))
     ]
     metrics = {
@@ -186,7 +205,9 @@ def main():
         "reordered_photon_count": sum(reordered_counts),
         "reordered_photon_count_delta": abs(sum(source_counts) - sum(reordered_counts)),
     }
-    Path("metrics.json").write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
+    Path("metrics.json").write_text(
+        json.dumps(metrics, indent=2) + "\n", encoding="utf-8"
+    )
     provenance = {
         "eventio_reader_error": reader_error,
         "converted_object_types": object_types,
@@ -198,7 +219,9 @@ def main():
         "camera_sha256": hashlib.sha256(camera.read_bytes()).hexdigest(),
         "atmosphere_sha256": hashlib.sha256(profile.read_bytes()).hexdigest(),
     }
-    Path("details.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
+    Path("details.json").write_text(
+        json.dumps(provenance, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":
