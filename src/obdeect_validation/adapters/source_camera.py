@@ -29,6 +29,7 @@ from obdeect_validation.adapters import common, readers
 
 C_M_NS = 0.299792458
 TIME_RADIUS_CM = 1500.0
+MIN_CAMERA_EVENTS = 2  # the p.e. standard error needs two events per sample
 KEYS = ("cx", "cy", "cz", "t", "z", "w", "wavelength", "x", "y")
 
 # Matched parameter sets. Flasher cases follow obdeect/validation/sources/compare_*.sh; point
@@ -376,6 +377,10 @@ def camera_metrics(reference, candidate):
     tel = shared[0]
     na, ima = reference[tel]
     nb, imb = candidate[tel]
+    if min(na.size, nb.size) < MIN_CAMERA_EVENTS:
+        raise ValueError(
+            f"camera comparison needs at least {MIN_CAMERA_EVENTS} triggered events per sample"
+        )
     mean_a, mean_b = na.mean(), nb.mean()
     ratio = float(mean_b / mean_a)
     se = float(
@@ -495,7 +500,9 @@ def _camera_stage(root, native_gst, reference_file, stage2):
     if (
         not a
         or not b
-        or any(len(v[0]) == 0 for v in list(a.values()) + list(b.values()))
+        or any(
+            len(v[0]) < MIN_CAMERA_EVENTS for v in list(a.values()) + list(b.values())
+        )
     ):
         return None, {
             "reference_triggered_telescopes": {
@@ -568,7 +575,7 @@ def main(case):
         if camera is None:
             details["stage2"] = {
                 "status": "BLOCKED",
-                "reason": "no triggered telescope events in sim_telarray for one input",
+                "reason": f"fewer than {MIN_CAMERA_EVENTS} triggered events per telescope in sim_telarray for one input",
                 **reason,
             }
         else:

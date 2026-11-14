@@ -133,3 +133,53 @@ def test_report_html_shows_status_reason_and_figures(tmp_path):
     assert "class='s BLOCKED'" in page
     assert "run interrupted" in page and "nsbls" in page
     assert "case-a/plot.png" in page
+
+
+def _fake_stream(records):
+    return lambda _path: iter(records)
+
+
+def _photons(n=2):
+    columns = {k: np.zeros(n) for k in ("x", "y", "cx", "cy", "t", "wavelength")}
+    return {"type": "photons", "columns": {**columns, "w": np.ones(n)}}
+
+
+def test_native_reader_rejects_photons_before_first_event(monkeypatch):
+    from obdeect_validation.adapters import readers
+
+    monkeypatch.setattr(readers, "Reader", _fake_stream([_photons()]))
+    with pytest.raises(ValueError, match="before its first event"):
+        readers.read_native("x")
+    counts, columns = readers.read_native("x", require_events=False)
+    assert counts == [2.0] and columns["w"].size == 2
+
+
+def test_native_reader_counts_weight_per_event(monkeypatch):
+    from obdeect_validation.adapters import readers
+
+    records = [{"type": "event"}, _photons(3), {"type": "event"}, _photons(1)]
+    monkeypatch.setattr(readers, "Reader", _fake_stream(records))
+    assert readers.read_native("x")[0] == [3.0, 1.0]
+
+
+def test_camera_metrics_need_two_events_per_sample():
+    from obdeect_validation.adapters import source_camera as sc
+
+    one = {1: (np.array([5.0]), np.ones(4))}
+    two = {1: (np.array([5.0, 6.0]), np.ones(4))}
+    with pytest.raises(ValueError, match="at least 2"):
+        sc.camera_metrics(one, two)
+
+
+def test_extinction_figure_colours_follow_the_photon_wavelengths(tmp_path):
+    plotting = pytest.importorskip("obdeect_validation.adapters.plotting")
+    from obdeect_validation.adapters import extinction_reference as er
+
+    expected = np.linspace(0.1, 0.9, 6)
+    er._plot(
+        expected,
+        expected,
+        np.array([300, 300, 400, 400, 500, 500.0]),
+        tmp_path / "e.png",
+    )
+    assert (tmp_path / "e.png").is_file() and plotting.CYCLE

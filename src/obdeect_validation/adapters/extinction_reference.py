@@ -121,6 +121,7 @@ def main() -> None:
     )
     actual_p = []
     actual_w = []
+    row_wavelengths = []
     expected_actual = []
     thinned_count = 0
     for elevation in elevations:
@@ -148,6 +149,7 @@ def main() -> None:
             )
             actual_p.append(weighted["p"].astype(np.float64))
             actual_w.append(weighted["w"].astype(np.float64))
+            row_wavelengths.append(subset["wavelength"].astype(np.float64))
             expected_actual.append(expected[rows])
             thinned_count += len(thinned["x"])
             if not np.all(thinned["w"] == 1.0):
@@ -211,21 +213,21 @@ def main() -> None:
     _plot(
         expected,
         candidate_p,
-        [c[0] for c in cases],
-        repetitions,
+        np.concatenate(row_wavelengths),
         Path("extinction-weighted.png"),
     )
     common.write_results(metrics)
 
 
-def _plot(expected, weighted, wavelengths, repetitions, path):
-    """obdeect weighted transmission against the table expectation, coloured by wavelength."""
+def _plot(expected, weighted, wavelengths, path):
+    """obdeect weighted transmission against the table expectation, coloured by wavelength.
+
+    All three arrays hold one entry per photon, in the same order.
+    """
     from obdeect_validation.adapters import plotting
 
-    # Rows follow the (elevation, path) grouping, so wavelengths repeat per group.
-    colors = np.resize(np.repeat(wavelengths, repetitions), expected.size).astype(float)
     fig, axes = plotting.figure(1, 2, (10, 3.8))
-    points = axes[0, 0].scatter(expected, weighted, c=colors, s=6, cmap="viridis")
+    points = axes[0, 0].scatter(expected, weighted, c=wavelengths, s=6, cmap="viridis")
     axes[0, 0].plot([0, 1], [0, 1], color=plotting.ANALYTIC, linewidth=1)
     axes[0, 0].set(xlabel="table expectation", ylabel="obdeect weighted p")
     fig.colorbar(points, ax=axes[0, 0], label="wavelength [nm]")

@@ -147,7 +147,8 @@ def impact_parameter(q, d):
 
 def read_native(path):
     """obdeect photon stream: positions m, times ns, wavelengths nm, weights (missing columns empty)."""
-    return readers.read_native(path)[1]
+    # Only the columns are used here, not the per-event weights.
+    return readers.read_native(path, require_events=False)[1]
 
 
 def read_reference(path):

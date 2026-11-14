@@ -34,9 +34,13 @@ def downward_cz(cx, cy):
     return -np.sqrt(np.clip(1.0 - cx**2 - cy**2, 0.0, None))
 
 
-def read_native(path, keys=NATIVE_KEYS):
+def read_native(path, keys=NATIVE_KEYS, require_events=True):
     """obdeect photon stream. Missing columns stay empty, except cz (from cx, cy)
-    and z (zero for camera-frame streams)."""
+    and z (zero for camera-frame streams).
+
+    Photons before the first event record are an error unless require_events is False
+    (then they count as one event; the per-event weights are not meaningful).
+    """
     counts, chunks = [], {k: [] for k in keys}
     for record in Reader(str(path)):
         if record["type"] == "event":
@@ -49,7 +53,9 @@ def read_native(path, keys=NATIVE_KEYS):
                     np.asarray(columns["cy"], dtype=np.float64),
                 )
             weights = np.asarray(columns["w"], dtype=np.float64)
-            if not counts:  # photons before the first event record
+            if not counts:
+                if require_events:
+                    raise ValueError("photon stream has photons before its first event")
                 counts.append(0.0)
             counts[-1] += float(np.sum(weights))
             for key in keys:
