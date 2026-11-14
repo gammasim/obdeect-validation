@@ -152,13 +152,13 @@ def sim_telarray(
     (root / f"{name}.command.json").write_text(json.dumps(argv, indent=2) + "\n")
     log = root / f"{name}.log"
     runner(argv, log, cwd=REFERENCE)
-    if not output.is_file():
-        raise RuntimeError(f"no sim_telarray output: {log}")
     dropped = (
         simtel_dropped_input(log.read_text(errors="replace")) if log.is_file() else []
     )
     if dropped:
         raise RuntimeError(f"sim_telarray dropped input ({dropped[0]}); see {log}")
+    if not output.is_file():
+        raise RuntimeError(f"no sim_telarray output: {log}")
     return output
 
 
