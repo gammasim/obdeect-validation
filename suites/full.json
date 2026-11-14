@@ -1,0 +1,24 @@
+{
+  "id": "full",
+  "cases": [
+    "../cases/stream/led-eventio.json",
+    "../cases/stream/corsika-roundtrip.json",
+    "../cases/propagation/extinction-analytic.json",
+    "../cases/propagation/extinction-simtel-table.json",
+    "../cases/propagation/atmosphere-corsika.json",
+    "../cases/sources/led-reference.json",
+    "../cases/sources/flasher-dish.json",
+    "../cases/sources/flasher-secondary.json",
+    "../cases/sources/point-source.json",
+    "../cases/sources/beam-scan.json",
+    "../cases/sources/laser-beam.json",
+    "../cases/sources/night-sky.json",
+    "../cases/sources/muon-track.json",
+    "../cases/optics/optics-lst.json",
+    "../cases/optics/optics-mst.json",
+    "../cases/optics/optics-sst.json",
+    "../cases/chain/stream-roundtrip-threshold.json",
+    "../cases/chain/atmosphere-substitution.json",
+    "../cases/chain/optics-bypass1.json"
+  ]
+}

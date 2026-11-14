@@ -1,0 +1,10 @@
+{
+  "eff_area_limit_exceeded": 0,
+  "eff_flen_limit_exceeded": 0,
+  "exceeded_limits": 0,
+  "max_rel_eff_area": 0.0009203236622301603,
+  "max_rel_eff_flen": 0.0001827922759973788,
+  "max_rel_psf_cm": 0.005327819267160749,
+  "n_offsets": 9,
+  "psf_cm_limit_exceeded": 0
+}

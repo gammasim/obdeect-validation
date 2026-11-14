@@ -1,0 +1,118 @@
+{
+  "band_nm": [
+    100.0,
+    2000.0
+  ],
+  "site_altitude_m": 2156.0,
+  "pathlen_m": 28.0,
+  "seed": 123,
+  "input_photon_weight": 54210207.6110011,
+  "propagation": {
+    "photons_in": 10888516,
+    "photons_out": 5391964,
+    "weight_out": 13239200.0,
+    "dropped": 0
+  },
+  "expected_transmission_standard_error": 0.0008147689729705225,
+  "sample_bunches": 217680,
+  "limits": {
+    "photoelectron_bias": [
+      "max(0.01, 5 se)",
+      "1 % agreement of the photon chain; 5 se covers event sampling."
+    ],
+    "arrival_time_bias": [
+      "max(0.05 ns, 5 se)",
+      "well below the 1 ns camera sample; 5 se covers event sampling."
+    ],
+    "image_shape": [
+      "mean reduced chi2 <= 2",
+      "equal Poisson images give about 1; above 2 the shape differs."
+    ],
+    "stage_counts": [
+      "max(0.01, 5 sqrt(1/N_ref + 1/N_cand))",
+      "1 % floor plus Poisson error of the stage counts."
+    ],
+    "transmission_mean": [
+      "max(0.01, 5 se)",
+      "obdeect weight loss must match the table expectation at 1 %."
+    ],
+    "trigger": [
+      "0 mismatches",
+      "trigger decisions must not change under unit-transmission substitution."
+    ]
+  },
+  "direct_photon_statistics": {
+    "All photons": [
+      18605134,
+      17093240,
+      18511833
+    ],
+    "Used photons": [
+      17625076,
+      16193023,
+      17537441
+    ],
+    "Not absorbed/max. Q.E.": [
+      703464,
+      656510,
+      678727
+    ],
+    "Reflected on mirror": [
+      586353,
+      545165,
+      563432
+    ],
+    "Camera hit": [
+      482848,
+      454441,
+      473114
+    ],
+    "Pixel hit": [
+      482848,
+      454441,
+      473114
+    ],
+    "Detected": [
+      325062,
+      300780,
+      328071
+    ]
+  },
+  "candidate_photon_statistics": {
+    "All photons": [
+      4569921,
+      4048066,
+      4621252
+    ],
+    "Used photons": [
+      4569921,
+      4048066,
+      4621252
+    ],
+    "Not absorbed/max. Q.E.": [
+      702774,
+      656578,
+      680717
+    ],
+    "Reflected on mirror": [
+      585762,
+      545171,
+      564086
+    ],
+    "Camera hit": [
+      481863,
+      454974,
+      473862
+    ],
+    "Pixel hit": [
+      481863,
+      454974,
+      473862
+    ],
+    "Detected": [
+      325349,
+      301340,
+      328335
+    ]
+  }
+}

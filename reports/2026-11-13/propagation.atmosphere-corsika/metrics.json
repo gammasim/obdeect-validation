@@ -1,0 +1,7 @@
+{
+  "sample_count": 24,
+  "bent_count": 24,
+  "max_direction_cosine_absolute_error": 1.5650813978140832e-12,
+  "max_displacement_absolute_error_m": 0.0004444791104951662,
+  "max_travel_time_absolute_error_ns": 0.0016314777130901348
+}

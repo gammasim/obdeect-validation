@@ -1,0 +1,19 @@
+{
+  "simtools_config": {
+    "application": "simtools-validate-optics",
+    "configuration": {
+      "site": "North",
+      "telescope": "LSTN-01",
+      "model_version": "6.0.2",
+      "simulation_models_path": "/models",
+      "zenith_angle": 20,
+      "source_distance": 10,
+      "max_offset": 1,
+      "offset_step": 0.5,
+      "offset_directions": "N,E",
+      "instrument_seed": 11,
+      "simulation_seed": [11]
+    }
+  },
+  "limits": {"psf_cm": null, "eff_area": null, "eff_flen": null}
+}

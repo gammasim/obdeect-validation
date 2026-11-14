@@ -1,0 +1,2063 @@
+{
+  "cases": [
+    {
+      "fingerprint": "e93a194c5bde1b519a91a791270c8dabfce75541af533fd038670abf86df0d4c",
+      "id": "stream.led-eventio",
+      "metrics": [
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 1,
+          "metric": "eventio_readable",
+          "status": "FAIL"
+        },
+        {
+          "actual": 3,
+          "atol": 0,
+          "expected": 3,
+          "metric": "source_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 3,
+          "metric": "eventio_event_count",
+          "status": "FAIL"
+        },
+        {
+          "actual": 60.0,
+          "atol": 0,
+          "expected": 60,
+          "metric": "source_photon_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 60,
+          "metric": "eventio_photon_count",
+          "status": "FAIL"
+        },
+        {
+          "actual": 3,
+          "atol": 0,
+          "expected": 0,
+          "metric": "event_count_delta",
+          "status": "FAIL"
+        },
+        {
+          "actual": 60.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_count_delta",
+          "status": "FAIL"
+        },
+        {
+          "actual": 20.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "max_event_photon_delta",
+          "status": "FAIL"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "LED light-source stream to sim_telarray EventIO, read by the independent eventio reader",
+      "status": "FAIL",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.stream_eventio"
+          ],
+          "cwd": "/results/full-integrated/stream.led-eventio",
+          "duration_seconds": 0.573382,
+          "name": "convert-and-read-eventio",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "stream.led-eventio/01-convert-and-read-eventio.stderr.log",
+          "stdout_log": "stream.led-eventio/01-convert-and-read-eventio.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "638a10e07639b7b5b4d14c7a112df016a512b55956c765f87dac7d7b0ea29062",
+      "id": "stream.corsika-roundtrip",
+      "metrics": [
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_event_telescope_key_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "bunch_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "codec_bounds_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_event_id_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "trigger_pattern_mismatches",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photoelectron_bias_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_cat_file_photon_mismatch",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_cat_stdin_photon_mismatch",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_tee_photon_mismatch",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_tee_stdout_photon_mismatch",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_from_corsika_stdin_photon_mismatch",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_to_simtel_stdin_key_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_to_simtel_stdin_bunch_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "variant_to_simtel_stdin_codec_bounds_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "CORSIKA IACT -> obdeect stream -> sim_telarray IACT, bunch and camera comparison, plus stream command variants",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.stream_chain",
+            "--input",
+            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+          ],
+          "cwd": "/results/full-integrated/stream.corsika-roundtrip",
+          "duration_seconds": 81.168764,
+          "name": "roundtrip-and-variants",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "stream.corsika-roundtrip/01-roundtrip-and-variants.stderr.log",
+          "stdout_log": "stream.corsika-roundtrip/01-roundtrip-and-variants.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "92b03212378280eebc2d540b8447f358a62842826b954d337954cb5e9cf0c615",
+      "id": "propagation.extinction-analytic",
+      "metrics": [
+        {
+          "actual": 16,
+          "atol": 0,
+          "expected": 16,
+          "metric": "sample_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 1e-12,
+          "expected": 0,
+          "metric": "max_transmission_absolute_error",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Beer-Lambert constant optical depth (analytic reference)",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.extinction_analytic"
+          ],
+          "cwd": "/results/full-integrated/propagation.extinction-analytic",
+          "duration_seconds": 0.171191,
+          "name": "beer-lambert",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "propagation.extinction-analytic/01-beer-lambert.stderr.log",
+          "stdout_log": "propagation.extinction-analytic/01-beer-lambert.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "5aa231c8bd9f7f1d0a84667bc644a13547c167f70381c9ff961a6319f5668255",
+      "id": "propagation.extinction-simtel-table",
+      "metrics": [
+        {
+          "actual": 9,
+          "atol": 0,
+          "expected": 9,
+          "metric": "wavelength_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 5,
+          "atol": 0,
+          "expected": 5,
+          "metric": "height_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 4,
+          "atol": 0,
+          "expected": 4,
+          "metric": "zenith_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 2,
+          "atol": 0,
+          "expected": 2,
+          "metric": "telescope_elevation_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 2,
+          "atol": 0,
+          "expected": 2,
+          "metric": "path_length_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 1,
+          "metric": "source_rows_ignored_above_api_wavelength_range",
+          "status": "PASS"
+        },
+        {
+          "actual": 4.4971047552522236e-08,
+          "atol": 1e-06,
+          "expected": 0,
+          "metric": "weighted_table_max_absolute_error",
+          "status": "PASS"
+        },
+        {
+          "actual": 4.4971047552522236e-08,
+          "atol": 1e-06,
+          "expected": 0,
+          "metric": "weighted_column_max_absolute_error",
+          "status": "PASS"
+        },
+        {
+          "actual": 4.336808689942018e-19,
+          "atol": 1e-12,
+          "expected": 0,
+          "metric": "telescope_depth_max_absolute_error",
+          "status": "PASS"
+        },
+        {
+          "actual": 2.767575682903425,
+          "atol": 5,
+          "expected": 0,
+          "metric": "thinning_count_residual_sigma",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Real sim_telarray transmission table, telescope path and thinning",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.extinction_reference"
+          ],
+          "cwd": "/results/full-integrated/propagation.extinction-simtel-table",
+          "duration_seconds": 0.318583,
+          "name": "table-interpolation-weighting-and-thinning",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "propagation.extinction-simtel-table/01-table-interpolation-weighting-and-thinning.stderr.log",
+          "stdout_log": "propagation.extinction-simtel-table/01-table-interpolation-weighting-and-thinning.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "5b62869b03e6d117c2999b674a14744ca709546e3affe1da7befd894a9de5cb4",
+      "id": "propagation.atmosphere-corsika",
+      "metrics": [
+        {
+          "actual": 24,
+          "atol": 0,
+          "expected": 24,
+          "metric": "sample_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 24,
+          "atol": 0,
+          "expected": 24,
+          "metric": "bent_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 1.5650813978140832e-12,
+          "atol": 1e-10,
+          "expected": 0,
+          "metric": "max_direction_cosine_absolute_error",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0004444791104951662,
+          "atol": 0.001,
+          "expected": 0,
+          "metric": "max_displacement_absolute_error_m",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0016314777130901348,
+          "atol": 0.003,
+          "expected": 0,
+          "metric": "max_travel_time_absolute_error_ns",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Atmosphere refraction against compiled CORSIKA IACT/atmo",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.atmosphere_reference"
+          ],
+          "cwd": "/results/full-integrated/propagation.atmosphere-corsika",
+          "duration_seconds": 1.373751,
+          "name": "corsika-reference-and-obdeect",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "propagation.atmosphere-corsika/01-corsika-reference-and-obdeect.stderr.log",
+          "stdout_log": "propagation.atmosphere-corsika/01-corsika-reference-and-obdeect.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "60b3caa8ddb0405bba7aa45d32561e96a28d95019a3870b4e24752419f7b8aa8",
+      "id": "sources.led-reference",
+      "metrics": [
+        {
+          "actual": 3,
+          "atol": 0,
+          "expected": 3,
+          "metric": "native_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 3,
+          "atol": 0,
+          "expected": 3,
+          "metric": "reference_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 60.0,
+          "atol": 0,
+          "expected": 60,
+          "metric": "native_photon_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 60.0,
+          "atol": 0,
+          "expected": 60,
+          "metric": "reference_photon_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "event_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "max_event_photon_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 1.0536712127723509e-08,
+          "atol": 0.0001,
+          "expected": 0,
+          "metric": "position_centroid_delta_cm",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "sources.led-reference",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.led_reference"
+          ],
+          "cwd": "/results/full-integrated/sources.led-reference",
+          "duration_seconds": 0.369779,
+          "name": "compare-led-reference",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.led-reference/01-compare-led-reference.stderr.log",
+          "stdout_log": "sources.led-reference/01-compare-led-reference.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "32a83ace4c7bb7dee771c0680b177a808fd7e00e395e033af5934b1768cdff12",
+      "id": "sources.flasher-dish",
+      "metrics": [
+        {
+          "actual": 20,
+          "atol": 0,
+          "expected": 20,
+          "metric": "native_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 20,
+          "atol": 0,
+          "expected": 20,
+          "metric": "reference_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "event_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_ratio_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_rms_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_rms_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_pe_ratio_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_image_chi2_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Dish flasher versus ff-1m (emission; camera stage in details.json)",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.source_camera",
+            "flasher-dish"
+          ],
+          "cwd": "/results/full-integrated/sources.flasher-dish",
+          "duration_seconds": 4.495216,
+          "name": "compare-flasher-dish",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.flasher-dish/01-compare-flasher-dish.stderr.log",
+          "stdout_log": "sources.flasher-dish/01-compare-flasher-dish.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "de5519d353cf52d41cd3324517e5345b2d1d2bdf22fea60e26fc0bf8023b3a2c",
+      "id": "sources.flasher-secondary",
+      "metrics": [
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 1,
+          "metric": "native_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 1,
+          "metric": "reference_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "event_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_ratio_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_mean_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_rms_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_rms_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Secondary flasher versus ff-gct (stage 1 emission)",
+      "status": "FAIL",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.source_camera",
+            "flasher-secondary"
+          ],
+          "cwd": "/results/full-integrated/sources.flasher-secondary",
+          "duration_seconds": 42.91939,
+          "name": "compare-flasher-secondary",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.flasher-secondary/01-compare-flasher-secondary.stderr.log",
+          "stdout_log": "sources.flasher-secondary/01-compare-flasher-secondary.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "f87ed1f2494951081946d2780f7c58d65e66c4e8c2b9d51ecb628d2a534eca52",
+      "id": "sources.point-source",
+      "metrics": [
+        {
+          "actual": 30,
+          "atol": 0,
+          "expected": 30,
+          "metric": "native_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 30,
+          "atol": 0,
+          "expected": 30,
+          "metric": "reference_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "event_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_ratio_accepted_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_mean_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_rms_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_rms_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_pe_ratio_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_image_chi2_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Point source versus xyzls (emission; camera stage in details.json)",
+      "status": "FAIL",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.source_camera",
+            "point-source"
+          ],
+          "cwd": "/results/full-integrated/sources.point-source",
+          "duration_seconds": 2.934573,
+          "name": "compare-point-source",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.point-source/01-compare-point-source.stderr.log",
+          "stdout_log": "sources.point-source/01-compare-point-source.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "a98edf5b2adc5238821bdf9320bf21f5a6ad415a70c60c40c205edefa92cd222",
+      "id": "sources.beam-scan",
+      "metrics": [
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 1,
+          "metric": "native_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 1,
+          "metric": "reference_event_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "event_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_ratio_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cx_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cy_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "t_rms_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_rms_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Beam scan versus xyls (emission; camera stage in details.json)",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.source_camera",
+            "beam-scan"
+          ],
+          "cwd": "/results/full-integrated/sources.beam-scan",
+          "duration_seconds": 1.276829,
+          "name": "compare-beam-scan",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.beam-scan/01-compare-beam-scan.stderr.log",
+          "stdout_log": "sources.beam-scan/01-compare-beam-scan.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "5d531ae2191b1ea5e096fb82c9c807007edc478cda9f0b0b0b54a34904c19545",
+      "id": "sources.laser-beam",
+      "metrics": [
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "ls_beam_outside_segment_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 43938,
+          "atol": 0,
+          "expected": 43938,
+          "metric": "primary_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "fov_entry_offset_m_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "fov_exit_offset_m_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "fov_path_offset_m_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "ls_beam_fov_points_off_primary_line_max_m_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Laser beam versus ls-beam: FoV crossing geometry only (yield, direction, time, camera BLOCKED)",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.source_comparison",
+            "laser-beam"
+          ],
+          "cwd": "/results/full-integrated/sources.laser-beam",
+          "duration_seconds": 0.822006,
+          "name": "compare-laser-beam",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.laser-beam/01-compare-laser-beam.stderr.log",
+          "stdout_log": "sources.laser-beam/01-compare-laser-beam.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "2ca958bde4ac09c140dac0e3c86beabc066eff5a0934b81582af1cb0e526cbd5",
+      "id": "sources.night-sky",
+      "metrics": [
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_mismatch_count",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "yield_ratio_native_reference_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "rate_native_relative_error_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "rate_reference_relative_error_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "yield_native_expected_relative_error_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "yield_reference_expected_relative_error_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cone_uniform_native_vs_analytic_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cone_uniform_reference_vs_analytic_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cz_native_vs_reference_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "impact_parameter_native_vs_sampler_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "projected_area_uniform_native_vs_analytic_ks_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "projected_area_uniform_reference_vs_analytic_ks_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "impact_parameter_native_vs_reference_ks_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "time_native_vs_pulse_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "time_reference_vs_pulse_ks_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "time_native_vs_reference_ks_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "time_mean_difference_ns_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Night sky versus nsbls: rate, direction, projected area, time",
+      "status": "FAIL",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.source_comparison",
+            "night-sky"
+          ],
+          "cwd": "/results/full-integrated/sources.night-sky",
+          "duration_seconds": 2.629774,
+          "name": "compare-night-sky",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.night-sky/01-compare-night-sky.stderr.log",
+          "stdout_log": "sources.night-sky/01-compare-night-sky.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "59f3e9d9cbcb9792060b9c8206ab1591df2036e59db2efca029cdc8726754b30",
+      "id": "sources.muon-track",
+      "metrics": [
+        {
+          "actual": 10,
+          "atol": 0,
+          "expected": 10,
+          "metric": "camera_events_native",
+          "status": "PASS"
+        },
+        {
+          "actual": 10,
+          "atol": 0,
+          "expected": 10,
+          "metric": "camera_events_reference",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "yield_ratio_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "native_analytic_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "reference_analytic_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cherenkov_cos_residual_native_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cherenkov_cos_residual_reference_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_native_vs_analytic_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_reference_vs_analytic_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "wavelength_native_vs_reference_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "azimuth_native_vs_analytic_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "azimuth_reference_vs_analytic_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "cz_mean_difference_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "obs_plane_xy_radius_native_vs_reference_ks_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "time_mean_difference_ns_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 0,
+          "metric": "time_native_vs_reference_ks_limit_exceeded",
+          "status": "FAIL"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_pe_ratio_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Muon track versus fake-muon: yield, Cherenkov angle, spectrum, time, camera p.e.",
+      "status": "FAIL",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.source_comparison",
+            "muon-track"
+          ],
+          "cwd": "/results/full-integrated/sources.muon-track",
+          "duration_seconds": 5.242613,
+          "name": "compare-muon-track",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "sources.muon-track/01-compare-muon-track.stderr.log",
+          "stdout_log": "sources.muon-track/01-compare-muon-track.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "da981635a85c9299da5e25406f997118a1261ef253bca0c219578e68ea64324d",
+      "id": "optics.lst-6.0.2",
+      "metrics": [
+        {
+          "actual": 9,
+          "atol": 0,
+          "expected": 9,
+          "metric": "n_offsets",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "psf_cm_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "eff_area_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "eff_flen_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "exceeded_limits",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Optics LSTN-01 (model 6.0.2): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.simtools_validate_optics",
+            "--config",
+            "/validation/fixtures/optics-inputs/optics-lst.json"
+          ],
+          "cwd": "/results/full-integrated/optics.lst-6.0.2",
+          "duration_seconds": 169.402794,
+          "name": "matched-backends",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "optics.lst-6.0.2/01-matched-backends.stderr.log",
+          "stdout_log": "optics.lst-6.0.2/01-matched-backends.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "e689ef3f130779d9233703b7a28880eb597009799abb0482bef0683b0f4e55fe",
+      "id": "optics.mst-6.0.2",
+      "metrics": [
+        {
+          "actual": 9,
+          "atol": 0,
+          "expected": 9,
+          "metric": "n_offsets",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "psf_cm_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "eff_area_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "eff_flen_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "exceeded_limits",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Optics MSTN-01 (model 6.0.2): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.simtools_validate_optics",
+            "--config",
+            "/validation/fixtures/optics-inputs/optics-mst.json"
+          ],
+          "cwd": "/results/full-integrated/optics.mst-6.0.2",
+          "duration_seconds": 143.518484,
+          "name": "matched-backends",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "optics.mst-6.0.2/01-matched-backends.stderr.log",
+          "stdout_log": "optics.mst-6.0.2/01-matched-backends.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "c3dbc66370c88fb8396f64dae18ba691e5ecd65fa2936f0da2620ff4f7601160",
+      "id": "optics.sst-6.0.2",
+      "metrics": [
+        {
+          "actual": 9,
+          "atol": 0,
+          "expected": 9,
+          "metric": "n_offsets",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "psf_cm_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "eff_area_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "eff_flen_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "exceeded_limits",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Optics SSTS-01 (dual mirror) (model 6.0.2): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.simtools_validate_optics",
+            "--config",
+            "/validation/fixtures/optics-inputs/optics-sst.json"
+          ],
+          "cwd": "/results/full-integrated/optics.sst-6.0.2",
+          "duration_seconds": 126.795742,
+          "name": "matched-backends",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "optics.sst-6.0.2/01-matched-backends.stderr.log",
+          "stdout_log": "optics.sst-6.0.2/01-matched-backends.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "4cb6a22bebf708609b30b2bbadb52df9b875536f17562d3d3a556e214af83082",
+      "id": "chain.stream-roundtrip-threshold",
+      "metrics": [
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photon_event_telescope_key_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "bunch_count_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "codec_bounds_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_event_id_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "trigger_pattern_mismatches",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photoelectron_bias_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "Near-threshold CORSIKA showers (20-100 GeV): stream round trip and sim_telarray camera",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.chain_showers",
+            "--input",
+            "/validation/inputs/gamma-20deg-20-100GeV.iact"
+          ],
+          "cwd": "/results/full-integrated/chain.stream-roundtrip-threshold",
+          "duration_seconds": 15.137045,
+          "name": "roundtrip-and-camera-threshold",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "chain.stream-roundtrip-threshold/01-roundtrip-and-camera-threshold.stderr.log",
+          "stdout_log": "chain.stream-roundtrip-threshold/01-roundtrip-and-camera-threshold.stdout.log"
+        }
+      ]
+    },
+    {
+      "fingerprint": "8fe2fa1046d62be9e97b82786d8e616c41fa626e275bd5c81851d75cdd92b0b1",
+      "id": "chain.atmosphere-substitution",
+      "metrics": [
+        {
+          "actual": 100.0,
+          "atol": 0,
+          "expected": 100,
+          "metric": "reference_camera_events",
+          "status": "PASS"
+        },
+        {
+          "actual": 100.0,
+          "atol": 0,
+          "expected": 100,
+          "metric": "candidate_camera_events",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_event_id_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 300.0,
+          "atol": 0,
+          "expected": 300,
+          "metric": "matched_event_telescope_samples",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "propagation_dropped_photons",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "transmission_mean_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "not_absorbed_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "detected_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photoelectron_bias_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "image_shape_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "arrival_time_bias_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0.0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "trigger_pattern_mismatches",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "obdeect atmosphere substitution vs sim_telarray atmosphere (20 deg, CORSIKA band)",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.atmosphere_chain",
+            "--showers",
+            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+          ],
+          "cwd": "/results/full-integrated-atmo/chain.atmosphere-substitution",
+          "duration_seconds": 25.670581,
+          "name": "zenith-20-substitution",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "chain.atmosphere-substitution/01-zenith-20-substitution.stderr.log",
+          "stdout_log": "chain.atmosphere-substitution/01-zenith-20-substitution.stdout.log"
+        }
+      ],
+      "note": "rerun after staging the CORSIKA log next to the shower input (first run: ERROR, missing log)"
+    },
+    {
+      "fingerprint": "ee3c8a578fe3654c4a1c4ac86b6c9504a742ee773ac7d637689445efea1f737a",
+      "id": "chain.optics-bypass1",
+      "metrics": [
+        {
+          "actual": 1,
+          "atol": 0,
+          "expected": 1,
+          "metric": "candidate_pipeline_complete",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "camera_event_id_delta",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "photoelectron_bias_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "image_shape_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "arrival_time_bias_limit_exceeded",
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "atol": 0,
+          "expected": 0,
+          "metric": "trigger_probability_limit_exceeded",
+          "status": "PASS"
+        }
+      ],
+      "missing": [],
+      "missing_inputs": [],
+      "missing_modules": [],
+      "name": "CORSIKA -> obdeect trace-stream -> sim_telarray camera (Bypass_Optics=1) vs direct sim_telarray, matched LSTN-01 7.0.0 model, unit atmosphere",
+      "status": "PASS",
+      "steps": [
+        {
+          "argv": [
+            "simtools-generate-array-config",
+            "--site",
+            "North",
+            "--array_element_list",
+            "LSTN-01",
+            "--model_version",
+            "7.0.0",
+            "--simulation_models_path",
+            "/models",
+            "--output_path",
+            "cfg"
+          ],
+          "cwd": "/results/full-integrated/chain.optics-bypass1",
+          "duration_seconds": 3.380879,
+          "name": "generate-sim_telarray-config",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "chain.optics-bypass1/01-generate-sim_telarray-config.stderr.log",
+          "stdout_log": "chain.optics-bypass1/01-generate-sim_telarray-config.stdout.log"
+        },
+        {
+          "argv": [
+            "/workdir/env/bin/python",
+            "-m",
+            "obdeect_validation.adapters.chain_optics",
+            "--config",
+            "cfg/model/7.0.0/CTAO.cfg"
+          ],
+          "cwd": "/results/full-integrated/chain.optics-bypass1",
+          "duration_seconds": 12.480283,
+          "name": "chain-optics-bypass1",
+          "returncode": 0,
+          "status": "PASS",
+          "stderr_log": "chain.optics-bypass1/02-chain-optics-bypass1.stderr.log",
+          "stdout_log": "chain.optics-bypass1/02-chain-optics-bypass1.stdout.log"
+        }
+      ]
+    }
+  ],
+  "interrupted": false,
+  "provenance": {
+    "distributions": {
+      "astropy": {
+        "native_sha256": {
+          "../../../bin/fits2bitmap": "84ce8adcbc26fae1847da6c90559e0b1dce9c7bcce7f18fb03e7d4c43a2a4237",
+          "../../../bin/fitscheck": "8c92cccbeab8fbac1f84b04432a3cc41389018cfb640667f744f84cca77e85ad",
+          "../../../bin/fitsdiff": "e651cbc1c3665c252d142e58e6c95e6dfd8904e175df18b2adb3e26cd61ebf4d",
+          "../../../bin/fitsheader": "abee6c094b21bb3b8ca772130380c6543d591e4c6a4210fee7dbf6e895359c87",
+          "../../../bin/fitsinfo": "d51005ff71c65c2a68eb8493ad4d9f3dd8dafe2c2a96b50b0b566abeb4a42bbf",
+          "../../../bin/samp_hub": "3457a521b8159f82ca71fa06ac110bd28589d30db64e3abbeaadb1349f28c0f6",
+          "../../../bin/showtable": "1661176fb490866ef9bb89cb6d450fae537d02c7920f5c2db8295b9bad8252b1",
+          "../../../bin/showtable-astropy": "52ddac13fc37cbc894ddebe0978a64a0bbf190a78016b2db797659fe00d403d3",
+          "../../../bin/volint": "e94ab2f08144adc82c6f07983fc34030107add567d2c568b3e57433131e4f6b3",
+          "../../../bin/wcslint": "11167389a1cf1cf0b147431934a6bccccae32003d9f72e43bf4454320059112e",
+          "astropy/compiler_version.abi3.so": "4e05a7ca22ce83e7e17ed6747865e8bb61a3c09e0388dd93ef047fd891b6e914",
+          "astropy/convolution/_convolve.abi3.so": "e4634c41d1d209b84a2874122ebd4458b9e43c3a85d71b738c15026ae08973de",
+          "astropy/cosmology/_src/flrw/scalar_inv_efuncs.abi3.so": "13156baeb3fb465825fb77a3e78722c6715c7c4832d002d5efa86e80c6d33fbb",
+          "astropy/cosmology/_src/signature_deprecations.abi3.so": "248477649748e0181ecce2bd7c1e2643c88bc0734fe747c96173d48f0af5033d",
+          "astropy/io/ascii/cparser.abi3.so": "c87971aefdd52c82ac3c2c490c112566d46a482ba64793b1df17e0b99eac01f2",
+          "astropy/io/fits/_utils.abi3.so": "303e66c676fbd9006e9c1d887ca573c2c3d5eb1f2f668da5adfae8889437651b",
+          "astropy/io/fits/hdu/compressed/_compression.abi3.so": "99f6b16ed53d7e99bf1328e6fe3d344e97870b1a0f8f38c0d1ea56dd465e3156",
+          "astropy/io/votable/fast_converters.abi3.so": "e2691968a1aa3b81334a40cecda446f90e0d497176fa3ff2db58c83b13ecec32",
+          "astropy/io/votable/tablewriter.abi3.so": "7e151aa166886d437cd63e77836f6d44c8d452866649329410b08010dc0cf8b8",
+          "astropy/stats/_fast_sigma_clip.abi3.so": "8c9175a4a3e19caf3f832c6c84c46a88ba2f243896e672bed956fb5fa59b6fc8",
+          "astropy/stats/_stats.abi3.so": "58936b11f70da1ba8e493d59ee116962a73926f8f1698261cbb6324fbef87b2b",
+          "astropy/table/_column_mixins.abi3.so": "d983e5a7d7c6cadf31bd45b03dd62a3043fb4792925a0bd738fab6abf5478885",
+          "astropy/table/_np_utils.abi3.so": "4298e4564daed4a3d0cab19ea09d972063f294689ca934b2007435eb072e80b9",
+          "astropy/time/_parse_times.abi3.so": "0b0079df503b6edb34544f7ec488da817c30170b47922748718126eca3c61573",
+          "astropy/timeseries/periodograms/bls/_impl.abi3.so": "7037057722dd176c9e1a53a8f573b69e41aab2e24503466e401b989114a9eb25",
+          "astropy/timeseries/periodograms/lombscargle/implementations/cython_impl.abi3.so": "13045ef5e37cafe52df56f82337577d924e993684cd25fcefcde52183918cc78",
+          "astropy/utils/xml/_iterparser.abi3.so": "38f80c882ec11450d359261df63e102eebcaed72e47c1f96f8723463c3db5aa9",
+          "astropy/wcs/_wcs.abi3.so": "7aee451e10990b56be1c25a0843038ebb2bc1a0d0ca7f2cab821bad9d4e9eb98"
+        },
+        "version": "8.0.2"
+      },
+      "eventio": {
+        "native_sha256": {
+          "../../../bin/eventio_cut_file": "0b699abec8487c2d8bac5cf6d96f9280cbc2c8fa66b768e48e499bd3f14cf4c7",
+          "../../../bin/eventio_plot_histograms": "6a446d3a6695c77437a468aab7e4575bd6d3d689bf61a755ba60b6aaa0e0ea51",
+          "../../../bin/eventio_print_object_information": "6da3941399043db8989722573abcc7247053a6de293ee16c26d72950ff7cf080",
+          "../../../bin/eventio_print_simtel_history": "9309251809a628a0973ac317e12d7b1b0b5bcdb8a8d00754abba769be9643f58",
+          "../../../bin/eventio_print_simtel_metaparams": "3dd67cbee04bd0e59329102b0adab2c7e0feba17bcea2309130e961dd40c5f4f",
+          "../../../bin/eventio_print_structure": "e3440b14549f33ba7d6f48ec3b0d0da93c22cdd91abf6ae96866a44a6d97a1c8",
+          "eventio/header.cpython-314-aarch64-linux-gnu.so": "e757132855abcfd2fe96e77d4a3caae532ce4b2c1b334b3dcb2ca3378ea7431b",
+          "eventio/simtel/parsing.cpython-314-aarch64-linux-gnu.so": "a2639168e7b6535d3b1b6234205abe86a98d17656396526c443c690d3e357891",
+          "eventio/var_int.cpython-314-aarch64-linux-gnu.so": "4cbb99676731b2d4cec65aee400810f1532df79fb3d32e429031da01fe4d5923"
+        },
+        "version": "2.2.0"
+      },
+      "gammasimtools": {
+        "native_sha256": {
+          "../../../bin/simtools-analyze-flasher-response": "0f30d1cb41d33c889bf687767d41203310bca6059728b27e6e4f57284dcc9e87",
+          "../../../bin/simtools-compare-atmospheres": "5ad0427781e5ffb08c223703777aae092efbb05564a14902c7cbf7aeab27597d",
+          "../../../bin/simtools-compare-productions": "5595ab6df65d746cd232996452389a9a254abff0735cd86316b6fad7c4986e32",
+          "../../../bin/simtools-compare-science-results": "bdbdc8e0cc824c5635eaa05b66f96dccadce3ef26afa44689354622731e59c1b",
+          "../../../bin/simtools-convert-geo-coordinates-of-array-elements": "0c077d67e2ee12e2fd1e44be2b8f8b63bade789ef4a2fe4d65af8d15e23c965b",
+          "../../../bin/simtools-create-setting-workflow": "661f91d5c56294c5f1528ea646584bc30b55b5666b796b1eebe9e3cd02b7a839",
+          "../../../bin/simtools-dependency-manifest": "15f001249cbb187e38ad2bf6e97c1d100e39b85e5da070dabae1fd5a8926916b",
+          "../../../bin/simtools-dependency-versions": "e7b4ec90833542159ec77974d7ab81fb9b50406c164353be404c5c9b78149073",
+          "../../../bin/simtools-derive-bias-curves": "cc696ee7507ef58be83f0eace49061a3f3b93629c016eed2b1096f7312700e98",
+          "../../../bin/simtools-derive-ctao-array-layouts": "648fb9eef057ead169bba0fae9706fc4520e8b1f5671eb3b5a04f725bad3459a",
+          "../../../bin/simtools-derive-incident-angle": "76fe092d76d5c9488fe9f3786eb0e6356288dafa2e4d255c50a6536cba0bb02c",
+          "../../../bin/simtools-derive-mirror-rnda": "2addef839cfb732f280ef4eccfc6c97d9eb6201db8642660895a636ddfa8ed2e",
+          "../../../bin/simtools-derive-photon-electron-spectrum": "6da2cf02d709bb9cd844492f13915282e1e7672b9a3698991834d835014c5259",
+          "../../../bin/simtools-derive-psf-parameters": "b27470f94b5ba2ea55034c2af26f1dc27032a515faf56823dde84cfe4e27f1b7",
+          "../../../bin/simtools-derive-pulse-shape-parameters": "8f5f93a08bc751a89ff93c0b15ad13e4ac01e8af14b05a27c8d6fc9c96450985",
+          "../../../bin/simtools-derive-telescope-sphere-radius": "17f156801eb6c6b77f0eb1bebe3aabd6982b29c65b5756aa6ff6bd19e68f06d3",
+          "../../../bin/simtools-derive-trigger-rates": "dc6f434af049620f380acb5c9bf8ff088d1f87cf64a111ad7116ff43c38ae0f5",
+          "../../../bin/simtools-docs-assemble-pages": "15bb3b97057bb63b0adcad753ab8200276cf54397d1baa91379f27a5fcc840c7",
+          "../../../bin/simtools-docs-generate-toctree": "ba21d18d9cdd8c95c5ec32d869239856072d8c40e59db8bdb856e5efe8f7f247",
+          "../../../bin/simtools-docs-produce-production-summary": "8dac99dbf190f8c7959ac9b79c1b9cd390db5c1570874e60efc6c0f8ab13d80a",
+          "../../../bin/simtools-docs-produce-reports": "c6b110f45dcfb3a1f43ba3551af651339a832503618f9e59182af37773f5253a",
+          "../../../bin/simtools-export-sim-telarray-metadata-schema": "53b433e961780454fc91ec71a0dc44440d00a9ffd50c571e8469c5a6dae08db7",
+          "../../../bin/simtools-generate-array-config": "0ccdf474dcbee185255d9e3e9812663482db670828d1fa48553540fd63fbf548",
+          "../../../bin/simtools-generate-bias-curve-submissions": "45f3a948a484b6ea5742cc5cc888fb56e7dadacb63bd1feda751926ac3203268",
+          "../../../bin/simtools-generate-corsika-histograms": "0b0160ea01474b57e01d307a6f68d449f05c0e8f076a4c4a4a85428c4191503c",
+          "../../../bin/simtools-generate-default-metadata": "d1042348a04584b55f9263056e74cab9b110e47e0682380eb13ec968b831c2b4",
+          "../../../bin/simtools-generate-regular-arrays": "4d3dd9aec15e858c0ea476161c810dbae11fb5078b52dfd78df76c9400a81aa5",
+          "../../../bin/simtools-generate-simtel-event-data": "10de5a30f9316cd0d773c6b7326d0e6a102b5567e1cbd953e6eda682248e17fa",
+          "../../../bin/simtools-generate-test-resources": "5ba58a4f53a47e1933cac3b4afc47e95f17e3e7c000bdf2b7b77dd34b3604424",
+          "../../../bin/simtools-get-array-layout": "d4071fbf5ec27845931835db4570c9ed4d3ee62de56e7e1e3a964c6f9ce0edc3",
+          "../../../bin/simtools-get-model-parameter": "b63fc4df203deabbe109ca4fb1737aa6ed56ce9538f8a50627824ebd75c986c4",
+          "../../../bin/simtools-inspect-file": "79eb5f39b0bd6ce4caf87781b6b2637103a5cdba26bc5ea47eea6b2c1133f285",
+          "../../../bin/simtools-maintain-simulation-model-add-production": "f6e50ea0bca6bfe19cbd26e4156219e13e2dd1ba3719189a9e3539124e2a42e7",
+          "../../../bin/simtools-maintain-simulation-model-compare-production-tables": "f3df26dc1f963255a07b206e815c9873f7cce16fdd1b1ecdbf5d40690d066d57",
+          "../../../bin/simtools-maintain-simulation-model-verify-production-tables": "0d34e41fac9c9c6226e7a5ba7cd9b7715fd2f5b497888127578fb4e41f56bf47",
+          "../../../bin/simtools-maintain-simulation-model-write-array-element-positions": "ed32d55c6684b688d1473e0296b6a02bb646233a0452a1cbbd7481a412c7a2f4",
+          "../../../bin/simtools-plot-array-layout": "5f00521725d4b4923aa066c574dc62cdc2ed1fe33429d08de342746026a1c971",
+          "../../../bin/simtools-plot-camera": "6777df6bf61c3d9cc346418a108f85d0b87b7cede98127ec7873d6a6034f4798",
+          "../../../bin/simtools-plot-corsika-limits": "298f4d08c211535baf580da4d0ff05e8250a9a5fdf489f5c81f4e05a3abbd16d",
+          "../../../bin/simtools-plot-production-grid": "22f7713f0cff9f28a3dd283ea8cc4109cfd1c09dde5e3095af33a3b2e8354b6d",
+          "../../../bin/simtools-plot-simtel-events": "339c3d45018e987b80e84b99f1b79cae6675700a5adb4863099293dee190d914",
+          "../../../bin/simtools-plot-simulated-event-distributions": "093c911e6371faaf8f625aa7a49607fe3839a292cc71d1ac9b7b95965d26e0ea",
+          "../../../bin/simtools-plot-tabular-data": "ea412382cc3884939bf9e00fbb6aac21ae6d25024298ac7e88763fe013bb16c1",
+          "../../../bin/simtools-plot-telescope-structure": "9b3142c01372fa489a88ce2af057f64d1969dba5eb11bc5791551c3ab7783e92",
+          "../../../bin/simtools-plot-trigger-patches": "14d78032ce6aea3810fe91e3b102d67fe3300cab1d375f4bc94911b946a309c3",
+          "../../../bin/simtools-production-derive-corsika-limits": "a718e5a230c19b9ee1dfb1a92eab3a44b5a22b3299f24f61687d3f726bf60680",
+          "../../../bin/simtools-production-derive-monte-carlo-statistics": "2ae38b557864c0cbe6e34fd48415e3bcd4d90c8e5996e34ea16642d923815f73",
+          "../../../bin/simtools-production-generate-grid": "84852f8a6d08ca86222d4e16c3992460fd4862f29c064ac0998adddf59e351a3",
+          "../../../bin/simtools-production-select-files": "9c9eae9d7018d60a5b4bc3c03e9308632eb50329eb78e5a840d5405a58b95695",
+          "../../../bin/simtools-run-application": "64b901b474a6fd18c8021e66b4f0b0ef2fffca4863863fed44d8ba1ddfc13814",
+          "../../../bin/simtools-run-science-tests": "3d0dc394286b4a3989dcc4d2b709bfaee98e73ba08ae7d4c829d0edfa2604106",
+          "../../../bin/simtools-simulate-flasher": "f753c14781782d49926555af673b837e7594dc7d2171722d104c02defbbb9d0b",
+          "../../../bin/simtools-simulate-illuminator": "a9e1992922312b90f2e5d4fba7d0b129c4eb0d0ca4d9e6299208c7ba987f9be5",
+          "../../../bin/simtools-simulate-pedestals": "5e83808e86d96f0494123d4abdd70cce7054b76b1a0cfef4fb0124ee9a4eedfd",
+          "../../../bin/simtools-simulate-prod": "79dee4604562701d18a1d00baf85a67d244bbc31b44deb1b4b22262df749e54b",
+          "../../../bin/simtools-submit-array-layouts": "e417e4b32644c7f9ef5a3445991fd5395254fe96d3b00b37ddad7bcdcb28e558",
+          "../../../bin/simtools-submit-data-from-external": "f567d769cb4eb93287718e80cae1e4e283c3a269aabb567101c941e1b99d3c76",
+          "../../../bin/simtools-submit-model-parameter-from-external": "5056c29dd06296d8dc9e03b38f42e6ab3a359ef41efff364fb329421ecb961a5",
+          "../../../bin/simtools-validate-file-using-schema": "40810fa61c0a6e328f8efafb3e769f47f779b319bf10f401d6e1e76aa164c07c",
+          "../../../bin/simtools-validate-optics": "393900b5173419f904aa8df850376645d086c059edd9bfda47f190dc06dd96f5",
+          "../../../bin/simtools-validate-pulse-response": "7005671d6a195959479823d18a52f60902b643dfef7ed7961626ad033e58d3ff",
+          "../../../bin/simtools-validate-repository-consistency": "f7d28660cd94b31271cf1ec816bc5a7a33cba02e5ef7af58029c7d7f78a16d25",
+          "../../../bin/simtools-validate-telescope-throughput": "71f984d96c5fdfc0937f70e38ee5eb6830384800ee53108c730f0233a4632922",
+          "../../../bin/simtools-write-production-metadata": "e285156cad0dd97f8470003909246116ebda8adf4876110cc2f3602ced5e92fe",
+          "../../../bin/simtools-write-reduced-event-lists": "be278ed521b228c89c31b9663a1913f022466cf811ba4c0686f892f67b063cc2",
+          "../../../bin/simtools-write-trigger-histograms": "331ae106422d2c5e6be342d28224abac3d9c42b475ad6e9beb658a505c63ec61"
+        },
+        "version": "0.39.1.dev101+g76e0d3b91.d20261113"
+      },
+      "numpy": {
+        "native_sha256": {
+          "../../../bin/f2py": "90f4552c2cadd7845c07973a8eadd3ad5ab9a1eb44b37a1c1b2f6351b83896dd",
+          "../../../bin/numpy-config": "9c4c30595972ddc3a1dff889bf95d06859f1b57b473c8ca05425462846432da8",
+          "numpy.libs/libscipy_openblas64_-f552eb69.so": "e58b9ec0d373252b70f37d9dc891d7183a4f57f062db87f38e9a1bf7442d3037",
+          "numpy/_core/_multiarray_tests.cpython-314-aarch64-linux-gnu.so": "125f27fce2231bca581cd160a1cb489963855afb0efd463e1d29871d149d81b6",
+          "numpy/_core/_multiarray_umath.cpython-314-aarch64-linux-gnu.so": "afe8261d6f26543cda9edac9f10d7795fd3f8f61cda886393b01c70945a8801f",
+          "numpy/_core/_operand_flag_tests.cpython-314-aarch64-linux-gnu.so": "915e2cc877dbca54cf1ab42b9cfda7d73b4d2e2170827a698af06e045cb8e443",
+          "numpy/_core/_rational_tests.cpython-314-aarch64-linux-gnu.so": "8598b7bc123be68c1d1211ffb63ad810eb1b5928eca5161b385eb595c9cf7c09",
+          "numpy/_core/_simd.cpython-314-aarch64-linux-gnu.so": "7c09c3ef583d09b17d9bd933b043945d251fe0f5a872d6ffe2b40a12ff70b48f",
+          "numpy/_core/_struct_ufunc_tests.cpython-314-aarch64-linux-gnu.so": "8788404afa2be979cc4648414d4a1e48356b424f3f8fbd1d142dc567264083ba",
+          "numpy/_core/_umath_tests.cpython-314-aarch64-linux-gnu.so": "7add3036108a9e9e5a48c88c03646f7a9f297d1b12894fc1eaa1e3956ad41af2",
+          "numpy/fft/_pocketfft_umath.cpython-314-aarch64-linux-gnu.so": "1369b5b1f7ff5ce29b127aebba982b36343dbd79c55ba27412e3ca0dcdc97ffb",
+          "numpy/linalg/_umath_linalg.cpython-314-aarch64-linux-gnu.so": "c4b774ba8f59ce358f8d384aa1339860b728ec39cfb92e2c86b227aa453b3531",
+          "numpy/linalg/lapack_lite.cpython-314-aarch64-linux-gnu.so": "33b2ef9d5f65c794b02c8ddc247921595aeecffdca3dffa76fe9feb178e47c53",
+          "numpy/random/_bounded_integers.cpython-314-aarch64-linux-gnu.so": "82b3753bf9d876a18026db38dec802dc92bef296da70832c5332b6e1025afb2d",
+          "numpy/random/_common.cpython-314-aarch64-linux-gnu.so": "0f0b194e4c3f3bbc60a8b7de65178ce42e75284b2f0795987392cb8ca4be964b",
+          "numpy/random/_generator.cpython-314-aarch64-linux-gnu.so": "49185ffac2492495db9f2be75044b81b0f62ab663e79d85bc1d0271210d341ad",
+          "numpy/random/_mt19937.cpython-314-aarch64-linux-gnu.so": "844059687f5e8ac4983ebeb0abbbb2457f2a8617154132de85f6763252a4412f",
+          "numpy/random/_pcg64.cpython-314-aarch64-linux-gnu.so": "1dd75ab93485d228fdf6b64f8c41777f16d3d3e484cdd4f9f650c3c5f4f41753",
+          "numpy/random/_philox.cpython-314-aarch64-linux-gnu.so": "4a5682c4373c1100723fd6257e07789ea6f746ad0bb3695806a39df07ece4b69",
+          "numpy/random/_sfc64.cpython-314-aarch64-linux-gnu.so": "079edba32f661e3442e97d82579723a789795499c7c97b7b2600457dfe7b3a67",
+          "numpy/random/bit_generator.cpython-314-aarch64-linux-gnu.so": "3175f249cdeb09d05b7e458ec149d0a4da8a060269e60ace7ecc85364f9b05d1",
+          "numpy/random/mtrand.cpython-314-aarch64-linux-gnu.so": "ac46434b06a064af24bb22798c5ef1208a9d890420bde3e5ddad4561e7c3abb2"
+        },
+        "version": "2.5.4"
+      },
+      "obdeect": {
+        "native_sha256": {},
+        "version": "0.8.1.dev27+g7544a7978"
+      },
+      "obdeect-propagation": {
+        "native_sha256": {
+          "obdeect/propagation/_core.cpython-314-aarch64-linux-gnu.so": "6037c0195d7eace3e57fabee5bf76fe14d6b17f47c0e16cd1cf9a21c8d833b11",
+          "obdeect/propagation/bin/obdeect-propagation-run": "8f4ab8551fd55a4d6d59a15785c4f2efc36ea0a97867a420f84a13d56ac54306"
+        },
+        "version": "0.8.1.dev27+g7544a7978"
+      },
+      "obdeect-ray-tracing": {
+        "native_sha256": {
+          "obdeect/ray_tracing/_core.cpython-314-aarch64-linux-gnu.so": "5f7b28d773a78f82bedce14fe3db88d352024299d83bd949373535f5195c7873"
+        },
+        "version": "0.8.1.dev27+g7544a7978"
+      },
+      "obdeect-sources": {
+        "native_sha256": {
+          "obdeect/sources/_core.cpython-314-aarch64-linux-gnu.so": "58a856e64068f0245c3d0fe9583cf3e501dfff2c73db7ac4b3e6f024bf4fea73",
+          "obdeect/sources/bin/obdeect-sources-beam-scan": "e2ec85cb9012c9d4fecb4977512d90d6556cd434fa5f05d45db42d143322c27e",
+          "obdeect/sources/bin/obdeect-sources-flasher": "3a180733bf11bd564c2e7711bdb107707614216e7f6a0287d64a28df30d806e7",
+          "obdeect/sources/bin/obdeect-sources-laser-beam": "6c7a4c0a66cbcea4e2a51c991e36a69a10b571c5f47ae492e4f796f9713f37dd",
+          "obdeect/sources/bin/obdeect-sources-led": "d2a803646a25c6e934b4d0268d37b21a58ad5c2df98072e412abaf1679bbdb3b",
+          "obdeect/sources/bin/obdeect-sources-muon-track": "d84f99769c3247ee2a6f86f79bb1f0474db0d70596c13404010f1d85f095b3b7",
+          "obdeect/sources/bin/obdeect-sources-night-sky": "f76d946d6015331e897f6de3a86cb05b7d2186bece45976bbc63fc8d18319208",
+          "obdeect/sources/bin/obdeect-sources-point-source": "8043236c8ce817f582693d22ad6a776b488e3b4418eddc75e044ad62870b4593"
+        },
+        "version": "0.8.1.dev27+g7544a7978"
+      },
+      "obdeect-stream": {
+        "native_sha256": {
+          "../../../bin/obdeect": "100a3c873ae6bb87c2ea419e986ef4b15b523d203a2794beac08f43cf5a9fa61",
+          "obdeect/stream/_core.cpython-314-aarch64-linux-gnu.so": "3d8cead6f5f1fba6afce72a355f96e6f0a6532475f146dd42c0060265a47d2ce",
+          "obdeect/stream/bin/obdeect-stream-cat": "610772094005c7b732f9e52e7ed5bdd7e78734e12e31fc5ccabb7cd6f793b7fa",
+          "obdeect/stream/bin/obdeect-stream-from-corsika": "da49305da60b35a633a6e35990a2b1a46c1fcaf2b9736d4d396c72801be4c838",
+          "obdeect/stream/bin/obdeect-stream-tee": "49ed72ca5446c1c76d8ed0d9498d169c5a9d527853e39c9062d2b327a3b9e936",
+          "obdeect/stream/bin/obdeect-stream-to-grisu": "29469eb638016cbcd320ac31a5d6e4071777a49eb4ff523a6219c5f3a30bbbab",
+          "obdeect/stream/bin/obdeect-stream-to-simtel": "4ca0d3e43b7c8e6386d1feaea5e633735ca79ca2b6d08993f6b4c52052b3b046",
+          "obdeect/stream/lib/libobdeect_stream_c.so": "e057bc3b92db8c38c2880590261e8525bb4831a959b10f29061c86bd23f48aa7"
+        },
+        "version": "0.8.1.dev27+g7544a7978"
+      }
+    },
+    "environment_sha256": "5fb91073ecc11c1effd805946ed1c257d20d3c574f17664d4105fb211196a1f4",
+    "git": [
+      {
+        "diff_sha256": "fc3c9859419a1e1c8e503f979e9d18a7e818248dae26472fa4091c456a55fec5",
+        "dirty": true,
+        "head": "6902c0c02070b141284482d8a0c97b01a5669d23",
+        "path": "/candidate"
+      },
+      {
+        "diff_sha256": null,
+        "dirty": false,
+        "head": "e6e532ca0ce824d472a08369c66ddc9f97c27a8f",
+        "path": "/models"
+      },
+      {
+        "diff_sha256": null,
+        "dirty": false,
+        "head": "7a57b358b8a6e64283c62655f20ade705ef30ef2",
+        "path": "/reference"
+      },
+      {
+        "diff_sha256": "6d0f1a50fd5bd98536a1a0484863e7de0e91596b7ab8e95fb4df24141c3244ff",
+        "dirty": true,
+        "head": "c4e8907ca02cee8d48934664c0a8dd7766110eaa",
+        "path": "/validation"
+      }
+    ],
+    "inputs": {
+      "/reference/cfg/CTA/CTA-PROD6-LST.cfg": "b87c0a01775c430b3564578ebeeba231852fe7d9fc0ade9372fd92d2338f9587",
+      "/reference/cfg/common/atm_profile_model_1.dat": "e45f3b9ef051e79accb6715b0521d09be6e306417456135be8476e8b71b93ebd",
+      "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat": "aff66f2c48d3c36d3e1bfe5a11761a04b957305ad7114f9e527701b4e16d8fa7",
+      "/reference/cfg/common/atm_trans_2158_1_10_0_0_0.dat": "576041fbdf1f9b3907e2d42b04e08b438e22348ae06a3c46ba0464b5b73abce6",
+      "/reference/cfg/common/atmprof1.dat": "f9f76f2455b499f738e5c42f40ff1d88f33964e6106f318fe3970ac366d71aa3",
+      "/validation/fixtures/optics-inputs/optics-lst.json": "41f88ad46fabb6c3ff7c3c6148c973ab398c8cf2b956892d2c14868350976e1a",
+      "/validation/fixtures/optics-inputs/optics-mst.json": "b78eeaaa3471bb6fa7361a93260fe8b32f8c05daad68ed5f930d9cacfdec2a0d",
+      "/validation/fixtures/optics-inputs/optics-sst.json": "0995941d4343b259ad73a744ef7f67e94843da84721566d330b4f823a6584b13",
+      "/validation/fixtures/unit-transmission.dat": "8ff1c902a61b264993b9aff9cddcb9879d63fa50da05019dea9aa62a0f2b71de",
+      "/validation/inputs/gamma-20deg-100-3000GeV.iact": "c6ade29bc6e7d0741e976a242cea3083aa253a659c2642ccf9941fc6e310883c",
+      "/validation/inputs/gamma-20deg-20-100GeV.iact": "a95cbc538d5af51ce2d04afea4d258e3db3d08f6d6f85f32a0ab6dbbe2426acd",
+      "/validation/src/obdeect_validation/adapters/compare-led-camera.txt": "b658af7886389a66f8be55034dad07030041fa02de0ba07c8d96c7c62c3f0280",
+      "/workdir/simulation_software/hessioxxx/src/fileopen.c": "6f923efa354bcace42b210bc86770a79955c3f0976f16715bf1754ebdb18c533",
+      "/workdir/simulation_software/hessioxxx/src/straux.c": "c52a93da3df0adbd85cba04933d429fd092e278d324e9d23b28cc8ce23e0820f",
+      "/workdir/simulation_software/sim_telarray/bin/sim_telarray": "21368ef09c85cd79fa9a0c8c06c51a818a907cdfe98460f2a539d6212879fd47",
+      "/workdir/simulation_software/sim_telarray/corsika/atmo.c": "8826326d0380f2ba4526e4dd91df1f914c644cb8baa697bd7d694f9dec33a23e",
+      "/workdir/simulation_software/sim_telarray/corsika/atmo.h": "587d1601c3e829ee605a7fcde0701886e1f994963389d4c0ddb26778d743a337"
+    },
+    "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
+    "python": "3.14.8 (main, Oct  1 2026, 00:00:00) [GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]",
+    "runner_version": "0.1.0",
+    "sources": {
+      "__init__.py": "1ad1a13da439720fd1e585c8fc7b3ee39874976e6b299ce132cca957a0ecb773",
+      "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "adapters/__init__.py": "feebfee705740b8605ef8e1e407f0a91dc10df47d8b8dae503cd1dd525a8d350",
+      "adapters/compare-led-camera.txt": "b658af7886389a66f8be55034dad07030041fa02de0ba07c8d96c7c62c3f0280",
+      "adapters/extinction_analytic.py": "296bab7a210198efd32e7b13c81aa64b5c230acee95b8282e1d4219a794f9ced",
+      "adapters/led_reference.py": "4f1587c06653f897b14f37f9b99e3d83db9a50b37227ecf84cd9fa245f6eed4d",
+      "adapters/simtools_validate_optics.py": "52fa72b3f155520a7c01d0ccba798c5ed8c9ec3dc3ec22ef8a923bb0c57a45f3",
+      "adapters/stream_eventio.py": "a3448296dd60e0917ad795fbef9faecdd8d030cef88d37afee89da151b522aaa",
+      "cli.py": "1bae1e9ba4ceec56f24a4de473ea9ba3668a309764ac07e42c650051565a66bd",
+      "runner.py": "0c46e617c1dfa00dc072553c13fb9b1d4225c2f6e34eae8b23640a560a2654d3"
+    }
+  },
+  "status": "ERROR",
+  "suite": "full"
+}

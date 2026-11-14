@@ -1,0 +1,7 @@
+{
+  "id": "stream",
+  "cases": [
+    "../cases/stream/led-eventio.json",
+    "../cases/stream/corsika-roundtrip.json"
+  ]
+}

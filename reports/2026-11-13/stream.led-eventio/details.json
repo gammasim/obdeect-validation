@@ -1,0 +1,51 @@
+{
+  "eventio_reader_error": "WrongType: Expected Object InputCard with type 1212 but received TelescopeDefinition with type 1201",
+  "converted_object_types": [
+    1200,
+    1201,
+    1216,
+    1202,
+    1203,
+    1204,
+    1209,
+    1202,
+    1203,
+    1204,
+    1209,
+    1202,
+    1203,
+    1204,
+    1209,
+    1212,
+    1210
+  ],
+  "corsika_reference_order": "1200 RunHeader, 1212 InputCard, 1216 AtmProfile, 1201 TelDef",
+  "reordered_object_types": [
+    1200,
+    1212,
+    1216,
+    1201,
+    1202,
+    1203,
+    1204,
+    1209,
+    1202,
+    1203,
+    1204,
+    1209,
+    1202,
+    1203,
+    1204,
+    1209,
+    1210
+  ],
+  "seed": 17,
+  "source_event_photons": [
+    20.0,
+    20.0,
+    20.0
+  ],
+  "eventio_event_photons": [],
+  "camera_sha256": "b658af7886389a66f8be55034dad07030041fa02de0ba07c8d96c7c62c3f0280",
+  "atmosphere_sha256": "e45f3b9ef051e79accb6715b0521d09be6e306417456135be8476e8b71b93ebd"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "performance",
+  "cases": [
+    "../cases/performance/stages.json"
+  ]
+}

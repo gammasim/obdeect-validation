@@ -1,0 +1,13 @@
+{
+  "eventio_readable": 0,
+  "source_event_count": 3,
+  "eventio_event_count": 0,
+  "event_count_delta": 3,
+  "source_photon_count": 60.0,
+  "eventio_photon_count": 0,
+  "photon_count_delta": 60.0,
+  "max_event_photon_delta": 20.0,
+  "reordered_event_count": 3,
+  "reordered_photon_count": 60.0,
+  "reordered_photon_count_delta": 0.0
+}

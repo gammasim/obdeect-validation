@@ -1,0 +1,26 @@
+{
+  "case": "night-sky versus nsbls (LightEmission)",
+  "impact_parameter": "distance from the origin to each ray. Native: from the sphere point. Reference: from the observation-plane crossing (x, y, 0) of the same ray (IACT convention)",
+  "mapping": {
+    "geometry": "telescope sphere radius 15 m at origin, viewing cone 10 deg about (0,0,-1), altitude 2150 m (both)",
+    "spectrum": "fixed 400 nm (both); inside the 300-650 nm band of the configured rate",
+    "rate": "configured 0.24 ph/(sr ns cm^2) (nsbls help text) -> photons per event = rate x Omega x pi R^2 x window",
+    "window": "uniform pulse of FWHM 2.35482 ns, i.e. width 1 ns (both)",
+    "bunch": "bunch size 2 photons (both)",
+    "time_convention": "native compared at the sphere centre plane, t - (X.d)/c; reference IACT time + event time_offset",
+    "atmosphere": "nsbls -A 1 and obdeect -A 1 (recorded; profile for air speed only)",
+    "sim_telarray": "propagate --no-extinction then obdeect stream to-simtel; telescope_theta=0, trigger_telescopes=1"
+  },
+  "physics_limits": {
+    "yield_and_rate": "max(0.01, 5 se) with se=0: fixed photon count per event in both",
+    "cone_and_direction": "KS alpha=1e-3",
+    "projected_area": "isotropic flux is uniform in projected area on the sphere (rho^2 uniform); KS alpha=1e-3",
+    "time_mean": "max(0.05 ns, 5 se)",
+    "camera": "max(0.01, 5 se) on the relative p.e. per event ratio (task rule)"
+  },
+  "reproducibility": "nsbls has no seed option: the reference sample is not reproducible; the native run is seeded (17)",
+  "limit_setting": "Limits set before the first run. The projected-area check is an analytic check of the declared isotropic flux (rho^2 uniform). Native impact parameters follow the declared sampler (1 - sqrt(U), KS passes); the flux is not area-uniform, and nsbls differs from obdeect (KS 0.18).",
+  "camera_status": "BLOCKED: camera comparison needs at least two triggered events per sample; sim_telarray triggered events: native 0, reference 0",
+  "camera_pe_native": [],
+  "camera_pe_reference": []
+}

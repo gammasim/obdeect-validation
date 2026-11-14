@@ -1,0 +1,173 @@
+{
+  "case": "muon-track versus fake-muon (LightEmission)",
+  "mapping": {
+    "geometry": "telescope sphere radius 15 m at origin; track from 3000 m above observation level to impact (0,0), vertical",
+    "index": "constant index replaced by sim_telarray profile: fake-muon -A 0 only uses the profile; obdeect gets the same n(h) through --index-profile (index.txt from fake-muon printout)",
+    "spectrum": "Cherenkov 1/lambda^2, 300-600 nm in both",
+    "photons": "fake-muon -b 1 (single photons); obdeect muon-track emits single photons",
+    "positions": "IACT x, y are the observation-plane crossing (z=0) of each ray; native rays crossed at z=0 (KS 0.0006 with the reference radii)",
+    "time_origin": "native t: emission time, t=0 at observation-level arrival; reference: IACT time + event time_offset",
+    "time_convention": "main check: plane through the sphere centre, t + (-P.d)/c; diagnostic: observation-plane arrival t - P_z/(c d_z)",
+    "sim_telarray": "propagate --no-extinction then obdeect stream to-simtel; both with the same chain settings, telescope_theta=0, trigger_telescopes=1"
+  },
+  "physics_limits": {
+    "yield": "max(0.01, 5 se) (task rule)",
+    "cherenkov_cos": "max(1e-6, 5 se): float32 directions and 5e-8 index table precision",
+    "time_mean": "max(0.05 ns, 5 se): float32 timestamps",
+    "ks": "two-sample / one-sample KS at alpha=1e-3 (statistical)",
+    "camera": "max(0.01, 5 se) on the relative p.e. per event ratio (task rule)"
+  },
+  "limit_setting": "Set before the first run: yield, Cherenkov angle, wavelength, azimuth, camera ratio. Set after exploratory runs: the cz check (KS replaced by a mean check, cz is float32 at 6e-8 resolution against a 2e-5 spread), the position convention (observation plane) and the time convention (centre plane). The time flags are a FAIL: neither convention reproduces the reference spread (0.30 ns vs 0.15 ns native).",
+  "analytic": "numerical integral of dN/ds x (fraction of Cherenkov azimuths hitting the sphere) over the track",
+  "reproducibility": "fake-muon has no seed option: the reference sample changes between runs at the 1e-4 level in yield; the native run is seeded (17)",
+  "index_table": [
+    [
+      0.0,
+      0.00022110000000008512
+    ],
+    [
+      100.0,
+      0.0002188000000000745
+    ],
+    [
+      200.0,
+      0.0002165999999999002
+    ],
+    [
+      300.0,
+      0.00021429999999988958
+    ],
+    [
+      400.0,
+      0.00021209999999993734
+    ],
+    [
+      500.0,
+      0.0002098999999999851
+    ],
+    [
+      600.0,
+      0.00020770000000003286
+    ],
+    [
+      700.0,
+      0.00020550000000008062
+    ],
+    [
+      800.0,
+      0.00020339999999996472
+    ],
+    [
+      900.0,
+      0.0002013999999999072
+    ],
+    [
+      1000.0,
+      0.00019940000000007174
+    ],
+    [
+      1100.0,
+      0.00019740000000001423
+    ],
+    [
+      1200.0,
+      0.0001955000000000151
+    ],
+    [
+      1300.0,
+      0.00019360000000001598
+    ],
+    [
+      1400.0,
+      0.00019180000000007524
+    ],
+    [
+      1500.0,
+      0.00018990000000007612
+    ],
+    [
+      1600.0,
+      0.00018809999999991334
+    ],
+    [
+      1700.0,
+      0.0001862999999999726
+    ],
+    [
+      1800.0,
+      0.00018450000000003186
+    ],
+    [
+      1900.0,
+      0.00018270000000009112
+    ],
+    [
+      2000.0,
+      0.00018099999999998673
+    ],
+    [
+      2100.0,
+      0.000179200000000046
+    ],
+    [
+      2200.0,
+      0.00017740000000010525
+    ],
+    [
+      2300.0,
+      0.00017570000000000086
+    ],
+    [
+      2400.0,
+      0.00017390000000006012
+    ],
+    [
+      2500.0,
+      0.00017219999999995572
+    ],
+    [
+      2600.0,
+      0.00017050000000007337
+    ],
+    [
+      2700.0,
+      0.00016879999999996897
+    ],
+    [
+      2800.0,
+      0.00016710000000008662
+    ],
+    [
+      2900.0,
+      0.00016539999999998223
+    ],
+    [
+      3000.0,
+      0.00016370000000009988
+    ]
+  ],
+  "camera_pe_native": [
+    2125.0,
+    2031.0,
+    2065.0,
+    2019.0,
+    2088.0,
+    2097.0,
+    2066.0,
+    2095.0,
+    2159.0,
+    2045.0
+  ],
+  "camera_pe_reference": [
+    2110.0,
+    2078.0,
+    2149.0,
+    2058.0,
+    2074.0,
+    2071.0,
+    2133.0,
+    2126.0,
+    2060.0,
+    2061.0
+  ]
+}
