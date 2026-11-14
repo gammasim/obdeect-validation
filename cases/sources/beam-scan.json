@@ -1,0 +1,83 @@
+{
+  "id": "sources.beam-scan",
+  "name": "Beam scan versus xyls (emission; camera stage in details.json)",
+  "commands": [
+    {
+      "name": "compare-beam-scan",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.source_camera",
+        "beam-scan"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "requires": [
+    "obdeect",
+    "xyls",
+    "python3"
+  ],
+  "metrics": [
+    {
+      "metric": "native_event_count",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "reference_event_count",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "photon_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cx_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cy_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cx_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cy_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "t_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "t_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "wavelength_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "wavelength_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

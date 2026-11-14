@@ -1,0 +1,37 @@
+{
+  "id": "stream.corsika-roundtrip",
+  "name": "CORSIKA IACT -> obdeect stream -> sim_telarray IACT, bunch and camera comparison, plus stream command variants",
+  "commands": [
+    {
+      "name": "roundtrip-and-variants",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.stream_chain",
+        "--input",
+        "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+      ],
+      "timeout": 3600
+    }
+  ],
+  "requires": [
+    "obdeect",
+    "sim_telarray"
+  ],
+  "metrics": [
+    {"metric": "photon_event_telescope_key_delta", "expected": 0, "atol": 0},
+    {"metric": "bunch_count_delta", "expected": 0, "atol": 0},
+    {"metric": "codec_bounds_exceeded", "expected": 0, "atol": 0},
+    {"metric": "camera_event_id_delta", "expected": 0, "atol": 0},
+    {"metric": "trigger_pattern_mismatches", "expected": 0, "atol": 0},
+    {"metric": "photoelectron_bias_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "variant_cat_file_photon_mismatch", "expected": 0, "atol": 0},
+    {"metric": "variant_cat_stdin_photon_mismatch", "expected": 0, "atol": 0},
+    {"metric": "variant_tee_photon_mismatch", "expected": 0, "atol": 0},
+    {"metric": "variant_tee_stdout_photon_mismatch", "expected": 0, "atol": 0},
+    {"metric": "variant_from_corsika_stdin_photon_mismatch", "expected": 0, "atol": 0},
+    {"metric": "variant_to_simtel_stdin_key_delta", "expected": 0, "atol": 0},
+    {"metric": "variant_to_simtel_stdin_bunch_delta", "expected": 0, "atol": 0},
+    {"metric": "variant_to_simtel_stdin_codec_bounds_exceeded", "expected": 0, "atol": 0}
+  ]
+}

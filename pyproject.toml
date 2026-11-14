@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "obdeect-validation"
+version = "0.1.0"
+description = "Reproducible validation cases for obdeect simulation components"
+requires-python = ">=3.14"
+dependencies = ["numpy>=2.3", "eventio"]
+
+[project.scripts]
+obdeect-validate = "obdeect_validation.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+references = ["numpy>=2", "eventio>=2", "astropy>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.setuptools.package-data]
+obdeect_validation = ["adapters/*.txt"]

@@ -1,0 +1,108 @@
+{
+  "id": "sources.muon-track",
+  "name": "Muon track versus fake-muon: yield, Cherenkov angle, spectrum, time, camera p.e.",
+  "requires": [
+    "obdeect",
+    "fake-muon",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "compare-muon-track",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.source_comparison",
+        "muon-track"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "camera_events_native",
+      "expected": 10,
+      "atol": 0
+    },
+    {
+      "metric": "camera_events_reference",
+      "expected": 10,
+      "atol": 0
+    },
+    {
+      "metric": "yield_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "native_analytic_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "reference_analytic_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cherenkov_cos_residual_native_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cherenkov_cos_residual_reference_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "wavelength_native_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "wavelength_reference_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "wavelength_native_vs_reference_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "azimuth_native_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "azimuth_reference_vs_analytic_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cz_mean_difference_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "obs_plane_xy_radius_native_vs_reference_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "time_mean_difference_ns_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "time_native_vs_reference_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "camera_pe_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

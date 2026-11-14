@@ -1,0 +1,23 @@
+# Build from the workspace root. SIMTOOLS_PROD_IMAGE must be an immutable image digest.
+ARG SIMTOOLS_PROD_IMAGE
+FROM ${SIMTOOLS_PROD_IMAGE}
+
+USER root
+COPY obdeect /opt/obdeect
+COPY obdeect-validation/pyproject.toml /opt/obdeect-validation/pyproject.toml
+COPY obdeect-validation/src /opt/obdeect-validation/src
+COPY obdeect-validation/cases /opt/obdeect-validation/cases
+COPY obdeect-validation/suites /opt/obdeect-validation/suites
+COPY obdeect-validation/environments /opt/obdeect-validation/environments
+COPY obdeect-validation/fixtures /opt/obdeect-validation/fixtures
+RUN python -m pip uninstall -y obdeect && python -m pip install --no-cache-dir \
+    /opt/obdeect/src/stream \
+    /opt/obdeect/src/propagation \
+    /opt/obdeect/src/sources \
+    /opt/obdeect/src/ray_tracing \
+    /opt/obdeect \
+    "/opt/obdeect-validation[dev,references]" scipy
+COPY simtools /opt/simtools-checkout
+RUN python -m pip install --no-cache-dir --no-deps /opt/simtools-checkout
+ENV PATH="/workdir/simulation_software/sim_telarray/LightEmission:/workdir/env/bin:/usr/local/bin:/usr/bin:/bin"
+USER 1000:1000

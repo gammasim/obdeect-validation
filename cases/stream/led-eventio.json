@@ -1,0 +1,29 @@
+{
+  "id": "stream.led-eventio",
+  "name": "LED light-source stream to sim_telarray EventIO, read by the independent eventio reader",
+  "commands": [
+    {
+      "name": "convert-and-read-eventio",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.stream_eventio"
+      ],
+      "timeout": 300
+    }
+  ],
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "metrics": [
+    {"metric": "eventio_readable", "expected": 1, "atol": 0},
+    {"metric": "source_event_count", "expected": 3, "atol": 0},
+    {"metric": "eventio_event_count", "expected": 3, "atol": 0},
+    {"metric": "source_photon_count", "expected": 60, "atol": 0},
+    {"metric": "eventio_photon_count", "expected": 60, "atol": 0},
+    {"metric": "event_count_delta", "expected": 0, "atol": 0},
+    {"metric": "photon_count_delta", "expected": 0, "atol": 0},
+    {"metric": "max_event_photon_delta", "expected": 0, "atol": 0}
+  ]
+}

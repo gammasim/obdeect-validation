@@ -1,0 +1,21 @@
+{
+  "id": "chain.stream-roundtrip-threshold",
+  "name": "Near-threshold CORSIKA showers (20-100 GeV): stream round trip and sim_telarray camera",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "roundtrip-and-camera-threshold",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.chain_showers",
+               "--input", "/validation/inputs/gamma-20deg-20-100GeV.iact"],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {"metric": "photon_event_telescope_key_delta", "expected": 0, "atol": 0},
+    {"metric": "bunch_count_delta", "expected": 0, "atol": 0},
+    {"metric": "codec_bounds_exceeded", "expected": 0, "atol": 0},
+    {"metric": "camera_event_id_delta", "expected": 0, "atol": 0},
+    {"metric": "trigger_pattern_mismatches", "expected": 0, "atol": 0},
+    {"metric": "photoelectron_bias_limit_exceeded", "expected": 0, "atol": 0}
+  ]
+}
