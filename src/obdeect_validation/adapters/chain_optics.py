@@ -21,7 +21,7 @@ MODEL, VERSION = "LSTN-01", "7.0.0"
 SEED = common.SIMTEL_SEED
 TELESCOPES = (1,)
 #: Legend label of the one telescope of the run (sim_telarray index 0).
-CAMERA_NAMES = {0: f"{MODEL} (model {VERSION})"}
+CAMERA_NAMES = {1: f"{MODEL} (model {VERSION})"}
 ZENITH_DEG, AZIMUTH_DEG = 20, 180
 
 
