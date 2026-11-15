@@ -206,9 +206,9 @@ def _standard_error(values):
 #: Telescopes of the three-telescope runs (simulate): sim_telarray index -> legend label, in the
 #: order of the TELESCOPE lines of the CORSIKA input; CTA-PROD6-LST.cfg (-DLST1), North site.
 PROD6_LSTS = {
-    0: "PROD6 LST at (0, 0) m",
-    1: "PROD6 LST at (50, 0) m",
-    2: "PROD6 LST at (0, 50) m",
+    1: "PROD6 LST at (0, 0) m",
+    2: "PROD6 LST at (50, 0) m",
+    3: "PROD6 LST at (0, 50) m",
 }
 
 
