@@ -876,7 +876,7 @@ def physics_check(root, source, inputs, qe_path, headroom, metrics, details):
     for label, (left, right) in pairs.items():
         out = root / "physics" / label
         out.mkdir(parents=True, exist_ok=True)
-        comparison = cs.compare_camera(left, right, out)
+        comparison = cs.compare_camera(left, right, out, co.CAMERA_NAMES)
         triggers = co.trigger_difference(left, right, shower_ids)
         centroids = co.centroid_offsets(left, right)
         metrics.update({f"physics_{label}_{k}": v for k, v in comparison.items()})

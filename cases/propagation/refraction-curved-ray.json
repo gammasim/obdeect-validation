@@ -1,0 +1,21 @@
+{
+  "id": "propagation.refraction-curved-ray",
+  "name": "Spherical-shell refraction and air delay against an independent numpy ray tracer",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "independent-tracer-and-obdeect",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.refraction_curved_reference"]
+    }
+  ],
+  "metrics": [
+    {"metric": "sample_count", "expected": 28, "atol": 0},
+    {"metric": "max_shift_error_m", "expected": 0, "atol": 0.05},
+    {"metric": "max_shift_error_normalised", "expected": 0, "atol": 1},
+    {"metric": "max_time_error_ns_normalised", "expected": 0, "atol": 1},
+    {"metric": "max_direction_scale_error", "expected": 0, "atol": 1e-6},
+    {"metric": "straight_delay_max_error_ns_normalised", "expected": 0, "atol": 1},
+    {"metric": "plane_limit_max_difference", "expected": 0, "atol": 1},
+    {"metric": "reference_convergence_relative_change", "expected": 0, "atol": 1e-8}
+  ]
+}

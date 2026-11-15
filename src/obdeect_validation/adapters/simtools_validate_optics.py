@@ -214,6 +214,54 @@ def _summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return summary
 
 
+VALUE_LABELS = {
+    "psf_cm": "PSF D80 [cm]",
+    "eff_area": "effective mirror area [m²]",
+    "eff_flen": "effective focal length [cm]",
+}
+# Offset directions of the star: along x (E/W, filled markers) or along y (N/S, open markers).
+DIRECTIONS = (
+    (True, "o", "-", "offset along x (E/W)"),
+    (False, "s", "--", "offset along y (N/S)"),
+)
+
+
+def plot_values(rows: list[dict[str, Any]], path: Path, label: str) -> None:
+    """obdeect and sim_telarray values per metric against off-axis angle, one panel per metric.
+
+    Colour is the program, marker and line the offset direction of the star: the optics are
+    not rotationally symmetric, so the two directions give different values off axis.
+    """
+    from obdeect_validation.adapters import plotting
+
+    fig, axes = plotting.figure(len(METRICS), 1, (6, 8))
+    for axis, metric in zip(axes[:, 0], METRICS, strict=True):
+        points = [row for row in rows if row[metric] is not None]
+        for program, key, color in (
+            ("obdeect", "obd", plotting.NATIVE),
+            ("sim_telarray", "sim", plotting.REFERENCE),
+        ):
+            for east_west, marker, style, direction in DIRECTIONS:
+                selected = sorted(
+                    (r for r in points if (abs(r["off_y_deg"]) < 1e-9) == east_west),
+                    key=lambda row: row["angle_deg"],
+                )
+                axis.plot(
+                    [row["angle_deg"] for row in selected],
+                    [row[metric][key] for row in selected],
+                    marker=marker,
+                    linestyle=style,
+                    color=color,
+                    markerfacecolor=color if east_west else "white",
+                    label=f"{program}, {direction}",
+                )
+        axis.set_ylabel(VALUE_LABELS[metric])
+    axes[0, 0].legend(fontsize="small")
+    axes[-1, 0].set_xlabel("off-axis angle [deg]")
+    fig.suptitle(f"{label}: obdeect and sim_telarray", fontsize="small")
+    plotting.save(fig, path)
+
+
 def _plot(
     rows: list[dict[str, Any]], limits: dict[str, float], path: Path, label: str
 ) -> None:
@@ -236,10 +284,7 @@ def _plot(
         )
         axis.axhline(0, color=plotting.ANALYTIC, linewidth=0.6)
         points = [row for row in rows if row[metric] is not None]
-        for east_west, marker, style, name in (
-            (True, "o", "-", "E/W"),
-            (False, "s", "--", "N/S"),
-        ):
+        for east_west, marker, style, name in DIRECTIONS:
             selected = sorted(
                 (row for row in points if (abs(row["off_y_deg"]) < 1e-9) == east_west),
                 key=lambda row: row["angle_deg"],
@@ -350,12 +395,9 @@ def execute(config_path: Path, output: Path) -> dict[str, float | int]:
     (output / "details.json").write_text(
         json.dumps(details, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
-    _plot(
-        rows,
-        limits,
-        output / "optics_relative_difference.png",
-        config["simtools_config"]["configuration"].get("telescope", "optics"),
-    )
+    telescope = config["simtools_config"]["configuration"].get("telescope", "optics")
+    _plot(rows, limits, output / "optics_relative_difference.png", telescope)
+    plot_values(rows, output / "optics_values.png", telescope)
     (output / "metrics.json").write_text(
         json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )

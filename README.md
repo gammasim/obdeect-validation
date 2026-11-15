@@ -11,7 +11,7 @@ From the workspace root (checkouts `obdeect`, `simtools`, `sim_telarray`,
 bash obdeect-validation/containers/run-validation.sh full obdeect-validation/results/full
 ```
 
-Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `chain`, `full`,
+Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `chain`, `curvature`, `full`,
 `performance` (report only). The launcher builds obdeect and simtools from the
 checkouts on a digest-pinned simtools-prod image and mounts this repository
 (`/validation`), sim_telarray (`/reference`) and the models (`/models`) read-only.
@@ -38,6 +38,17 @@ Case files are JSON. Each has an id, executable requirements, commands (argument
 arrays, without shell expansion), and metrics with metric/expected/atol.
 Commands run inside an isolated case output directory and write metrics.json.
 Adapters also write details.json and PNG figures; `report.html` links them per case.
+
+Reports: `python scripts/collect_report.py RUN reports/DATE` copies verdicts, metrics,
+details and figures of a run and writes `reports/DATE/README.md`, the page to read: overview
+table, then one section per validation step (stream, propagation, sources, optics, chain,
+performance) with each case's verdict, headline numbers and captioned figures. Titles,
+headline numbers and captions are set in `scripts/report_layout.json`. Hand-written text
+(run, versions, findings) goes into the `<!-- notes:KEY -->` blocks of the README; they are
+kept when it is rewritten (`--readme-only reports/DATE` rewrites without copying).
+Collecting replaces the report (case directories of an earlier collection are removed; the
+README notes stay). A separate run, such as performance, is added with
+`--add RUN reports/DATE`: its cases are listed in `report_only.json` and shown as REPORT ONLY.
 Figures use one palette (`adapters/plotting.py`): obdeect blue, reference program
 orange, analytic expectation black dashed, one colour per telescope or zenith angle.
 Shared helpers (commands, sim_telarray, photon readers, output files) are in
@@ -63,9 +74,29 @@ workspace project-notes/projects/cta/202611/full-simulation-chain/{plan.md,pr.md
 |---|---|---|
 | stream | LED to EventIO; CORSIKA round trip incl. stdin/tee variants | eventio reader, sim_telarray camera |
 | propagation | analytic Beer–Lambert; sim_telarray tables; refraction/time | sim_telarray tables, compiled CORSIKA atmo |
+| curvature | Chapman extinction; spherical geometry; curved Bouguer refraction; input guards (no showers); curved flag, emission geometry and curved extinction of CORSIKA CURVED showers; high-zenith chain | analytic, independent ray tracer, CORSIKA CURVED, sim_telarray (plane-parallel) |
 | sources | LED, flasher dish/secondary, point source, beam scan, laser, night sky, muon | pixled, ff-1m, ff-gct, xyzls, xyls, ls-beam, nsbls, fake-muon (+ camera) |
 | optics | LST, MST, SST: D80, effective area, focal length, 0–4 deg | simtools-validate-optics, both backends |
 | chain | near-threshold round trip; obdeect atmosphere; obdeect optics + Bypass_Optics=1 | direct sim_telarray |
+
+### Curvature suite
+
+`suites/curvature.json` validates the curved and spherical atmosphere of the obdeect
+propagation stage. Four cases need no showers (`propagation.curvature-chapman`,
+`propagation.curvature-geometry`, `propagation.refraction-curved-ray`,
+`propagation.curvature-input-guards`) and use analytic or independent references. Four need
+CORSIKA CURVED showers at 65 and 75 deg (`stream.corsika-curved-flag`,
+`propagation.curvature-corsika-geometry`, `propagation.curvature-corsika-extinction`,
+`chain.curvature-high-zenith`); the cards are in `fixtures/corsika/*-curved.card` and the
+files are generated on a host with the curved CORSIKA binary (variants in
+`$SIMTOOLS_CORSIKA_PATH/build_opts.yml`) with
+`python -m obdeect_validation.adapters.curved_showers run --geometry curved --zenith 65 ...`,
+then copied to `inputs/` (hashes in `fixtures/inputs.json`, `null` until generated). The run
+checks the CURVED banner of the CORSIKA log, so a flat binary cannot pass as curved.
+sim_telarray applies a plane-parallel airmass 1/|cz| also to CURVED input, so the chain case
+tests the predicted curved-to-plane-parallel ratio, not a zero difference. The comparison with the
+CORSIKA `DISTIP`/`TOFIP` tables needs an instrumented CORSIKA run, see
+`docs/curvature-corsika-tables.md`. Details of all curvature cases: `docs/curvature-validation.md`.
 
 Optics limits (2% D80, 1% area, 0.2% focal length) are provisional, taken from the
 largest deviations measured in the old validation, pending scientific approval.

@@ -20,7 +20,70 @@ SHAPE_CHI2_LIMIT = 2.0
 SIGMA = 5.0  # limit = max(floor, SIGMA * standard error)
 
 
-def generate(root, showers=20, zenith=20, energy_min=100, energy_max=3000):
+FLAT_TELESCOPES = (
+    (0.0, 0.0, 0.0, 1200.0),
+    (5000.0, 0.0, 0.0, 1200.0),
+    (0.0, 5000.0, 0.0, 1200.0),
+)  # (x, y, z, radius) in cm, as the flat showers of this chain have always used
+FLAT_SCATTER_CM = 10000.0  # CSCAT radius in cm
+SEED_OFFSETS = (0, 12, 26, 44)  # SEED lines are seed_base + offset: 17, 29, 43, 61
+
+
+def card_text(
+    *,
+    showers,
+    zenith,
+    energy_min,
+    energy_max,
+    data_dir,
+    direct,
+    telfil,
+    telescopes=FLAT_TELESCOPES,
+    scatter_cm=FLAT_SCATTER_CM,
+    seed_base=17,
+    tstart=False,
+    long_format=False,
+):
+    """CORSIKA input card of the IACT showers; the values are written as given.
+
+    data_dir is the DATDIR, direct the DIRECT prefix (with trailing slash) and telfil the IACT
+    output name below it. Telescope positions, radii and the CSCAT radius are in cm (CORSIKA
+    units). long_format writes TELFIL with a leading '+', which selects the long (non-compact)
+    bunch format explicitly (corsika7/bernlohr/iact.c, TELFIL parsing). With the defaults the card
+    is the one generate() has always written.
+    """
+    seeds = "".join(f"SEED {seed_base + offset} 0 0\n" for offset in SEED_OFFSETS)
+    scatter = "".join(f"TELESCOPE {x} {y} {z} {r}\n" for x, y, z, r in telescopes)
+    start = "TSTART T\n" if tstart else ""
+    prefix = "+" if long_format else ""
+    return f"""RUNNR 1
+EVTNR 1
+NSHOW {showers}
+PRMPAR 1
+ERANGE {energy_min} {energy_max}
+ESLOPE -2.0
+THETAP {zenith} {zenith}
+PHIP 0.0 0.0
+{seeds}OBSLEV 215600.0
+ATMOSPHERE 1 Y
+{start}MAGNET 20.0 40.0
+ARRANG 0.0
+HADFLG 0 0 0 0 0 2
+ECUTS 0.3 0.3 0.02 0.02
+ELMFLG F F
+CSCAT 5 {scatter_cm} 0.0
+DATDIR {data_dir}/
+DIRECT {direct}
+{scatter}TELFIL {prefix}{direct}{telfil}
+IACT SPLIT_AUTO 0
+IACT IO_BUFFER 800MB
+IACT MAX_BUNCHES 1000000
+EXIT
+"""
+
+
+def prepare_data(root):
+    """Link the CORSIKA data files into root/data and copy the atmosphere; return SHA-256 sums."""
     root.mkdir(parents=True, exist_ok=True)
     data = root / "data"
     data.mkdir(exist_ok=True)
@@ -46,41 +109,45 @@ def generate(root, showers=20, zenith=20, energy_min=100, energy_max=3000):
             destination.symlink_to(original)
         hashes[name] = common.sha256(original)
     shutil.copyfile(common.REFERENCE / "cfg/common/atmprof1.dat", root / "atmprof1.dat")
-    card = f"""RUNNR 1
-EVTNR 1
-NSHOW {showers}
-PRMPAR 1
-ERANGE {energy_min} {energy_max}
-ESLOPE -2.0
-THETAP {zenith} {zenith}
-PHIP 0.0 0.0
-SEED 17 0 0
-SEED 29 0 0
-SEED 43 0 0
-SEED 61 0 0
-OBSLEV 215600.0
-ATMOSPHERE 1 Y
-MAGNET 20.0 40.0
-ARRANG 0.0
-HADFLG 0 0 0 0 0 2
-ECUTS 0.3 0.3 0.02 0.02
-ELMFLG F F
-CSCAT 5 10000.0 0.0
-DATDIR {data}/
-DIRECT {root}/
-TELESCOPE 0.0 0.0 0.0 1200.0
-TELESCOPE 5000.0 0.0 0.0 1200.0
-TELESCOPE 0.0 5000.0 0.0 1200.0
-TELFIL {root}/showers.iact
-IACT SPLIT_AUTO 0
-IACT IO_BUFFER 800MB
-IACT MAX_BUNCHES 1000000
-EXIT
-"""
+    return hashes
+
+
+def generate(
+    root, showers=20, zenith=20, energy_min=100, energy_max=3000, geometry="flat"
+):
+    """Run CORSIKA in root for IACT showers and return root/showers.iact.
+
+    geometry "flat" keeps the card, executable and environment default this chain has always
+    used (TELFIL without prefix). geometry "curved" uses the same telescope layout, the long
+    bunch format (TELFIL '+') and the curved executable (CORSIKA_BINARY still overrides it).
+    """
+    long_format = False
+    if geometry == "flat":
+        layout = {"telescopes": FLAT_TELESCOPES, "scatter_cm": FLAT_SCATTER_CM}
+    elif geometry == "curved":
+        from obdeect_validation.adapters import curved_showers
+
+        layout = curved_showers.layout()
+        long_format = True
+    else:
+        raise ValueError(f"unknown CORSIKA geometry: {geometry!r}")
+    hashes = prepare_data(root)
+    card = card_text(
+        showers=showers,
+        zenith=zenith,
+        energy_min=energy_min,
+        energy_max=energy_max,
+        data_dir=root / "data",
+        direct=f"{root}/",
+        telfil="showers.iact",
+        long_format=long_format,
+        **layout,
+    )
     (root / "corsika.card").write_text(card)
-    corsika = os.environ.get(
-        "CORSIKA_BINARY",
-        "/workdir/simulation_software/corsika7/corsika_qgs2_urqmd_flat",
+    corsika = os.environ.get("CORSIKA_BINARY") or (
+        "/workdir/simulation_software/corsika7/corsika_qgs2_urqmd_flat"
+        if geometry == "flat"
+        else str(curved_showers.corsika_executable("curved"))
     )
     with (
         (root / "corsika.card").open("rb") as stdin,
@@ -203,8 +270,20 @@ def _standard_error(values):
     return float(np.std(values, ddof=1) / np.sqrt(values.size))
 
 
-def compare_camera(left, right, output):
-    """Paired per-telescope comparison of two sim_telarray runs; writes the CSV and the figure."""
+#: Telescopes of the three-telescope runs (simulate): sim_telarray index -> legend label, in the
+#: order of the TELESCOPE lines of the CORSIKA input; CTA-PROD6-LST.cfg (-DLST1), North site.
+PROD6_LSTS = {
+    1: "PROD6 LST at (0, 0) m",
+    2: "PROD6 LST at (50, 0) m",
+    3: "PROD6 LST at (0, 50) m",
+}
+
+
+def compare_camera(left, right, output, names=PROD6_LSTS):
+    """Paired per-telescope comparison of two sim_telarray runs; writes the CSV and the figure.
+
+    names maps the sim_telarray telescope index to its legend label (telescope type).
+    """
     if not left or not right:
         raise ValueError("camera comparison requires nonempty triggered event samples")
     keys = sorted(set(left) & set(right), key=int)
@@ -250,7 +329,7 @@ def compare_camera(left, right, output):
         header="event,telescope,reference,candidate",
         comments="",
     )
-    _plot_camera(array, difference, output / "camera-comparison.png")
+    plot_camera(array, difference, output / "camera-comparison.png", names)
     mean_time = float(np.mean(times))
     return {
         "matched_event_telescope_samples": len(pairs),
@@ -271,8 +350,9 @@ def compare_camera(left, right, output):
     }
 
 
-def _plot_camera(array, difference, path):
-    """Paired p.e. (colour per telescope) against the identity line, and the relative differences."""
+def plot_camera(array, difference, path, names):
+    """Paired p.e. (colour per telescope, labelled with its type) against the identity line,
+    and the relative differences. array rows: event, telescope index, reference, candidate."""
     from obdeect_validation.adapters import plotting
 
     fig, axes = plotting.figure(1, 2, (10, 4))
@@ -284,7 +364,7 @@ def _plot_camera(array, difference, path):
             s=14,
             color=plotting.CYCLE[i % len(plotting.CYCLE)],
             alpha=0.8,
-            label=f"telescope {tel}",
+            label=names.get(tel, f"unknown type (index {tel})"),
         )
     top = float(max(array[:, 2].max(), array[:, 3].max()))
     axes[0, 0].plot(
