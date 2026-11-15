@@ -308,7 +308,7 @@ def _signal_group(process: subprocess.Popen[bytes], sig: int) -> bool:
     """
     try:
         os.killpg(process.pid, sig)
-    except ProcessLookupError, PermissionError:
+    except (ProcessLookupError, PermissionError):
         return False
     return True
 
