@@ -1,11 +1,11 @@
 {
   "backends": {
     "obdeect": {
-      "dir": "/results/full-2026-11-14/optics.sst-6.0.2/obdeect",
+      "dir": "/results/optics.lst-7.0.0/obdeect",
       "returncode": 0
     },
     "sim_telarray": {
-      "dir": "/results/full-2026-11-14/optics.sst-6.0.2/sim_telarray",
+      "dir": "/results/optics.lst-7.0.0/sim_telarray",
       "returncode": 0
     }
   },
@@ -13,16 +13,16 @@
     "instrument_seed": 11,
     "max_offset": 4,
     "max_workers": 2,
-    "model_version": "6.0.2",
+    "model_version": "7.0.0",
     "offset_directions": "N,E",
     "offset_step": 1,
     "simulation_models_path": "/models",
     "simulation_seed": [
       11
     ],
-    "site": "South",
+    "site": "North",
     "source_distance": 10,
-    "telescope": "SSTS-01",
+    "telescope": "LSTN-01",
     "zenith_angle": 20
   },
   "exceeded_rule": "abs(obd/sim - 1) > max(limit, 3 * rel_se) per offset",
@@ -36,254 +36,254 @@
     {
       "angle_deg": 0.0,
       "eff_area": {
-        "delta": 0.0027771217060765796,
+        "delta": 0.0005279197677270364,
         "exceeded": false,
-        "obd": 7.208261995716805,
+        "obd": 365.87240272129446,
         "rel_se": null,
-        "sim": 7.18829921394,
+        "sim": 365.67935336200503,
         "threshold": 0.01
       },
       "eff_flen": null,
       "off_x_deg": 0.0,
       "off_y_deg": 0.0,
       "psf_cm": {
-        "delta": 0.0002312858091004788,
+        "delta": 0.00038683745649970014,
         "exceeded": false,
-        "obd": 0.7044325668230215,
+        "obd": 3.0535493595364755,
         "rel_se": null,
-        "sim": 0.7042696792404334,
+        "sim": 3.052368589035194,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 1.0,
       "eff_area": {
-        "delta": 0.0020132159850621,
+        "delta": 0.00043918917308682914,
         "exceeded": false,
-        "obd": 7.087048080560839,
+        "obd": 365.8720717728846,
         "rel_se": null,
-        "sim": 7.072808988446009,
+        "sim": 365.71145526126,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": 6.85327712279804e-05,
+        "delta": 0.0001827922759973788,
         "exceeded": false,
-        "obd": 214.80257830061967,
-        "rel_se": 7.694559349273222e-05,
-        "sim": 214.7878582934647,
+        "obd": 2926.164436713661,
+        "rel_se": 4.2984886061945495e-05,
+        "sim": 2925.6296542104424,
         "threshold": 0.002
       },
       "off_x_deg": 0.0,
       "off_y_deg": 1.0,
       "psf_cm": {
-        "delta": -0.000250892704973249,
+        "delta": -0.0034571355792605285,
         "exceeded": false,
-        "obd": 0.6731685168665064,
+        "obd": 5.045214191659028,
         "rel_se": null,
-        "sim": 0.6733374523212791,
+        "sim": 5.062716689654549,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 2.0,
       "eff_area": {
-        "delta": 0.0026286135038224856,
+        "delta": 0.0007777988138053527,
         "exceeded": false,
-        "obd": 6.917448678012281,
+        "obd": 365.9200592923161,
         "rel_se": null,
-        "sim": 6.899313050560479,
+        "sim": 365.635668303225,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": 2.764801491972335e-06,
+        "delta": 5.845352769329182e-05,
         "exceeded": false,
-        "obd": 214.87304121985102,
-        "rel_se": 3.187290900171994e-05,
-        "sim": 214.87244714018857,
+        "obd": 2925.3149733759456,
+        "rel_se": 3.909693037051813e-05,
+        "sim": 2925.1439883908133,
         "threshold": 0.002
       },
       "off_x_deg": 0.0,
       "off_y_deg": 2.0,
       "psf_cm": {
-        "delta": 0.0010331451864167285,
+        "delta": -0.005327819267160749,
         "exceeded": false,
-        "obd": 0.6010035042849078,
+        "obd": 8.537299748500768,
         "rel_se": null,
-        "sim": 0.6003832212498681,
+        "sim": 8.583028573505281,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 3.0,
       "eff_area": {
-        "delta": 0.0021381106587905485,
+        "delta": 0.0009203236622301603,
         "exceeded": false,
-        "obd": 6.6685934604842805,
+        "obd": 365.4438245305094,
         "rel_se": null,
-        "sim": 6.654365690274414,
+        "sim": 365.10780717630007,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": -1.3935442982782043e-05,
+        "delta": 3.6949759005144855e-05,
         "exceeded": false,
-        "obd": 214.94437018504232,
-        "rel_se": 1.9464760884464293e-05,
-        "sim": 214.94736557179954,
+        "obd": 2924.2641214296323,
+        "rel_se": 3.974679195608394e-05,
+        "sim": 2924.1560745673837,
         "threshold": 0.002
       },
       "off_x_deg": 0.0,
       "off_y_deg": 3.0,
       "psf_cm": {
-        "delta": 0.0004530511111100477,
+        "delta": -0.004472499704737287,
         "exceeded": false,
-        "obd": 0.5646965838339982,
+        "obd": 12.389216945405819,
         "rel_se": null,
-        "sim": 0.5644408632737361,
+        "sim": 12.444876652559884,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 4.0,
       "eff_area": {
-        "delta": 0.003122901783187526,
+        "delta": 0.0005633183968722921,
         "exceeded": false,
-        "obd": 6.257233310568876,
+        "obd": 364.6363104104201,
         "rel_se": null,
-        "sim": 6.237753419292682,
+        "sim": 364.431019712625,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": -2.4451443570772113e-05,
+        "delta": 8.567371982959315e-07,
         "exceeded": false,
-        "obd": 214.8888080203433,
-        "rel_se": 1.9869782522978343e-05,
-        "sim": 214.89406249038598,
+        "obd": 2922.8395085433895,
+        "rel_se": 4.155044305648955e-05,
+        "sim": 2922.837004440203,
         "threshold": 0.002
       },
       "off_x_deg": 0.0,
       "off_y_deg": 4.0,
       "psf_cm": {
-        "delta": 0.0003027793944705426,
+        "delta": -0.002959744236609718,
         "exceeded": false,
-        "obd": 0.6465804713386495,
+        "obd": 16.478952391461732,
         "rel_se": null,
-        "sim": 0.6463847593526177,
+        "sim": 16.527870661395227,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 1.0,
       "eff_area": {
-        "delta": 0.002682516700828863,
+        "delta": 4.462422186279902e-05,
         "exceeded": false,
-        "obd": 7.085958424663617,
+        "obd": 365.80985347182855,
         "rel_se": null,
-        "sim": 7.067001076251796,
+        "sim": 365.79353022018,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": 0.00010518566672135243,
+        "delta": 0.00012021255899496985,
         "exceeded": false,
-        "obd": 214.83103269605948,
-        "rel_se": 7.681923931248857e-05,
-        "sim": 214.80843792729874,
+        "obd": 2934.2045212723183,
+        "rel_se": 4.689101004070554e-05,
+        "sim": 2933.8518354354687,
         "threshold": 0.002
       },
       "off_x_deg": 1.0,
       "off_y_deg": 0.0,
       "psf_cm": {
-        "delta": 0.0005798150735245589,
+        "delta": -0.0019981136660089938,
         "exceeded": false,
-        "obd": 0.6734736027238173,
+        "obd": 5.339996623090148,
         "rel_se": null,
-        "sim": 0.673083338858209,
+        "sim": 5.35068790571711,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 2.0,
       "eff_area": {
-        "delta": 0.0029199490677054296,
+        "delta": 0.00011518265412147066,
         "exceeded": false,
-        "obd": 6.913922253576393,
+        "obd": 365.8727336697043,
         "rel_se": null,
-        "sim": 6.893792729921704,
+        "sim": 365.83059633066006,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": 5.359432036944334e-05,
+        "delta": 8.362641532255743e-05,
         "exceeded": false,
-        "obd": 214.96280705110277,
-        "rel_se": 3.181052877838553e-05,
-        "sim": 214.95128688296975,
+        "obd": 2933.0967082737347,
+        "rel_se": 4.2581459499907495e-05,
+        "sim": 2932.851444420764,
         "threshold": 0.002
       },
       "off_x_deg": 2.0,
       "off_y_deg": 0.0,
       "psf_cm": {
-        "delta": 0.0007329320917603965,
+        "delta": -0.0014070591573349667,
         "exceeded": false,
-        "obd": 0.6009384521168223,
+        "obd": 9.098341126838122,
         "rel_se": null,
-        "sim": 0.60049832762146,
+        "sim": 9.111161069454852,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 3.0,
       "eff_area": {
-        "delta": 0.0038503379507970337,
+        "delta": 0.0004782432580618945,
         "exceeded": false,
-        "obd": 6.666967672000505,
+        "obd": 365.77742052766104,
         "rel_se": null,
-        "sim": 6.641396052732396,
+        "sim": 365.602573561725,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": 4.185419031332849e-05,
+        "delta": 5.374570775340537e-05,
         "exceeded": false,
-        "obd": 215.1431683282327,
-        "rel_se": 1.982942032557134e-05,
-        "sim": 215.13416406198715,
+        "obd": 2932.530576288201,
+        "rel_se": 4.2792008425877915e-05,
+        "sim": 2932.3729738273255,
         "threshold": 0.002
       },
       "off_x_deg": 3.0,
       "off_y_deg": 0.0,
       "psf_cm": {
-        "delta": 0.0011507156115555528,
+        "delta": -0.0003789101080606816,
         "exceeded": false,
-        "obd": 0.5688420871820832,
+        "obd": 13.101250112875908,
         "rel_se": null,
-        "sim": 0.568188264076308,
+        "sim": 13.106216190668981,
         "threshold": 0.02
       }
     },
     {
       "angle_deg": 4.0,
       "eff_area": {
-        "delta": 0.003189384327488165,
+        "delta": 0.0007899417819061672,
         "exceeded": false,
-        "obd": 6.244482740972108,
+        "obd": 365.3286544838738,
         "rel_se": null,
-        "sim": 6.224630003594233,
+        "sim": 365.04029390363996,
         "threshold": 0.01
       },
       "eff_flen": {
-        "delta": 2.121568821644715e-05,
+        "delta": 5.327959087941814e-05,
         "exceeded": false,
-        "obd": 215.24499089974327,
-        "rel_se": 2.1275211161819884e-05,
-        "sim": 215.24042442600705,
+        "obd": 2932.299537720267,
+        "rel_se": 4.425650490077749e-05,
+        "sim": 2932.14331432408,
         "threshold": 0.002
       },
       "off_x_deg": 4.0,
       "off_y_deg": 0.0,
       "psf_cm": {
-        "delta": 0.00026661029928742863,
+        "delta": 0.0003938091678101774,
         "exceeded": false,
-        "obd": 0.6514084224499072,
+        "obd": 17.356814106419723,
         "rel_se": null,
-        "sim": 0.6512347965458937,
+        "sim": 17.349981524633986,
         "threshold": 0.02
       }
     }
@@ -297,22 +297,22 @@
   "summary": {
     "eff_area": {
       "exceeded_offsets": [],
-      "max_abs_delta": 0.0038503379507970337,
-      "signed_delta_at_max": 0.0038503379507970337
+      "max_abs_delta": 0.0009203236622301603,
+      "signed_delta_at_max": 0.0009203236622301603
     },
     "eff_flen": {
       "exceeded_offsets": [],
-      "max_abs_delta": 0.00010518566672135243,
-      "signed_delta_at_max": 0.00010518566672135243
+      "max_abs_delta": 0.0001827922759973788,
+      "signed_delta_at_max": 0.0001827922759973788
     },
     "psf_cm": {
       "exceeded_offsets": [],
-      "max_abs_delta": 0.0011507156115555528,
-      "signed_delta_at_max": 0.0011507156115555528
+      "max_abs_delta": 0.005327819267160749,
+      "signed_delta_at_max": -0.005327819267160749
     }
   },
   "versions": {
-    "gammasimtools": "0.39.1.dev101+g76e0d3b91.d20261113",
-    "obdeect": "0.8.1.dev30+gd2170362b.d20261114"
+    "gammasimtools": "0.39.1.dev119+g16998e0c2",
+    "obdeect": "0.8.1.dev52+g6721ba04b"
   }
 }

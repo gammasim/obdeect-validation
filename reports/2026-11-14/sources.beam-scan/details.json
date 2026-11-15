@@ -23,6 +23,6 @@
   "stage2": {
     "status": "BLOCKED",
     "reason": "no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per position, so the flat-field intensity cannot be matched between the two",
-    "traceback": "Traceback (most recent call last):\n  File \"/validation/src/obdeect_validation/adapters/source_camera.py\", line 819, in main\n    raise RuntimeError(stage2[\"blocked\"])\nRuntimeError: no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per position, so the flat-field intensity cannot be matched between the two\n"
+    "traceback": "Traceback (most recent call last):\n  File \"/validation/src/obdeect_validation/adapters/source_camera.py\", line 738, in main\n    raise RuntimeError(stage2[\"blocked\"])\nRuntimeError: no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per position, so the flat-field intensity cannot be matched between the two\n"
   }
 }
