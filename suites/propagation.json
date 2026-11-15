@@ -3,6 +3,10 @@
   "cases": [
     "../cases/propagation/extinction-analytic.json",
     "../cases/propagation/extinction-simtel-table.json",
-    "../cases/propagation/atmosphere-corsika.json"
+    "../cases/propagation/atmosphere-corsika.json",
+    "../cases/propagation/curvature-chapman.json",
+    "../cases/propagation/curvature-geometry.json",
+    "../cases/propagation/refraction-curved-ray.json",
+    "../cases/propagation/curvature-input-guards.json"
   ]
 }

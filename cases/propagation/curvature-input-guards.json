@@ -1,0 +1,16 @@
+{
+  "id": "propagation.curvature-input-guards",
+  "name": "Curvature mode rules of the atmosphere stage through the CLI and the Python API",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "guards",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.curvature_guards"]
+    }
+  ],
+  "metrics": [
+    {"metric": "guard_case_count", "expected": 13, "atol": 0},
+    {"metric": "guard_unexpected_outcome_count", "expected": 0, "atol": 0},
+    {"metric": "guard_message_mismatch_count", "expected": 0, "atol": 0}
+  ]
+}

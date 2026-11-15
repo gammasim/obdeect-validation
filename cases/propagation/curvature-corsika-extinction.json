@@ -1,0 +1,19 @@
+{
+  "id": "propagation.curvature-corsika-extinction",
+  "name": "Curved CORSIKA photons through the corsika stage vs the curved slant expectation (65 and 75 deg)",
+  "requires": ["obdeect"],
+  "timeout": 7200,
+  "commands": [
+    {
+      "name": "curved-showers-corsika-extinction",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.curvature_corsika_extinction"],
+      "timeout": 7200
+    }
+  ],
+  "metrics": [
+    {"metric": "file_count", "expected": 2, "atol": 0},
+    {"metric": "propagation_dropped_photons", "expected": 0, "atol": 0},
+    {"metric": "curved_transmission_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "predicted_ratio_monotonic_violations", "expected": 0, "atol": 0}
+  ]
+}

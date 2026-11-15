@@ -1,0 +1,13 @@
+{
+  "id": "propagation.curvature-chapman",
+  "name": "Spherical slant depth against the Chapman integral (exponential atmosphere)",
+  "requires": ["obdeect"],
+  "commands": [{"name": "curvature-chapman", "argv": ["{python}", "-m", "obdeect_validation.adapters.curvature_chapman"]}],
+  "metrics": [
+    {"metric": "sample_count", "expected": 30, "atol": 0},
+    {"metric": "max_transmission_relative_error_vs_reference", "expected": 0, "atol": 1e-5},
+    {"metric": "max_transmission_relative_error_vs_chapman", "expected": 0, "atol": 2.8e-3},
+    {"metric": "flat_limit_max_relative_error", "expected": 0, "atol": 1e-6},
+    {"metric": "curved_below_plane_violations", "expected": 0, "atol": 0}
+  ]
+}
