@@ -588,6 +588,7 @@ def _simtel(
     defines=("-DCTA_NORTH", "-DLST1"),
     altitude=2150,
     atmospheric_transmission=None,
+    runner=common.command,
 ):
     """sim_telarray with the options of simtools' light-emission step (released binary)."""
     return common.sim_telarray(
@@ -611,6 +612,7 @@ def _simtel(
         },
         config=common.REFERENCE / "cfg" / cfg,
         defines=(*defines, "-DNUM_TELESCOPES=1"),
+        runner=runner,
     )
 
 
