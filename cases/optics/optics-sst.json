@@ -1,6 +1,6 @@
 {
-  "id": "optics.sst-6.0.2",
-  "name": "Optics SSTS-01 (dual mirror) (model 6.0.2): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
+  "id": "optics.sst-7.0.0",
+  "name": "Optics SSTS-01 (dual mirror) (model 7.0.0): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
   "requires": ["simtools-validate-optics"],
   "commands": [{"name": "matched-backends", "timeout": 3600, "argv": ["{python}", "-m", "obdeect_validation.adapters.simtools_validate_optics", "--config", "/validation/fixtures/optics-inputs/optics-sst.json"]}],
   "metrics": [

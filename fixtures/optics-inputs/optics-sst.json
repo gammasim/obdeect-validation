@@ -4,7 +4,7 @@
     "configuration": {
       "site": "South",
       "telescope": "SSTS-01",
-      "model_version": "6.0.2",
+      "model_version": "7.0.0",
       "simulation_models_path": "/models",
       "zenith_angle": 20,
       "source_distance": 10,

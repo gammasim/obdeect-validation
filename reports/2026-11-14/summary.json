@@ -1,7 +1,7 @@
 {
   "cases": [
     {
-      "fingerprint": "36b7195ec8d885b85fbab4594afd3d0a895d0ac79d84cd6ffd1cd5883a22445e",
+      "fingerprint": "7ed07c0efc39e5501ff98f884cb641a90354b8083f10fd3ee96e1c2656c2b64e",
       "id": "stream.led-eventio",
       "metrics": [
         {
@@ -80,8 +80,8 @@
             "-m",
             "obdeect_validation.adapters.stream_eventio"
           ],
-          "cwd": "/results/full-2026-11-14/stream.led-eventio",
-          "duration_seconds": 0.367591,
+          "cwd": "/results/stream.led-eventio",
+          "duration_seconds": 0.471941,
           "name": "convert-and-read-eventio",
           "returncode": 0,
           "status": "PASS",
@@ -91,7 +91,7 @@
       ]
     },
     {
-      "fingerprint": "a4dc4a3b1a1ab9d12686206d705bf1dfd9e3bbed4b71cae4d1e02ae4bc7814d3",
+      "fingerprint": "de98c4af752510e02b8164df0d58711cfd415eb2094d28963a7a0130cf046c06",
       "id": "stream.corsika-roundtrip",
       "metrics": [
         {
@@ -207,8 +207,8 @@
             "--input",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "cwd": "/results/full-2026-11-14/stream.corsika-roundtrip",
-          "duration_seconds": 76.066538,
+          "cwd": "/results/stream.corsika-roundtrip",
+          "duration_seconds": 102.692261,
           "name": "roundtrip-and-variants",
           "returncode": 0,
           "status": "PASS",
@@ -218,7 +218,7 @@
       ]
     },
     {
-      "fingerprint": "67bf4d5ddfe178b688293a13c840cda9e2e10e728f98cf7cf8172b88d08127d6",
+      "fingerprint": "c36e1299cb466c00a90136fbfd607dad7404049274f330129b0af1fd0e0e031d",
       "id": "propagation.extinction-analytic",
       "metrics": [
         {
@@ -248,8 +248,8 @@
             "-m",
             "obdeect_validation.adapters.extinction_analytic"
           ],
-          "cwd": "/results/full-2026-11-14/propagation.extinction-analytic",
-          "duration_seconds": 0.16898,
+          "cwd": "/results/propagation.extinction-analytic",
+          "duration_seconds": 0.570632,
           "name": "beer-lambert",
           "returncode": 0,
           "status": "PASS",
@@ -259,7 +259,7 @@
       ]
     },
     {
-      "fingerprint": "79283c8aff3ab9d029a12b11a2122d661798aa2775659acf98bda78fc9ab7114",
+      "fingerprint": "53ae21cb3629646f31d2f5abd282864f505d1d15ab80852dfb838dca61162b04",
       "id": "propagation.extinction-simtel-table",
       "metrics": [
         {
@@ -345,8 +345,8 @@
             "-m",
             "obdeect_validation.adapters.extinction_reference"
           ],
-          "cwd": "/results/full-2026-11-14/propagation.extinction-simtel-table",
-          "duration_seconds": 0.268061,
+          "cwd": "/results/propagation.extinction-simtel-table",
+          "duration_seconds": 2.377278,
           "name": "table-interpolation-weighting-and-thinning",
           "returncode": 0,
           "status": "PASS",
@@ -356,7 +356,7 @@
       ]
     },
     {
-      "fingerprint": "d3cc293059f717248f75985798f31ef2b53a317bb2fa8b51126d11dd7bef0b71",
+      "fingerprint": "7305490640b26c4e4af6acb57b8168f436d7816d6b262c50c9c0915817e5220a",
       "id": "propagation.atmosphere-corsika",
       "metrics": [
         {
@@ -407,8 +407,8 @@
             "-m",
             "obdeect_validation.adapters.atmosphere_reference"
           ],
-          "cwd": "/results/full-2026-11-14/propagation.atmosphere-corsika",
-          "duration_seconds": 1.374018,
+          "cwd": "/results/propagation.atmosphere-corsika",
+          "duration_seconds": 1.625442,
           "name": "corsika-reference-and-obdeect",
           "returncode": 0,
           "status": "PASS",
@@ -418,7 +418,7 @@
       ]
     },
     {
-      "fingerprint": "bb5abbc73e1a0402bbfef8da2857c9e21949733fceca6033790430afd3e1e0a1",
+      "fingerprint": "4dba54adcbabcb65ccf557c8576d6cc1b676b75748f4988301ff25e246695f43",
       "id": "sources.led-reference",
       "metrics": [
         {
@@ -490,8 +490,8 @@
             "-m",
             "obdeect_validation.adapters.led_reference"
           ],
-          "cwd": "/results/full-2026-11-14/sources.led-reference",
-          "duration_seconds": 0.419282,
+          "cwd": "/results/sources.led-reference",
+          "duration_seconds": 0.368414,
           "name": "compare-led-reference",
           "returncode": 0,
           "status": "PASS",
@@ -501,7 +501,7 @@
       ]
     },
     {
-      "fingerprint": "cf38f4d66ce809bffb7ffe981dfec2edd3dcc23f49b883a7392054d706acbeb8",
+      "fingerprint": "ff5f580d8e4837d426229e4a6ffba442c46484b556c182e961545137e6606f27",
       "id": "sources.flasher-dish",
       "metrics": [
         {
@@ -616,8 +616,8 @@
             "obdeect_validation.adapters.source_camera",
             "flasher-dish"
           ],
-          "cwd": "/results/full-2026-11-14/sources.flasher-dish",
-          "duration_seconds": 4.695988,
+          "cwd": "/results/sources.flasher-dish",
+          "duration_seconds": 6.171599,
           "name": "compare-flasher-dish",
           "returncode": 0,
           "status": "PASS",
@@ -627,7 +627,7 @@
       ]
     },
     {
-      "fingerprint": "b93364f14b87640b455599d273b90f81dbeb237654c58e85208e742b47bf40e8",
+      "fingerprint": "32a5bb8c4ca5795f84fbd66d908fda1ffaf1bc51e8f63f73e4a6b23107c14c6e",
       "id": "sources.flasher-secondary",
       "metrics": [
         {
@@ -728,8 +728,8 @@
             "obdeect_validation.adapters.source_camera",
             "flasher-secondary"
           ],
-          "cwd": "/results/full-2026-11-14/sources.flasher-secondary",
-          "duration_seconds": 11.626069,
+          "cwd": "/results/sources.flasher-secondary",
+          "duration_seconds": 14.295252,
           "name": "compare-flasher-secondary",
           "returncode": 0,
           "status": "PASS",
@@ -739,7 +739,7 @@
       ]
     },
     {
-      "fingerprint": "c73046a7839c6aaaa8b59483f0fd227b6d446271b99772f051a061a1b1e01a09",
+      "fingerprint": "99b735555af315fdd1514e6cd35339f4e730b97210517856434eec4101c2273c",
       "id": "sources.point-source",
       "metrics": [
         {
@@ -854,8 +854,8 @@
             "obdeect_validation.adapters.source_camera",
             "point-source"
           ],
-          "cwd": "/results/full-2026-11-14/sources.point-source",
-          "duration_seconds": 2.431687,
+          "cwd": "/results/sources.point-source",
+          "duration_seconds": 2.731193,
           "name": "compare-point-source",
           "returncode": 0,
           "status": "PASS",
@@ -865,7 +865,7 @@
       ]
     },
     {
-      "fingerprint": "bed609d2898186031e88302b1f553a3b0c9e02188a0568d836bc65a8b26ea484",
+      "fingerprint": "a22dbcfb223a68764c5aada673a89238ebec1cec230515fa78a7004c91e8fa98",
       "id": "sources.beam-scan",
       "metrics": [
         {
@@ -966,8 +966,8 @@
             "obdeect_validation.adapters.source_camera",
             "beam-scan"
           ],
-          "cwd": "/results/full-2026-11-14/sources.beam-scan",
-          "duration_seconds": 1.074022,
+          "cwd": "/results/sources.beam-scan",
+          "duration_seconds": 1.273381,
           "name": "compare-beam-scan",
           "returncode": 0,
           "status": "PASS",
@@ -977,7 +977,7 @@
       ]
     },
     {
-      "fingerprint": "f8a935baf6137d052433c1de264738c460fa5e363e8c70e0b815b766e10e53f4",
+      "fingerprint": "f48704aabcb585f65e945adf89e57212311c0df3a75f65548ac20969ab2c5bf5",
       "id": "sources.laser-beam",
       "metrics": [
         {
@@ -1036,8 +1036,8 @@
             "obdeect_validation.adapters.source_comparison",
             "laser-beam"
           ],
-          "cwd": "/results/full-2026-11-14/sources.laser-beam",
-          "duration_seconds": 0.723457,
+          "cwd": "/results/sources.laser-beam",
+          "duration_seconds": 0.769344,
           "name": "compare-laser-beam",
           "returncode": 0,
           "status": "PASS",
@@ -1047,7 +1047,7 @@
       ]
     },
     {
-      "fingerprint": "fdbc57dba3de32db568665da2b42c788b19be3a4077beb4f0aa5b3c44b682e61",
+      "fingerprint": "9c9e21ac91a3a0069163882584e32a7662e09cc8cb1d1bf8c5e61612b913a083",
       "id": "sources.night-sky",
       "metrics": [
         {
@@ -1133,20 +1133,13 @@
           "expected": 0,
           "metric": "time_native_vs_pulse_ks_limit_exceeded",
           "status": "PASS"
-        },
-        {
-          "actual": 1,
-          "atol": 0,
-          "expected": 0,
-          "metric": "camera_pe_ratio_limit_exceeded",
-          "status": "FAIL"
         }
       ],
       "missing": [],
       "missing_inputs": [],
       "missing_modules": [],
       "name": "Night sky versus nsbls: yield, rate, direction, projected area, time, camera p.e.",
-      "status": "FAIL",
+      "status": "PASS",
       "steps": [
         {
           "argv": [
@@ -1155,8 +1148,8 @@
             "obdeect_validation.adapters.source_comparison",
             "night-sky"
           ],
-          "cwd": "/results/full-2026-11-14/sources.night-sky",
-          "duration_seconds": 14.937703,
+          "cwd": "/results/sources.night-sky",
+          "duration_seconds": 16.897374,
           "name": "compare-night-sky",
           "returncode": 0,
           "status": "PASS",
@@ -1166,7 +1159,7 @@
       ]
     },
     {
-      "fingerprint": "cda3e9ee70e22ba64bac65f231213bd84ae4d13ccfae6cd6e6721b1b5f7b2673",
+      "fingerprint": "daa2c4ff26f0278e583e590287ef6e2b0f6bc68a81048188adbabf54481dac12",
       "id": "sources.muon-track",
       "metrics": [
         {
@@ -1309,8 +1302,8 @@
             "obdeect_validation.adapters.source_comparison",
             "muon-track"
           ],
-          "cwd": "/results/full-2026-11-14/sources.muon-track",
-          "duration_seconds": 4.894794,
+          "cwd": "/results/sources.muon-track",
+          "duration_seconds": 5.194035,
           "name": "compare-muon-track",
           "returncode": 0,
           "status": "PASS",
@@ -1320,8 +1313,8 @@
       ]
     },
     {
-      "fingerprint": "b662021231c496931e9bbd4a204c6a451ddcb0d4d68381b2507a2ee11d2e25cc",
-      "id": "optics.lst-6.0.2",
+      "fingerprint": "b07372ebca64ee15a1838845cab1b5978fa75a816a9ceb37769108d6848e9739",
+      "id": "optics.lst-7.0.0",
       "metrics": [
         {
           "actual": 9,
@@ -1362,7 +1355,7 @@
       "missing": [],
       "missing_inputs": [],
       "missing_modules": [],
-      "name": "Optics LSTN-01 (model 6.0.2): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
+      "name": "Optics LSTN-01 (model 7.0.0): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
       "status": "PASS",
       "steps": [
         {
@@ -1373,19 +1366,19 @@
             "--config",
             "/validation/fixtures/optics-inputs/optics-lst.json"
           ],
-          "cwd": "/results/full-2026-11-14/optics.lst-6.0.2",
-          "duration_seconds": 166.914871,
+          "cwd": "/results/optics.lst-7.0.0",
+          "duration_seconds": 175.995816,
           "name": "matched-backends",
           "returncode": 0,
           "status": "PASS",
-          "stderr_log": "optics.lst-6.0.2/01-matched-backends.stderr.log",
-          "stdout_log": "optics.lst-6.0.2/01-matched-backends.stdout.log"
+          "stderr_log": "optics.lst-7.0.0/01-matched-backends.stderr.log",
+          "stdout_log": "optics.lst-7.0.0/01-matched-backends.stdout.log"
         }
       ]
     },
     {
-      "fingerprint": "fc8deb48d3db0f7242f4126dcc65032a24bd0bf3e059e031244e94c1b9dab09f",
-      "id": "optics.mst-6.0.2",
+      "fingerprint": "770048bda217ac2e10676633874dac0c5f694c10468010a36e81c873c225361b",
+      "id": "optics.mst-7.0.0",
       "metrics": [
         {
           "actual": 9,
@@ -1426,7 +1419,7 @@
       "missing": [],
       "missing_inputs": [],
       "missing_modules": [],
-      "name": "Optics MSTN-01 (model 6.0.2): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
+      "name": "Optics MSTN-01 (model 7.0.0): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
       "status": "PASS",
       "steps": [
         {
@@ -1437,19 +1430,19 @@
             "--config",
             "/validation/fixtures/optics-inputs/optics-mst.json"
           ],
-          "cwd": "/results/full-2026-11-14/optics.mst-6.0.2",
-          "duration_seconds": 144.381479,
+          "cwd": "/results/optics.mst-7.0.0",
+          "duration_seconds": 186.832423,
           "name": "matched-backends",
           "returncode": 0,
           "status": "PASS",
-          "stderr_log": "optics.mst-6.0.2/01-matched-backends.stderr.log",
-          "stdout_log": "optics.mst-6.0.2/01-matched-backends.stdout.log"
+          "stderr_log": "optics.mst-7.0.0/01-matched-backends.stderr.log",
+          "stdout_log": "optics.mst-7.0.0/01-matched-backends.stdout.log"
         }
       ]
     },
     {
-      "fingerprint": "dd3ccf703b1cb53b22e97740aa9de7b49a8104a047250d5f1ddac45a36d8857d",
-      "id": "optics.sst-6.0.2",
+      "fingerprint": "ae8378b1406ad9e0bbdc6b0e9b357984f9ddd2353955b41f22726f845c44edd5",
+      "id": "optics.sst-7.0.0",
       "metrics": [
         {
           "actual": 9,
@@ -1490,7 +1483,7 @@
       "missing": [],
       "missing_inputs": [],
       "missing_modules": [],
-      "name": "Optics SSTS-01 (dual mirror) (model 6.0.2): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
+      "name": "Optics SSTS-01 (dual mirror) (model 7.0.0): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
       "status": "PASS",
       "steps": [
         {
@@ -1501,18 +1494,18 @@
             "--config",
             "/validation/fixtures/optics-inputs/optics-sst.json"
           ],
-          "cwd": "/results/full-2026-11-14/optics.sst-6.0.2",
-          "duration_seconds": 126.401678,
+          "cwd": "/results/optics.sst-7.0.0",
+          "duration_seconds": 194.250568,
           "name": "matched-backends",
           "returncode": 0,
           "status": "PASS",
-          "stderr_log": "optics.sst-6.0.2/01-matched-backends.stderr.log",
-          "stdout_log": "optics.sst-6.0.2/01-matched-backends.stdout.log"
+          "stderr_log": "optics.sst-7.0.0/01-matched-backends.stderr.log",
+          "stdout_log": "optics.sst-7.0.0/01-matched-backends.stdout.log"
         }
       ]
     },
     {
-      "fingerprint": "84c1fa7b73d629c51c14abae7e491bac91a529b10ae817be4a75df08532be7d0",
+      "fingerprint": "311bb7614a29d60f7c45912c6cb6915212164830bc8de0c1da52d1666cbcf4eb",
       "id": "chain.stream-roundtrip-threshold",
       "metrics": [
         {
@@ -1572,8 +1565,8 @@
             "--input",
             "/validation/inputs/gamma-20deg-20-100GeV.iact"
           ],
-          "cwd": "/results/full-2026-11-14/chain.stream-roundtrip-threshold",
-          "duration_seconds": 15.281146,
+          "cwd": "/results/chain.stream-roundtrip-threshold",
+          "duration_seconds": 19.953776,
           "name": "roundtrip-and-camera-threshold",
           "returncode": 0,
           "status": "PASS",
@@ -1583,7 +1576,7 @@
       ]
     },
     {
-      "fingerprint": "d31802ced059239fa0e976a3f501508aee86e71d6818653171f53529d67b0f3b",
+      "fingerprint": "90deb55ce13c0cb242807dd6a71730226f8992fd40059a819947744d7cedc3ba",
       "id": "chain.atmosphere-substitution",
       "metrics": [
         {
@@ -1685,8 +1678,8 @@
             "--showers",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "cwd": "/results/full-2026-11-14/chain.atmosphere-substitution",
-          "duration_seconds": 24.480038,
+          "cwd": "/results/chain.atmosphere-substitution",
+          "duration_seconds": 39.510372,
           "name": "zenith-20-substitution",
           "returncode": 0,
           "status": "PASS",
@@ -1696,7 +1689,7 @@
       ]
     },
     {
-      "fingerprint": "0017408160fe4549dd67bb713bf356be5cb71eb85725278489b1d7effb42d8de",
+      "fingerprint": "ddef4179f0c7aebaf171b59b3fefc94dfaa46e6c3188fe85285926780d7917d0",
       "id": "chain.optics-bypass1",
       "metrics": [
         {
@@ -1762,8 +1755,8 @@
             "--output_path",
             "cfg"
           ],
-          "cwd": "/results/full-2026-11-14/chain.optics-bypass1",
-          "duration_seconds": 3.436454,
+          "cwd": "/results/chain.optics-bypass1",
+          "duration_seconds": 8.480274,
           "name": "generate-sim_telarray-config",
           "returncode": 0,
           "status": "PASS",
@@ -1778,8 +1771,8 @@
             "--config",
             "cfg/model/7.0.0/CTAO.cfg"
           ],
-          "cwd": "/results/full-2026-11-14/chain.optics-bypass1",
-          "duration_seconds": 12.272246,
+          "cwd": "/results/chain.optics-bypass1",
+          "duration_seconds": 24.373617,
           "name": "chain-optics-bypass1",
           "returncode": 0,
           "status": "PASS",
@@ -1908,7 +1901,7 @@
           "../../../bin/simtools-write-reduced-event-lists": "be278ed521b228c89c31b9663a1913f022466cf811ba4c0686f892f67b063cc2",
           "../../../bin/simtools-write-trigger-histograms": "331ae106422d2c5e6be342d28224abac3d9c42b475ad6e9beb658a505c63ec61"
         },
-        "version": "0.39.1.dev101+g76e0d3b91.d20261113"
+        "version": "0.39.1.dev119+g16998e0c2"
       },
       "numpy": {
         "native_sha256": {
@@ -1939,56 +1932,50 @@
       },
       "obdeect": {
         "native_sha256": {},
-        "version": "0.8.1.dev30+gd2170362b.d20261114"
+        "version": "0.8.1.dev52+g6721ba04b"
       },
       "obdeect-propagation": {
         "native_sha256": {
-          "obdeect/propagation/_core.cpython-314-aarch64-linux-gnu.so": "6037c0195d7eace3e57fabee5bf76fe14d6b17f47c0e16cd1cf9a21c8d833b11",
-          "obdeect/propagation/bin/obdeect-propagation-run": "8f4ab8551fd55a4d6d59a15785c4f2efc36ea0a97867a420f84a13d56ac54306"
+          "obdeect/propagation/_core.cpython-314-aarch64-linux-gnu.so": "1f251a27da072298cc6dee49b838c923025e9f9ae752d69a531cc46ff344f0d2",
+          "obdeect/propagation/bin/obdeect-propagation-run": "2c13edbe8b1671d55d3a6cb4b9ee4f08b8a1554e733b028d8da60898c1b85da7"
         },
-        "version": "0.8.1.dev27+g7544a7978"
+        "version": "0.8.1.dev52+g6721ba04b"
       },
       "obdeect-ray-tracing": {
         "native_sha256": {
           "obdeect/ray_tracing/_core.cpython-314-aarch64-linux-gnu.so": "5f7b28d773a78f82bedce14fe3db88d352024299d83bd949373535f5195c7873"
         },
-        "version": "0.8.1.dev27+g7544a7978"
+        "version": "0.8.1.dev52+g6721ba04b"
       },
       "obdeect-sources": {
         "native_sha256": {
           "obdeect/sources/_core.cpython-314-aarch64-linux-gnu.so": "58a856e64068f0245c3d0fe9583cf3e501dfff2c73db7ac4b3e6f024bf4fea73",
-          "obdeect/sources/bin/obdeect-sources-beam-scan": "e2ec85cb9012c9d4fecb4977512d90d6556cd434fa5f05d45db42d143322c27e",
-          "obdeect/sources/bin/obdeect-sources-flasher": "3a180733bf11bd564c2e7711bdb107707614216e7f6a0287d64a28df30d806e7",
-          "obdeect/sources/bin/obdeect-sources-laser-beam": "6c7a4c0a66cbcea4e2a51c991e36a69a10b571c5f47ae492e4f796f9713f37dd",
-          "obdeect/sources/bin/obdeect-sources-led": "d2a803646a25c6e934b4d0268d37b21a58ad5c2df98072e412abaf1679bbdb3b",
-          "obdeect/sources/bin/obdeect-sources-muon-track": "d84f99769c3247ee2a6f86f79bb1f0474db0d70596c13404010f1d85f095b3b7",
-          "obdeect/sources/bin/obdeect-sources-night-sky": "668cb6a11589527bbe62516e9505b677bbf824b7ded516e67c24b97a9807b8f1",
-          "obdeect/sources/bin/obdeect-sources-point-source": "8043236c8ce817f582693d22ad6a776b488e3b4418eddc75e044ad62870b4593"
+          "obdeect/sources/bin/obdeect-sources-beam-scan": "00c74fe8dc4270dacac2e85f4806bbef0a797a4fa6ea3236b84104bb7399ba31",
+          "obdeect/sources/bin/obdeect-sources-flasher": "271f96d23343855e782d28880decd6fe8a49a79276361e38db1afb0dfff066b7",
+          "obdeect/sources/bin/obdeect-sources-laser-beam": "551d37741da3437de9600709cb3bc708fadf29c1f50cf9e29fe6af1d3983d599",
+          "obdeect/sources/bin/obdeect-sources-led": "fd1b4a8931f7da911eaf892bd12a4303f40e54af5fbf1365d09839d7b2e3eef6",
+          "obdeect/sources/bin/obdeect-sources-muon-track": "fe5b5d63749e1c49cbdd2609f343f141da33935850a80d0159891e5ae1aacee1",
+          "obdeect/sources/bin/obdeect-sources-night-sky": "24ada760180ffb6ab21f15c2da99e19d475e269acc393fe4f93da51da979b7b9",
+          "obdeect/sources/bin/obdeect-sources-point-source": "d8696b96c268c04cfb6b6741fb10f8ddd4393e9c835e676daed895813ff0edba"
         },
-        "version": "0.8.1.dev31+g320a6e74b.d20261114"
+        "version": "0.8.1.dev52+g6721ba04b"
       },
       "obdeect-stream": {
         "native_sha256": {
           "../../../bin/obdeect": "100a3c873ae6bb87c2ea419e986ef4b15b523d203a2794beac08f43cf5a9fa61",
-          "obdeect/stream/_core.cpython-314-aarch64-linux-gnu.so": "a5d639b30a82d5f4465f67f892ce3bd02b99e33f273e7a4ef13883f560bc56e6",
+          "obdeect/stream/_core.cpython-314-aarch64-linux-gnu.so": "506f26146e43e1f599fde2a9bb53e2dea85f4a318f1c1ac49ca0aa1a75e6d8f9",
           "obdeect/stream/bin/obdeect-stream-cat": "610772094005c7b732f9e52e7ed5bdd7e78734e12e31fc5ccabb7cd6f793b7fa",
-          "obdeect/stream/bin/obdeect-stream-from-corsika": "da49305da60b35a633a6e35990a2b1a46c1fcaf2b9736d4d396c72801be4c838",
+          "obdeect/stream/bin/obdeect-stream-from-corsika": "633982b59711a3c47aedaabde35287ff7de174afc0a93940c2188e500446eec5",
           "obdeect/stream/bin/obdeect-stream-tee": "49ed72ca5446c1c76d8ed0d9498d169c5a9d527853e39c9062d2b327a3b9e936",
           "obdeect/stream/bin/obdeect-stream-to-grisu": "29469eb638016cbcd320ac31a5d6e4071777a49eb4ff523a6219c5f3a30bbbab",
-          "obdeect/stream/bin/obdeect-stream-to-simtel": "a8f8527df317d9181effbb7211d769f60faaffb3c08873e3ac849773a5780858",
+          "obdeect/stream/bin/obdeect-stream-to-simtel": "59f9fadde500f2478773b413854db1a213e016f70054a70f2d5ca1150c7e9b1e",
           "obdeect/stream/lib/libobdeect_stream_c.so": "e057bc3b92db8c38c2880590261e8525bb4831a959b10f29061c86bd23f48aa7"
         },
-        "version": "0.8.1.dev31+g320a6e74b.d20261114"
+        "version": "0.8.1.dev52+g6721ba04b"
       }
     },
-    "environment_sha256": "aa1cb97cb195ee79a4ff75affc67cdfd3436460467d88a42327757d3fd44f1e1",
+    "environment_sha256": "30098b1f5a320415caedbb77a1b084179f9871b415cd4ad412f9a74b4cc192ad",
     "git": [
-      {
-        "diff_sha256": "7e6d1413327dbac668ec57d3557c5fbea6bcc883be2425a5bd83800556329c50",
-        "dirty": true,
-        "head": "320a6e74b526888347b69084803ec97d802a635d",
-        "path": "/candidate"
-      },
       {
         "diff_sha256": null,
         "dirty": false,
@@ -2002,9 +1989,9 @@
         "path": "/reference"
       },
       {
-        "diff_sha256": "15ab107df5ca2c6e5ec44a5718e5a14513aeeace67fc29058ff4644465572dc5",
+        "diff_sha256": "6f74b1d59a440dda9b60cb52ddeef75b7987021efebf9d9959d053a9e95c9be6",
         "dirty": true,
-        "head": "3776909c0b36e744e9c3a55ba2d52dc103457f51",
+        "head": "9073762a9f965d84a87c0da46bbf8aa74613ff0b",
         "path": "/validation"
       }
     ],
@@ -2014,9 +2001,9 @@
       "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat": "aff66f2c48d3c36d3e1bfe5a11761a04b957305ad7114f9e527701b4e16d8fa7",
       "/reference/cfg/common/atm_trans_2158_1_10_0_0_0.dat": "576041fbdf1f9b3907e2d42b04e08b438e22348ae06a3c46ba0464b5b73abce6",
       "/reference/cfg/common/atmprof1.dat": "f9f76f2455b499f738e5c42f40ff1d88f33964e6106f318fe3970ac366d71aa3",
-      "/validation/fixtures/optics-inputs/optics-lst.json": "41f88ad46fabb6c3ff7c3c6148c973ab398c8cf2b956892d2c14868350976e1a",
-      "/validation/fixtures/optics-inputs/optics-mst.json": "b78eeaaa3471bb6fa7361a93260fe8b32f8c05daad68ed5f930d9cacfdec2a0d",
-      "/validation/fixtures/optics-inputs/optics-sst.json": "0995941d4343b259ad73a744ef7f67e94843da84721566d330b4f823a6584b13",
+      "/validation/fixtures/optics-inputs/optics-lst.json": "f07371a0917c32fefcadd4d4507c087120e4182d5d73be7d9282b5f04aca1bac",
+      "/validation/fixtures/optics-inputs/optics-mst.json": "fef76ca707d740e0d29e999e042815f2d65149f4c31309b6e1cbcf42e67b42c7",
+      "/validation/fixtures/optics-inputs/optics-sst.json": "0b358d61109dc683726178a24ebc963775e5c8a47fe0e98288982f5b34619bcc",
       "/validation/fixtures/unit-transmission.dat": "14ec8979c4135deb2daf5ec3601f2574241b0f282f0cde3b5b5d5501d1f4a17f",
       "/validation/inputs/gamma-20deg-100-3000GeV.iact": "c6ade29bc6e7d0741e976a242cea3083aa253a659c2642ccf9941fc6e310883c",
       "/validation/inputs/gamma-20deg-20-100GeV.iact": "a95cbc538d5af51ce2d04afea4d258e3db3d08f6d6f85f32a0ab6dbbe2426acd",
@@ -2034,15 +2021,27 @@
       "__init__.py": "1ad1a13da439720fd1e585c8fc7b3ee39874976e6b299ce132cca957a0ecb773",
       "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
       "adapters/__init__.py": "feebfee705740b8605ef8e1e407f0a91dc10df47d8b8dae503cd1dd525a8d350",
+      "adapters/atmosphere_chain.py": "0e24080dd2321e2f1b5d9a14edefa295ece02c6557aaf3135b948f8a6907c2f6",
+      "adapters/atmosphere_reference.py": "07a7432a1b6b9f7df98eef8b1c750ecc3aa384e360a2e4e12321915d3c625a15",
+      "adapters/chain_optics.py": "7b3fe13169d0cb019d7ae0309c00a6fa9af2b3a8be43b26f43df189e7ab60375",
+      "adapters/chain_showers.py": "3a197325a1f2619c4ec33c95ece967695b1ba58bd48d7af7b276cc3108583004",
+      "adapters/common.py": "aab360248c7f2a639c3044ef6fe9735158bcaf1334255f77db58136229db1b79",
       "adapters/compare-led-camera.txt": "b658af7886389a66f8be55034dad07030041fa02de0ba07c8d96c7c62c3f0280",
-      "adapters/extinction_analytic.py": "296bab7a210198efd32e7b13c81aa64b5c230acee95b8282e1d4219a794f9ced",
-      "adapters/led_reference.py": "4f1587c06653f897b14f37f9b99e3d83db9a50b37227ecf84cd9fa245f6eed4d",
-      "adapters/simtools_validate_optics.py": "52fa72b3f155520a7c01d0ccba798c5ed8c9ec3dc3ec22ef8a923bb0c57a45f3",
-      "adapters/stream_eventio.py": "a3448296dd60e0917ad795fbef9faecdd8d030cef88d37afee89da151b522aaa",
-      "cli.py": "1bae1e9ba4ceec56f24a4de473ea9ba3668a309764ac07e42c650051565a66bd",
-      "runner.py": "0c46e617c1dfa00dc072553c13fb9b1d4225c2f6e34eae8b23640a560a2654d3"
+      "adapters/extinction_analytic.py": "c0e1751955fe3ec4f7f3b67e14839ba2208a28d12c66e9526faa98920d6e7071",
+      "adapters/extinction_reference.py": "997bf7ab82c2463f62f7c7262d0bd916e7ef759f07060f178dcb0b366986f449",
+      "adapters/led_reference.py": "6711e065de4b0d895dea2e21b326719071a3959672dbea655227a3936e2beacf",
+      "adapters/performance.py": "276bf2915a5479d8834ff13b54cacf9c8e3dae155341803634c1caba8ecd9e27",
+      "adapters/plotting.py": "a3dda74404388f02142c61cffb707d6f80dd9fb451f4db58d19dd4100a319f99",
+      "adapters/readers.py": "801a8bd292d46b6bfea648328b5b6a8333e72910aaca24640195a46f43acb086",
+      "adapters/simtools_validate_optics.py": "e418c5178a641e114e3c1892fa5bdd65f5c314b08dd39057b4bedbd00fc6cf68",
+      "adapters/source_camera.py": "0ea993ed25862b65c2a865e68daed25264c4acab247fb8c188583bcf4fff9c17",
+      "adapters/source_comparison.py": "e40825f192eacc0d0302bc08c1918e1050c58296beb1cdfc9cfc661eb44a8dbf",
+      "adapters/stream_chain.py": "d5c2d834a83536f8f7cefd3f84a41d5af34f3d695ae41c2c0070796b97d2b949",
+      "adapters/stream_eventio.py": "911be9024b1f35b98a88800aedd229b9e6272e1a259764d10e22f577e18edc6b",
+      "cli.py": "a9d419ee5f54685312811e50ab5bbac8d96ac312cbe40fda8357bb80806564c8",
+      "runner.py": "3ee3ae95f7d61cc3f4022ac45c624a195dfff0ecc7088c09de1acb525f5682d0"
     }
   },
-  "status": "FAIL",
+  "status": "PASS",
   "suite": "full"
 }

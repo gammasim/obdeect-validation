@@ -1,11 +1,11 @@
 {
   "backends": {
     "obdeect": {
-      "dir": "/results/full-2026-11-14/optics.mst-6.0.2/obdeect",
+      "dir": "/results/optics.mst-7.0.0/obdeect",
       "returncode": 0
     },
     "sim_telarray": {
-      "dir": "/results/full-2026-11-14/optics.mst-6.0.2/sim_telarray",
+      "dir": "/results/optics.mst-7.0.0/sim_telarray",
       "returncode": 0
     }
   },
@@ -13,7 +13,7 @@
     "instrument_seed": 11,
     "max_offset": 4,
     "max_workers": 2,
-    "model_version": "6.0.2",
+    "model_version": "7.0.0",
     "offset_directions": "N,E",
     "offset_step": 1,
     "simulation_models_path": "/models",
@@ -312,7 +312,7 @@
     }
   },
   "versions": {
-    "gammasimtools": "0.39.1.dev101+g76e0d3b91.d20261113",
-    "obdeect": "0.8.1.dev30+gd2170362b.d20261114"
+    "gammasimtools": "0.39.1.dev119+g16998e0c2",
+    "obdeect": "0.8.1.dev52+g6721ba04b"
   }
 }
