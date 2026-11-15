@@ -3,7 +3,6 @@
 import numpy as np
 import pytest
 
-pytest.importorskip("obdeect.stream")
 summarize_iact = pytest.importorskip("obdeect_validation.adapters.summarize_iact")
 
 
