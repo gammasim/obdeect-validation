@@ -7,6 +7,7 @@ import re
 import statistics
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -21,25 +22,88 @@ TRANSMISSION = common.TRANSMISSION_TABLE
 RUSAGE = []
 
 
+PROC_VMHWM = re.compile(r"^VmHWM:\s+(\d+)\s+kB", re.MULTILINE)
+
+
+def parse_vmhwm_kb(text):
+    """Peak resident set [kB] from the text of /proc/<pid>/status, or None when absent."""
+    match = PROC_VMHWM.search(text)
+    return int(match[1]) if match else None
+
+
+def read_vmhwm_kb(pid):
+    try:
+        return parse_vmhwm_kb(Path(f"/proc/{pid}/status").read_text())
+    except OSError:  # the child has exited, or there is no /proc
+        return None
+
+
+class RssSampler:
+    """Peak RSS of one running child, sampled from /proc until stop() (Linux only).
+
+    wait4 ru_maxrss is not used on Linux: exec keeps the high-water mark of the forked parent,
+    so every child of a large Python process reports the parent's peak (identical values for all
+    stages). The sampled VmHWM is the child's own peak, a lower bound at the sampling interval.
+    """
+
+    def __init__(self, pid, read=None, interval=0.002):
+        self.read = read or (lambda: read_vmhwm_kb(pid))
+        self.interval = interval
+        self.peak_kb = None
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+
+    def _run(self):
+        while True:
+            kb = self.read()
+            if kb is not None and (self.peak_kb is None or kb > self.peak_kb):
+                self.peak_kb = kb
+            if self._stop.wait(self.interval):
+                return
+
+    def start(self):
+        self._thread.start()
+
+    def stop(self):
+        """Stop sampling and return the peak [kB], or None when no sample was taken."""
+        self._stop.set()
+        self._thread.join()
+        return self.peak_kb
+
+
 def run_timed(argv, log, cwd=None, stdout_file=None):
-    """Run one child and keep its own wall time, CPU time and peak RSS (wait4 rusage)."""
+    """Run one child and keep its own wall time, CPU time and peak RSS.
+
+    Peak RSS: sampled VmHWM on Linux, wait4 ru_maxrss elsewhere (see RssSampler). The record
+    keeps the raw ru_maxrss as rusage_maxrss_mb for comparison.
+    """
     argv = list(map(str, argv))
     with (
         Path(log).open("wb") as log_stream,
-        (
-            Path(stdout_file).open("wb") if stdout_file else open(os.devnull, "wb")
-        ) as output,
+        Path(stdout_file).open("wb") if stdout_file else log_stream as output,
     ):
         start = time.perf_counter()
         process = subprocess.Popen(argv, cwd=cwd, stdout=output, stderr=log_stream)
+        sampler = RssSampler(process.pid) if sys.platform.startswith("linux") else None
+        if sampler:
+            sampler.start()
         _, status, usage = os.wait4(process.pid, 0)
         wall = time.perf_counter() - start
+        sampled_kb = sampler.stop() if sampler else None
     process.returncode = os.waitstatus_to_exitcode(status)
     rss_divisor = 1024 * 1024 if sys.platform == "darwin" else 1024
+    rusage_mb = usage.ru_maxrss / rss_divisor
+    if sampled_kb is not None:
+        peak_mb, source = sampled_kb / 1024, "proc-VmHWM-sampled"
+    else:
+        peak_mb, source = rusage_mb, "wait4-ru_maxrss"
     record = {
+        "argv": argv,
         "wall_s": wall,
         "cpu_s": usage.ru_utime + usage.ru_stime,
-        "peak_rss_mb": usage.ru_maxrss / rss_divisor,
+        "peak_rss_mb": peak_mb,
+        "peak_rss_source": source,
+        "rusage_maxrss_mb": rusage_mb,
         "returncode": process.returncode,
     }
     RUSAGE.append(record)

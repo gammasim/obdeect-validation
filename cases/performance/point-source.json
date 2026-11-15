@@ -1,0 +1,16 @@
+{
+  "id": "performance.point-source",
+  "name": "point-source: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (report only)",
+  "requires": ["obdeect", "python3"],
+  "commands": [
+    {
+      "name": "measure-point-source",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.performance_chain", "point-source"],
+      "timeout": 7200
+    }
+  ],
+  "metrics": [
+    {"metric": "reference_completed", "expected": 1, "atol": 0},
+    {"metric": "candidate_threads1_completed", "expected": 1, "atol": 0}
+  ]
+}

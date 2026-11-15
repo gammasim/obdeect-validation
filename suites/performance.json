@@ -1,6 +1,9 @@
 {
   "id": "performance",
   "cases": [
-    "../cases/performance/stages.json"
+    "../cases/performance/stages.json",
+    "../cases/performance/air-shower.json",
+    "../cases/performance/flasher-dish.json",
+    "../cases/performance/point-source.json"
   ]
 }

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -92,7 +93,7 @@ def run_tool(argv, log) -> str:
     return Path(log).read_text(encoding="utf-8", errors="replace")
 
 
-def sim_telarray(
+def sim_telarray_argv(
     root: Path,
     input_file,
     name: str,
@@ -100,16 +101,13 @@ def sim_telarray(
     config: str | Path | None = None,
     defines=("-DCTA_NORTH", "-DLST1"),
     extra=(),
-    runner=command,
-) -> Path:
-    """Run the released sim_telarray on input_file and return <root>/<name>.simtel.
+    binary: str | None = None,
+):
+    """argv and output path of sim_telarray on input_file (input_file "-" reads standard input).
 
-    options become -C key=value; extra holds further sim_telarray arguments. The
-    command line is kept in <name>.command.json.
+    options become -C key=value; extra holds further sim_telarray arguments.
     """
     output = root / f"{name}.simtel"
-    output.unlink(missing_ok=True)
-    (root / f"{name}.hdata").unlink(missing_ok=True)
     options = {
         "histogram_file": root / f"{name}.hdata",
         "output_file": output,
@@ -119,7 +117,7 @@ def sim_telarray(
         **options,
     }
     argv = [
-        SIMTEL_BINARY,
+        binary or SIMTEL_BINARY,
         "-c",
         config or REFERENCE / "cfg/CTA/CTA-PROD6-LST.cfg",
         f"-I{REFERENCE / 'cfg/common'}",
@@ -131,7 +129,30 @@ def sim_telarray(
     for key, value in options.items():
         argv += ["-C", f"{key}={value}"]
     argv += [*extra, input_file]
-    argv = [str(arg) for arg in argv]
+    return [str(arg) for arg in argv], output
+
+
+def sim_telarray(
+    root: Path,
+    input_file,
+    name: str,
+    options: dict[str, Any],
+    config: str | Path | None = None,
+    defines=("-DCTA_NORTH", "-DLST1"),
+    extra=(),
+    runner=command,
+    binary: str | None = None,
+) -> Path:
+    """Run the released sim_telarray on input_file and return <root>/<name>.simtel.
+
+    The command line is kept in <name>.command.json.
+    """
+    output = root / f"{name}.simtel"
+    output.unlink(missing_ok=True)
+    (root / f"{name}.hdata").unlink(missing_ok=True)
+    argv, output = sim_telarray_argv(
+        root, input_file, name, options, config, defines, extra, binary
+    )
     (root / f"{name}.command.json").write_text(json.dumps(argv, indent=2) + "\n")
     runner(argv, root / f"{name}.log", cwd=REFERENCE)
     if not output.is_file():
@@ -172,3 +193,30 @@ def event_deltas(left, right) -> list[float]:
         else (left[i] if i < len(left) else right[i])
         for i in range(max(len(left), len(right)))
     ]
+
+
+ATMOSPHERE_READ = re.compile(r"Read atmospheric transmission data from file (\S+)")
+
+
+def check_atmosphere(text, expected):
+    """Raise unless the sim_telarray output read exactly the atmospheric table `expected` (by file name).
+
+    sim_telarray loads its atmosphere from the configuration only under some #if branches, and falls
+    back to a built-in table silently otherwise; the read line is the evidence.
+    """
+    files = [Path(match[1]).name for match in ATMOSPHERE_READ.finditer(text)]
+    if not files:
+        raise RuntimeError(
+            "sim_telarray output has no 'Read atmospheric transmission' line"
+        )
+    wrong = sorted({name for name in files if name != Path(expected).name})
+    if wrong:
+        raise RuntimeError(
+            f"sim_telarray read atmospheric table(s) {wrong}, expected {Path(expected).name}"
+        )
+    return files
+
+
+def check_atmosphere_log(path, expected):
+    """check_atmosphere on the text of a log file."""
+    return check_atmosphere(Path(path).read_text(errors="replace"), expected)

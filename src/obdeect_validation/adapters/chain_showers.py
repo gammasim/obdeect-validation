@@ -131,7 +131,38 @@ def compare_photons(reference, candidate):
     return metrics, per_field
 
 
-def simulate(root, input_file, name, bypass=0, config=None, extra=None, runner=command):
+def simulate_argv(
+    root, input_file, name, bypass=0, config=None, extra=None, binary=None
+):
+    """argv and output of the three-telescope sim_telarray run (see simulate)."""
+    return common.sim_telarray_argv(
+        root,
+        input_file,
+        name,
+        {
+            "maximum_telescopes": 3,
+            "altitude": 2156,
+            "telescope_theta": 20,
+            "telescope_phi": 180,
+            "Bypass_Optics": bypass,
+        },
+        config=config,
+        defines=("-DCTA_NORTH", "-DLST1", "-DNUM_TELESCOPES=3"),
+        extra=extra or (),
+        binary=binary,
+    )
+
+
+def simulate(
+    root,
+    input_file,
+    name,
+    bypass=0,
+    config=None,
+    extra=None,
+    runner=command,
+    binary=None,
+):
     """Three-telescope sim_telarray run of the CORSIKA showers (zenith 20 deg, azimuth 180 deg)."""
     return common.sim_telarray(
         root,
@@ -148,6 +179,7 @@ def simulate(root, input_file, name, bypass=0, config=None, extra=None, runner=c
         defines=("-DCTA_NORTH", "-DLST1", "-DNUM_TELESCOPES=3"),
         extra=extra or (),
         runner=runner,
+        binary=binary,
     )
 
 
