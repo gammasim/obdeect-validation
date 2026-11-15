@@ -866,7 +866,7 @@ def physics_check(root, source, inputs, qe_path, headroom, metrics, details):
     files = envelope_files(envelope_dir, qe_path, headroom)
     optimised = _pipe_camera(envelope_dir, source, inputs, files)
     details["counts"]["physics_envelope"] = pipeline_counts(envelope_dir)
-    shower_ids = [str(event.event_number) for event in IACTFile(source)]
+    shower_ids = co.camera_keys(source)
     pairs = {
         "unthinned": (reference, unthinned),
         "envelope": (reference, optimised),
@@ -914,14 +914,13 @@ def run_air_shower(root, source, config, reps, metrics, details):
         "config": config,
         "config_dir": config_dir,
         "rotation": co.camera_rotation_deg(config_dir, cfg_text),
-        "unit": root / "unit-atmosphere.dat",
         "models": str(common.models_root()),
         "qe": config_dir / co.cfg_value(cfg_text, "quantum_efficiency"),
         "qe_variation": float(co.cfg_value(cfg_text, "qe_variation")),
         "atmosphere": root / "atmosphere-below-1000nm.dat",
         "reference_atmosphere": config_dir / ATMOSPHERE_FILE,
     }
-    shutil.copyfile(co.UNIT_ATMOSPHERE, inputs["unit"])
+    inputs["unit"] = common.write_zero_depth_table(root, co.UNIT_ATMOSPHERE)
     # Propagation needs integer wavelengths below 1000 nm, so the reference atmosphere is cut there
     # for propagation (candidate); the reference keeps the full table.
     performance.restrict_table(inputs["reference_atmosphere"], inputs["atmosphere"])

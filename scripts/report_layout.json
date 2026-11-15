@@ -55,6 +55,17 @@
       "intro": "At large zenith angles the plane-parallel atmosphere is no longer accurate. obdeect propagation has two curved modes: `spherical` (obdeect applies curvature: emission altitude, extinction and refraction in spherical shells) and `corsika` (CORSIKA with the CURVED option has already curved the shower; obdeect applies the curved extinction only). These cases check the curved geometry and extinction against analytic results and an independent ray tracer, the CURVED flags from CORSIKA through the stream, the mode rules, and CURVED CORSIKA showers at 65° and 75° through obdeect and sim_telarray. sim_telarray itself is plane-parallel, so at these angles it is a reference for the method, not for the result."
     },
     {
+      "key": "endtoend",
+      "cases": [
+        "determinism.*",
+        "fanout.*",
+        "ledger.*",
+        "robustness.*"
+      ],
+      "title": "End-to-end robustness and determinism",
+      "intro": "Whole-chain properties that do not compare with a reference program: identical output for identical input (threads, chunking, pipes, tee fan-out), rejection of tampered efficiency ledgers, and graceful failure on damaged streams. Pass means zero mismatches and zero silent accepts, with positive controls accepted."
+    },
+    {
       "key": "performance",
       "prefix": "performance.",
       "title": "Performance",
@@ -793,6 +804,38 @@
         }
       ],
       "differences": "obdeect and sim_telarray are expected to disagree here: obdeect applies the curved atmosphere, sim_telarray the plane-parallel one. The case passes when the size of the disagreement matches the prediction ({showers[0][pe_ratio][predicted_ratio]:.4f} at 65°, {showers[1][pe_ratio][predicted_ratio]:.4f} at 75°)."
+    },
+    "stream.matrix-inputs-headers": {
+      "title": "CORSIKA shower inputs of the physics matrix: EventIO headers vs logs",
+      "description": "The 16 shower inputs (7 cards: 20/40/60 deg, azimuth 180, South, array-north, r1300, proton) are read with the eventio reader and their headers compared with the CORSIKA logs."
+    },
+    "sources.illuminator-illn-01": {
+      "title": "Illuminator ILLN-01 vs xyzls",
+      "description": "Illuminator ILLN-01 against xyzls at three distances: emission (photon yield, directions, times, wavelengths) and camera stage in details.json."
+    },
+    "sources.illuminator-ills-01": {
+      "title": "Illuminator ILLS-01 vs xyzls",
+      "description": "Illuminator ILLS-01 against xyzls at three distances: emission (photon yield, directions, times, wavelengths) and camera stage in details.json."
+    },
+    "sources.night-sky-camera": {
+      "title": "Night-sky camera p.e. vs analytic expectation",
+      "description": "Night-sky background through sim_telarray's camera, against the analytic expectation (rate x area x solid angle x efficiencies). No nsbls comparison."
+    },
+    "determinism.photons": {
+      "title": "Determinism of trace-stream and propagation",
+      "description": "Photon-by-photon equality across thread counts (1, 4, all), input chunk sizes (1024, 65536) and file, pipe or in-process use; a changed seed must be detected."
+    },
+    "fanout.tee-and-models": {
+      "title": "Fan-out of one atmosphere stream to tee branches and models",
+      "description": "One atmosphere stream fanned out to tee branches (same LSTN-01 twice, LST and MST consumers) against separate full runs: photons and sim_telarray camera must be identical."
+    },
+    "ledger.efficiency-tamper": {
+      "title": "Efficiency ledger: tampered chains rejected",
+      "description": "Tampered efficiency chains (missing atmosphere, factor applied twice or pending, undeclared envelope, backward state, angular t0) must be rejected with a message naming the factor; positive controls must be accepted."
+    },
+    "robustness.stream-damage": {
+      "title": "Stream damage: truncated, corrupt and mismatched streams",
+      "description": "Truncated, corrupt, version-mismatched and empty streams through the pipe chain must fail cleanly: no crash, no hang, no silent success; early consumer exit is included."
     }
   },
   "since": "2026-11-14",

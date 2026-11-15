@@ -20,6 +20,34 @@
     "gamma-75deg-1000-10000GeV-curved.iact": {
       "sha256": null,
       "card": "corsika/gamma-75deg-1000-10000GeV-curved.card"
+    },
+    "gamma-40deg-100-3000GeV.iact": {
+      "sha256": "d48774102c854154394b0928afed55c10797729aba3b207825c649922a3218ba",
+      "card": "corsika/gamma-40deg-100-3000GeV.card"
+    },
+    "gamma-60deg-300-5000GeV.iact": {
+      "sha256": "9364592394ddc11b1545d0c9a2d6803047ec5188cc89db6294946d17f71011d8",
+      "card": "corsika/gamma-60deg-300-5000GeV.card"
+    },
+    "gamma-20deg-az180-100-3000GeV.iact": {
+      "sha256": "d60bd6f951b3f30180a343de0a3a0e6ebb2091e8a8916f3a0e351f6104bf131b",
+      "card": "corsika/gamma-20deg-az180-100-3000GeV.card"
+    },
+    "gamma-20deg-South-100-3000GeV.iact": {
+      "sha256": "de37d938b25eb875b821be6762dc046223a557d0443a35de08d68a3a1ec67114",
+      "card": "corsika/gamma-20deg-South-100-3000GeV.card"
+    },
+    "proton-20deg-300-10000GeV.iact": {
+      "sha256": "473914c930e8ab128b6881a4f2ba01662eac5acb8c11e40a31399b590fdd3c80",
+      "card": "corsika/proton-20deg-300-10000GeV.card"
+    },
+    "gamma-20deg-100-3000GeV-r1300.iact": {
+      "sha256": "e9a230cd290501402738134bacb319fb503a9bf60c82afe2a39a216bee6caaca",
+      "card": "corsika/gamma-20deg-100-3000GeV-r1300.card"
+    },
+    "gamma-20deg-100-3000GeV-array-north.iact": {
+      "sha256": "06ee912fd3afb5ddc6ee0ec6def37aa297a5176f6a366cb3b1a3534c79ef46dd",
+      "card": "corsika/gamma-20deg-100-3000GeV-array-north.card"
     }
   }
 }

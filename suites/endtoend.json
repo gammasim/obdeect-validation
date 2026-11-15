@@ -1,0 +1,9 @@
+{
+  "id": "endtoend",
+  "cases": [
+    "../cases/determinism/determinism-photons.json",
+    "../cases/fanout/fanout-tee-models.json",
+    "../cases/ledger/efficiency-ledger.json",
+    "../cases/robustness/stream-damage.json"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "sources.night-sky-camera",
+  "name": "Night-sky camera p.e. versus analytic expectation (rate x area x solid angle x efficiencies; no nsbls)",
+  "requires": ["obdeect", "sim_telarray", "python3"],
+  "commands": [
+    {
+      "name": "compare-night-sky-camera",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.night_sky_camera"],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {"metric": "camera_events", "expected": 4, "atol": 0},
+    {"metric": "camera_pe_ratio_limit_exceeded", "expected": 0, "atol": 0}
+  ]
+}

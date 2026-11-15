@@ -34,3 +34,10 @@ simtools/.pytest_cache/**
 !sim_telarray/
 !sim_telarray/**
 sim_telarray/.git
+sim_telarray/**/*.o
+sim_telarray/**/*.a
+sim_telarray/**/*.so*
+sim_telarray/bin
+sim_telarray/bin/**
+sim_telarray/lib
+sim_telarray/lib/**

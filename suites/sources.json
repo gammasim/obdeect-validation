@@ -8,6 +8,9 @@
     "../cases/sources/beam-scan.json",
     "../cases/sources/laser-beam.json",
     "../cases/sources/night-sky.json",
-    "../cases/sources/muon-track.json"
+    "../cases/sources/muon-track.json",
+    "../cases/sources/illuminator-illn-01.json",
+    "../cases/sources/illuminator-ills-01.json",
+    "../cases/sources/night-sky-camera.json"
   ]
 }

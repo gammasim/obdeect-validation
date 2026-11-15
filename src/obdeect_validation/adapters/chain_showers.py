@@ -229,17 +229,24 @@ def simulate(
     extra=None,
     runner=command,
     binary=None,
+    zenith=20,
+    azimuth=180,
+    altitude=2156,
 ):
-    """Three-telescope sim_telarray run of the CORSIKA showers (zenith 20 deg, azimuth 180 deg)."""
+    """Three-telescope sim_telarray run of the CORSIKA showers (default zenith 20 deg, azimuth 180 deg).
+
+    zenith, azimuth (telescope pointing, deg) and altitude (m) are written as given; the defaults
+    are the LSTN-01 North chain.
+    """
     return common.sim_telarray(
         root,
         input_file,
         name,
         {
             "maximum_telescopes": 3,
-            "altitude": 2156,
-            "telescope_theta": 20,
-            "telescope_phi": 180,
+            "altitude": altitude,
+            "telescope_theta": zenith,
+            "telescope_phi": azimuth,
             "Bypass_Optics": bypass,
         },
         config=config,

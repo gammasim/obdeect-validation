@@ -1,0 +1,140 @@
+{
+  "id": "robustness.stream-damage",
+  "name": "Robustness: truncated, corrupt, version-mismatched, empty-event, zero-photon-telescope and no-event streams through the pipe chain; early consumer exit",
+  "requires": [
+    "obdeect"
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-20-100GeV.iact",
+    "/validation/inputs/gamma-20deg-20-100GeV.corsika.log",
+    "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"
+  ],
+  "commands": [
+    {
+      "name": "robustness-stream",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.robustness_stream"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "setup_stage_failures",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "reference_chain_not_ok",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "truncated_half_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "truncated_half_silent_success",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "truncated_header_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "truncated_header_silent_success",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "corrupt_rows_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "corrupt_rows_silent_success",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "corrupt_magic_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "corrupt_magic_silent_success",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "format_major_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "format_major_silent_success",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "empty_event_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "empty_event_trace_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "empty_event_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "empty_event_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "telescope_no_photons_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "telescope_no_photons_trace_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "telescope_no_photons_photons_out",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "no_events_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "no_events_trace_crash_or_hang",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "no_events_photons_out",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "early_exit_hang",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

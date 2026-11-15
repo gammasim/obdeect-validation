@@ -1,0 +1,117 @@
+{
+  "id": "fanout.tee-and-models",
+  "name": "Fan-out: one atmosphere stream to tee branches (same LSTN-01 twice with byte copies, LST and MST consumers) vs separate full runs; photon and sim_telarray camera identity",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config",
+    "sim_telarray"
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-20-100GeV.iact",
+    "/validation/inputs/gamma-20deg-20-100GeV.corsika.log",
+    "/validation/fixtures/unit-transmission.dat",
+    "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"
+  ],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "fanout-chain",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.fanout_chain",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg"
+      ],
+      "timeout": 3600
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "fanout_a_stage_failures",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tee_copies_not_byte_identical",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tee_stdout_not_byte_identical",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "same_model_trace_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "same_model_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "same_model_simtel_input_bytes_differ",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "same_model_camera_event_id_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "same_model_camera_event_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fanout_b_stage_failures",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "two_model_lst_tee_vs_separate_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "two_model_lst_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "two_model_mst_tee_vs_separate_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "two_model_mst_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "two_model_stage_failures",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

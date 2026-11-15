@@ -57,6 +57,22 @@
     "/workdir/simulation_software/hessioxxx/src/straux.c",
     "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
     "/workdir/simulation_software/sim_telarray/corsika/atmo.c",
-    "/workdir/simulation_software/sim_telarray/corsika/atmo.h"
+    "/workdir/simulation_software/sim_telarray/corsika/atmo.h",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.corsika.log",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV-r1300.corsika.log",
+    "/validation/inputs/gamma-20deg-100-3000GeV-r1300.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV.corsika.log",
+    "/validation/inputs/gamma-20deg-20-100GeV.corsika.log",
+    "/validation/inputs/gamma-20deg-South-100-3000GeV.corsika.log",
+    "/validation/inputs/gamma-20deg-South-100-3000GeV.iact",
+    "/validation/inputs/gamma-20deg-az180-100-3000GeV.corsika.log",
+    "/validation/inputs/gamma-20deg-az180-100-3000GeV.iact",
+    "/validation/inputs/gamma-40deg-100-3000GeV.corsika.log",
+    "/validation/inputs/gamma-40deg-100-3000GeV.iact",
+    "/validation/inputs/gamma-60deg-300-5000GeV.corsika.log",
+    "/validation/inputs/gamma-60deg-300-5000GeV.iact",
+    "/validation/inputs/proton-20deg-300-10000GeV.corsika.log",
+    "/validation/inputs/proton-20deg-300-10000GeV.iact"
   ]
 }

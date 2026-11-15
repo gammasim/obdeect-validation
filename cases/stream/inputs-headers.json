@@ -1,0 +1,244 @@
+{
+  "id": "stream.matrix-inputs-headers",
+  "name": "CORSIKA IACT shower inputs of the physics matrix: eventio readable, shower and event counts, primary, energy, zenith, azimuth and observation level in the headers, flat CORSIKA logs with the site atmosphere",
+  "commands": [
+    {
+      "name": "check-headers",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.shower_matrix",
+        "check",
+        "/validation/inputs/gamma-20deg-100-3000GeV.iact",
+        "/validation/inputs/gamma-40deg-100-3000GeV.iact",
+        "/validation/inputs/gamma-60deg-300-5000GeV.iact",
+        "/validation/inputs/gamma-20deg-az180-100-3000GeV.iact",
+        "/validation/inputs/proton-20deg-300-10000GeV.iact",
+        "/validation/inputs/gamma-20deg-South-100-3000GeV.iact",
+        "/validation/inputs/gamma-20deg-100-3000GeV-r1300.iact",
+        "/validation/inputs/gamma-20deg-100-3000GeV-array-north.iact"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-100-3000GeV.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV.corsika.log",
+    "/validation/inputs/gamma-40deg-100-3000GeV.iact",
+    "/validation/inputs/gamma-40deg-100-3000GeV.corsika.log",
+    "/validation/inputs/gamma-60deg-300-5000GeV.iact",
+    "/validation/inputs/gamma-60deg-300-5000GeV.corsika.log",
+    "/validation/inputs/gamma-20deg-az180-100-3000GeV.iact",
+    "/validation/inputs/gamma-20deg-az180-100-3000GeV.corsika.log",
+    "/validation/inputs/proton-20deg-300-10000GeV.iact",
+    "/validation/inputs/proton-20deg-300-10000GeV.corsika.log",
+    "/validation/inputs/gamma-20deg-South-100-3000GeV.iact",
+    "/validation/inputs/gamma-20deg-South-100-3000GeV.corsika.log",
+    "/validation/inputs/gamma-20deg-100-3000GeV-r1300.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV-r1300.corsika.log",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.corsika.log"
+  ],
+  "metrics": [
+    {
+      "metric": "gamma_20deg_100_3000GeV_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_40deg_100_3000GeV_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_40deg_100_3000GeV_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_40deg_100_3000GeV_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_40deg_100_3000GeV_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_40deg_100_3000GeV_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_60deg_300_5000GeV_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_60deg_300_5000GeV_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_60deg_300_5000GeV_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_60deg_300_5000GeV_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_60deg_300_5000GeV_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_az180_100_3000GeV_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_az180_100_3000GeV_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_az180_100_3000GeV_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_az180_100_3000GeV_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_az180_100_3000GeV_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "proton_20deg_300_10000GeV_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "proton_20deg_300_10000GeV_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "proton_20deg_300_10000GeV_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "proton_20deg_300_10000GeV_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "proton_20deg_300_10000GeV_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_South_100_3000GeV_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_South_100_3000GeV_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_South_100_3000GeV_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_South_100_3000GeV_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_South_100_3000GeV_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_r1300_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_r1300_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_r1300_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_r1300_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_r1300_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_array_north_readable",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_array_north_shower_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_array_north_event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_array_north_header_mismatches",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "gamma_20deg_100_3000GeV_array_north_log_mismatch",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}
