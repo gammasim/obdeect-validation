@@ -38,6 +38,14 @@ Case files are JSON. Each has an id, executable requirements, commands (argument
 arrays, without shell expansion), and metrics with metric/expected/atol.
 Commands run inside an isolated case output directory and write metrics.json.
 Adapters also write details.json and PNG figures; `report.html` links them per case.
+
+Reports: `python scripts/collect_report.py RUN reports/DATE` copies verdicts, metrics,
+details and figures of a run and writes `reports/DATE/README.md`, the page to read: overview
+table, then one section per validation step (stream, propagation, sources, optics, chain,
+performance) with each case's verdict, headline numbers and captioned figures. Titles,
+headline numbers and captions are set in `scripts/report_layout.json`. Hand-written text
+(run, versions, findings) goes into the `<!-- notes:KEY -->` blocks of the README; they are
+kept when it is rewritten (`--readme-only reports/DATE` rewrites without copying).
 Figures use one palette (`adapters/plotting.py`): obdeect blue, reference program
 orange, analytic expectation black dashed, one colour per telescope or zenith angle.
 Shared helpers (commands, sim_telarray, photon readers, output files) are in

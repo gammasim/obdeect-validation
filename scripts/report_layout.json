@@ -1,0 +1,535 @@
+{
+  "title": "obdeect versus sim_telarray",
+  "reading_guide": [
+    "**What is compared.** Each case compares obdeect with a reference: an analytic expectation, a sim_telarray, LightEmission or CORSIKA program, or both. Signed values are obdeect / reference − 1, ratios are obdeect / reference, ± is one standard error.",
+    "**What PASS means.** All gated checks of the case are inside limits fixed before the run (`details.json`). Where a reference program is known to be wrong, the case is gated against the analytic expectation, and the comparison with that program is *recorded only*: shown, but not part of the verdict.",
+    "**Same frame before comparing.** obdeect light sources write photons where they are emitted, the LightEmission programs where they arrive. Before comparing, obdeect photons are moved to the reference plane (flight time added). The time panels show the arrival times as compared.",
+    "**Known features of the reference programs.** Some differences in the plots come from the reference, not from obdeect; each affected case has an *Expected differences* box under its figure.",
+    "- ff-1m, ff-gct and fake-muon write times in steps of 1/32 ns: their time histograms show spikes or a comb, obdeect times are continuous. Means and widths are compared.",
+    "- nsbls samples the photon entry point wrongly (radius `1 − sqrt(u)` instead of `sqrt(u)`, rotated azimuth): its entry-point, time and camera distributions differ from the analytic expectation, which obdeect follows.",
+    "- fake-muon times deviate slightly from the analytic distribution; obdeect follows it.",
+    "**Image χ²/ndf (chain cases).** Camera images of the same event and telescope from the two runs, pixel by pixel: mean over pixels with signal of (a − b)² / (a + b), with a, b the photoelectrons of the pixel in each run. Differences from Poisson fluctuations alone give about 1; systematic shape differences give more (limit 2). Values below 1 mean the two runs share part of their fluctuations (e.g. identical photons in the stream round trip). For light sources the summed images are compared the same way (χ² per pixel of the normalised images).",
+    "**KS.** Largest difference of two cumulative distributions, compared with the critical value for the sample sizes (in brackets where shown).",
+    "**Optics.** The star is moved off axis along x (E/W) and along y (N/S). The optics are not rotationally symmetric, so off axis the two directions give different values; each figure shows both, and both programs must agree for each direction."
+  ],
+  "steps": [
+    {
+      "key": "stream",
+      "prefix": "stream.",
+      "title": "Photon stream format",
+      "intro": "The obdeect photon stream must carry CORSIKA photons and light-source photons to sim_telarray without loss: CORSIKA → stream → sim_telarray EventIO, compared with sim_telarray on the original CORSIKA file."
+    },
+    {
+      "key": "propagation",
+      "prefix": "propagation.",
+      "title": "Atmosphere (propagation)",
+      "intro": "obdeect propagation (extinction, refraction, travel time) against analytic results, sim_telarray's extinction tables and the compiled CORSIKA atmosphere code."
+    },
+    {
+      "key": "sources",
+      "prefix": "sources.",
+      "title": "Light sources",
+      "intro": "obdeect light sources against the sim_telarray LightEmission programs and analytic expectations: photon yield, directions, times and wavelengths at emission, then camera photoelectrons in sim_telarray. Signed values are obdeect / reference − 1; ratios are obdeect / reference."
+    },
+    {
+      "key": "optics",
+      "prefix": "optics.",
+      "title": "Telescope optics",
+      "intro": "Ray tracing of obdeect against sim_telarray for the same telescope model, star light at 0–4° off axis along two directions: PSF (D80), effective mirror area and effective focal length."
+    },
+    {
+      "key": "chain",
+      "prefix": "chain.",
+      "title": "Full chain",
+      "intro": "obdeect stages inserted into the CORSIKA → sim_telarray chain, compared event by event with the direct sim_telarray run on the same showers and seeds. Bias = obdeect / reference − 1 of camera photoelectrons, with its standard error."
+    },
+    {
+      "key": "performance",
+      "prefix": "performance.",
+      "title": "Performance",
+      "intro": "Wall and CPU time of the obdeect chain against sim_telarray on the same input and machine. Informational, no limits."
+    }
+  ],
+  "cases": {
+    "stream.led-eventio": {
+      "title": "LED stream → sim_telarray EventIO, strict reader",
+      "headline": "photons {source_photon_count:.0f} / {eventio_photon_count:.0f}, block order as CORSIKA: {header_order_matches_corsika}",
+      "description": "An LED light-source stream is converted to sim_telarray EventIO and read back with the independent `eventio` reader.",
+      "rows": [
+        {
+          "label": "Events (stream / EventIO)",
+          "text": "{source_event_count} / {eventio_event_count}"
+        },
+        {
+          "label": "Photons (stream / EventIO)",
+          "text": "{source_photon_count:.0f} / {eventio_photon_count:.0f}"
+        },
+        {
+          "label": "Block order as CORSIKA (1 = yes)",
+          "text": "{header_order_matches_corsika}"
+        }
+      ]
+    },
+    "stream.corsika-roundtrip": {
+      "title": "CORSIKA → stream → sim_telarray",
+      "headline": "p.e. {photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}, {trigger_pattern_mismatches} trigger mismatches",
+      "description": "CORSIKA IACT file → `obdeect stream from-corsika` → `obdeect stream to-simtel` → sim_telarray, against sim_telarray on the CORSIKA file. Also checks the stdin, cat and tee variants. Array: three PROD6 LSTs (sim_telarray `CTA-PROD6-LST.cfg`, not the simulation-models release) at the CTAO-North altitude of 2156 m, at x, y = (0, 0), (50, 0) and (0, 50) m; gamma showers at 20° zenith.",
+      "rows": [
+        {
+          "label": "Telescope events compared",
+          "text": "{matched_event_telescope_samples:.0f}"
+        },
+        {
+          "label": "Camera p.e. bias",
+          "text": "{photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}"
+        },
+        {
+          "label": "Trigger mismatches",
+          "text": "{trigger_pattern_mismatches}"
+        },
+        {
+          "label": "Bunch count difference",
+          "text": "{bunch_count_delta}"
+        },
+        {
+          "label": "Largest codec error (in units of the codec bound)",
+          "text": "{max_codec_normalized_error:.3f}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "camera-comparison.png",
+          "caption": "Camera p.e. per telescope event, colour per telescope (type and position in the legend): round trip against direct sim_telarray (left), relative difference (right)."
+        }
+      ]
+    },
+    "propagation.extinction-analytic": {
+      "title": "Extinction vs analytic Beer–Lambert",
+      "headline": "largest transmission error {max_transmission_absolute_error:.1e}",
+      "description": "Atmospheric transmission for an exponential atmosphere against the analytic Beer–Lambert result, zenith 0–60°.",
+      "rows": [
+        {
+          "label": "Samples",
+          "text": "{sample_count}"
+        },
+        {
+          "label": "Largest transmission error",
+          "text": "{max_transmission_absolute_error:.1e}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "extinction-analytic.png",
+          "caption": "Transmission of obdeect and the analytic expectation."
+        }
+      ]
+    },
+    "propagation.extinction-simtel-table": {
+      "title": "Extinction vs sim_telarray tables",
+      "headline": "largest error {weighted_table_max_absolute_error:.1e}",
+      "description": "Extinction from a sim_telarray optical-depth table against sim_telarray's own interpolation, for wavelengths, heights, zenith angles, telescope elevations and in-telescope path lengths; weighted and thinned modes.",
+      "rows": [
+        {
+          "label": "Grid (wavelengths × heights × zeniths)",
+          "text": "{wavelength_count} × {height_count} × {zenith_count}"
+        },
+        {
+          "label": "Largest error (weighted mode)",
+          "text": "{weighted_table_max_absolute_error:.1e}"
+        },
+        {
+          "label": "Largest error (in-telescope depth)",
+          "text": "{telescope_depth_max_absolute_error:.1e}"
+        },
+        {
+          "label": "Thinned count residual",
+          "text": "{thinning_count_residual_sigma:.2f} σ"
+        }
+      ],
+      "figures": [
+        {
+          "file": "extinction-weighted.png",
+          "caption": "Weighted transmission of obdeect against the sim_telarray table."
+        }
+      ]
+    },
+    "propagation.atmosphere-corsika": {
+      "title": "Refraction and timing vs CORSIKA atmo",
+      "headline": "displacement {max_displacement_absolute_error_m:.1e} m, time {max_travel_time_absolute_error_ns:.1e} ns",
+      "description": "Refraction and travel time against the compiled CORSIKA atmosphere code (atmo.c) for emission heights 3–20 km and zenith 0–60°.",
+      "rows": [
+        {
+          "label": "Samples (bent)",
+          "text": "{sample_count} ({bent_count})"
+        },
+        {
+          "label": "Largest displacement error",
+          "text": "{max_displacement_absolute_error_m:.1e} m"
+        },
+        {
+          "label": "Largest travel-time error",
+          "text": "{max_travel_time_absolute_error_ns:.1e} ns"
+        },
+        {
+          "label": "Largest direction-cosine error",
+          "text": "{max_direction_cosine_absolute_error:.1e}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "atmosphere-reference.png",
+          "caption": "obdeect − CORSIKA: direction cosine, displacement and travel time against emission height, per zenith angle."
+        }
+      ]
+    },
+    "sources.led-reference": {
+      "title": "LED vs pixled",
+      "headline": "photons {native_photon_count:.0f} / {reference_photon_count:.0f}",
+      "description": "LED in the camera against the pixled reference program: identical photons expected.",
+      "rows": [
+        {
+          "label": "Photons (obdeect / reference)",
+          "text": "{native_photon_count:.0f} / {reference_photon_count:.0f}"
+        },
+        {
+          "label": "Largest per-event photon difference",
+          "text": "{max_event_photon_delta}"
+        },
+        {
+          "label": "Position centroid difference",
+          "text": "{position_centroid_delta_cm:.2e} cm"
+        }
+      ]
+    },
+    "sources.flasher-dish": {
+      "title": "Flasher on the dish vs ff-1m",
+      "headline": "photons {photon_ratio:.4f} ± {photon_ratio_se:.4f}, camera p.e. {camera_pe_ratio:.4f} ± {camera_pe_ratio_se:.4f}",
+      "description": "Flasher on the dish axis against ff-1m: emission (stage 1), then camera photoelectrons through sim_telarray (stage 2).",
+      "rows": [
+        {
+          "label": "Photons per event",
+          "text": "{photon_ratio:.4f} ± {photon_ratio_se:.4f}"
+        },
+        {
+          "label": "Direction mean cx / cy",
+          "text": "{cx_delta_sigma:+.2f} σ / {cy_delta_sigma:+.2f} σ"
+        },
+        {
+          "label": "Arrival time mean (after frame correction)",
+          "text": "{t_mean_delta:+.3f} ± {t_mean_delta_se:.3f} ns"
+        },
+        {
+          "label": "Camera p.e.",
+          "text": "{camera_pe_ratio:.4f} ± {camera_pe_ratio_se:.4f}"
+        },
+        {
+          "label": "Camera image χ²/ndf",
+          "text": "{camera_image_reduced_chi2:.2f}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "stage1.png",
+          "caption": "Emission: direction cosines, arrival time at the reference plane (obdeect times moved to the plane, as in the metrics) and wavelength of obdeect and LightEmission photons."
+        }
+      ],
+      "differences": "Time panel: ff-1m writes times in steps of 1/32 ns, so its histogram is a row of spikes; obdeect times are continuous. Both cover the same window; the mean difference is {t_mean_delta:+.3f} ns (limit 0.05 ns). Wavelength: both are monochromatic."
+    },
+    "sources.flasher-secondary": {
+      "title": "Flasher via secondary mirror vs ff-gct",
+      "headline": "photons {photon_ratio:.4f} ± {photon_ratio_se:.4f}, time {t_mean_delta:+.3f} ns, camera p.e. {camera_pe_ratio:.3f} ± {camera_pe_ratio_se:.3f}",
+      "description": "Flashers at the camera corners, light reflected by the secondary mirror, against ff-gct; camera photoelectrons through sim_telarray.",
+      "rows": [
+        {
+          "label": "Photons per event",
+          "text": "{photon_ratio:.4f} ± {photon_ratio_se:.4f}"
+        },
+        {
+          "label": "Arrival time mean",
+          "text": "{t_mean_delta:+.3f} ± {t_mean_delta_se:.3f} ns"
+        },
+        {
+          "label": "Camera p.e.",
+          "text": "{camera_pe_ratio:.4f} ± {camera_pe_ratio_se:.4f}"
+        },
+        {
+          "label": "Camera image χ²/ndf",
+          "text": "{camera_image_reduced_chi2:.2f}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "stage1.png",
+          "caption": "Emission: direction cosines, arrival time at the reference plane (obdeect times moved to the plane, as in the metrics) and wavelength of obdeect and LightEmission photons."
+        }
+      ],
+      "differences": "Time panel: ff-gct writes times in steps of 1/32 ns, so its histogram has regular spikes on the same falling distribution; obdeect times are continuous. Mean difference {t_mean_delta:+.3f} ns (limit 0.05 ns). Times are compared with the ff-gct time model: photons with |cz| ≥ 0.3 within the camera radius on both sides."
+    },
+    "sources.point-source": {
+      "title": "Point source vs xyzls",
+      "headline": "accepted photons {photon_ratio_accepted:.3f} ± {photon_ratio_accepted_se:.3f}, time {t_mean_delta:+.3f} ns, camera p.e. {camera_pe_ratio:.3f} ± {camera_pe_ratio_se:.3f}",
+      "description": "Isotropic point source at a distance against xyzls; photons accepted by the telescope and camera photoelectrons.",
+      "rows": [
+        {
+          "label": "Accepted photons (gated)",
+          "text": "{photon_ratio_accepted:.3f} ± {photon_ratio_accepted_se:.3f}"
+        },
+        {
+          "label": "Raw photons (recorded only)",
+          "text": "{photon_ratio:.3f} ± {photon_ratio_se:.3f}"
+        },
+        {
+          "label": "Arrival time mean",
+          "text": "{t_mean_delta:+.3f} ± {t_mean_delta_se:.3f} ns"
+        },
+        {
+          "label": "Camera p.e.",
+          "text": "{camera_pe_ratio:.3f} ± {camera_pe_ratio_se:.3f}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "stage1.png",
+          "caption": "Emission: direction cosines, arrival time at the reference plane (obdeect times moved to the plane, as in the metrics) and wavelength of obdeect and LightEmission photons."
+        }
+      ]
+    },
+    "sources.beam-scan": {
+      "title": "Beam scan vs xyls",
+      "headline": "photons {photon_ratio:.3f} ± {photon_ratio_se:.3f}",
+      "description": "Scanning laser beam against the LightEmission beam program.",
+      "rows": [
+        {
+          "label": "Photons per event",
+          "text": "{photon_ratio:.3f} ± {photon_ratio_se:.3f}"
+        },
+        {
+          "label": "Direction mean cx / cy",
+          "text": "{cx_delta_sigma:+.2f} σ / {cy_delta_sigma:+.2f} σ"
+        }
+      ],
+      "figures": [
+        {
+          "file": "stage1.png",
+          "caption": "Emission: direction cosines, arrival time at the reference plane (obdeect times moved to the plane, as in the metrics) and wavelength of obdeect and LightEmission photons."
+        }
+      ]
+    },
+    "sources.laser-beam": {
+      "title": "Laser beam geometry vs ls-beam",
+      "headline": "path {fov_path_native_m:.2f} vs {fov_path_reference_m:.2f} m",
+      "description": "Laser beam geometry against ls-beam: where the beam enters and leaves the telescope field of view.",
+      "rows": [
+        {
+          "label": "Path in the field of view (obdeect / reference)",
+          "text": "{fov_path_native_m:.2f} / {fov_path_reference_m:.2f} m"
+        },
+        {
+          "label": "Entry / exit offset",
+          "text": "{fov_entry_offset_m:.2f} / {fov_exit_offset_m:.2f} m"
+        }
+      ],
+      "figures": [
+        {
+          "file": "laser-beam.png",
+          "caption": "Beam path of obdeect and ls-beam relative to the field of view."
+        }
+      ]
+    },
+    "sources.muon-track": {
+      "title": "Muon track vs fake-muon and analytic",
+      "headline": "yield {yield_ratio_native_reference:.4f} ± {yield_ratio_se:.4f}, time vs analytic {time_native_vs_analytic_mean_difference_ns:+.1e} ns, camera p.e. {camera_pe_ratio:.3f} ± {camera_pe_ratio_se:.3f}",
+      "description": "Muon track against fake-muon and the analytic Cherenkov expectation; camera photoelectrons through sim_telarray.",
+      "rows": [
+        {
+          "label": "Photon yield (obdeect / fake-muon)",
+          "text": "{yield_ratio_native_reference:.4f} ± {yield_ratio_se:.4f}"
+        },
+        {
+          "label": "Time vs analytic",
+          "text": "{time_native_vs_analytic_mean_difference_ns:+.1e} ns, KS {time_native_vs_analytic_ks:.4f}"
+        },
+        {
+          "label": "Camera p.e.",
+          "text": "{camera_pe_ratio:.3f} ± {camera_pe_ratio_se:.3f}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "muon-track.png",
+          "caption": "Wavelength against 1/λ², Cherenkov angle residual, arrival time against the analytic distribution (black), and camera p.e. per triggered event."
+        }
+      ],
+      "differences": "Time (bottom left): fake-muon writes times in steps of 1/32 ns (comb); obdeect follows the analytic distribution (black; mean difference {time_native_vs_analytic_mean_difference_ns:+.1e} ns, KS {time_native_vs_analytic_ks:.4f}, critical {time_native_vs_analytic_ks_critical:.4f}). Cherenkov angle (top right): the edges differ by about 1e-7 in cos θ, far below what an image resolves. Wavelength and camera p.e. agree."
+    },
+    "sources.night-sky": {
+      "title": "Night sky vs analytic and nsbls",
+      "headline": "rate error {rate_native_relative_error:.1e}, area-uniform KS {projected_area_uniform_native_vs_analytic_ks:.4f}, camera p.e. vs nsbls {camera_pe_ratio:.2f} (recorded only)",
+      "description": "Night-sky background source against the analytic flux and nsbls; camera photoelectrons through sim_telarray.",
+      "rows": [
+        {
+          "label": "Rate, relative error vs configured",
+          "text": "{rate_native_relative_error:.1e}"
+        },
+        {
+          "label": "Area-uniform entry (KS, critical)",
+          "text": "{projected_area_uniform_native_vs_analytic_ks:.4f} ({projected_area_uniform_native_vs_analytic_ks_critical:.4f})"
+        },
+        {
+          "label": "Flat pulse (KS, critical)",
+          "text": "{time_native_vs_pulse_ks:.4f} ({time_native_vs_pulse_ks_critical:.4f})"
+        },
+        {
+          "label": "Camera p.e. vs nsbls (recorded only)",
+          "text": "{camera_pe_ratio:.3f} ± {camera_pe_ratio_se:.3f}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "night-sky.png",
+          "caption": "Angular distribution in the cone, projected entry point (uniform expected), time at the centre plane, and camera p.e. per triggered event."
+        }
+      ],
+      "differences": "The nsbls curves differ because nsbls is wrong, not obdeect. Projected entry point (top right): an isotropic flux is flat in ρ²; obdeect is flat (KS {projected_area_uniform_native_vs_analytic_ks:.4f}, critical {projected_area_uniform_native_vs_analytic_ks_critical:.4f}), nsbls piles up at the centre (KS {projected_area_uniform_reference_vs_analytic_ks:.2f}) because it draws the radius as 1 − sqrt(u) instead of sqrt(u) and rotates the entry point with the wrong azimuth (`IactLightEmission.cc` ~l.1395). Time (bottom left): the wrong entry points give nsbls a spread of {time_reference_sd_ns:.1f} ns; obdeect has the configured pulse ({time_native_sd_ns:.2f} ns). Camera (bottom right): nsbls puts more light on the dish centre, so its camera sees more; obdeect / nsbls = {camera_pe_ratio:.2f}, recorded only. With the nsbls sampler in obdeect (2026-11-13 report) the camera ratio was 0.998 ± 0.009."
+    },
+    "optics.*": {
+      "title": "Optics {suffix}",
+      "headline": "D80 ≤ {max_rel_psf_cm:.2%}, area ≤ {max_rel_eff_area:.2%}, focal length ≤ {max_rel_eff_flen:.3%}",
+      "description": "sim_telarray ray tracing (via simtools) against obdeect for the same telescope model: a star at 10 km, 0–4° off axis, moved along x (E/W) and along y (N/S). PSF (D80), effective mirror area and effective focal length per offset.",
+      "rows": [
+        {
+          "label": "Offsets",
+          "text": "{n_offsets}"
+        },
+        {
+          "label": "Largest PSF (D80) difference",
+          "text": "{max_rel_psf_cm:.2%}"
+        },
+        {
+          "label": "Largest effective area difference",
+          "text": "{max_rel_eff_area:.2%}"
+        },
+        {
+          "label": "Largest effective focal length difference",
+          "text": "{max_rel_eff_flen:.3%}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "optics_values.png",
+          "caption": "obdeect (blue) and sim_telarray (orange) against off-axis angle; filled circles and solid lines: star offset along x (E/W), open squares and dashed lines: along y (N/S). On axis there is one point."
+        },
+        {
+          "file": "optics_relative_difference.png",
+          "caption": "obdeect / sim_telarray − 1 against off-axis angle, per offset direction; shaded band = provisional limit."
+        }
+      ],
+      "links": {
+        "label": "Plots written by simtools (one program each)",
+        "files": [
+          "obdeect/*.png",
+          "sim_telarray/*.png"
+        ]
+      }
+    },
+    "chain.stream-roundtrip-threshold": {
+      "title": "Near-threshold showers (20–100 GeV), stream round trip",
+      "headline": "{matched_event_telescope_samples:.0f} telescope events, p.e. {photoelectron_relative_bias:+.2%}, {trigger_pattern_mismatches} trigger mismatches",
+      "description": "Stream round trip for near-threshold showers (20–100 GeV), where single photons decide the trigger. Array: three PROD6 LSTs (sim_telarray `CTA-PROD6-LST.cfg`, not the simulation-models release) at the CTAO-North altitude of 2156 m, at x, y = (0, 0), (50, 0) and (0, 50) m; gamma showers at 20° zenith.",
+      "rows": [
+        {
+          "label": "Telescope events compared",
+          "text": "{matched_event_telescope_samples:.0f}"
+        },
+        {
+          "label": "Camera p.e. bias",
+          "text": "{photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}"
+        },
+        {
+          "label": "Trigger mismatches",
+          "text": "{trigger_pattern_mismatches}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "camera-comparison.png",
+          "caption": "Camera p.e. per telescope event, colour per telescope (type and position in the legend): round trip against direct sim_telarray (left), relative difference (right)."
+        }
+      ]
+    },
+    "chain.atmosphere-substitution": {
+      "title": "obdeect atmosphere + sim_telarray optics and camera",
+      "headline": "p.e. {photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}, image χ² {mean_image_reduced_chi2:.2f}",
+      "description": "obdeect atmosphere (extinction) replaces sim_telarray's: CORSIKA → obdeect propagation → sim_telarray with a zero optical-depth table, against sim_telarray with its own table. Array: three PROD6 LSTs (sim_telarray `CTA-PROD6-LST.cfg`, not the simulation-models release) at the CTAO-North altitude of 2156 m, at x, y = (0, 0), (50, 0) and (0, 50) m; gamma showers at 20° zenith.",
+      "rows": [
+        {
+          "label": "Telescope events compared",
+          "text": "{matched_event_telescope_samples:.0f}"
+        },
+        {
+          "label": "Camera p.e. bias",
+          "text": "{photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}"
+        },
+        {
+          "label": "Image χ²/ndf",
+          "text": "{mean_image_reduced_chi2:.2f}"
+        },
+        {
+          "label": "Trigger mismatches",
+          "text": "{trigger_pattern_mismatches}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "camera-comparison.png",
+          "caption": "Camera p.e. per telescope event, colour per telescope (type and position in the legend): obdeect atmosphere against sim_telarray's (left), relative difference (right)."
+        }
+      ]
+    },
+    "chain.optics-bypass*": {
+      "title": "obdeect atmosphere and optics + sim_telarray camera",
+      "headline": "p.e. {photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}, image χ² {mean_image_reduced_chi2:.2f}, {trigger_pattern_mismatches} trigger mismatches",
+      "description": "obdeect atmosphere and optics replace sim_telarray's: CORSIKA → obdeect propagation → obdeect trace-stream → sim_telarray camera only, against the direct sim_telarray run. Telescope: one LSTN-01, simulation models 7.0.0, CTAO-North, from the configuration simtools generates; gamma showers at 20° zenith.",
+      "rows": [
+        {
+          "label": "Telescope events compared",
+          "text": "{matched_event_telescope_samples:.0f}"
+        },
+        {
+          "label": "Camera p.e. bias",
+          "text": "{photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}"
+        },
+        {
+          "label": "Image χ²/ndf",
+          "text": "{mean_image_reduced_chi2:.2f}"
+        },
+        {
+          "label": "Mean arrival-time difference",
+          "text": "{mean_arrival_time_difference_ns:+.3f} ns"
+        },
+        {
+          "label": "Trigger mismatches",
+          "text": "{trigger_pattern_mismatches}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "camera-comparison.png",
+          "caption": "Camera p.e. per telescope event, colour per telescope (type and position in the legend): obdeect chain against direct sim_telarray (left), relative difference (right)."
+        }
+      ]
+    },
+    "performance.stages": {
+      "title": "Stage throughput",
+      "description": "Throughput of each chain stage on one CORSIKA input.",
+      "figures": [
+        {
+          "file": "photons-per-second.png",
+          "caption": "Photons per second for each stage."
+        }
+      ]
+    }
+  },
+  "since": "2026-11-14",
+  "before_since": "*This report predates the reading guide (reports from 2026-11-14 on). Its stage-1 time panels show each program's own time frame (obdeect at emission, the reference at arrival), not the compared arrival times; the case notes explain the failures of that run.*"
+}

@@ -137,3 +137,20 @@ def test_load_atmprof_reads_altitude_and_index_columns(tmp_path):
     heights, nm1 = sc.load_atmprof(table)
     assert heights.tolist() == pytest.approx([0.0, 1000.0])
     assert nm1.tolist() == pytest.approx([2.7e-4, 2.5e-4])
+
+
+def test_plotted_times_are_the_compared_arrival_times():
+    # obdeect photons start at the flasher (t = 0, z = 16 m); the reference records arrival
+    # times on the plane z = 0. The plot must show both at the arrival plane.
+    native = _stream(1000, 3)
+    native["t"] = np.zeros(1000)
+    native["x"], native["y"] = np.zeros(1000), np.zeros(1000)
+    reference = _stream(1000, 4)
+    t_native, t_reference = sc.compared_times(
+        native, reference, {"time_correction": "geometric"}
+    )
+    flight = 16.0 / sc.C_M_NS
+    assert np.allclose(t_native, flight)
+    assert abs(t_native.mean() - t_reference.mean()) < 0.5
+    m = sc.emission_metrics([1000.0], native, [1000.0], reference, "geometric")
+    assert m["t_mean_native"] == pytest.approx(np.mean(t_native))

@@ -1,0 +1,1 @@
+Report README per run: `scripts/collect_report.py` writes `reports/DATE/README.md` with an overview table and one section per validation step; each case shows its verdict, headline numbers and captioned figures (layout in `scripts/report_layout.json`). Hand-written notes are kept when the README is rewritten.
