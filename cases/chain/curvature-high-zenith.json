@@ -1,0 +1,19 @@
+{
+  "id": "chain.curvature-high-zenith",
+  "name": "obdeect corsika stage vs sim_telarray atmosphere on curved CORSIKA showers (65-85 deg)",
+  "requires": ["obdeect", "/workdir/simulation_software/sim_telarray/bin/sim_telarray"],
+  "timeout": 14400,
+  "commands": [
+    {
+      "name": "curved-zenith-substitution",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.chain_curvature"],
+      "timeout": 14400
+    }
+  ],
+  "metrics": [
+    {"metric": "file_count", "expected": 4, "atol": 0},
+    {"metric": "pe_ratio_vs_prediction_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "simtel_plane_parallel_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "propagation_dropped_photons", "expected": 0, "atol": 0}
+  ]
+}

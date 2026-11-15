@@ -20,7 +20,66 @@ SHAPE_CHI2_LIMIT = 2.0
 SIGMA = 5.0  # limit = max(floor, SIGMA * standard error)
 
 
-def generate(root, showers=20, zenith=20, energy_min=100, energy_max=3000):
+FLAT_TELESCOPES = (
+    (0.0, 0.0, 0.0, 1200.0),
+    (5000.0, 0.0, 0.0, 1200.0),
+    (0.0, 5000.0, 0.0, 1200.0),
+)  # (x, y, z, radius) in cm, as the flat showers of this chain have always used
+FLAT_SCATTER_CM = 10000.0  # CSCAT radius in cm
+SEED_OFFSETS = (0, 12, 26, 44)  # SEED lines are seed_base + offset: 17, 29, 43, 61
+
+
+def card_text(
+    *,
+    showers,
+    zenith,
+    energy_min,
+    energy_max,
+    data_dir,
+    direct,
+    telfil,
+    telescopes=FLAT_TELESCOPES,
+    scatter_cm=FLAT_SCATTER_CM,
+    seed_base=17,
+    tstart=False,
+):
+    """CORSIKA input card of the IACT showers; the values are written as given.
+
+    data_dir is the DATDIR, direct the DIRECT prefix (with trailing slash) and telfil the IACT
+    output name below it. Telescope positions, radii and the CSCAT radius are in cm (CORSIKA
+    units). With the defaults the card is the one generate() has always written.
+    """
+    seeds = "".join(f"SEED {seed_base + offset} 0 0\n" for offset in SEED_OFFSETS)
+    scatter = "".join(f"TELESCOPE {x} {y} {z} {r}\n" for x, y, z, r in telescopes)
+    start = "TSTART T\n" if tstart else ""
+    return f"""RUNNR 1
+EVTNR 1
+NSHOW {showers}
+PRMPAR 1
+ERANGE {energy_min} {energy_max}
+ESLOPE -2.0
+THETAP {zenith} {zenith}
+PHIP 0.0 0.0
+{seeds}OBSLEV 215600.0
+ATMOSPHERE 1 Y
+{start}MAGNET 20.0 40.0
+ARRANG 0.0
+HADFLG 0 0 0 0 0 2
+ECUTS 0.3 0.3 0.02 0.02
+ELMFLG F F
+CSCAT 5 {scatter_cm} 0.0
+DATDIR {data_dir}/
+DIRECT {direct}
+{scatter}TELFIL {direct}{telfil}
+IACT SPLIT_AUTO 0
+IACT IO_BUFFER 800MB
+IACT MAX_BUNCHES 1000000
+EXIT
+"""
+
+
+def prepare_data(root):
+    """Link the CORSIKA data files into root/data and copy the atmosphere; return SHA-256 sums."""
     root.mkdir(parents=True, exist_ok=True)
     data = root / "data"
     data.mkdir(exist_ok=True)
@@ -46,41 +105,42 @@ def generate(root, showers=20, zenith=20, energy_min=100, energy_max=3000):
             destination.symlink_to(original)
         hashes[name] = common.sha256(original)
     shutil.copyfile(common.REFERENCE / "cfg/common/atmprof1.dat", root / "atmprof1.dat")
-    card = f"""RUNNR 1
-EVTNR 1
-NSHOW {showers}
-PRMPAR 1
-ERANGE {energy_min} {energy_max}
-ESLOPE -2.0
-THETAP {zenith} {zenith}
-PHIP 0.0 0.0
-SEED 17 0 0
-SEED 29 0 0
-SEED 43 0 0
-SEED 61 0 0
-OBSLEV 215600.0
-ATMOSPHERE 1 Y
-MAGNET 20.0 40.0
-ARRANG 0.0
-HADFLG 0 0 0 0 0 2
-ECUTS 0.3 0.3 0.02 0.02
-ELMFLG F F
-CSCAT 5 10000.0 0.0
-DATDIR {data}/
-DIRECT {root}/
-TELESCOPE 0.0 0.0 0.0 1200.0
-TELESCOPE 5000.0 0.0 0.0 1200.0
-TELESCOPE 0.0 5000.0 0.0 1200.0
-TELFIL {root}/showers.iact
-IACT SPLIT_AUTO 0
-IACT IO_BUFFER 800MB
-IACT MAX_BUNCHES 1000000
-EXIT
-"""
+    return hashes
+
+
+def generate(
+    root, showers=20, zenith=20, energy_min=100, energy_max=3000, geometry="flat"
+):
+    """Run CORSIKA in root for IACT showers and return root/showers.iact.
+
+    geometry "flat" keeps the card, executable and environment default this chain has always
+    used. geometry "curved" uses the compact-format layout of curved_showers and the curved
+    executable (CORSIKA_BINARY still overrides the executable).
+    """
+    if geometry == "flat":
+        layout = {"telescopes": FLAT_TELESCOPES, "scatter_cm": FLAT_SCATTER_CM}
+    elif geometry == "curved":
+        from obdeect_validation.adapters import curved_showers
+
+        layout = curved_showers.layout(zenith)
+    else:
+        raise ValueError(f"unknown CORSIKA geometry: {geometry!r}")
+    hashes = prepare_data(root)
+    card = card_text(
+        showers=showers,
+        zenith=zenith,
+        energy_min=energy_min,
+        energy_max=energy_max,
+        data_dir=root / "data",
+        direct=f"{root}/",
+        telfil="showers.iact",
+        **layout,
+    )
     (root / "corsika.card").write_text(card)
-    corsika = os.environ.get(
-        "CORSIKA_BINARY",
-        "/workdir/simulation_software/corsika7/corsika_qgs2_urqmd_flat",
+    corsika = os.environ.get("CORSIKA_BINARY") or (
+        "/workdir/simulation_software/corsika7/corsika_qgs2_urqmd_flat"
+        if geometry == "flat"
+        else str(curved_showers.corsika_executable("curved"))
     )
     with (
         (root / "corsika.card").open("rb") as stdin,

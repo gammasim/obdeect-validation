@@ -11,7 +11,7 @@ From the workspace root (checkouts `obdeect`, `simtools`, `sim_telarray`,
 bash obdeect-validation/containers/run-validation.sh full obdeect-validation/results/full
 ```
 
-Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `chain`, `full`,
+Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `chain`, `curvature`, `full`,
 `performance` (report only). The launcher builds obdeect and simtools from the
 checkouts on a digest-pinned simtools-prod image and mounts this repository
 (`/validation`), sim_telarray (`/reference`) and the models (`/models`) read-only.
@@ -60,9 +60,28 @@ workspace project-notes/projects/cta/202611/full-simulation-chain/{plan.md,pr.md
 |---|---|---|
 | stream | LED to EventIO; CORSIKA round trip incl. stdin/tee variants | eventio reader, sim_telarray camera |
 | propagation | analytic Beer–Lambert; sim_telarray tables; refraction/time | sim_telarray tables, compiled CORSIKA atmo |
+| curvature | Chapman extinction; spherical geometry; curved Bouguer refraction; input guards (no showers); curved flag, emission geometry and curved extinction of CORSIKA CURVED showers; high-zenith chain | analytic, independent ray tracer, CORSIKA CURVED, sim_telarray (plane-parallel) |
 | sources | LED, flasher dish/secondary, point source, beam scan, laser, night sky, muon | pixled, ff-1m, ff-gct, xyzls, xyls, ls-beam, nsbls, fake-muon (+ camera) |
 | optics | LST, MST, SST: D80, effective area, focal length, 0–4 deg | simtools-validate-optics, both backends |
 | chain | near-threshold round trip; obdeect atmosphere; obdeect optics + Bypass_Optics=1 | direct sim_telarray |
+
+### Curvature suite
+
+`suites/curvature.json` validates the curved and spherical atmosphere of the obdeect
+propagation stage. Four cases need no showers (`propagation.curvature-chapman`,
+`propagation.curvature-geometry`, `propagation.refraction-curved-ray`,
+`propagation.curvature-input-guards`) and use analytic or independent references. Four need
+CORSIKA CURVED showers at 65, 75, 80 and 85 deg (`stream.corsika-curved-flag`,
+`propagation.curvature-corsika-geometry`, `propagation.curvature-corsika-extinction`,
+`chain.curvature-high-zenith`); the cards are in `fixtures/corsika/*-curved.card` and the
+files are generated on a host with the curved CORSIKA binary (variants in
+`$SIMTOOLS_CORSIKA_PATH/build_opts.yml`) with
+`python -m obdeect_validation.adapters.curved_showers run --geometry curved --zenith 65 ...`,
+then copied to `inputs/` (hashes in `fixtures/inputs.json`, `null` until generated). The run
+checks the CURVED banner of the CORSIKA log, so a flat binary cannot pass as curved.
+sim_telarray applies a plane-parallel airmass 1/|cz| also to CURVED input, so the chain case
+tests the predicted curved-to-plane-parallel ratio, not a zero difference. The comparison with the
+CORSIKA `DISTIP`/`TOFIP` tables is a design note, `docs/curvature-corsika-tables.md`, not a case.
 
 Optics limits (2% D80, 1% area, 0.2% focal length) are provisional, taken from the
 largest deviations measured in the old validation, pending scientific approval.

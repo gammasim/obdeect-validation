@@ -19,6 +19,14 @@
     "../cases/optics/optics-sst.json",
     "../cases/chain/stream-roundtrip-threshold.json",
     "../cases/chain/atmosphere-substitution.json",
-    "../cases/chain/optics-bypass1.json"
+    "../cases/chain/optics-bypass1.json",
+    "../cases/propagation/curvature-chapman.json",
+    "../cases/propagation/curvature-geometry.json",
+    "../cases/propagation/refraction-curved-ray.json",
+    "../cases/propagation/curvature-input-guards.json",
+    "../cases/stream/corsika-curved-flag.json",
+    "../cases/propagation/curvature-corsika-geometry.json",
+    "../cases/propagation/curvature-corsika-extinction.json",
+    "../cases/chain/curvature-high-zenith.json"
   ]
 }

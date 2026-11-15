@@ -1,0 +1,29 @@
+{
+  "id": "stream.corsika-curved-flag",
+  "name": "CORSIKA 65 deg flat and curved showers: CURVED flag in EVTH words 77 and 79, obdeect run keys, CURVED log pattern",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "curved-flag",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.stream_curved_flag",
+        "--curved",
+        "/validation/inputs/gamma-65deg-300-5000GeV-curved.iact",
+        "--flat",
+        "/validation/inputs/gamma-65deg-300-5000GeV-flat.iact"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {"metric": "curved_file_curvature_applied", "expected": 1, "atol": 0},
+    {"metric": "flat_file_curvature_applied", "expected": 0, "atol": 0},
+    {"metric": "word79_flag_mismatch", "expected": 0, "atol": 0},
+    {"metric": "iact_curved_bit_mismatch", "expected": 0, "atol": 0},
+    {"metric": "refraction_bit_mismatch", "expected": 0, "atol": 0},
+    {"metric": "run_key_missing_count", "expected": 0, "atol": 0},
+    {"metric": "curved_log_pattern_mismatch", "expected": 0, "atol": 0}
+  ]
+}

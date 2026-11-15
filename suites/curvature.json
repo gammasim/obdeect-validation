@@ -1,0 +1,13 @@
+{
+  "id": "curvature",
+  "cases": [
+    "../cases/propagation/curvature-chapman.json",
+    "../cases/propagation/curvature-geometry.json",
+    "../cases/propagation/refraction-curved-ray.json",
+    "../cases/propagation/curvature-input-guards.json",
+    "../cases/stream/corsika-curved-flag.json",
+    "../cases/propagation/curvature-corsika-geometry.json",
+    "../cases/propagation/curvature-corsika-extinction.json",
+    "../cases/chain/curvature-high-zenith.json"
+  ]
+}
