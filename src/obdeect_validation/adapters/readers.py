@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import numpy as np
 from eventio.iact import IACTFile
-from obdeect.stream import Reader
 
 NATIVE_KEYS = ("x", "y", "z", "cx", "cy", "cz", "t", "zem", "w", "wavelength")
 # IACT field -> column; positions are stored in cm.
@@ -41,6 +40,8 @@ def read_native(path, keys=NATIVE_KEYS, require_events=True):
     Photons before the first event record are an error unless require_events is False
     (then they count as one event; the per-event weights are not meaningful).
     """
+    from obdeect.stream import Reader  # optional dependency, only for native streams
+
     counts, chunks = [], {k: [] for k in keys}
     for record in Reader(str(path)):
         if record["type"] == "event":

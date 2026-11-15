@@ -28,6 +28,12 @@ obdeect-validate list --suite suites/smoke.json --json
 obdeect-validate run --case cases/chain/optics-bypass1.json --environment environments/workspace.json --output results/one --non-interactive
 ```
 
+Former `obdeect/validation/` scripts, now here: the flasher, LED and stream cross-checks are
+cases (`cases/sources/flasher-dish.json`, `flasher-secondary.json`, `led-reference.json`,
+`cases/stream/corsika-roundtrip.json`). The obdeect chain test runs without the container
+once obdeect is installed (`python -m pytest tests/test_obdeect_chain.py`; it skips otherwise).
+Summary of an IACT file: `python -m obdeect_validation.adapters.summarize_iact FILE.iact.gz`.
+
 Case files are JSON. Each has an id, executable requirements, commands (argument
 arrays, without shell expansion), and metrics with metric/expected/atol.
 Commands run inside an isolated case output directory and write metrics.json.

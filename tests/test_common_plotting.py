@@ -6,6 +6,7 @@ import signal
 import subprocess
 import sys
 import time
+import types
 
 import numpy as np
 import pytest
@@ -135,8 +136,13 @@ def test_report_html_shows_status_reason_and_figures(tmp_path):
     assert "case-a/plot.png" in page
 
 
-def _fake_stream(records):
-    return lambda _path: iter(records)
+def _fake_stream(monkeypatch, records):
+    stream = types.ModuleType("obdeect.stream")
+    stream.Reader = lambda _path: iter(records)
+    obdeect = types.ModuleType("obdeect")
+    obdeect.stream = stream
+    monkeypatch.setitem(sys.modules, "obdeect", obdeect)
+    monkeypatch.setitem(sys.modules, "obdeect.stream", stream)
 
 
 def _photons(n=2):
@@ -147,7 +153,7 @@ def _photons(n=2):
 def test_native_reader_rejects_photons_before_first_event(monkeypatch):
     from obdeect_validation.adapters import readers
 
-    monkeypatch.setattr(readers, "Reader", _fake_stream([_photons()]))
+    _fake_stream(monkeypatch, [_photons()])
     with pytest.raises(ValueError, match="before its first event"):
         readers.read_native("x")
     counts, columns = readers.read_native("x", require_events=False)
@@ -158,7 +164,7 @@ def test_native_reader_counts_weight_per_event(monkeypatch):
     from obdeect_validation.adapters import readers
 
     records = [{"type": "event"}, _photons(3), {"type": "event"}, _photons(1)]
-    monkeypatch.setattr(readers, "Reader", _fake_stream(records))
+    _fake_stream(monkeypatch, records)
     assert readers.read_native("x")[0] == [3.0, 1.0]
 
 
