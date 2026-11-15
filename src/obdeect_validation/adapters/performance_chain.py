@@ -275,7 +275,7 @@ def shower_candidate(work, source, inputs, threads):
                     "propagation",
                     "run",
                     "--transmission",
-                    inputs["table"],
+                    inputs["atmosphere"],
                     "--site-altitude",
                     2156,
                     "--pathlen",
@@ -620,6 +620,15 @@ def envelope_pipeline(
     ]
 
 
+def _abort_pipeline(procs, samplers):
+    """Kill and reap the children of a pipe whose setup failed; stop their samplers."""
+    for proc in procs:
+        proc.kill()
+        proc.wait()
+    for sampler in samplers:
+        sampler.stop()
+
+
 def run_pipeline(stages, output, logs):
     """Run (name, argv) stages as one pipe: each stdout feeds the next stdin, the last writes output.
 
@@ -630,31 +639,38 @@ def run_pipeline(stages, output, logs):
     """
     start = time.perf_counter()
     running = []
+    procs, samplers = [], []  # everything started, for cleanup if the setup fails
     previous = subprocess.DEVNULL
-    for index, (name, argv) in enumerate(stages):
-        last = index == len(stages) - 1
-        argv = [str(arg) for arg in argv]
-        with Path(logs[name]).open("wb") as log:
-            if last:
-                with Path(output).open("wb") as out:
+    try:
+        for index, (name, argv) in enumerate(stages):
+            last = index == len(stages) - 1
+            argv = [str(arg) for arg in argv]
+            with Path(logs[name]).open("wb") as log:
+                if last:
+                    with Path(output).open("wb") as out:
+                        proc = subprocess.Popen(
+                            argv, stdin=previous, stdout=out, stderr=log
+                        )
+                else:
                     proc = subprocess.Popen(
-                        argv, stdin=previous, stdout=out, stderr=log
+                        argv, stdin=previous, stdout=subprocess.PIPE, stderr=log
                     )
-            else:
-                proc = subprocess.Popen(
-                    argv, stdin=previous, stdout=subprocess.PIPE, stderr=log
-                )
-        if previous is not subprocess.DEVNULL:
-            previous.close()  # the parent keeps no copy of the pipe end
-        sampler = (
-            performance.RssSampler(proc.pid)
-            if sys.platform.startswith("linux")
-            else None
-        )
-        if sampler:
-            sampler.start()
-        running.append((name, argv, proc, sampler))
-        previous = proc.stdout
+            procs.append(proc)
+            if previous is not subprocess.DEVNULL:
+                previous.close()  # the parent keeps no copy of the pipe end
+            sampler = (
+                performance.RssSampler(proc.pid)
+                if sys.platform.startswith("linux")
+                else None
+            )
+            if sampler:
+                sampler.start()
+                samplers.append(sampler)
+            running.append((name, argv, proc, sampler))
+            previous = proc.stdout
+    except BaseException:
+        _abort_pipeline(procs, samplers)
+        raise
     exits = {}
 
     def wait(name, proc, sampler):
@@ -828,7 +844,7 @@ def physics_check(root, source, inputs, qe_path, headroom, metrics, details):
     """Camera comparison of the optimised chain with sim_telarray on the same input (report only).
 
     Normal atmosphere everywhere: reference = sim_telarray Bypass_Optics=0 with the config's
-    atmosphere; candidates = obdeect propagation with the same transmission table. Controls:
+    atmosphere; candidates = obdeect propagation with the same atmosphere. Controls:
     the unthinned pipe (weighted propagation, QE applied by sim_telarray).
     """
     work = root / "work" / "physics"
@@ -899,7 +915,6 @@ def run_air_shower(root, source, config, reps, metrics, details):
         "config_dir": config_dir,
         "rotation": co.camera_rotation_deg(config_dir, cfg_text),
         "unit": root / "unit-atmosphere.dat",
-        "table": root / "transmission-below-1000nm.dat",
         "models": str(common.models_root()),
         "qe": config_dir / co.cfg_value(cfg_text, "quantum_efficiency"),
         "qe_variation": float(co.cfg_value(cfg_text, "qe_variation")),
@@ -907,9 +922,8 @@ def run_air_shower(root, source, config, reps, metrics, details):
         "reference_atmosphere": config_dir / ATMOSPHERE_FILE,
     }
     shutil.copyfile(co.UNIT_ATMOSPHERE, inputs["unit"])
-    performance.restrict_table(performance.TRANSMISSION, inputs["table"])
-    # Propagation needs integer wavelengths below 1000 nm, so the table is cut there; the reference
-    # keeps the full table (its wavelengths are never above 1000 nm in the sim_telarray band).
+    # Propagation needs integer wavelengths below 1000 nm, so the reference atmosphere is cut there
+    # for propagation (candidate); the reference keeps the full table.
     performance.restrict_table(inputs["reference_atmosphere"], inputs["atmosphere"])
     headroom = headroom_for(inputs["qe_variation"])
     details["settings"].update(
@@ -917,7 +931,7 @@ def run_air_shower(root, source, config, reps, metrics, details):
             "input": str(source),
             "config": str(config),
             "reference_atmosphere": co.cfg_value(cfg_text, "atmospheric_transmission"),
-            "candidate_atmosphere": "obdeect propagation (transmission table, 250-700 nm); sim_telarray unit table",
+            "candidate_atmosphere": "obdeect propagation (reference atmosphere below 1000 nm, 250-700 nm); sim_telarray unit table",
             "telescopes": list(co.TELESCOPES),
             "pointing": f"zenith {co.ZENITH_DEG} deg, azimuth {co.AZIMUTH_DEG} deg",
         }

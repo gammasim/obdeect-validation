@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -159,7 +161,7 @@ def test_shower_candidate_passes_the_thread_setting_to_trace_stream(
     monkeypatch.setattr(performance_chain.cs, "simulate", lambda *a, **k: None)
     inputs = {
         "rotation": 0.0,
-        "table": tmp_path / "table.dat",
+        "atmosphere": tmp_path / "atmosphere.dat",
         "models": "/models",
         "config": tmp_path / "CTAO.cfg",
         "config_dir": tmp_path,
@@ -339,6 +341,32 @@ def test_run_pipeline_raises_on_a_failed_member(tmp_path: Path, monkeypatch) -> 
         performance_chain.run_pipeline(
             [("bad", ["false"]), ("sink", ["cat"])], tmp_path / "out.bin", logs
         )
+
+
+def test_run_pipeline_kills_started_members_when_setup_fails(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setattr(performance, "RUSAGE", [])
+    started = []
+    real_popen = subprocess.Popen
+
+    def popen(argv, **kwargs):
+        if argv[0] == "no-such-stage":
+            raise FileNotFoundError(argv[0])
+        proc = real_popen(argv, **kwargs)
+        started.append(proc)
+        return proc
+
+    monkeypatch.setattr(performance_chain.subprocess, "Popen", popen)
+    logs = {"sleeper": tmp_path / "s.log", "missing": tmp_path / "m.log"}
+    stages = [
+        ("sleeper", [sys.executable, "-c", "import time; time.sleep(60)"]),
+        ("missing", ["no-such-stage"]),
+    ]
+    with pytest.raises(FileNotFoundError):
+        performance_chain.run_pipeline(stages, tmp_path / "out.bin", logs)
+    assert started[0].returncode < 0  # killed and reaped, not left running
+    assert performance.RUSAGE == []
 
 
 def test_summarise_keeps_pipeline_members() -> None:
