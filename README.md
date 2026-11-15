@@ -46,6 +46,9 @@ performance) with each case's verdict, headline numbers and captioned figures. T
 headline numbers and captions are set in `scripts/report_layout.json`. Hand-written text
 (run, versions, findings) goes into the `<!-- notes:KEY -->` blocks of the README; they are
 kept when it is rewritten (`--readme-only reports/DATE` rewrites without copying).
+Collecting replaces the report (case directories of an earlier collection are removed; the
+README notes stay). A separate run, such as performance, is added with
+`--add RUN reports/DATE`: its cases are listed in `report_only.json` and shown as REPORT ONLY.
 Figures use one palette (`adapters/plotting.py`): obdeect blue, reference program
 orange, analytic expectation black dashed, one colour per telescope or zenith angle.
 Shared helpers (commands, sim_telarray, photon readers, output files) are in

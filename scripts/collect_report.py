@@ -12,34 +12,56 @@ Hand-written text goes into blocks of README.md and is kept when it is rewritten
     <!-- notes:end -->          limits, scope
     <!-- /notes -->             closes each block
 
+A collection replaces the report: case directories and run files of an earlier collection
+into the same directory are removed first (README.md and its notes are kept). Cases of a
+separate run (e.g. performance) are added with --add; they are listed in report_only.json
+and shown as REPORT ONLY. The README shows only the cases of summary.json and that list.
+
     python scripts/collect_report.py results/full-integrated reports/2026-11-13
+    python scripts/collect_report.py --add results/perf reports/2026-11-13
     python scripts/collect_report.py --readme-only reports/2026-11-13
 """
 
+import argparse
 import fnmatch
 import json
 import re
 import shutil
 import string
-import sys
 from pathlib import Path
 
 KEEP_NAMES = {"metrics.json", "details.json"}
 KEEP_SUFFIXES = {".png", ".svg"}
 TOP_LEVEL = ("summary.json", "junit.xml", "report.html")
+REPORT_ONLY = "report_only.json"
 MAX_BYTES = 2_000_000
 LAYOUT = Path(__file__).with_name("report_layout.json")
 NOTES = re.compile(r"<!-- notes:([\w-]+) -->\n(.*?)<!-- /notes -->", re.DOTALL)
 MISSING = "–"
 
 
-def collect(run: Path, report: Path) -> list[Path]:
+def collect(run: Path, report: Path, add: bool = False) -> list[Path]:
+    """Copy a run into a report. Without add, the report is replaced (stale case directories
+    and run files removed, README.md kept); with add, the run's cases are added as report-only
+    cases and recorded in report_only.json."""
     copied = []
     report.mkdir(parents=True, exist_ok=True)
-    for name in TOP_LEVEL:
-        if (run / name).is_file():
-            shutil.copy2(run / name, report / name)
-            copied.append(report / name)
+    if add:
+        listed = set(_read_json(report / REPORT_ONLY).get("cases", []))
+        listed.update(path.parent.name for path in run.glob("*/metrics.json"))
+        (report / REPORT_ONLY).write_text(
+            json.dumps({"cases": sorted(listed)}, indent=2) + "\n", encoding="utf-8"
+        )
+    else:
+        for path in report.iterdir():
+            if path.is_dir():
+                shutil.rmtree(path)
+            elif path.name in (*TOP_LEVEL, REPORT_ONLY):
+                path.unlink()
+        for name in TOP_LEVEL:
+            if (run / name).is_file():
+                shutil.copy2(run / name, report / name)
+                copied.append(report / name)
     for path in sorted(run.rglob("*")):
         relative = path.relative_to(run)
         if (
@@ -188,11 +210,12 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
     summary = _read_json(report / "summary.json")
     cases = list(summary.get("cases", []))
     # Case directories from a separate run (e.g. performance) are shown as report only.
+    # Cases of a separate run added with --add (report_only.json); other directories are ignored.
     known = {case["id"] for case in cases}
     cases += [
-        {"id": path.parent.name, "status": "REPORT ONLY"}
-        for path in sorted(report.glob("*/metrics.json"))
-        if path.parent.name not in known
+        {"id": case_id, "status": "REPORT ONLY"}
+        for case_id in _read_json(report / REPORT_ONLY).get("cases", [])
+        if case_id not in known and (report / case_id).is_dir()
     ]
     statuses = [case.get("status", "UNKNOWN") for case in cases]
     counts = ", ".join(
@@ -306,11 +329,21 @@ def write_readme(report: Path, layout_path: Path = LAYOUT) -> Path:
 
 
 def main() -> None:
-    if sys.argv[1] == "--readme-only":
-        print(write_readme(Path(sys.argv[2])))
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("paths", nargs="+", type=Path, help="RUN REPORT, or REPORT")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--add", action="store_true", help="add RUN as report-only cases")
+    mode.add_argument(
+        "--readme-only", action="store_true", help="rewrite REPORT/README.md"
+    )
+    args = parser.parse_args()
+    if args.readme_only:
+        print(write_readme(args.paths[0]))
         return
-    run, report = Path(sys.argv[1]), Path(sys.argv[2])
-    copied = collect(run, report)
+    if len(args.paths) != 2:
+        parser.error("expected RUN REPORT")
+    run, report = args.paths
+    copied = collect(run, report, add=args.add)
     write_readme(report)
     total = sum(path.stat().st_size for path in copied)
     print(json.dumps({"files": len(copied), "bytes": total}))

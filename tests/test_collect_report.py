@@ -75,14 +75,46 @@ def test_rewrite_keeps_hand_written_notes(tmp_path):
     assert "<!-- notes:sources -->\nff-1m finding.\n<!-- /notes -->" in rewritten
 
 
-def test_case_directory_missing_from_summary_is_report_only(tmp_path):
+def _run(tmp_path, name, case_ids):
+    run = tmp_path / name
+    for case_id in case_ids:
+        (run / case_id).mkdir(parents=True)
+        (run / case_id / "metrics.json").write_text("{}")
+    summary = {"suite": "s", "status": "PASS", "cases": []}
+    summary["cases"] = [{"id": c, "status": "PASS", "metrics": []} for c in case_ids]
+    (run / "summary.json").write_text(json.dumps(summary))
+    return run
+
+
+def test_unlisted_case_directory_is_not_shown(tmp_path):
     report = _report(tmp_path)
-    extra = report / "performance.stages"
-    extra.mkdir()
-    (extra / "metrics.json").write_text("{}")
+    (report / "stale.case").mkdir()
+    (report / "stale.case" / "metrics.json").write_text("{}")
+    assert "stale.case" not in collect_report.write_readme(report).read_text()
+
+
+def test_collect_replaces_stale_cases_and_keeps_notes(tmp_path):
+    report = tmp_path / "report"
+    collect_report.collect(_run(tmp_path, "old", ["sources.old", "stream.a"]), report)
+    (report / "README.md").write_text("<!-- notes:intro -->\nkeep\n<!-- /notes -->\n")
+    collect_report.collect(_run(tmp_path, "new", ["stream.a"]), report)
+    assert not (report / "sources.old").exists()
     readme = collect_report.write_readme(report).read_text()
-    assert "## 2. Performance" in readme
-    assert "REPORT ONLY" in readme
+    assert "sources.old" not in readme and "keep" in readme
+
+
+def test_add_records_report_only_cases(tmp_path):
+    report = tmp_path / "report"
+    collect_report.collect(_run(tmp_path, "full", ["stream.a"]), report)
+    collect_report.collect(
+        _run(tmp_path, "perf", ["performance.stages"]), report, add=True
+    )
+    assert (report / "stream.a").is_dir()  # adding keeps the main run
+    listed = json.loads((report / collect_report.REPORT_ONLY).read_text())
+    assert listed == {"cases": ["performance.stages"]}
+    readme = collect_report.write_readme(report).read_text()
+    assert "## 2. Performance" in readme and "REPORT ONLY" in readme
+    assert json.loads((report / "summary.json").read_text())["suite"] == "s"
 
 
 def test_reading_guide_and_differences_only_for_current_reports(tmp_path):
