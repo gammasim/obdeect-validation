@@ -167,6 +167,73 @@ def test_missing_environment_input_and_module_block_before_command(
     )
 
 
+def test_missing_case_input_blocks_only_that_case(tmp_path: Path) -> None:
+    launched = tmp_path / "launched"
+    shower = tmp_path / "shower.iact"
+    command = {
+        "name": "mark-launch",
+        "argv": [PYTHON, "-c", f"open({str(launched)!r}, 'w').write('started')"],
+    }
+    blocked_case = {
+        "id": "needs-shower",
+        "inputs": [str(shower)],
+        "commands": [command],
+    }
+    other_marker = tmp_path / "other-launched"
+    available = tmp_path / "available.iact"
+    available.write_bytes(b"ready")
+    other_case = {
+        "id": "available",
+        "inputs": [str(available)],
+        "commands": [
+            {
+                "name": "mark",
+                "argv": [
+                    PYTHON,
+                    "-c",
+                    f"open({str(other_marker)!r}, 'w').write('started')",
+                ],
+            }
+        ],
+    }
+    first_case = write_json(tmp_path / "blocked.json", blocked_case)
+    second_case = write_json(tmp_path / "available.json", other_case)
+    suite = write_json(
+        tmp_path / "suite.json",
+        {"id": "unit", "cases": [str(first_case), str(second_case)]},
+    )
+    output = tmp_path / "run"
+    result = invoke("run", "--suite", str(suite), "--output", str(output), cwd=tmp_path)
+    assert result.returncode == 3
+    assert not launched.exists()
+    summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+    case = summary["cases"][0]
+    assert case["status"] == "BLOCKED"
+    assert case["steps"] == []
+    assert case["missing_inputs"] == [str(shower)]
+    assert other_marker.exists()
+    assert summary["cases"][1]["status"] == "PASS"
+
+    shower.write_bytes(b"x")  # present: the case runs
+    output = tmp_path / "run-present"
+    result = invoke("run", "--suite", str(suite), "--output", str(output), cwd=tmp_path)
+    assert result.returncode == 0
+    assert launched.exists()
+    summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+    assert summary["cases"][0]["missing_inputs"] == []
+
+
+def test_case_inputs_must_be_a_list_of_paths(tmp_path: Path) -> None:
+    command = {"name": "noop", "argv": [PYTHON, "-c", "pass"]}
+    valid = suite_file(tmp_path, {"id": "ok", "inputs": [], "commands": [command]})
+    assert invoke("list", "--suite", str(valid), cwd=tmp_path).returncode == 0
+    for bad in ("shower.iact", [""], [1]):
+        case = {"id": "bad-inputs", "inputs": bad, "commands": [command]}
+        suite = suite_file(tmp_path, case)
+        result = invoke("list", "--suite", str(suite), cwd=tmp_path)
+        assert result.returncode == 2, bad
+
+
 def test_timeout_returns_execution_error(tmp_path: Path) -> None:
     case = {
         "id": "timeout",
@@ -347,6 +414,29 @@ def test_resume_reuses_pass_but_invalidates_changed_case(tmp_path: Path) -> None
     assert marker.read_text(encoding="utf-8").splitlines() == ["run", "run"]
     summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
     assert "PASS" in json.dumps(summary)
+
+
+def test_resume_invalidates_changed_and_missing_case_input(tmp_path: Path) -> None:
+    marker = tmp_path / "runs.txt"
+    input_file = tmp_path / "input.dat"
+    input_file.write_text("first", encoding="utf-8")
+    case = metric_case()
+    case["inputs"] = [str(input_file)]
+    case["commands"][0]["argv"][-1] += f"; open({str(marker)!r}, 'a').write('run\\n')"
+    suite = suite_file(tmp_path, case)
+    output = tmp_path / "run"
+    args = ("run", "--suite", str(suite), "--output", str(output))
+    assert invoke(*args, cwd=tmp_path).returncode == 0
+    assert invoke(*args, "--resume", cwd=tmp_path).returncode == 0
+    assert marker.read_text().splitlines() == ["run"]
+    input_file.write_text("second", encoding="utf-8")
+    assert invoke(*args, "--resume", cwd=tmp_path).returncode == 0
+    assert marker.read_text().splitlines() == ["run", "run"]
+    input_file.unlink()
+    assert invoke(*args, "--resume", cwd=tmp_path).returncode == 3
+    summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+    assert summary["cases"][0]["status"] == "BLOCKED"
+    assert summary["cases"][0]["missing_inputs"] == [str(input_file)]
 
 
 def test_resume_invalidates_when_tracked_source_changes(tmp_path: Path) -> None:

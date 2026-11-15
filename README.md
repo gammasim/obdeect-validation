@@ -54,6 +54,9 @@ orange, analytic expectation black dashed, one colour per telescope or zenith an
 Shared helpers (commands, sim_telarray, photon readers, output files) are in
 `adapters/common.py` and `adapters/readers.py`. `VALIDATION_MODELS` overrides the
 simulation-models location (default `/models`).
+A case may list `inputs` (absolute file paths, for example the shower files under
+`/validation/inputs/`): if one is missing the case is reported as blocked (exit status 3) and
+its commands are not run. `inputs` of the environment file block every case.
 Suites select case files. Keep inputs and seeds explicit. Never change a reference
 or tolerance simply to make a failing comparison pass.
 
