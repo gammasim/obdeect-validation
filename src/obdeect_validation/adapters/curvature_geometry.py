@@ -62,7 +62,10 @@ EMISSION_LATERAL_M = (
     (0.0, 5000.0),
     (7000.0, -7000.0),
 )
-SKY_HEIGHT_M = (1000.0, 3000.0)  # above the observation level: emission at 3 and 5 km a.s.l.
+SKY_HEIGHT_M = (
+    1000.0,
+    3000.0,
+)  # above the observation level: emission at 3 and 5 km a.s.l.
 # (zenith deg, azimuth deg) of downward photons; one upward direction (30 deg, 0) is added.
 DOWNWARD = (
     (0.0, 0.0),
@@ -189,7 +192,9 @@ def straight_arrival(x, y, z, cx, cy, z_plane):
     return x + cx * s, y + cy * s, s / LIGHT_SPEED_M_PER_S * 1e9
 
 
-def lateral_shift_closed_form(d_m, z_sky_m, observation_m=SITE_M, radius_m=EARTH_RADIUS_M):
+def lateral_shift_closed_form(
+    d_m, z_sky_m, observation_m=SITE_M, radius_m=EARTH_RADIUS_M
+):
     """sqrt(d^2 + L^2) - L with L = R + z + H: the closed-form shift of zem at lateral d."""
     level = radius_m + z_sky_m + observation_m
     return math.sqrt(d_m * d_m + level * level) - level
@@ -229,7 +234,9 @@ def _write_input(path: Path, curvature_applied: int, photons, telescopes) -> Non
             "w": np.ones(n, dtype=np.float32),
         }
         writer.write_photons(telescope_id, 0, 0, arrays)
-        writer.write("telescope_end", {"telescope_id": telescope_id, "photons": float(n)})
+        writer.write(
+            "telescope_end", {"telescope_id": telescope_id, "photons": float(n)}
+        )
     writer.write("event_end", {})
     writer.write("run_end", {})
     writer.close()
@@ -250,7 +257,8 @@ def _read_output(path: Path):
             block[key].append(np.asarray(record["columns"][key], dtype=np.float64))
     return {
         telescope: {
-            key: np.concatenate(values) if values else np.empty(0) for key, values in block.items()
+            key: np.concatenate(values) if values else np.empty(0)
+            for key, values in block.items()
         }
         for telescope, block in blocks.items()
     }
@@ -278,8 +286,12 @@ def main() -> None:
     upward = [p for p in photons if p["upward"]]
     _write_input(Path("in-sky.pst"), 0, photons, telescopes)
 
-    summary = _run(propagation, "in-sky.pst", "spherical.pst", EARTH_RADIUS_M, "spherical")
-    flat_summary = _run(propagation, "in-sky.pst", "flat.pst", FLAT_RADIUS_M, "spherical")
+    summary = _run(
+        propagation, "in-sky.pst", "spherical.pst", EARTH_RADIUS_M, "spherical"
+    )
+    flat_summary = _run(
+        propagation, "in-sky.pst", "flat.pst", FLAT_RADIUS_M, "spherical"
+    )
     plane_summary = _run(propagation, "in-sky.pst", "plane.pst", EARTH_RADIUS_M, "none")
     curved = _read_output(Path("spherical.pst"))
     flat = _read_output(Path("flat.pst"))
@@ -302,14 +314,18 @@ def main() -> None:
                 f"telescope {telescope_id}: {block['x'].size} photons kept, "
                 f"expected {len(reaching)}"
             )
-        x_arrival, y_arrival, t_arrival = straight_arrival(x_in, y_in, z_in, cx_in, cy_in, z_t)
+        x_arrival, y_arrival, t_arrival = straight_arrival(
+            x_in, y_in, z_in, cx_in, cy_in, z_t
+        )
         position_errors.append(block["x"] - (x_arrival - x_t))
         position_errors.append(block["y"] - (y_arrival - y_t))
         time_errors.append(block["t"] - t_arrival)
         zem_errors.append(block["zem"] - zem_expected)
         # Flat limit: R = 1e12 m against plane-parallel (curvature none) on the same photons.
         for key in ("x", "y", "zem"):
-            flat_differences.append(np.abs(flat[telescope_id][key] - plane[telescope_id][key]))
+            flat_differences.append(
+                np.abs(flat[telescope_id][key] - plane[telescope_id][key])
+            )
     dropped_expected = len(upward) * len(telescopes)
 
     # Lateral shift of zem: emission points at radial distance 5 km (zem does not depend on the
@@ -320,9 +336,12 @@ def main() -> None:
     shift_obdeect = first["zem"][shift_index] - (z_in[shift_index] + SITE_M)
     shift_expected = (LATERAL_SHIFT_KM * 1000.0) ** 2 / (2.0 * EARTH_RADIUS_M)
     shift_relative = np.abs(shift_obdeect / shift_expected - 1.0)
-    shift_closed = np.array([
-        lateral_shift_closed_form(LATERAL_SHIFT_KM * 1000.0, z) for z in z_in[shift_index]
-    ])
+    shift_closed = np.array(
+        [
+            lateral_shift_closed_form(LATERAL_SHIFT_KM * 1000.0, z)
+            for z in z_in[shift_index]
+        ]
+    )
 
     metrics = {
         "sample_count": len(reaching) * len(telescopes),
@@ -335,14 +354,20 @@ def main() -> None:
     }
     details = {
         "limits": LIMITS,
-        "telescopes": [{"telescope_id": t[0], "lateral_m": t[1], "z_m": t[3]} for t in telescopes],
+        "telescopes": [
+            {"telescope_id": t[0], "lateral_m": t[1], "z_m": t[3]} for t in telescopes
+        ],
         "photons": {
             "sky_total": len(photons),
             "reaching": len(reaching),
             "upward": len(upward),
             "dropped_expected": dropped_expected,
         },
-        "run_summaries": {"spherical": summary, "flat_1e12": flat_summary, "none": plane_summary},
+        "run_summaries": {
+            "spherical": summary,
+            "flat_1e12": flat_summary,
+            "none": plane_summary,
+        },
         "flat_limit_difference_m": "max over x, y, zem of |R=1e12 spherical - none| (metric)",
         "lateral_shift": [
             {
@@ -358,7 +383,15 @@ def main() -> None:
         "time_reference": "t_out = s / c, s = (z - z_t) / sqrt(1 - cx^2 - cy^2)",
     }
     common.write_results(metrics, details)
-    _plot(x_in, y_in, z_in, zem_expected, zem_flat, first["zem"], Path("curvature-geometry.png"))
+    _plot(
+        x_in,
+        y_in,
+        z_in,
+        zem_expected,
+        zem_flat,
+        first["zem"],
+        Path("curvature-geometry.png"),
+    )
 
 
 def _plot(x_in, y_in, z_in, zem_expected, zem_flat, zem_obdeect, path: Path) -> None:

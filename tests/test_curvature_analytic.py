@@ -30,7 +30,9 @@ def _simpson_grid(values, grid):
 
 def test_chapman_at_zenith_is_one():
     # Ch(x, 1) = 1: the column straight up from r is H exactly.
-    assert chapman_case.chapman(800.0, 1.0, intervals=200000) == pytest.approx(1.0, rel=1e-7)
+    assert chapman_case.chapman(800.0, 1.0, intervals=200000) == pytest.approx(
+        1.0, rel=1e-7
+    )
 
 
 @pytest.mark.parametrize("x", [5.0, 20.0])
@@ -45,7 +47,9 @@ def test_chapman_horizon_limit_sqrt_pi_x_over_2():
     # Asymptotically Ch(x, 0) = sqrt(pi x / 2) (1 + 3/(8x) + ...).
     x = 2000.0
     actual = chapman_case.chapman(x, 0.0, intervals=400000, upper_y=2.0)
-    assert actual == pytest.approx(math.sqrt(math.pi * x / 2.0) * (1.0 + 3.0 / (8.0 * x)), rel=1e-4)
+    assert actual == pytest.approx(
+        math.sqrt(math.pi * x / 2.0) * (1.0 + 3.0 / (8.0 * x)), rel=1e-4
+    )
 
 
 def test_chapman_flat_limit_is_secant_for_large_x():
@@ -69,7 +73,12 @@ def test_slant_depth_chapman_matches_exact_exponential_integral():
 
         def integrand(u):
             h = h_t + u * u
-            return density(h) * 2.0 * u / np.sqrt(chapman_case.cos_theta_squared(h, h_t, cos_t))
+            return (
+                density(h)
+                * 2.0
+                * u
+                / np.sqrt(chapman_case.cos_theta_squared(h, h_t, cos_t))
+            )
 
         direct = chapman_case.simpson(integrand, 0.0, math.sqrt(z - h_t), 400000)
         closed = chapman_case.slant_depth_chapman(h_t, z, cos_t)
@@ -84,7 +93,11 @@ def test_cos_theta_squared_stable_form_matches_naive_form():
             naive = (
                 1.0
                 - (1.0 - cos_t * cos_t)
-                * ((chapman_case.EARTH_RADIUS_M + h_t) / (chapman_case.EARTH_RADIUS_M + h)) ** 2
+                * (
+                    (chapman_case.EARTH_RADIUS_M + h_t)
+                    / (chapman_case.EARTH_RADIUS_M + h)
+                )
+                ** 2
             )
             stable = chapman_case.cos_theta_squared(h, h_t, cos_t)
             assert stable == pytest.approx(naive, rel=1e-12)
@@ -96,7 +109,9 @@ def test_cos_theta_squared_keeps_grazing_rays_small_corrections():
     cos_t = math.cos(math.radians(89.5))
     sin_t = math.sin(math.radians(89.5))
     dh = 1e-3
-    correction = chapman_case.cos_theta_squared(2000.0 + dh, 2000.0, cos_t) - cos_t * cos_t
+    correction = (
+        chapman_case.cos_theta_squared(2000.0 + dh, 2000.0, cos_t) - cos_t * cos_t
+    )
     assert correction == pytest.approx(
         sin_t * sin_t * 2.0 * dh / chapman_case.EARTH_RADIUS_M, rel=1e-4
     )
@@ -110,7 +125,9 @@ def test_plane_parallel_limit_of_table_slant_depth(monkeypatch):
     table = chapman_case.PiecewiseTable(heights, tau)
     for zenith in (0.0, 30.0, 60.0):
         cos_t = math.cos(math.radians(zenith))
-        table_form = chapman_case.slant_depth_table(table, 2000.0, 40000.0, cos_t, intervals=200000)
+        table_form = chapman_case.slant_depth_table(
+            table, 2000.0, 40000.0, cos_t, intervals=200000
+        )
         plane = chapman_case.plane_parallel_depth(table, 2000.0, 40000.0, cos_t)
         assert table_form == pytest.approx(plane, rel=1e-6)
 

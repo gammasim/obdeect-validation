@@ -159,7 +159,9 @@ class PiecewiseTable:
     def derivative(self, height_m):
         h = np.asarray(height_m, dtype=float)
         k = np.clip(
-            np.searchsorted(self.log_h, np.log10(h), side="right") - 1, 0, len(self.slope) - 1
+            np.searchsorted(self.log_h, np.log10(h), side="right") - 1,
+            0,
+            len(self.slope) - 1,
         )
         value = self.slope[k] / (h * math.log(10.0))
         return np.where(h >= self.top_m, 0.0, value)
@@ -188,7 +190,9 @@ def simpson(f, a, b, intervals):
     return (b - a) / (3.0 * intervals) * float(np.sum(weights * f(x)))
 
 
-def slant_depth_table(table: PiecewiseTable, h_t, z, cos_t, intervals=REFERENCE_INTERVALS):
+def slant_depth_table(
+    table: PiecewiseTable, h_t, z, cos_t, intervals=REFERENCE_INTERVALS
+):
     """int_{h_t}^{z} d tau/dh / cos(theta(h)) dh with h = h_t + u^2 (the table form)."""
     upper = math.sqrt(z - h_t)
 
@@ -218,7 +222,8 @@ def slant_depth_chapman(h_t, z, cos_t):
     x_t = (EARTH_RADIUS_M + h_t) / SCALE_HEIGHT_M
     x_e = r_e / SCALE_HEIGHT_M
     return VERTICAL_DEPTH * (
-        chapman(x_t, cos_t) - math.exp(-(z - h_t) / SCALE_HEIGHT_M) * chapman(x_e, cos_e)
+        chapman(x_t, cos_t)
+        - math.exp(-(z - h_t) / SCALE_HEIGHT_M) * chapman(x_e, cos_e)
     )
 
 
@@ -321,18 +326,26 @@ def main() -> None:
         curvature="corsika",
     )
     curved = Path("curved.pst")
-    propagation.propagate("in-curved.pst", curved, earth_radius_m=EARTH_RADIUS_M, **kwargs)
+    propagation.propagate(
+        "in-curved.pst", curved, earth_radius_m=EARTH_RADIUS_M, **kwargs
+    )
     p_curved, w_curved, zem_out = _read_output(curved)
     if p_curved.size != len(samples):
-        raise RuntimeError(f"expected {len(samples)} output photons, got {p_curved.size}")
+        raise RuntimeError(
+            f"expected {len(samples)} output photons, got {p_curved.size}"
+        )
     if not np.array_equal(zem_out.astype(np.float32), z_emission):
         raise RuntimeError("output photons are not in input order")
 
     # Flat limit: the zenith <= 60 deg photons only. Weighted output drops w = 0 rows, and at
     # 89.5 deg the plane-parallel depth of 40 km is above 100 (T = 0 by the kernel's cutoff),
     # so the flat run must not contain it; a missing row would shift the comparison.
-    flat_index = [i for i, (zenith, _) in enumerate(samples) if zenith <= FLAT_MAX_ZENITH_DEG]
-    _write_input(Path("in-flat.pst"), 1, cx[flat_index], cy[flat_index], z_emission[flat_index])
+    flat_index = [
+        i for i, (zenith, _) in enumerate(samples) if zenith <= FLAT_MAX_ZENITH_DEG
+    ]
+    _write_input(
+        Path("in-flat.pst"), 1, cx[flat_index], cy[flat_index], z_emission[flat_index]
+    )
     flat = Path("flat.pst")
     propagation.propagate("in-flat.pst", flat, earth_radius_m=FLAT_RADIUS_M, **kwargs)
     p_flat_subset, _, zem_flat = _read_output(flat)
@@ -349,27 +362,34 @@ def main() -> None:
         tau_ref = slant_depth_table(table, SITE_M, z, cos_t)
         tau_chap = slant_depth_chapman(SITE_M, z, cos_t)
         tau_plane = plane_parallel_depth(table, SITE_M, z, cos_t)
-        rows.append({
-            "zenith_deg": zenith,
-            "emission_m": z,
-            "cos_theta_t": cos_t,
-            "tau_reference_table": tau_ref,
-            "tau_chapman": tau_chap,
-            "tau_plane_table": tau_plane,
-            "transmission_curved": float(p_curved[i]),
-            "transmission_flat": None if np.isnan(p_flat[i]) else float(p_flat[i]),
-            "transmission_reference_table": math.exp(-tau_ref),
-            "transmission_chapman": math.exp(-tau_chap),
-            "transmission_plane": math.exp(-tau_plane),
-            "weight": float(w_curved[i]),
-        })
+        rows.append(
+            {
+                "zenith_deg": zenith,
+                "emission_m": z,
+                "cos_theta_t": cos_t,
+                "tau_reference_table": tau_ref,
+                "tau_chapman": tau_chap,
+                "tau_plane_table": tau_plane,
+                "transmission_curved": float(p_curved[i]),
+                "transmission_flat": None if np.isnan(p_flat[i]) else float(p_flat[i]),
+                "transmission_reference_table": math.exp(-tau_ref),
+                "transmission_chapman": math.exp(-tau_chap),
+                "transmission_plane": math.exp(-tau_plane),
+                "weight": float(w_curved[i]),
+            }
+        )
 
     rel_ref = [
-        abs(r["transmission_curved"] / r["transmission_reference_table"] - 1.0) for r in rows
+        abs(r["transmission_curved"] / r["transmission_reference_table"] - 1.0)
+        for r in rows
     ]
-    rel_chap = [abs(r["transmission_curved"] / r["transmission_chapman"] - 1.0) for r in rows]
+    rel_chap = [
+        abs(r["transmission_curved"] / r["transmission_chapman"] - 1.0) for r in rows
+    ]
     flat_rows = [r for r in rows if r["transmission_flat"] is not None]
-    rel_flat = [abs(r["transmission_flat"] / r["transmission_plane"] - 1.0) for r in flat_rows]
+    rel_flat = [
+        abs(r["transmission_flat"] / r["transmission_plane"] - 1.0) for r in flat_rows
+    ]
     violations = sum(
         1
         for r in rows
@@ -380,7 +400,8 @@ def main() -> None:
     hs = np.linspace(SITE_M, 40000.0, 400001)
     table_error = np.abs(table.depth(hs) - exact_depth(hs))
     table_transmission = max(
-        abs(math.exp(-r["tau_reference_table"]) / math.exp(-r["tau_chapman"]) - 1.0) for r in rows
+        abs(math.exp(-r["tau_reference_table"]) / math.exp(-r["tau_chapman"]) - 1.0)
+        for r in rows
     )
 
     metrics = {
@@ -398,7 +419,9 @@ def main() -> None:
             "wavelengths_nm": [WAVELENGTHS_NM[0], WAVELENGTHS_NM[-1]],
             "tau_exact_model": "A (1 - exp(-(h - H2)/H)), A = 1, H = 8 km, H2 = 2 km",
             "interpolation_max_abs_error_tau_2_40km": float(np.max(table_error)),
-            "interpolation_height_of_max_error_m": float(hs[int(np.argmax(table_error))]),
+            "interpolation_height_of_max_error_m": float(
+                hs[int(np.argmax(table_error))]
+            ),
             "max_transmission_error_table_vs_chapman": table_transmission,
         },
         "flat_residual_estimate": {
@@ -431,7 +454,8 @@ def _plot(rows, path: Path) -> None:
     for i, height in enumerate(heights):
         color = plotting.CYCLE[i % len(plotting.CYCLE)]
         subset = sorted(
-            (r for r in rows if r["emission_m"] == height), key=lambda r: r["zenith_deg"]
+            (r for r in rows if r["emission_m"] == height),
+            key=lambda r: r["zenith_deg"],
         )
         zenith = [r["zenith_deg"] for r in subset]
         label = f"{height / 1000:g} km"
@@ -455,7 +479,10 @@ def _plot(rows, path: Path) -> None:
         )
         axes[0, 1].plot(
             zenith,
-            [r["transmission_curved"] / r["transmission_chapman"] - 1.0 for r in subset],
+            [
+                r["transmission_curved"] / r["transmission_chapman"] - 1.0
+                for r in subset
+            ],
             "o-",
             color=color,
             label=label,
