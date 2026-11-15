@@ -30,6 +30,11 @@ if [[ "${MODE3:-0}" == 1 ]]; then
   simtel_commit=$(git -C sim_telarray rev-parse --verify "$simtel_ref^{commit}")
   simtel_src=$(mktemp -d "${TMPDIR:-/tmp}/simtel-src.XXXXXX")
   git -C sim_telarray archive "$simtel_commit" | tar -x -C "$simtel_src"
+  # hessio at HESSIO_REV (pinned), exported with git archive from the clone HESSIO_REPO.
+  hessio_rev=${HESSIO_REV:-604578331f4696703001e4af3b95a19cdcaa3852}
+  : "${HESSIO_REPO:?set HESSIO_REPO to a hessio git clone containing $hessio_rev}"
+  hessio_src=$(mktemp -d "${TMPDIR:-/tmp}/hessio-src.XXXXXX")
+  git -C "$HESSIO_REPO" archive "$hessio_rev" | tar -x -C "$hessio_src"
   podman build --rm \
     --ignorefile obdeect-validation/containers/context.ignore \
     --build-arg "VALIDATION_IMAGE=$image" \
@@ -39,11 +44,6 @@ if [[ "${MODE3:-0}" == 1 ]]; then
     --build-context "hessio=$hessio_src" \
     --file obdeect-validation/containers/Dockerfile.mode3 \
     --tag obdeect-validation:mode3 .
-  # hessio at HESSIO_REV (pinned), exported with git archive from the clone HESSIO_REPO.
-  hessio_rev=${HESSIO_REV:-604578331f4696703001e4af3b95a19cdcaa3852}
-  : "${HESSIO_REPO:?set HESSIO_REPO to a hessio git clone containing $hessio_rev}"
-  hessio_src=$(mktemp -d "${TMPDIR:-/tmp}/hessio-src.XXXXXX")
-  git -C "$HESSIO_REPO" archive "$hessio_rev" | tar -x -C "$hessio_src"
   run_image=obdeect-validation:mode3
   extra_env=(--env SIMTEL_CANDIDATE_BINARY=/opt/mode3/sim_telarray)
 fi
