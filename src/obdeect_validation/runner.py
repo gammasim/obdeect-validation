@@ -59,7 +59,7 @@ def validate_case(case: dict[str, Any], where: str = "case") -> dict[str, Any]:
     _keys(
         case,
         {"id", "commands"},
-        {"id", "name", "requires", "timeout", "commands", "metrics"},
+        {"id", "name", "requires", "inputs", "timeout", "commands", "metrics"},
         where,
     )
     _string(case["id"], f"{where}.id")
@@ -69,6 +69,8 @@ def validate_case(case: dict[str, Any], where: str = "case") -> dict[str, Any]:
         _string(case["name"], f"{where}.name")
     if "requires" in case:
         _require_list(case["requires"], f"{where}.requires")
+    if "inputs" in case:
+        _input_list(case["inputs"], f"{where}.inputs")
     _timeout(case.get("timeout", 3600), f"{where}.timeout")
     for i, command in enumerate(case["commands"]):
         label = f"{where}.commands[{i}]"
@@ -132,6 +134,14 @@ def _require_list(value: Any, where: str) -> list[str]:
         not isinstance(item, str) or not item for item in value
     ):
         raise ConfigError(f"{where}: expected a list of executable names")
+    return value
+
+
+def _input_list(value: Any, where: str) -> list[str]:
+    if not isinstance(value, list) or any(
+        not isinstance(item, str) or not item for item in value
+    ):
+        raise ConfigError(f"{where}: expected a list of input file paths")
     return value
 
 
@@ -298,7 +308,7 @@ def _signal_group(process: subprocess.Popen[bytes], sig: int) -> bool:
     """
     try:
         os.killpg(process.pid, sig)
-    except (ProcessLookupError, PermissionError):
+    except ProcessLookupError, PermissionError:
         return False
     return True
 
@@ -449,7 +459,11 @@ def _run_case(
     fingerprint = _fingerprint(case, provenance, tools)
     if missing_modules is None:
         missing_modules = _missing_modules(environment)
-    missing_inputs = [str(path) for path in environment["inputs"] if not path.is_file()]
+    # Inputs of the environment block every case; inputs of the case only that case.
+    wanted = [*environment["inputs"], *(Path(item) for item in case.get("inputs", []))]
+    missing_inputs = list(
+        dict.fromkeys(str(path) for path in wanted if not path.is_file())
+    )
     result: dict[str, Any] = {
         "id": case["id"],
         "name": case.get("name", case["id"]),

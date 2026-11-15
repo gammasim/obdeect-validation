@@ -167,6 +167,49 @@ def test_missing_environment_input_and_module_block_before_command(
     )
 
 
+def test_missing_case_input_blocks_only_that_case(tmp_path: Path) -> None:
+    launched = tmp_path / "launched"
+    shower = tmp_path / "shower.iact"
+    command = {
+        "name": "mark-launch",
+        "argv": [PYTHON, "-c", f"open({str(launched)!r}, 'w').write('started')"],
+    }
+    blocked_case = {
+        "id": "needs-shower",
+        "inputs": [str(shower)],
+        "commands": [command],
+    }
+    suite = suite_file(tmp_path, blocked_case)
+    output = tmp_path / "run"
+    result = invoke("run", "--suite", str(suite), "--output", str(output), cwd=tmp_path)
+    assert result.returncode == 3
+    assert not launched.exists()
+    summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+    case = summary["cases"][0]
+    assert case["status"] == "BLOCKED"
+    assert case["steps"] == []
+    assert case["missing_inputs"] == [str(shower)]
+
+    shower.write_bytes(b"x")  # present: the case runs
+    output = tmp_path / "run-present"
+    result = invoke("run", "--suite", str(suite), "--output", str(output), cwd=tmp_path)
+    assert result.returncode == 0
+    assert launched.exists()
+    summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+    assert summary["cases"][0]["missing_inputs"] == []
+
+
+def test_case_inputs_must_be_a_list_of_paths(tmp_path: Path) -> None:
+    command = {"name": "noop", "argv": [PYTHON, "-c", "pass"]}
+    valid = suite_file(tmp_path, {"id": "ok", "inputs": [], "commands": [command]})
+    assert invoke("list", "--suite", str(valid), cwd=tmp_path).returncode == 0
+    for bad in ("shower.iact", [""], [1]):
+        case = {"id": "bad-inputs", "inputs": bad, "commands": [command]}
+        suite = suite_file(tmp_path, case)
+        result = invoke("list", "--suite", str(suite), cwd=tmp_path)
+        assert result.returncode == 2, bad
+
+
 def test_timeout_returns_execution_error(tmp_path: Path) -> None:
     case = {
         "id": "timeout",
