@@ -582,14 +582,15 @@ def test_evaluate_counts_refraction_and_iact_bit_disagreement():
     assert metrics["iact_curved_bit_mismatch"] == 1
 
 
-def test_evaluate_log_pattern_enforced_and_missing_log_recorded():
+@pytest.mark.parametrize("kind", ["curved", "flat"])
+def test_evaluate_log_pattern_enforced_and_missing_log_recorded(kind):
     metrics, _ = stream_curved_flag.evaluate(_items(flat={"log_text": CURVED_LOG}))
     assert metrics["curved_log_pattern_mismatch"] == 1
     metrics, details = stream_curved_flag.evaluate(
-        _items(curved={"log_text": None, "log": "missing"})
+        _items(**{kind: {"log_text": None, "log": "missing"}})
     )
-    assert metrics["curved_log_pattern_mismatch"] == 0
-    assert details["log_missing"] == ["curved"]
+    assert metrics["curved_log_pattern_mismatch"] == 1
+    assert details["log_missing"] == [kind]
 
 
 def test_routes_for_skips_api_when_not_importable(monkeypatch, tmp_path):

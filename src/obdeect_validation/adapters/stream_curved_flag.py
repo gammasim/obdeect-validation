@@ -11,7 +11,7 @@ flat_file_curvature_applied (expected 0), word79_flag_mismatch (run key against 
 conversion route), iact_curved_bit_mismatch (word 77 bit 0x40 against word 79),
 refraction_bit_mismatch (refraction_applied against word 77 bit 0x10, per route),
 run_key_missing_count (absent run keys or run records, per route), curved_log_pattern_mismatch
-(curved log without the pattern or flat log with it; a missing log is recorded in details only).
+(curved log without the pattern, flat log with it, or a missing log).
 """
 
 from __future__ import annotations
@@ -104,6 +104,7 @@ def evaluate(items: list[dict]) -> tuple[dict, dict]:
         log_text = item.get("log_text")
         if log_text is None:
             details["log_missing"].append(kind)
+            metrics["curved_log_pattern_mismatch"] += 1
         elif curved_showers.log_is_curved(log_text) != (kind == "curved"):
             metrics["curved_log_pattern_mismatch"] += 1
         details["files"][kind] = {
