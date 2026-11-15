@@ -385,7 +385,17 @@ def _provenance(environment: dict[str, Any]) -> dict[str, Any]:
 def _fingerprint(
     case: dict[str, Any], provenance: dict[str, Any], tools: dict[str, str | None]
 ) -> str:
-    payload = {"case": case, "provenance": provenance, "executables": tools}
+    inputs = {
+        item: _hash_file(path) if path.is_file() else None
+        for item in case.get("inputs", [])
+        for path in [Path(item)]
+    }
+    payload = {
+        "case": case,
+        "case_inputs": inputs,
+        "provenance": provenance,
+        "executables": tools,
+    }
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
