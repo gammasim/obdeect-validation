@@ -146,3 +146,37 @@ def test_links_are_listed_not_embedded(tmp_path):
         "simtools plots: [extra.png](sources.flasher-dish/extra.png)"
     )
     assert not any(line.startswith("![") for line in lines)
+
+
+def test_curvature_cases_have_their_own_step_and_detail_values(tmp_path):
+    report = tmp_path / "2099-01-01"
+    shower = {
+        "pe_ratio": {
+            "measured_ratio": 1.25,
+            "predicted_ratio": 1.24,
+            "ratio_error": 0.01,
+        }
+    }
+    cases = {
+        "propagation.extinction-analytic": ({"sample_count": 16}, {}),
+        "propagation.curvature-chapman": ({"sample_count": 30}, {}),
+        "chain.curvature-high-zenith": (
+            {"file_count": 2, "pe_ratio_vs_prediction_limit_exceeded": 0},
+            {"showers": [shower, shower]},
+        ),
+    }
+    for case_id, (metrics, details) in cases.items():
+        (report / case_id).mkdir(parents=True)
+        (report / case_id / "metrics.json").write_text(json.dumps(metrics))
+        (report / case_id / "details.json").write_text(json.dumps(details))
+    summary = {"suite": "s", "status": "PASS", "cases": []}
+    summary["cases"] = [{"id": c, "status": "PASS", "metrics": []} for c in cases]
+    (report / "summary.json").write_text(json.dumps(summary))
+    readme = collect_report.write_readme(report).read_text()
+    atmosphere = readme.split("## 1. Atmosphere (propagation)")[1].split("## 2.")[0]
+    curvature = readme.split("## 2. Earth curvature (large zenith angles)")[1]
+    assert "extinction-analytic" in atmosphere and "curvature-chapman" not in atmosphere
+    assert "curvature-chapman" in curvature and "curvature-high-zenith" in curvature
+    assert "65°: p.e. ratio 1.2500 vs predicted 1.2400" in readme
+    # A details field that is absent gives the missing mark, not an error.
+    assert collect_report.format_row("{showers[5][x]}", {"showers": []}) == "–"

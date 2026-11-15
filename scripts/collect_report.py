@@ -93,21 +93,34 @@ def _case_layout(layout: dict, case_id: str) -> dict:
 
 
 def _step_of(layout: dict, case_id: str) -> dict:
+    """Step of a case: a step listing the case in 'cases' (patterns) wins over id prefixes."""
     for step in layout["steps"]:
-        if case_id.startswith(step["prefix"]):
+        if any(fnmatch.fnmatchcase(case_id, p) for p in step.get("cases", [])):
+            return step
+    for step in layout["steps"]:
+        if "prefix" in step and case_id.startswith(step["prefix"]):
             return step
     return {"key": "other", "title": "Other cases", "intro": ""}
 
 
-def format_row(template: str, metrics: dict) -> str:
-    """Fill a format string with metric values; a missing or wrong-typed value gives '–'."""
+def format_row(template: str, values: dict) -> str:
+    """Fill a format string with case values (metrics, and details fields such as
+    {showers[0][zenith_deg]}); a missing or wrong-typed value gives '–'."""
     fields = [name for _, name, _, _ in string.Formatter().parse(template) if name]
-    if any(metrics.get(name) is None for name in fields):
+    if any(values.get(re.split(r"[.\[]", name)[0]) is None for name in fields):
         return MISSING
     try:
-        return template.format(**metrics)
-    except (ValueError, TypeError):
+        return template.format(**values)
+    except (ValueError, TypeError, KeyError, IndexError):
         return MISSING
+
+
+def _values(case_dir: Path) -> dict:
+    """Values for the layout templates: details.json fields, overridden by metrics.json."""
+    return {
+        **_read_json(case_dir / "details.json"),
+        **_read_json(case_dir / "metrics.json"),
+    }
 
 
 def _anchor(case_id: str) -> str:
@@ -247,7 +260,7 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
         for case in cases:
             if _step_of(layout, case["id"]) != step:
                 continue
-            metrics = _read_json(report / case["id"] / "metrics.json")
+            metrics = _values(report / case["id"])
             entry = _case_layout(layout, case["id"])
             lines.append(
                 f"| {number}. {step['title']} | [{_title(entry, case, step)}](#{_anchor(case['id'])}) "
@@ -275,7 +288,7 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
             if _step_of(layout, case["id"]) != step:
                 continue
             case_dir = report / case["id"]
-            metrics = _read_json(case_dir / "metrics.json")
+            metrics = _values(case_dir)
             entry = _case_layout(layout, case["id"])
             lines += [
                 f'<a id="{_anchor(case["id"])}"></a>',
