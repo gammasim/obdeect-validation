@@ -1,0 +1,26 @@
+{
+  "id": "performance.air-shower",
+  "name": "Air shower: CORSIKA IACT -> sim_telarray full optics versus obdeect chain ending in sim_telarray camera (Bypass_Optics=1); threads=1 and default (report only)",
+  "requires": ["obdeect", "simtools-generate-array-config", "python3"],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": ["simtools-generate-array-config", "--site", "North", "--array_element_list", "LSTN-01",
+               "--model_version", "7.0.0", "--simulation_models_path", "/models", "--output_path", "cfg"],
+      "timeout": 900
+    },
+    {
+      "name": "measure-air-shower",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.performance_chain", "air-shower",
+               "--config", "cfg/model/7.0.0/CTAO.cfg"],
+      "timeout": 7200
+    }
+  ],
+  "metrics": [
+    {"metric": "reference_completed", "expected": 1, "atol": 0},
+    {"metric": "candidate_threads1_completed", "expected": 1, "atol": 0},
+    {"metric": "candidate_threadsdefault_completed", "expected": 1, "atol": 0},
+    {"metric": "candidate_envelope_completed", "expected": 1, "atol": 0},
+    {"metric": "physics_completed", "expected": 1, "atol": 0}
+  ]
+}
