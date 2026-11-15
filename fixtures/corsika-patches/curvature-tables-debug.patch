@@ -1,0 +1,198 @@
+curvature-tables-debug.patch: output-only trace for the CORSIKA CURVED table comparison.
+
+Base: simpipe/simulation_software/corsika7, commit 4363a29c (HEAD of that checkout); src/corsika.F
+blob 4548f67a, unmodified there. Apply in the corsika7 source directory (the one that holds src/):
+
+    cd <corsika7>
+    patch -p0 --dry-run < curvature-tables-debug.patch    # check
+    patch -p0 < curvature-tables-debug.patch              # or: git apply curvature-tables-debug.patch
+
+Changes (output only; physics, random number streams and card parsing are not changed):
+
+  INRTAB, after the table is built: CVTBHD writes the constants (C(1), C(25), OBSLEV(1), ETADSN,
+  MODATM, IATMOX and FREFRX when __ATMEXT__) and 32 table rows: theta 0, 30, 60, 70, 75, 80, 85,
+  89 deg (N = 4 theta) by height 3, 8, 20, 60 km (M = 4 h), DISTEF and TOF at each.
+
+  CERENK, IACT branch, after TELOUT: each bunch that hits a telescope (ITHIT .NE. 0) writes one
+  line 'BUNCH' (see the format 9611), at most NCVTMX = 200 per shower. Fields: shower number,
+  bunch number in the shower, N2 and M2 of the table cell, then 22 reals: WEMIS, ZAPP, ZEM, STHE,
+  RDIST, TOFIP, TEMIS*1e9, CARTIM, UMEAN, VMEAN, WMEAN, UEMIS2, VEMIS2, CTHETA, the four DISTEF
+  values of the cell (N2,M2), (N2,M1), (N1,M2), (N1,M1) and the four TOF values in the same order.
+
+Enable at run time: set the environment variable OBDEECT_CURVTAB (any non-empty value). The file
+curvature-tables.dat is written to the run directory. Do not set CDEBUG for this run: the existing
+LCERDB prints (for example in TOFIP) flood the normal log and are not needed.
+
+Units: lengths in cm (as CORSIKA), times in ns, angles as cosines (WEMIS, CTHETA, UMEAN, ...).
+See docs/curvature-corsika-tables.md of obdeect-validation for the card, the run and the analysis.
+
+--- corsika.F
++++ corsika.F
+@@ -76920,6 +76920,9 @@
+ #if !__IACT__
+ #define __CERTELINC__
+ #define __CEREN3INC__
++#endif
++#if __CURVED__
++#define __RTABLEINC__
+ #endif
+ #include "corsika.h"
+
+@@ -76951,6 +76954,15 @@
+ #if __CERENKOV__
+       DOUBLE PRECISION DISTIP,TOFIP
+       EXTERNAL         DISTIP,TOFIP
++#if __CURVED__
++C  OBDEECT VALIDATION TRACE (CVTBUN): BUNCH COUNTER PER SHOWER
++      INTEGER          CVTBUN,CVUN,CVN1,CVN2,CVM1,CVM2,ICVEV,ICVBN
++      INTEGER          NCVTMX
++      PARAMETER        ( NCVTMX = 200 )
++      DOUBLE PRECISION CVTH2,CVHH2,CVDS(4),CVTF(4)
++      EXTERNAL         CVTBUN
++      DATA             ICVEV / -1 /, ICVBN / 0 /
++#endif
+ #endif
+ #else
+ #if !__CERWLEN__
+@@ -77551,6 +77563,42 @@
+      *                  AMASS,CHARGE
+ #endif
+      *                )
++#if __CURVED__
++C  OBDEECT VALIDATION TRACE: BUNCHES THAT HIT A TELESCOPE, AT MOST
++C  NCVTMX PER SHOWER, TO THE UNIT OF CVTBUN (ENV OBDEECT_CURVTAB).
++        IF ( ITHIT .NE. 0 ) THEN
++          CVUN = CVTBUN()
++          IF ( CVUN .GT. 0 ) THEN
++            IF ( ISHOWNO .NE. ICVEV ) THEN
++              ICVEV = ISHOWNO
++              ICVBN = 0
++            ENDIF
++            CVTH2 = ACOS( WEMIS ) * ( 180.D0/PI ) * 4.D0
++            CVHH2 = ZAPP * 1.D-5 * 4.D0
++            CVN2  = INT( CVTH2 )
++            CVM2  = INT( CVHH2 )
++            CVN1  = CVN2 + 1
++            CVM1  = CVM2 + 1
++            IF ( ICVBN .LT. NCVTMX  .AND.  CVN1 .LE. 360  .AND.
++     *           CVM1 .LE. 452 ) THEN
++              ICVBN = ICVBN + 1
++              CVDS(1) = DISTEF(CVN2,CVM2)
++              CVDS(2) = DISTEF(CVN2,CVM1)
++              CVDS(3) = DISTEF(CVN1,CVM2)
++              CVDS(4) = DISTEF(CVN1,CVM1)
++              CVTF(1) = TOF(CVN2,CVM2)
++              CVTF(2) = TOF(CVN2,CVM1)
++              CVTF(3) = TOF(CVN1,CVM2)
++              CVTF(4) = TOF(CVN1,CVM1)
++              WRITE(CVUN,9611) ISHOWNO,ICVBN,CVN2,CVM2,WEMIS,ZAPP,ZEM,
++     *          STHE,RDIST,TOFIP(WEMIS,ZAPP),TEMIS*1.D9,CARTIM,UMEAN,
++     *          VMEAN,WMEAN,UEMIS2,VEMIS2,CTHETA,CVDS(1),CVDS(2),
++     *          CVDS(3),CVDS(4),CVTF(1),CVTF(2),CVTF(3),CVTF(4)
++            ENDIF
++          ENDIF
++        ENDIF
++ 9611   FORMAT('BUNCH',I10,I7,2I6,22(1X,E23.15))
++#endif
+ C  WHETHER THE PHOTON BUNCH SHOULD BE OUTPUT VIA THE OUTPT2 FUNCTION
+ C  DEPENDS ON THE RETURN CODE FROM TELOUT. IF STORING OF BUNCHES IS
+ C  DONE ALREADY IN TELOUT, ITHIT=0 WOULD INDICATE NO TELESCOPE WAS HIT
+@@ -78363,9 +78411,99 @@
+  211      FORMAT(1H ,F9.5,' |',10(1X,F7.1),' |',I3)
+         ENDDO
+         WRITE(MDEBUG,*) ' '
++      ENDIF
++
++      CALL CVTBHD
++
++      RETURN
++      END
++
++C-----------------------------------------------------------------------
++C  OBDEECT VALIDATION TRACE (NOT CORSIKA PHYSICS). RETURNS THE UNIT OF
++C  THE TRACE FILE curvature-tables.dat, OPENED ON THE FIRST CALL WHEN
++C  THE ENVIRONMENT VARIABLE OBDEECT_CURVTAB IS SET; 0 IF IT IS NOT.
++C  A card flag is not used: this keeps the card file of a traced run
++C  identical to a normal run and avoids changing the card parser.
++C-----------------------------------------------------------------------
++
++      INTEGER FUNCTION CVTBUN()
++
++      IMPLICIT NONE
++      CHARACTER*16     CVVAL
++      INTEGER          CVUN,CVLEN,CVSTAT
++      LOGICAL          CVFRST
++      SAVE
++      DATA             CVFRST / .TRUE. /
++      DATA             CVUN / 0 /
++C-----------------------------------------------------------------------
++      IF ( CVFRST ) THEN
++        CVFRST = .FALSE.
++        CVVAL  = ' '
++        CALL GET_ENVIRONMENT_VARIABLE( 'OBDEECT_CURVTAB', CVVAL,
++     *                                 CVLEN, CVSTAT )
++        IF ( CVSTAT .EQ. 0  .AND.  CVLEN .GT. 0 ) THEN
++          OPEN( NEWUNIT=CVUN, FILE='curvature-tables.dat',
++     *          STATUS='UNKNOWN', FORM='FORMATTED', IOSTAT=CVSTAT )
++          IF ( CVSTAT .NE. 0 ) CVUN = 0
++        ENDIF
+       ENDIF
++      CVTBUN = CVUN
++      RETURN
++      END
++
++C-----------------------------------------------------------------------
++C  OBDEECT VALIDATION TRACE (NOT CORSIKA PHYSICS). CONSTANTS AND THE
++C  TABLE ROWS AT THE GRID POINTS OF THE COMPARISON, WRITTEN ONCE AFTER
++C  INRTAB. ROW: N = 4*THETA(DEG), M = 4*HEIGHT(KM), DISTEF(N,M) [CM],
++C  TOF(N,M) [NS]. THETA 0, 30, 60, 70, 75, 80, 85, 89 DEG; HEIGHT 3, 8,
++C  20, 60 KM.
++C-----------------------------------------------------------------------
++
++      SUBROUTINE CVTBHD
++
++      IMPLICIT NONE
++#define __CONSTAINC__
++#define __CEREN1INC__
++#define __OBSPARINC__
++#define __PARPARINC__
++#define __RTABLEINC__
++#define __ATMOSINC__
++#if __ATMEXT__
++#define __ATMOSXINC__
++#endif
++#include "corsika.h"
+
++      INTEGER          CVTBUN,CVUN,IT,IH,NT,NH
++      INTEGER          NTH(8),NHE(4)
++      EXTERNAL         CVTBUN
++      DATA             NTH / 0,120,240,280,300,320,340,356 /
++      DATA             NHE / 12,32,80,240 /
++C-----------------------------------------------------------------------
++      CVUN = CVTBUN()
++      IF ( CVUN .LE. 0 ) RETURN
++      WRITE(CVUN,9601)
++      WRITE(CVUN,9602) 'C1_CM      ', C(1)
++      WRITE(CVUN,9602) 'C25_CMPS   ', C(25)
++      WRITE(CVUN,9602) 'OBSLEV_CM  ', OBSLEV(1)
++      WRITE(CVUN,9602) 'ETADSN     ', ETADSN
++      WRITE(CVUN,9603) 'MODATM     ', MODATM
++#if __ATMEXT__
++      WRITE(CVUN,9603) 'IATMOX     ', IATMOX
++      WRITE(CVUN,9604) 'FREFRX     ', FREFRX
++#endif
++      DO IT = 1, 8
++        DO IH = 1, 4
++          NT = NTH(IT)
++          NH = NHE(IH)
++          WRITE(CVUN,9605) NT,NH,DISTEF(NT,NH),TOF(NT,NH)
++        ENDDO
++      ENDDO
+       RETURN
++ 9601 FORMAT('CURVTAB 1 OBDEECT VALIDATION TRACE (NOT CORSIKA OUTPUT)')
++ 9602 FORMAT('CONST ',A12,1X,E23.15)
++ 9603 FORMAT('CONST ',A12,1X,I12)
++ 9604 FORMAT('CONST ',A12,1X,L2)
++ 9605 FORMAT('ROW',2I6,2(1X,E23.15))
+       END
+ #endif

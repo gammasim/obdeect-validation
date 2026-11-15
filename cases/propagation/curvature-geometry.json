@@ -1,0 +1,15 @@
+{
+  "id": "propagation.curvature-geometry",
+  "name": "Spherical sky-frame geometry: emission altitude, arrival, drops, flat limit",
+  "requires": ["obdeect"],
+  "commands": [{"name": "curvature-geometry", "argv": ["{python}", "-m", "obdeect_validation.adapters.curvature_geometry"]}],
+  "metrics": [
+    {"metric": "sample_count", "expected": 1296, "atol": 0},
+    {"metric": "max_zem_error_m", "expected": 0, "atol": 5e-3},
+    {"metric": "max_position_error_m", "expected": 0, "atol": 1e-3},
+    {"metric": "max_time_error_ns", "expected": 0, "atol": 2e-3},
+    {"metric": "flat_limit_max_difference", "expected": 0, "atol": 1e-3},
+    {"metric": "dropped_count_mismatch", "expected": 0, "atol": 0},
+    {"metric": "lateral_shift_relative_error", "expected": 0, "atol": 1e-2}
+  ]
+}

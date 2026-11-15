@@ -68,10 +68,16 @@ def test_limits_use_five_sigma_or_floor():
 
 
 def test_expected_transmission_with_constant_depth_is_exponential_in_airmass():
-    samples = [(0.0, 1.0, 2.0), (0.0, 0.5, 3.0)]  # zem_m, |cz|, photons
+    # Depth 0.2 above the telescope and 0 at and below it (tau(H2) = 0), no in-telescope path:
+    # the telescope and focus terms vanish and only the airmass term remains. A depth that is
+    # the same at every height would cancel in tau(zem) - tau(h_t) and predict T = 1.
+    def step_depth(wavelength, height):
+        return 0.2 if height > chain.SITE_ALTITUDE_M else 0.0
+
+    samples = [(20000.0, 1.0, 2.0), (20000.0, 0.5, 3.0)]  # zem_m, |cz|, photons
     draws = [0.3, 0.7]
     mean, se = chain.expected_transmission(
-        samples, lambda wavelength, height: 0.2, (250.0, 700.0), draws
+        samples, step_depth, (250.0, 700.0), draws, pathlen_m=0.0
     )
     expected = (2.0 * math.exp(-0.2) + 3.0 * math.exp(-0.4)) / 5.0
     assert mean == pytest.approx(expected)
