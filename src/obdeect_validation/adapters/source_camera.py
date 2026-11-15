@@ -336,9 +336,11 @@ def _time_block(native_t, native_w, ref_t, ref_w, tol=0.05):
     }
 
 
-def ff_gct_time_metrics(native, ref, min_abs_cz=FF_GCT_MIN_ABS_CZ):
-    """Time keys of stage 1 for the ff-gct time model; both samples use the same selection:
-    impact within TIME_RADIUS_CM of the axis and |cz| >= min_abs_cz (cz of the reference from cx, cy).
+def ff_gct_times(native, ref, min_abs_cz=FF_GCT_MIN_ABS_CZ):
+    """Arrival times of the ff-gct time model: obdeect times on the plane z = 0 and the photons
+    compared on both sides (impact within TIME_RADIUS_CM, |cz| >= min_abs_cz).
+
+    Returns t_native, native_ok, ref_ok and the native impact-within-radius mask.
     """
     cz = native["cz"]
     if np.any(cz == 0):
@@ -347,17 +349,23 @@ def ff_gct_time_metrics(native, ref, min_abs_cz=FF_GCT_MIN_ABS_CZ):
     path = -native["z"] / cz  # m, negative for photons heading away from the plane
     t_native = native["t"] + np.abs(path) / C_M_NS
     xp, yp = native["x"] + path * native["cx"], native["y"] + path * native["cy"]
-    native_ok = (100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM) & (np.abs(cz) >= min_abs_cz)
-    ref_cz = np.abs(ref["cz"])
-    ref_ok = (ref["r"] < TIME_RADIUS_CM) & (ref_cz >= min_abs_cz)
+    inside = 100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM
+    native_ok = inside & (np.abs(cz) >= min_abs_cz)
+    ref_ok = (ref["r"] < TIME_RADIUS_CM) & (np.abs(ref["cz"]) >= min_abs_cz)
+    return t_native, native_ok, ref_ok, inside
+
+
+def ff_gct_time_metrics(native, ref, min_abs_cz=FF_GCT_MIN_ABS_CZ):
+    """Time keys of stage 1 for the ff-gct time model; both samples use the same selection:
+    impact within TIME_RADIUS_CM of the axis and |cz| >= min_abs_cz (cz of the reference from cx, cy).
+    """
+    t_native, native_ok, ref_ok, inside = ff_gct_times(native, ref, min_abs_cz)
     if not native_ok.any() or not ref_ok.any():
         raise ValueError("no photons left for the time comparison")
     metrics = {
         "time_correction_ns_mean": float(np.mean((t_native - native["t"])[native_ok])),
-        "native_photons_moving_away_fraction": float(np.mean(cz >= 0)),
-        "t_native_outside_radius_fraction": float(
-            1.0 - np.mean(100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM)
-        ),
+        "native_photons_moving_away_fraction": float(np.mean(native["cz"] >= 0)),
+        "t_native_outside_radius_fraction": float(1.0 - np.mean(inside)),
         "t_native_excluded_fraction": float(1.0 - np.mean(native_ok)),
         "t_reference_outside_radius_fraction": float(
             1.0 - np.mean(ref["r"] < TIME_RADIUS_CM)
@@ -374,6 +382,41 @@ def ff_gct_time_metrics(native, ref, min_abs_cz=FF_GCT_MIN_ABS_CZ):
         )
     )
     return metrics
+
+
+def emission_times(native, ref, time_correction):
+    """Arrival times compared in stage 1: obdeect times moved to the reference plane
+    (time_correction 'geometric', 'geometric_air' or 'none') and the photons compared.
+
+    Returns t_native, native_ok, ref_ok and the native 'heading for the plane' mask (None
+    without a time correction).
+    """
+    t_native = native["t"].copy()
+    native_ok = np.ones(t_native.size, dtype=bool)
+    toward = None
+    if time_correction in ("geometric", "geometric_air"):
+        cz = native["cz"]
+        if np.any(cz == 0):
+            raise ValueError("native photons parallel to the plane z = 0")
+        # Only photons heading for the plane (cz < 0) have a flight path to it (about half of the
+        # flasher-secondary photons do not); their time moments are not compared.
+        toward = cz < 0
+        path = np.where(toward, -native["z"] / np.where(toward, cz, -1.0), 0.0)  # m
+        t_native = t_native + path / C_M_NS
+        if time_correction == "geometric_air":
+            # xyzls adds the light time in air (raybnd_); obdeect emits at the source, no air delay.
+            heights, index_minus_one = load_atmprof(atmprof_path())
+            t_native = t_native + air_delay_ns(
+                native["z"], cz, heights, index_minus_one, ATMPROF_OBSLEV_M
+            )
+        # Same camera acceptance as the reference: arrival position within TIME_RADIUS_CM.
+        xp, yp = native["x"] + path * native["cx"], native["y"] + path * native["cy"]
+        native_ok = toward & (100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM)
+    # Reference bunches within the fiducial radius of 1500 cm (xyzls -r default). Bunches beyond
+    # it (flasher-secondary: 3.6 %, incl. times near -2e8 ns) are not camera photons; their
+    # fraction is reported, not compared.
+    ref_ok = ref["r"] < TIME_RADIUS_CM
+    return t_native, native_ok, ref_ok, toward
 
 
 def emission_metrics(
@@ -423,26 +466,8 @@ def emission_metrics(
             }
         )
     wn, wr = native["w"], ref["w"]
-    t_native = native["t"].copy()
-    native_ok = np.ones(t_native.size, dtype=bool)
-    if time_correction in ("geometric", "geometric_air"):
-        cz = native["cz"]
-        if np.any(cz == 0):
-            raise ValueError("native photons parallel to the plane z = 0")
-        # Only photons heading for the plane (cz < 0) have a flight path to it (about half of the
-        # flasher-secondary photons do not); their time moments are not compared.
-        toward = cz < 0
-        path = np.where(toward, -native["z"] / np.where(toward, cz, -1.0), 0.0)  # m
-        t_native = t_native + path / C_M_NS
-        if time_correction == "geometric_air":
-            # xyzls adds the light time in air (raybnd_); obdeect emits at the source, no air delay.
-            heights, index_minus_one = load_atmprof(atmprof_path())
-            t_native = t_native + air_delay_ns(
-                native["z"], cz, heights, index_minus_one, ATMPROF_OBSLEV_M
-            )
-        # Same camera acceptance as the reference: arrival position within TIME_RADIUS_CM.
-        xp, yp = native["x"] + path * native["cx"], native["y"] + path * native["cy"]
-        native_ok = toward & (100.0 * np.hypot(xp, yp) < TIME_RADIUS_CM)
+    t_native, native_ok, good, toward = emission_times(native, ref, time_correction)
+    if toward is not None:
         metrics["native_photons_moving_away_fraction"] = float(np.mean(~toward))
         metrics["t_native_outside_radius_fraction"] = float(1.0 - np.mean(native_ok))
     metrics["time_correction_ns_mean"] = float(np.mean(t_native - native["t"]))
@@ -465,10 +490,6 @@ def emission_metrics(
                 f"{key}_ks_limit_exceeded": int(d_ks >= 0.01 and p_ks <= 1e-3),
             }
         )
-    # Time moments use reference bunches within the fiducial radius of 1500 cm (xyzls -r default).
-    # Bunches beyond it (flasher-secondary: 3.6 %, incl. times near -2e8 ns) are not camera photons;
-    # their fraction is reported, not compared.
-    good = ref["r"] < TIME_RADIUS_CM
     metrics["t_reference_outside_radius_fraction"] = (
         float(1.0 - np.mean(good)) if good.size else 0.0
     )
@@ -562,21 +583,40 @@ def camera_metrics(reference, candidate):
     }
 
 
-def _plot(native, ref, output):
+def _plot(native, ref, output, times):
+    """Stage 1 histograms; times = (native, reference) arrival times as compared by the metrics
+    (obdeect times moved to the reference plane, same photon selection on both sides)."""
     from obdeect_validation.adapters import plotting
 
+    columns = {
+        "cx": (native["cx"], ref["cx"], "cx"),
+        "cy": (native["cy"], ref["cy"], "cy"),
+        "t": (*times, "arrival time at the reference plane [ns]"),
+        "wavelength": (native["wavelength"], ref["wavelength"], "wavelength [nm]"),
+    }
     fig, axes = plotting.figure(2, 2, (9, 7))
-    for axis, key in zip(axes.flat, ("cx", "cy", "t", "wavelength")):
+    for axis, (values_native, values_ref, label) in zip(axes.flat, columns.values()):
         plotting.histograms(
             axis,
             [
-                ("obdeect", native[key], plotting.NATIVE),
-                ("LightEmission", ref[key], plotting.REFERENCE),
+                ("obdeect", values_native, plotting.NATIVE),
+                ("LightEmission", values_ref, plotting.REFERENCE),
             ],
-            key,
+            label,
             clip=(0.001, 0.999),
         )
     plotting.save(fig, output)
+
+
+def compared_times(native, ref, spec):
+    """Native and reference arrival times as compared by the stage 1 metrics of a case."""
+    if "time_model" in spec:
+        t_native, native_ok, ref_ok, _ = ff_gct_times(native, ref)
+    else:
+        t_native, native_ok, ref_ok, _ = emission_times(
+            native, ref, spec["time_correction"]
+        )
+    return t_native[native_ok], ref["t"][ref_ok]
 
 
 def _simtel(
@@ -718,7 +758,7 @@ def main(case):
     )
     if "time_model" in spec:
         metrics.update(ff_gct_time_metrics(native, ref))
-    _plot(native, ref, root / "stage1.png")
+    _plot(native, ref, root / "stage1.png", compared_times(native, ref, spec))
     details = {
         "case": case,
         "native_command": spec["native"],

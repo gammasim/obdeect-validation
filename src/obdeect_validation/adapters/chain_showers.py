@@ -203,8 +203,20 @@ def _standard_error(values):
     return float(np.std(values, ddof=1) / np.sqrt(values.size))
 
 
-def compare_camera(left, right, output):
-    """Paired per-telescope comparison of two sim_telarray runs; writes the CSV and the figure."""
+#: Telescopes of the three-telescope runs (simulate): sim_telarray index -> legend label, in the
+#: order of the TELESCOPE lines of the CORSIKA input; CTA-PROD6-LST.cfg (-DLST1), North site.
+PROD6_LSTS = {
+    1: "PROD6 LST at (0, 0) m",
+    2: "PROD6 LST at (50, 0) m",
+    3: "PROD6 LST at (0, 50) m",
+}
+
+
+def compare_camera(left, right, output, names=PROD6_LSTS):
+    """Paired per-telescope comparison of two sim_telarray runs; writes the CSV and the figure.
+
+    names maps the sim_telarray telescope index to its legend label (telescope type).
+    """
     if not left or not right:
         raise ValueError("camera comparison requires nonempty triggered event samples")
     keys = sorted(set(left) & set(right), key=int)
@@ -250,7 +262,7 @@ def compare_camera(left, right, output):
         header="event,telescope,reference,candidate",
         comments="",
     )
-    _plot_camera(array, difference, output / "camera-comparison.png")
+    plot_camera(array, difference, output / "camera-comparison.png", names)
     mean_time = float(np.mean(times))
     return {
         "matched_event_telescope_samples": len(pairs),
@@ -271,8 +283,9 @@ def compare_camera(left, right, output):
     }
 
 
-def _plot_camera(array, difference, path):
-    """Paired p.e. (colour per telescope) against the identity line, and the relative differences."""
+def plot_camera(array, difference, path, names):
+    """Paired p.e. (colour per telescope, labelled with its type) against the identity line,
+    and the relative differences. array rows: event, telescope index, reference, candidate."""
     from obdeect_validation.adapters import plotting
 
     fig, axes = plotting.figure(1, 2, (10, 4))
@@ -284,7 +297,7 @@ def _plot_camera(array, difference, path):
             s=14,
             color=plotting.CYCLE[i % len(plotting.CYCLE)],
             alpha=0.8,
-            label=f"telescope {tel}",
+            label=names.get(tel, f"unknown type (index {tel})"),
         )
     top = float(max(array[:, 2].max(), array[:, 3].max()))
     axes[0, 0].plot(

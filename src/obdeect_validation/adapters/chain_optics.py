@@ -20,6 +20,8 @@ UNIT_ATMOSPHERE = common.VALIDATION / "fixtures/unit-transmission.dat"
 MODEL, VERSION = "LSTN-01", "7.0.0"
 SEED = common.SIMTEL_SEED
 TELESCOPES = (1,)
+#: Legend label of the one telescope of the run (sim_telarray index 0).
+CAMERA_NAMES = {1: f"{MODEL} (model {VERSION})"}
 ZENITH_DEG, AZIMUTH_DEG = 20, 180
 
 
@@ -274,7 +276,7 @@ def main():
             "camera_event_id_delta": len(set(a) ^ set(b)),
         }
     )
-    comparison = cs.compare_camera(a, b, root)
+    comparison = cs.compare_camera(a, b, root, CAMERA_NAMES)
     metrics.update(comparison)
     triggers = trigger_difference(a, b, shower_ids)
     details["trigger_probability_per_telescope"] = triggers
