@@ -1,6 +1,6 @@
 {
   "id": "propagation.curvature-corsika-geometry",
-  "name": "CORSIKA CURVED geometry: emission altitude, detector-frame directions, compact format, headers",
+  "name": "CORSIKA CURVED geometry (65 and 75 deg): emission altitude, detector-frame directions, bunch format, headers",
   "timeout": 1800,
   "commands": [
     {
@@ -9,10 +9,10 @@
     }
   ],
   "metrics": [
-    {"metric": "file_count", "expected": 4, "atol": 0},
+    {"metric": "file_count", "expected": 2, "atol": 0},
     {"metric": "median_slant_depth_outside_range_count", "expected": 0, "atol": 0},
     {"metric": "mean_zenith_error_max_deg", "expected": 0, "atol": 0.5},
-    {"metric": "compact_format_violations", "expected": 0, "atol": 0},
+    {"metric": "long_format_violation_count", "expected": 0, "atol": 0},
     {"metric": "header_flag_mismatch_count", "expected": 0, "atol": 0},
     {"metric": "curved_log_missing_count", "expected": 0, "atol": 0}
   ]

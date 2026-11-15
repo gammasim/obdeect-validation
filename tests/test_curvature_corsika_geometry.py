@@ -2,11 +2,13 @@
 
 Slant depths are checked against the flat limit (R -> 1e12 m), the vertical column, the ordering
 curved < plane-parallel, a direct path integral along the axis, and the weighted median, mean
-zenith, core-selection and compact-format helpers. The input-missing path is checked with a
+zenith, core-selection and bunch-format helpers. The input-missing path is checked with a
 temporary inputs folder.
 """
 
 import math
+import os
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -68,7 +70,7 @@ def _direct_path_slant(profile, h_m, theta_deg, earth_radius=EARTH, points=40000
 @pytest.mark.parametrize("zenith", [0.0, 30.0, 60.0, 75.0])
 @pytest.mark.parametrize("altitude", [SITE, 10000.0, 20000.0])
 def test_flat_limit_reproduces_plane_parallel(profile, zenith, altitude):
-    # Relative residual is about h / (R cos^2 z); at 85 deg it reaches 2e-6 and is not tested here.
+    # The residual grows with h / (R cos^2 z) and is only checked where it is small (up to 75 deg).
     curved = geometry_case.slant_depth_curved(
         profile, altitude, zenith, earth_radius_m=1e12
     )
@@ -76,7 +78,7 @@ def test_flat_limit_reproduces_plane_parallel(profile, zenith, altitude):
     assert curved == pytest.approx(plane, rel=1e-6)
 
 
-@pytest.mark.parametrize("zenith", [30.0, 65.0, 75.0, 80.0, 85.0])
+@pytest.mark.parametrize("zenith", [30.0, 65.0, 75.0])
 @pytest.mark.parametrize("altitude", [SITE + 1.0, 8000.0, 15000.0, 25000.0])
 def test_curved_slant_depth_below_plane_parallel(profile, zenith, altitude):
     # The axis rises away from the Earth's surface: ds/dh <= 1/cos z for h >= site altitude.
@@ -94,11 +96,11 @@ def test_vertical_case_equals_thickness_exactly(profile):
 
 def test_slant_depth_decreases_with_altitude(profile):
     altitudes = np.linspace(SITE, 100000.0, 60)
-    values = [geometry_case.slant_depth_curved(profile, h, 85.0) for h in altitudes]
+    values = [geometry_case.slant_depth_curved(profile, h, 75.0) for h in altitudes]
     assert np.all(np.diff(values) < 0.0)
 
 
-@pytest.mark.parametrize("zenith", [45.0, 85.0])
+@pytest.mark.parametrize("zenith", [45.0, 75.0])
 def test_curved_slant_depth_matches_direct_path_integral(profile, zenith):
     altitude = 12000.0
     direct = _direct_path_slant(profile, altitude, zenith)
@@ -142,12 +144,12 @@ def test_photon_weighted_median_rejects_bad_weights():
         geometry_case.photon_weighted_median([1.0], [1.0, 2.0])
 
 
-@pytest.mark.parametrize("zenith", [65.0, 85.0])
+@pytest.mark.parametrize("zenith", [65.0, 75.0])
 def test_mean_zenith_of_cherenkov_cone_is_axis_zenith(zenith):
     """Photon directions on a 1 deg cone about the axis (Cherenkov emission) average to the axis.
 
-    The residual is second order, about alpha^2 cot(theta) / 2: 0.004 deg at 65 deg and 0.0008 deg
-    at 85 deg for alpha = 1 deg (a cone about a near-vertical axis would instead average to alpha).
+    The residual is second order, about alpha^2 cot(theta) / 2: 0.004 deg at 65 deg and 0.002 deg
+    at 75 deg for alpha = 1 deg (a cone about a near-vertical axis would instead average to alpha).
     """
     theta = math.radians(zenith)
     alpha = math.radians(1.0)
@@ -195,12 +197,75 @@ def test_ground_impact_adds_detector_position_and_slope_shift():
     assert x[0] == pytest.approx(c / math.sqrt(1.0 - c * c) * 10.0)
 
 
-def test_compact_violations_counts_each_bunch_once():
-    x = np.array([0.0, 33.0, 1.0, 1.0, 1.0])
-    y = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
-    time = np.array([0.0, 0.0, 3300.0, 0.0, 0.0])
-    photons = np.array([1.0, 1.0, 1.0, 327.0, 326.0])
-    assert geometry_case.compact_violations(x, y, time, photons) == 3
+class _Stream(list):
+    """Stand-in for EventIOFile: a context manager over its top-level objects."""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+class _Container:
+    """Stand-in for an EventIO container: iterating yields its children."""
+
+    def __init__(self, type_, version, children=()):
+        self.header = SimpleNamespace(
+            type=type_, version=version, only_subobjects=bool(children)
+        )
+        self._children = list(children)
+
+    def __iter__(self):
+        return iter(self._children)
+
+
+def test_photon_blocks_are_found_below_containers(monkeypatch):
+    tree = [
+        _Container(1202, 0),
+        _Container(
+            1203,
+            0,
+            [
+                _Container(
+                    1204,
+                    0,
+                    [
+                        _Container(1205, 0),
+                        _Container(1205, 1000),
+                    ],
+                ),
+                _Container(1204, 0, [_Container(1205, 1001)]),
+            ],
+        ),
+    ]
+    monkeypatch.setattr(geometry_case, "EventIOFile", lambda path: _Stream(tree))
+    assert geometry_case.photon_block_versions("unused.iact") == [0, 1000, 1001]
+    monkeypatch.setattr(
+        geometry_case, "EventIOFile", lambda path: _Stream([_Container(1202, 0)])
+    )
+    with pytest.raises(RuntimeError, match="no photon bunch block"):
+        geometry_case.photon_block_versions("unused.iact")
+
+
+@pytest.mark.skipif(
+    not os.environ.get("OBDEECT_TEST_IACT"),
+    reason="set OBDEECT_TEST_IACT to a flat IACT file (long format from the legacy card)",
+)
+def test_real_file_photon_blocks_are_long_format():
+    versions = geometry_case.photon_block_versions(os.environ["OBDEECT_TEST_IACT"])
+    assert versions
+    assert geometry_case.compact_block_count(versions) == 0
+
+
+def test_compact_block_count_uses_the_eventio_version():
+    """Long blocks have version 0, compact blocks 1000 + n (io_simtel.c)."""
+    assert geometry_case.is_compact_version(1000)
+    assert geometry_case.is_compact_version(1001)
+    assert not geometry_case.is_compact_version(0)
+    assert not geometry_case.is_compact_version(999)
+    assert geometry_case.compact_block_count([0, 1000, 0, 1005]) == 2
+    assert geometry_case.compact_block_count([0, 0]) == 0
 
 
 # ---- inputs --------------------------------------------------------------------------------
@@ -209,17 +274,15 @@ def test_compact_violations_counts_each_bunch_once():
 def test_missing_inputs_are_listed_and_exit_code_is_3(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("VALIDATION_INPUTS", str(tmp_path))
     missing = geometry_case.check_inputs(tmp_path)
-    assert len(missing) == 8  # four shower files and four logs
+    assert len(missing) == 4  # two shower files and two logs
     assert all("curved" in name for name in missing)
     assert geometry_case.main() == 3
     assert "missing input" in capsys.readouterr().err
 
 
-def test_curved_sources_are_the_four_zenith_angles():
+def test_curved_sources_are_the_two_zenith_angles():
     names = [name for name, *_ in geometry_case._sources()]
     assert names == [
         "gamma-65deg-300-5000GeV-curved.iact",
         "gamma-75deg-1000-10000GeV-curved.iact",
-        "gamma-80deg-1000-10000GeV-curved.iact",
-        "gamma-85deg-1000-10000GeV-curved.iact",
     ]

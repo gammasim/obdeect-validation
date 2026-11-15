@@ -71,7 +71,7 @@ workspace project-notes/projects/cta/202611/full-simulation-chain/{plan.md,pr.md
 propagation stage. Four cases need no showers (`propagation.curvature-chapman`,
 `propagation.curvature-geometry`, `propagation.refraction-curved-ray`,
 `propagation.curvature-input-guards`) and use analytic or independent references. Four need
-CORSIKA CURVED showers at 65, 75, 80 and 85 deg (`stream.corsika-curved-flag`,
+CORSIKA CURVED showers at 65 and 75 deg (`stream.corsika-curved-flag`,
 `propagation.curvature-corsika-geometry`, `propagation.curvature-corsika-extinction`,
 `chain.curvature-high-zenith`); the cards are in `fixtures/corsika/*-curved.card` and the
 files are generated on a host with the curved CORSIKA binary (variants in
@@ -81,7 +81,8 @@ then copied to `inputs/` (hashes in `fixtures/inputs.json`, `null` until generat
 checks the CURVED banner of the CORSIKA log, so a flat binary cannot pass as curved.
 sim_telarray applies a plane-parallel airmass 1/|cz| also to CURVED input, so the chain case
 tests the predicted curved-to-plane-parallel ratio, not a zero difference. The comparison with the
-CORSIKA `DISTIP`/`TOFIP` tables is a design note, `docs/curvature-corsika-tables.md`, not a case.
+CORSIKA `DISTIP`/`TOFIP` tables needs an instrumented CORSIKA run, see
+`docs/curvature-corsika-tables.md`. Details of all curvature cases: `docs/curvature-validation.md`.
 
 Optics limits (2% D80, 1% area, 0.2% focal length) are provisional, taken from the
 largest deviations measured in the old validation, pending scientific approval.

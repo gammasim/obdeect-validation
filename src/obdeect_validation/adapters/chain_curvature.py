@@ -8,7 +8,7 @@ Unit: sim_telarray with the zero-optical-depth table on the CORSIKA photons them
 detection count without atmosphere, so the plane-parallel check is a ratio and needs no absolute
 normalisation of sim_telarray's quantum efficiency.
 
-Checks per zenith angle (65, 75, 80, 85 deg):
+Checks per zenith angle (65 and 75 deg):
   1. Detected photo-electron ratio candidate / reference against the prediction from the same bunches.
      The prediction weights each wavelength by the detection weight of the LST-1 configuration:
      quantum efficiency (high-QE pixels) times mirror reflectivity. sim_telarray's 'Detected' count
@@ -63,8 +63,10 @@ LIMITS = {
         (
             "sim_telarray's own atmosphere against the plane-parallel expectation of the same bunches, "
             "weighted by the quantum efficiency that this stage counts (the ratio to the unit run removes "
-            "the normalisation). The curved correction (2 % at 75 deg, more than 10 % at 85 deg) lies "
-            "far outside 1 % plus 5 se, so the check decides whether sim_telarray is plane-parallel."
+            "the normalisation). The curved-to-plane difference of the mean transmission at 75 deg is "
+            "about 0.2 % (synthetic estimate, curvature_corsika_extinction notes), below the 1 % floor: "
+            "the check bounds a plane-parallel sim_telarray at the 1 % level and does not resolve the "
+            "curved correction."
         ),
     ),
 }
@@ -194,7 +196,7 @@ def analyse(root, source, zenith, table, cut_path, zero_path, weights) -> dict:
         source.with_suffix(".corsika.log").read_text(errors="replace")
     )
     zem, cz, photons = curved.load_bunches(source)
-    h_t = curved.telescope_altitude_m(zenith)
+    h_t = curved.telescope_altitude_m()
     transmission = curved.expectation(zem, cz, photons, table, band, h_t)
     detected = curved.expectation(
         zem, cz, photons, table, band, h_t, weight=weights.detection

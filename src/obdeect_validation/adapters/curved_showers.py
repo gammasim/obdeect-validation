@@ -12,32 +12,27 @@ Header flags (CORSIKA EVTH, 1-based Fortran words; the file stores them 0-based)
   word 77  integer flags; bit 0x40 = CURVED option compiled in, bit 0x10 = refraction
            (ATMEXT refraction, corsika.tex footnote). sim_telarray reads the same word.
 
-Compact bunch format limits (CORSIKA bernlohr/README, section d). The IACT bunches are written
-in the compact format (16 bytes per bunch) unless TELFIL is prefixed with '+'. Two limits matter:
-  (2) for a detector sphere of radius R, sec(z) * R < 32.7 m (impact points are taken in the
-      horizontal plane through the sphere centre);
-  (3) times within 3.27 us of the reference time, and for large zenith angles horizontal core
-      distances of about 1000 m.
-The cards therefore follow these rules:
-  * The sphere radius, not the core scatter, sets limit (2): R = min(1200 cm, 0.8 * 32.7 m *
-    cos z) with a 20 % margin. At 65 deg R = 11.05 m, at 75 deg 6.76 m, at 80 deg 4.54 m and at
-    85 deg 2.27 m. Smaller spheres collect fewer photons; this is the price of the compact format
-    without '+'.
-  * The telescopes sit at (0, 0), (300 m, 0) and (0, 300 m) with Z = R, the CORSIKA
-    recommendation that a sphere is not cut by the observation level (corsika.tex, TELESCOPE).
-  * CSCAT scatters the core within 300 m, so every core-telescope distance is below 600 m and
-    limit (3) holds. CSCAT and TELESCOPE values are in cm in CORSIKA; the constants below are cm.
-    (The 800 quoted for CSCAT in the brief would be 8 m in CORSIKA units.)
-The flat cards of this module use the same telescope layout as the curved ones (only TSTART and
-the executable differ). generate() in chain_showers keeps the legacy flat layout.
+Bunch format. IACT photon bunches are written in the long format by default: corsika7/bernlohr
+iact.c defines PREF_LONG_BUNCH unless PREF_COMPACT_BUNCH is set (lines 118 to 120), and a
+TELFIL name with a leading '+' selects the non-compact format explicitly (lines 961 to 964; the
+comment at line 882 reads "A leading + means: use non-compact format"). A leading '-' would select
+the compact format, which is not used here. The compact format (16 bytes per bunch, int16 fields)
+has the limits of the bernlohr README section d, among them sec(z) * R < 32.7 m for the detector
+sphere radius R; these limits do not apply to the long format. Each photon block records its
+format in the eventio header version: 0 for the long format, 1000 + n for the compact one
+(io_simtel.c, write_tel_compact_photons). curvature_corsika_geometry counts the compact blocks.
 
-Cards. NSHOW 20 showers per file, PRMPAR 1 (gamma), OBSLEV 215600 cm, ATMOSPHERE 1 Y (refraction on),
-fixed seeds 17, 29, 43, 61 (SEED lines, seed_base offsets). Energy windows: the threshold rises
-with zenith (longer slant path, more absorption, wider light pool), so 300 to 5000 GeV is used at
-65 deg and 1 to 10 TeV at 75, 80 and 85 deg. These windows are the brief's choice; whether the
-telescopes trigger in each window is to be checked after generation (no CORSIKA run was possible
-here). Placeholder DATDIR ("<corsika data>") in the checked-in cards; run_corsika substitutes the
-real data directory.
+Cards. The telescopes are the fixed full-size spheres of the legacy flat card
+(chain_showers.FLAT_TELESCOPES: radius 1200 cm, at (0, 0), (5000 cm, 0) and (0, 5000 cm)) and
+CSCAT is the legacy 10000 cm. The curved and the flat 65 deg control card both write
+'TELFIL +<name>', so both use the long format; chain_showers.generate keeps the legacy TELFIL of
+the flat 20 deg card. NSHOW 20 showers per file, PRMPAR 1 (gamma), OBSLEV 215600 cm,
+ATMOSPHERE 1 Y (refraction on), fixed seeds 17, 29, 43, 61 (SEED lines, seed_base offsets).
+Energy windows: the threshold rises with zenith (longer slant path, more absorption, wider light
+pool), so 300 to 5000 GeV is used at 65 deg and 1 to 10 TeV at 75 deg. These windows are the
+brief's choice; whether the telescopes trigger in each window is to be checked after generation
+(no CORSIKA run was possible here). Placeholder DATDIR ("<corsika data>") in the checked-in cards;
+run_corsika substitutes the real data directory.
 
 Units and frames: positions in cm (CORSIKA), returned bunch positions in m, times in ns, wavelengths
 in nm, zem in m above sea level (with CURVED the emission altitude is the altitude a.s.l.).
@@ -47,7 +42,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import shutil
 import subprocess
@@ -70,8 +64,6 @@ FIXTURE_CASES = (
     ("curved", 65, 300, 5000),
     ("flat", 65, 300, 5000),
     ("curved", 75, 1000, 10000),
-    ("curved", 80, 1000, 10000),
-    ("curved", 85, 1000, 10000),
 )
 
 EVTH_TYPE = 1202
@@ -80,12 +72,6 @@ EVTH_FLAGS_INDEX = 76  # word 77
 EVTH_CURVED_INDEX = 78  # word 79
 IACT_CURVED_BIT = 0x40
 REFRACTION_BIT = 0x10
-
-SPHERE_LIMIT_M = 32.7  # compact format limit (2)
-SPHERE_MARGIN = 0.8
-MAX_RADIUS_CM = 1200.0  # radius of the legacy flat layout
-CURVED_TELESCOPES_XY_CM = ((0.0, 0.0), (30000.0, 0.0), (0.0, 30000.0))
-CURVED_SCATTER_CM = 30000.0
 
 
 class MissingPrerequisite(RuntimeError):
@@ -111,24 +97,15 @@ def shower_name(zenith_deg, geometry, energy_min=300, energy_max=5000) -> str:
     return f"gamma-{zenith_deg:g}deg-{energy_min:g}-{energy_max:g}GeV-{_geometry(geometry)}.iact"
 
 
-def telescope_radius_cm(zenith_deg) -> float:
-    """Sphere radius in cm that keeps sec(z) * R below the compact-format limit (2)."""
-    limit_cm = (
-        SPHERE_MARGIN * SPHERE_LIMIT_M * 100.0 * math.cos(math.radians(zenith_deg))
-    )
-    return min(MAX_RADIUS_CM, float(math.floor(limit_cm)))
+def layout() -> dict:
+    """Telescope and scatter keywords of the cards (cm), for chain_showers.card_text.
 
-
-def layout(zenith_deg) -> dict:
-    """Telescope and scatter keywords of the compact-format cards (cm), for chain_showers.card_text."""
-    radius = telescope_radius_cm(zenith_deg)
-    if radius / 100.0 / math.cos(math.radians(zenith_deg)) >= SPHERE_LIMIT_M:
-        raise ValueError(
-            f"no compact-format telescope radius at zenith {zenith_deg} deg"
-        )
+    The legacy full-size spheres of the flat card, independent of the zenith angle: the long
+    bunch format has no sec(z) * R limit, so the sphere is not shrunk with zenith.
+    """
     return {
-        "telescopes": tuple((x, y, radius, radius) for x, y in CURVED_TELESCOPES_XY_CM),
-        "scatter_cm": CURVED_SCATTER_CM,
+        "telescopes": chain_showers.FLAT_TELESCOPES,
+        "scatter_cm": chain_showers.FLAT_SCATTER_CM,
     }
 
 
@@ -293,7 +270,8 @@ def write_card(
 ) -> Path:
     """Write the CORSIKA card of one shower file as root/<shower stem>.card and return it.
 
-    TSTART T is written for flat geometry only (simtools omits it for the curved binary).
+    TSTART T is written for flat geometry only (simtools omits it for the curved binary). Both
+    geometries use the long bunch format (TELFIL '+'), see the module docstring.
     """
     geometry = _geometry(geometry)
     name = shower_name(
@@ -309,7 +287,8 @@ def write_card(
         telfil=name,
         seed_base=seed_base,
         tstart=geometry == "flat",
-        **layout(zenith_deg),
+        long_format=True,
+        **layout(),
     )
     path = Path(root) / f"{name.removesuffix('.iact')}.card"
     path.parent.mkdir(parents=True, exist_ok=True)

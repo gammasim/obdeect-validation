@@ -1,5 +1,5 @@
 {
-  "note": "Shower inputs are not in Git. Regenerate with CORSIKA 7.8010 from the cards, or copy them to inputs/; checked by sha256. Each shower file needs its CORSIKA log as <name>.corsika.log (wavelength band for the atmosphere case). The curved and flat 65 deg, 75, 80 and 85 deg files (curved and flat CORSIKA binaries, see obdeect_validation.adapters.curved_showers) have sha256 null until generated; generation command: python -m obdeect_validation.adapters.curved_showers run --geometry curved|flat --zenith ZENITH --energy-min LO --energy-max HI --root WORKDIR, then copy WORKDIR/<name>.iact and WORKDIR/<name>.corsika.log to inputs/ and set the sha256 (null until generated).",
+  "note": "Shower inputs are not in Git. Regenerate with CORSIKA 7.8010 from the cards, or copy them to inputs/; checked by sha256. Each shower file needs its CORSIKA log as <name>.corsika.log (wavelength band for the atmosphere case). The curved and flat 65 deg and the curved 75 deg files (curved and flat CORSIKA binaries, see obdeect_validation.adapters.curved_showers) have sha256 null until generated; generation command: python -m obdeect_validation.adapters.curved_showers run --geometry curved|flat --zenith ZENITH --energy-min LO --energy-max HI --root WORKDIR, then copy WORKDIR/<name>.iact and WORKDIR/<name>.corsika.log to inputs/ and set the sha256 (null until generated).",
   "files": {
     "gamma-20deg-100-3000GeV.iact": {
       "sha256": "c6ade29bc6e7d0741e976a242cea3083aa253a659c2642ccf9941fc6e310883c",
@@ -20,14 +20,6 @@
     "gamma-75deg-1000-10000GeV-curved.iact": {
       "sha256": null,
       "card": "corsika/gamma-75deg-1000-10000GeV-curved.card"
-    },
-    "gamma-80deg-1000-10000GeV-curved.iact": {
-      "sha256": null,
-      "card": "corsika/gamma-80deg-1000-10000GeV-curved.card"
-    },
-    "gamma-85deg-1000-10000GeV-curved.iact": {
-      "sha256": null,
-      "card": "corsika/gamma-85deg-1000-10000GeV-curved.card"
     }
   }
 }

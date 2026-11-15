@@ -5,7 +5,6 @@ flags and the bunch reader are then checked against it). Everything else uses sy
 """
 
 import json
-import math
 import os
 import struct
 import sys
@@ -43,8 +42,8 @@ def test_shower_name_format():
         == "gamma-65deg-300-5000GeV-curved.iact"
     )
     assert (
-        curved_showers.shower_name(85, "flat", energy_min=1000, energy_max=10000)
-        == "gamma-85deg-1000-10000GeV-flat.iact"
+        curved_showers.shower_name(75, "flat", energy_min=1000, energy_max=10000)
+        == "gamma-75deg-1000-10000GeV-flat.iact"
     )
 
 
@@ -53,27 +52,45 @@ def test_unknown_geometry_is_rejected():
         curved_showers.shower_name(65, "spherical")
 
 
-# ---- compact-format layout --------------------------------------------------------------
+# ---- telescope layout and bunch format ------------------------------------------------
 
 
-@pytest.mark.parametrize("zenith", [65, 75, 80, 85])
-def test_layout_respects_compact_format_limits(zenith):
-    layout = curved_showers.layout(zenith)
-    for x, y, z, radius in layout["telescopes"]:
-        # limit (2): sec(z) * R < 32.7 m for the sphere radius R (cm -> m)
-        assert radius / 100.0 / math.cos(math.radians(zenith)) < 32.7
-        assert z == radius  # CORSIKA recommendation Z >= R
-    # limit (3): cores lie within the scatter radius of the origin and telescopes within the
-    # largest distance from the origin, so core-telescope distances are bounded by their sum
-    farthest = max(math.hypot(x, y) for x, y, *_ in layout["telescopes"])
-    assert (layout["scatter_cm"] + farthest) / 100.0 < 1000.0
+def test_layout_is_the_legacy_full_size_layout_at_every_zenith():
+    layout = curved_showers.layout()
+    assert layout["telescopes"] == chain_showers.FLAT_TELESCOPES
+    assert layout["scatter_cm"] == chain_showers.FLAT_SCATTER_CM
+    assert all(radius == 1200.0 for *_, radius in layout["telescopes"])
 
 
-def test_telescope_radius_shrinks_with_zenith():
-    radii = [curved_showers.telescope_radius_cm(z) for z in (65, 75, 80, 85)]
-    assert radii == sorted(radii, reverse=True)
-    assert curved_showers.telescope_radius_cm(65) == pytest.approx(1105.0)
-    assert curved_showers.telescope_radius_cm(85) == pytest.approx(227.0)
+def test_cards_request_the_long_bunch_format(tmp_path):
+    """TELFIL '+' selects the long (non-compact) format (corsika7/bernlohr/iact.c, line 961)."""
+    cases = (
+        ("curved", 65, 300, 5000),
+        ("curved", 75, 1000, 10000),
+        ("flat", 65, 300, 5000),
+    )
+    for geometry, zenith, low, high in cases:
+        text = curved_showers.write_card(
+            tmp_path / geometry, geometry, zenith, energy_min=low, energy_max=high
+        ).read_text()
+        telfil = [line for line in text.splitlines() if line.startswith("TELFIL")]
+        assert telfil == [
+            f"TELFIL +./gamma-{zenith}deg-{low}-{high}GeV-{geometry}.iact"
+        ]
+
+
+def test_legacy_flat_telfil_has_no_long_format_prefix():
+    text = chain_showers.card_text(
+        showers=20,
+        zenith=20,
+        energy_min=100,
+        energy_max=3000,
+        data_dir="d",
+        direct="x/",
+        telfil="showers.iact",
+    )
+    assert "TELFIL x/showers.iact\n" in text
+    assert "TELFIL +" not in text
 
 
 # ---- cards ------------------------------------------------------------------------------
@@ -110,15 +127,15 @@ def test_flat_and_curved_cards_differ_only_in_tstart_and_telfil(tmp_path):
 
 def test_card_records_seeds_and_placeholder(tmp_path):
     text = curved_showers.write_card(
-        tmp_path, "curved", 80, energy_min=1000, energy_max=10000
+        tmp_path, "curved", 75, energy_min=1000, energy_max=10000
     ).read_text()
     for seed in (17, 29, 43, 61):
         assert f"SEED {seed} 0 0\n" in text
     assert "NSHOW 20\n" in text
-    assert "THETAP 80 80\n" in text
+    assert "THETAP 75 75\n" in text
     assert "DATDIR <corsika data>/\n" in text
     assert "ATMOSPHERE 1 Y\n" in text
-    assert "TELFIL ./gamma-80deg-1000-10000GeV-curved.iact\n" in text
+    assert "TELFIL +./gamma-75deg-1000-10000GeV-curved.iact\n" in text
 
 
 def test_legacy_flat_card_is_unchanged():
@@ -457,6 +474,7 @@ def test_run_corsika_curved_checks_pattern_and_copies_log(corsika_root, run_setu
     card = (run_setup / "gamma-65deg-300-5000GeV-curved.card").read_text()
     assert f"DATDIR {run_setup.resolve() / 'data'}/" in card
     assert "TSTART" not in card
+    assert "TELFIL +" in card
 
 
 def test_run_corsika_curved_rejects_flat_log(corsika_root, run_setup):

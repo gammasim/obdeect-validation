@@ -2,8 +2,8 @@
 
 obdeect's corsika mode takes CURVED-CORSIKA photons as already curved: emission altitudes zem
 above sea level, directions and positions in the detector frame, times and refraction applied by
-CORSIKA. This adapter checks those assumptions on the four curved shower files (65, 75, 80 and
-85 deg) with numpy and the EventIO reader only. No obdeect code is used.
+CORSIKA. This adapter checks those assumptions on the two curved shower files (65 and 75 deg) with numpy and the
+EventIO reader only. No obdeect code is used.
 
 Per file:
   (a) Emission altitude. The photon-weighted median zem of the file is placed on the primary
@@ -13,8 +13,9 @@ Per file:
       XMAX_BAND. The plane-parallel value thick(zem)/cos(zenith) is reported for contrast.
   (b) Directions. The photon-weighted mean zenith of the bunches within CORE_RADIUS_M of the core
       must equal the primary zenith within ZENITH_TOLERANCE_DEG.
-  (c) Compact format. Bunches with |x|, |y| >= 32.7 m from the detector centre, |t| >= 3.27 us
-      or more than 326 photons are violations (CORSIKA bernlohr README, section d).
+  (c) Bunch format. Every photon block (EventIO type 1205) must be in the long format, i.e. its
+      header version is not 1000 + n (the compact format, io_simtel.c). The long format is the
+      default of corsika7/bernlohr/iact.c and is also requested by TELFIL '+' (curved_showers).
   (d) Header and log. The CURVED log banner and the EVTH flags (word 79 and word 77 bit 0x40)
       must agree and mark the file as curved.
 
@@ -30,6 +31,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from eventio import EventIOFile
 from eventio.iact import IACTFile
 from numpy.polynomial.legendre import leggauss
 
@@ -46,9 +48,12 @@ GAUSS_ORDER = (
 XMAX_BAND_G_CM2 = (200.0, 500.0)
 ZENITH_TOLERANCE_DEG = 0.5
 CORE_RADIUS_M = 150.0
-COMPACT_POSITION_LIMIT_M = 32.7
-COMPACT_TIME_LIMIT_NS = 3270.0
-COMPACT_MAX_PHOTONS = 327.0
+PHOTON_BLOCK_TYPE = (
+    1205  # EventIO type of an IACT photon bunch block (eventio iact.objects)
+)
+COMPACT_VERSION_BASE = (
+    1000  # header version of a compact block is 1000 + n (io_simtel.c)
+)
 
 LIMITS = {
     "xmax_band_g_cm2": (
@@ -66,10 +71,11 @@ LIMITS = {
     "zenith_tolerance_deg": (
         "|mean zenith(|x_core| <= 150 m) - theta0| <= 0.5 deg",
         (
-            "Refraction bends the arrival direction by about (n-1) tan(theta) = 2.8e-4 * 11.4 = "
-            "0.18 deg at 85 deg. The Cherenkov cone (about 1 deg half-angle) is symmetric about the "
+            "Refraction bends the arrival direction by about (n-1) tan(theta) = 2.8e-4 * 3.73 = "
+            "0.06 deg at 75 deg. The Cherenkov cone (about 1 deg half-angle) is symmetric about the "
             "axis, so its effect on the mean zenith is second order, alpha^2 cot(theta) / 2 (0.004 "
-            "deg at 65 deg, 0.001 deg at 85 deg). 0.5 deg is about 2.5 times the refraction effect."
+            "deg at 65 deg, 0.002 deg at 75 deg). 0.5 deg is about 8 times the refraction effect at "
+            "75 deg."
         ),
     ),
     "core_radius_m": (
@@ -81,20 +87,14 @@ LIMITS = {
             "ground_impact_m."
         ),
     ),
-    "compact_position_limit_m": (
-        "|x|, |y| < 32.7 m from the detector centre",
+    "long_format_violation_count": (
+        "0 compact photon blocks (EventIO version 1000 + n) in each file, at least one block",
         (
-            "CORSIKA compact format: int16 in 0.1 cm units around the detector centre "
-            "(bernlohr README d, 2)."
+            "The long bunch format has float32 fields without the int16 range limits of the compact "
+            "format (bernlohr README section d), so the limits no longer apply. The format is "
+            "checked on the file itself, not inferred from the TELFIL name: the block version is "
+            "0 for the long and 1000 + n for the compact format (io_simtel.c)."
         ),
-    ),
-    "compact_time_limit_ns": (
-        "|t| < 3270 ns",
-        "CORSIKA compact format: int16 in 0.1 ns units (bernlohr README d, 3).",
-    ),
-    "compact_max_photons": (
-        "photons < 327 per bunch",
-        "CORSIKA compact format: int16 in 0.01 photon units (bernlohr README d, 1).",
     ),
     "header_flags": (
         "word 79 == 2, word 77 bit 0x40 set, CURVED log banner present",
@@ -282,19 +282,38 @@ def within_radius(x_m, y_m, centre_x_m, centre_y_m, radius_m) -> np.ndarray:
     return (x_m - centre_x_m) ** 2 + (y_m - centre_y_m) ** 2 <= radius_m**2
 
 
-def compact_violations(x_rel_m, y_rel_m, time_ns, photons) -> int:
-    """Number of bunches outside the compact-format limits (position, time, bunch size)."""
-    x_rel_m = np.asarray(x_rel_m, dtype=np.float64)
-    y_rel_m = np.asarray(y_rel_m, dtype=np.float64)
-    time_ns = np.asarray(time_ns, dtype=np.float64)
-    photons = np.asarray(photons, dtype=np.float64)
-    outside = (
-        (np.abs(x_rel_m) >= COMPACT_POSITION_LIMIT_M)
-        | (np.abs(y_rel_m) >= COMPACT_POSITION_LIMIT_M)
-        | (np.abs(time_ns) >= COMPACT_TIME_LIMIT_NS)
-        | (photons >= COMPACT_MAX_PHOTONS)
-    )
-    return int(np.count_nonzero(outside))
+def is_compact_version(version) -> bool:
+    """True if an IACT photon block header version marks the compact bunch format (1000 + n)."""
+    return int(version) // COMPACT_VERSION_BASE == 1
+
+
+def compact_block_count(versions) -> int:
+    """Number of photon blocks, given their header versions, that use the compact format."""
+    return sum(1 for version in versions if is_compact_version(version))
+
+
+def _objects(parent):
+    """All EventIO objects below parent (an iterable of objects), depth first."""
+    for obj in parent:
+        yield obj
+        if obj.header.only_subobjects:
+            yield from _objects(obj)
+
+
+def photon_block_versions(path) -> list[int]:
+    """Header versions of all photon bunch blocks (type 1205) of an IACT file, in file order.
+
+    Raises RuntimeError when the file holds no photon block, so that an empty file cannot pass.
+    """
+    with EventIOFile(str(path)) as stream:
+        versions = [
+            int(obj.header.version)
+            for obj in _objects(stream)
+            if obj.header.type == PHOTON_BLOCK_TYPE
+        ]
+    if not versions:
+        raise RuntimeError(f"{path}: no photon bunch block (type {PHOTON_BLOCK_TYPE})")
+    return versions
 
 
 # ---- reading IACT files --------------------------------------------------------------------
@@ -385,7 +404,14 @@ def _concatenate(chunks):
 # ---- per-file analysis -------------------------------------------------------------------
 
 
-def analyse_file(name: str, shower: dict, profile, log_text: str, flags: dict) -> dict:
+def analyse_file(
+    name: str,
+    shower: dict,
+    profile,
+    log_text: str,
+    flags: dict,
+    long_format_violations: int,
+) -> dict:
     """Checks (a) to (d) for one file, from the output of read_shower_file."""
     zeniths = shower["zenith_deg"]
     if zeniths.size == 0 or shower["zem_m"].size == 0:
@@ -409,9 +435,6 @@ def analyse_file(name: str, shower: dict, profile, log_text: str, flags: dict) -
         raise RuntimeError(f"{name}: no bunches within {CORE_RADIUS_M} m of the core")
     mean_zenith = mean_zenith_deg(
         shower["cx"][near], shower["cy"][near], shower["photons"][near]
-    )
-    violations = compact_violations(
-        shower["x_rel_m"], shower["y_rel_m"], shower["time_ns"], shower["photons"]
     )
     per_event = []
     for number in np.unique(shower["event"]):
@@ -439,7 +462,7 @@ def analyse_file(name: str, shower: dict, profile, log_text: str, flags: dict) -
         "near_core_bunches": int(np.count_nonzero(near)),
         "mean_zenith_near_core_deg": mean_zenith,
         "mean_zenith_error_deg": mean_zenith - theta0,
-        "compact_format_violations": violations,
+        "long_format_violations": long_format_violations,
         "curved_log": curved_showers.log_is_curved(log_text),
         "header": flags,
         "per_event_zem_median_m": [entry["zem_median_m"] for entry in per_event],
@@ -558,7 +581,10 @@ def main() -> int:
         log_text = iact.with_suffix(".corsika.log").read_text(errors="replace")
         flags = curved_showers.read_header_flags(iact)
         shower = read_shower_file(iact)
-        rows.append(analyse_file(name, shower, profile, log_text, flags))
+        long_format_violations = compact_block_count(photon_block_versions(iact))
+        rows.append(
+            analyse_file(name, shower, profile, log_text, flags, long_format_violations)
+        )
 
     outside = [row["file"] for row in rows if not row["curved_within_band"]]
     metrics = {
@@ -567,8 +593,8 @@ def main() -> int:
         "mean_zenith_error_max_deg": max(
             abs(row["mean_zenith_error_deg"]) for row in rows
         ),
-        "compact_format_violations": sum(
-            row["compact_format_violations"] for row in rows
+        "long_format_violation_count": sum(
+            row["long_format_violations"] for row in rows
         ),
         "header_flag_mismatch_count": sum(
             1

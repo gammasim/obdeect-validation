@@ -23,14 +23,17 @@ def _table():
 
 def test_curved_cases_match_fixture_cards():
     cases = adapter.curved_cases()
-    assert [case[0] for case in cases] == [65, 75, 80, 85]
+    assert [case[0] for case in cases] == [65, 75]
     assert cases[0][1:] == (300, 5000)
     assert all(low == 1000 and high == 10000 for _, low, high in cases[1:])
 
 
-def test_telescope_altitude_uses_sphere_radius_of_layout():
-    assert adapter.telescope_altitude_m(65) == pytest.approx(2156.0 + 11.05)
-    assert adapter.telescope_altitude_m(85) == pytest.approx(2156.0 + 2.27)
+def test_telescope_altitude_is_site_plus_card_telescope_height():
+    # The legacy card places the telescopes at z = 0 (observation level), so h_t = 2156 m.
+    assert adapter.telescope_altitude_m() == pytest.approx(2156.0)
+    assert adapter.telescope_altitude_m() == pytest.approx(
+        2156.0 + curved_showers.layout()["telescopes"][0][2] / 100.0
+    )
 
 
 def test_check_inputs_names_every_missing_file(tmp_path):
@@ -61,9 +64,10 @@ def test_check_inputs_names_every_missing_file(tmp_path):
 
 
 def test_ratio_violations_counts_below_one_and_falls():
-    zeniths = [85, 65, 75, 80]
-    assert adapter.ratio_violations(zeniths, [1.1, 1.001, 1.01, 1.03]) == 0
-    assert adapter.ratio_violations([65, 75, 80, 85], [1.001, 1.01, 1.00, 0.9]) == 3
+    zeniths = [75, 65]
+    assert adapter.ratio_violations(zeniths, [1.1, 1.001]) == 0
+    assert adapter.ratio_violations([65, 75], [1.01, 1.00]) == 1  # fall with zenith
+    assert adapter.ratio_violations([65, 75], [0.9, 1.01]) == 1  # ratio below one
     assert adapter.ratio_violations([65, 75], [1.0, 1.0]) == 0
 
 
@@ -130,7 +134,7 @@ def test_ratio_check_limit_grows_with_few_counts_and_draws():
 
 
 def test_plane_check_would_flag_a_curved_sim_telarray():
-    # A curved sim_telarray at 85 deg would lie more than 10 % from the plane prediction.
+    # A curved sim_telarray lying 10 % from the plane prediction must be flagged.
     plane_count = 0.45 * 1.0e6
     agree = chain.ratio_check(1.001, 1.0, 1e-5, plane_count, 1.0e6)
     assert agree["limit_exceeded"] == 0

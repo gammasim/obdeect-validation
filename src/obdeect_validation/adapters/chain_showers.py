@@ -42,16 +42,20 @@ def card_text(
     scatter_cm=FLAT_SCATTER_CM,
     seed_base=17,
     tstart=False,
+    long_format=False,
 ):
     """CORSIKA input card of the IACT showers; the values are written as given.
 
     data_dir is the DATDIR, direct the DIRECT prefix (with trailing slash) and telfil the IACT
     output name below it. Telescope positions, radii and the CSCAT radius are in cm (CORSIKA
-    units). With the defaults the card is the one generate() has always written.
+    units). long_format writes TELFIL with a leading '+', which selects the long (non-compact)
+    bunch format explicitly (corsika7/bernlohr/iact.c, TELFIL parsing). With the defaults the card
+    is the one generate() has always written.
     """
     seeds = "".join(f"SEED {seed_base + offset} 0 0\n" for offset in SEED_OFFSETS)
     scatter = "".join(f"TELESCOPE {x} {y} {z} {r}\n" for x, y, z, r in telescopes)
     start = "TSTART T\n" if tstart else ""
+    prefix = "+" if long_format else ""
     return f"""RUNNR 1
 EVTNR 1
 NSHOW {showers}
@@ -70,7 +74,7 @@ ELMFLG F F
 CSCAT 5 {scatter_cm} 0.0
 DATDIR {data_dir}/
 DIRECT {direct}
-{scatter}TELFIL {direct}{telfil}
+{scatter}TELFIL {prefix}{direct}{telfil}
 IACT SPLIT_AUTO 0
 IACT IO_BUFFER 800MB
 IACT MAX_BUNCHES 1000000
@@ -114,15 +118,17 @@ def generate(
     """Run CORSIKA in root for IACT showers and return root/showers.iact.
 
     geometry "flat" keeps the card, executable and environment default this chain has always
-    used. geometry "curved" uses the compact-format layout of curved_showers and the curved
-    executable (CORSIKA_BINARY still overrides the executable).
+    used (TELFIL without prefix). geometry "curved" uses the same telescope layout, the long
+    bunch format (TELFIL '+') and the curved executable (CORSIKA_BINARY still overrides it).
     """
+    long_format = False
     if geometry == "flat":
         layout = {"telescopes": FLAT_TELESCOPES, "scatter_cm": FLAT_SCATTER_CM}
     elif geometry == "curved":
         from obdeect_validation.adapters import curved_showers
 
-        layout = curved_showers.layout(zenith)
+        layout = curved_showers.layout()
+        long_format = True
     else:
         raise ValueError(f"unknown CORSIKA geometry: {geometry!r}")
     hashes = prepare_data(root)
@@ -134,6 +140,7 @@ def generate(
         data_dir=root / "data",
         direct=f"{root}/",
         telfil="showers.iact",
+        long_format=long_format,
         **layout,
     )
     (root / "corsika.card").write_text(card)

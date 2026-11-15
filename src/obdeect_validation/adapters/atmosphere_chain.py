@@ -7,6 +7,10 @@ mode), then sim_telarray with unit transmission (zero optical depth table).
 The obdeect wavelength band must equal the band sim_telarray samples from (CORSIKA
 CHERENKOV WAVELENGTH BAND, read from corsika.log). A narrower band changes the photon population
 and biases the candidate high.
+
+The transmission expectation (expected_transmission) is sim_telarray's atmospheric_transmission2:
+it includes the telescope altitude term tau(h_t) and the in-telescope focus term
+tau(h_t + pathlen) - tau(h_t), as obdeect does with --site-altitude and --pathlen.
 """
 
 import argparse
@@ -17,6 +21,9 @@ from pathlib import Path
 MAX_LAMBDA_NM = 1000.0  # sim_telarray skips bunches at or above MAX_LAMBDA; obdeect table ends at 999 nm
 SITE_ALTITUDE_M = 2156.0
 PATHLEN_M = 28.0
+# z of the telescopes above the observation level in the flat CORSIKA cards (0 cm, see
+# chain_showers.FLAT_TELESCOPES). obdeect and sim_telarray put telescopes at level + z.
+TELESCOPE_Z_M = 0.0
 SEED = 123
 SAMPLE_FRACTION = 0.02
 BAND_PATTERN = re.compile(
@@ -44,7 +51,11 @@ LIMITS = {
     ),
     "transmission_mean": (
         "max(0.01, 5 se)",
-        "obdeect weight loss must match the table expectation at 1 %.",
+        (
+            "obdeect weight loss must match the table expectation at 1 %. The expectation "
+            "includes the telescope altitude and in-telescope focus terms (sim_telarray "
+            "atmospheric_transmission2), as obdeect does."
+        ),
     ),
     "trigger": (
         "0 mismatches",
@@ -123,22 +134,43 @@ def ratio_limit(reference, candidate):
     return max(0.01, 5 * math.sqrt(1 / reference + 1 / candidate))
 
 
-def expected_transmission(samples, table_depth, band, rng_draws):
-    """Photon-weighted mean of exp(-tau(zem) / |cz|) for wavelengths drawn as 1/lambda^2 in band.
+def expected_transmission(
+    samples,
+    table_depth,
+    band,
+    rng_draws,
+    telescope_altitude_m=SITE_ALTITUDE_M + TELESCOPE_Z_M,
+    pathlen_m=PATHLEN_M,
+):
+    """Photon-weighted mean transmission for wavelengths drawn as 1/lambda^2 in band.
+
+    Per photon, with airmass 1/|cz| (sim_telarray atmospheric_transmission2, obdeect --site-altitude
+    and --pathlen):
+        T = exp(-(|tau(zem) - tau_tel| / |cz| + tau_focus)),
+        tau_tel = tau(h_t), tau_focus = tau(h_t + pathlen_m) - tau(h_t),
+    with h_t = telescope_altitude_m (observation level + telescope z) and tau = table_depth(
+    wavelength, height_m), the vertical optical depth above H2 (zero at and below H2).
 
     samples: list of (zem_m, cz_abs, photons). Wavelengths at or above MAX_LAMBDA give zero.
     Returns (mean, standard error of the weighted mean).
     """
     lo, hi = band
+    telescope_depths = {}
     values = []
     total = 0.0
     for (zem_m, cz_abs, photons), u in zip(samples, rng_draws):
         wavelength = math.floor(1.0 / (1.0 / lo - u * (1.0 / lo - 1.0 / hi)))
-        probability = (
-            0.0
-            if wavelength >= MAX_LAMBDA_NM
-            else math.exp(-abs(table_depth(max(wavelength, 200), zem_m)) / cz_abs)
-        )
+        if wavelength >= MAX_LAMBDA_NM:
+            probability = 0.0
+        else:
+            row = max(wavelength, 200)
+            if row not in telescope_depths:
+                tau_tel = table_depth(row, telescope_altitude_m)
+                tau_focus = table_depth(row, telescope_altitude_m + pathlen_m) - tau_tel
+                telescope_depths[row] = (tau_tel, tau_focus)
+            tau_tel, tau_focus = telescope_depths[row]
+            optical_depth = abs(table_depth(row, zem_m) - tau_tel) / cz_abs + tau_focus
+            probability = math.exp(-optical_depth)
         values.append(photons * probability)
         total += photons
     mean = sum(values) / total
@@ -260,7 +292,15 @@ def main():
     input_weight, sample = read_bunches(source, SAMPLE_FRACTION, args.seed)
     depth = table_reference(cut_path)[1]
     draws = np.random.default_rng(args.seed).random(len(sample)).tolist()
-    expected, expected_se = expected_transmission(sample, depth, band, draws)
+    telescope_altitude = args.site_altitude + TELESCOPE_Z_M
+    expected, expected_se = expected_transmission(
+        sample,
+        depth,
+        band,
+        draws,
+        telescope_altitude_m=telescope_altitude,
+        pathlen_m=args.pathlen,
+    )
     observed = summary["weight_out"] / input_weight
 
     direct = cs.simulate(root, source, "direct", bypass=0)
@@ -307,6 +347,7 @@ def main():
     details = {
         "band_nm": list(band),
         "site_altitude_m": args.site_altitude,
+        "telescope_altitude_m": telescope_altitude,
         "pathlen_m": args.pathlen,
         "seed": args.seed,
         "input_photon_weight": input_weight,
