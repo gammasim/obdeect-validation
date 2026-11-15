@@ -12,6 +12,6 @@
   "ls_beam_fov_points_off_primary_line_max_m": 0.0002636459459976328,
   "ls_beam_fov_points_off_primary_line_max_m_limit_exceeded": 0,
   "primary_count": 43938,
-  "ls_beam_emission_count": 18,
+  "ls_beam_emission_count": 19,
   "ls_beam_outside_segment_count": 0
 }

@@ -149,7 +149,7 @@ def test_execute_writes_application_config_outputs_and_compares_paired_offsets(
             {
                 "simtools_config": {
                     "application": "simtools-validate-optics",
-                    "configuration": {"model_version": "6.0.2", "telescope": "LSTN-01"},
+                    "configuration": {"model_version": "7.0.0", "telescope": "LSTN-01"},
                 },
                 "limits": LIMITS,
             }
@@ -185,7 +185,7 @@ def test_execute_writes_application_config_outputs_and_compares_paired_offsets(
         "obdeect",
     ]
     assert all(
-        entry["applications"][0]["configuration"]["model_version"] == "6.0.2"
+        entry["applications"][0]["configuration"]["model_version"] == "7.0.0"
         for entry in configs
     )
     assert metrics["n_offsets"] == 2
@@ -211,7 +211,7 @@ def test_execute_rejects_mismatched_offset_pairing(monkeypatch, tmp_path: Path) 
             {
                 "simtools_config": {
                     "application": "simtools-validate-optics",
-                    "configuration": {"model_version": "6.0.2"},
+                    "configuration": {"model_version": "7.0.0"},
                 },
                 "limits": LIMITS,
             }

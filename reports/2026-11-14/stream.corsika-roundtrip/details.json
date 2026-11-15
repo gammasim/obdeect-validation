@@ -213,7 +213,6 @@
     "2003",
     "2004"
   ],
-  "chunk_size_options": [],
   "variant_commands": [
     "stream cat FILE",
     "stream cat -",

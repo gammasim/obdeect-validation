@@ -5,7 +5,7 @@
     "index": "constant index replaced by sim_telarray profile: fake-muon -A 0 only uses the profile; obdeect gets the same n(h) through --index-profile (index.txt from fake-muon printout)",
     "spectrum": "Cherenkov 1/lambda^2, 300-600 nm in both",
     "photons": "fake-muon -b 1 (single photons); obdeect muon-track emits single photons",
-    "positions": "IACT x, y are the observation-plane crossing (z=0) of each ray; native rays crossed at z=0 (KS 0.0006 with the reference radii)",
+    "positions": "IACT x, y are the observation-plane crossing (z=0) of each ray; native rays crossed at z=0 (compared in obs_plane_xy_radius_native_vs_reference)",
     "time_origin": "emission time -h/c (track time zero at impact, beta=1); arrival at z=0 for both codes",
     "time_convention": "native: propagate --profile atmprof1.dat (air delay and refraction) and read t; reference: IACT time (raybnd: air delay included) + event time_offset; expected: t_em + (h + int_0^h (n-1) dh)/(|cz| c), straight path, n(h) from index.txt",
     "time_reference_finding": "sim_telarray IACT time is 0.005 ns above the straight-path expectation on average and differs at KS 0.02 (see time_reference_vs_analytic_*); obdeect matches the expectation (time_native_vs_analytic_*). Not judged: the reference residual is recorded only.",
@@ -161,15 +161,15 @@
     2048.0
   ],
   "camera_pe_reference": [
-    2140.0,
-    2135.0,
-    2037.0,
-    2077.0,
-    2066.0,
-    2054.0,
-    2146.0,
-    2139.0,
-    2190.0,
-    2107.0
+    2147.0,
+    2044.0,
+    2051.0,
+    2017.0,
+    2088.0,
+    2082.0,
+    2147.0,
+    2048.0,
+    2080.0,
+    2047.0
   ]
 }

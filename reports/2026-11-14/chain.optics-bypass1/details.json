@@ -37,9 +37,9 @@
     "camera_rotation_deg": 10.893,
     "mirror_class": "0"
   },
-  "config": "/results/full-2026-11-14/chain.optics-bypass1/cfg/model/7.0.0/CTAO.cfg",
+  "config": "/results/chain.optics-bypass1/cfg/model/7.0.0/CTAO.cfg",
   "physics_limits": {
-    "photoelectron_relative_bias": 0.01,
+    "photoelectron_relative_bias": "max(0.01, 5 se)",
     "trigger_probability": "paired |mean| > 5 se per telescope"
   },
   "trigger_probability_per_telescope": {

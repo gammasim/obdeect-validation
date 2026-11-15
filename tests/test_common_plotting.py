@@ -6,6 +6,7 @@ import signal
 import subprocess
 import sys
 import time
+import types
 
 import numpy as np
 import pytest
@@ -135,8 +136,13 @@ def test_report_html_shows_status_reason_and_figures(tmp_path):
     assert "case-a/plot.png" in page
 
 
-def _fake_stream(records):
-    return lambda _path: iter(records)
+def _fake_stream(monkeypatch, records):
+    stream = types.ModuleType("obdeect.stream")
+    stream.Reader = lambda _path: iter(records)
+    obdeect = types.ModuleType("obdeect")
+    obdeect.stream = stream
+    monkeypatch.setitem(sys.modules, "obdeect", obdeect)
+    monkeypatch.setitem(sys.modules, "obdeect.stream", stream)
 
 
 def _photons(n=2):
@@ -147,7 +153,7 @@ def _photons(n=2):
 def test_native_reader_rejects_photons_before_first_event(monkeypatch):
     from obdeect_validation.adapters import readers
 
-    monkeypatch.setattr(readers, "Reader", _fake_stream([_photons()]))
+    _fake_stream(monkeypatch, [_photons()])
     with pytest.raises(ValueError, match="before its first event"):
         readers.read_native("x")
     counts, columns = readers.read_native("x", require_events=False)
@@ -158,7 +164,7 @@ def test_native_reader_counts_weight_per_event(monkeypatch):
     from obdeect_validation.adapters import readers
 
     records = [{"type": "event"}, _photons(3), {"type": "event"}, _photons(1)]
-    monkeypatch.setattr(readers, "Reader", _fake_stream(records))
+    _fake_stream(monkeypatch, records)
     assert readers.read_native("x")[0] == [3.0, 1.0]
 
 
@@ -183,3 +189,34 @@ def test_extinction_figure_colours_follow_the_photon_wavelengths(tmp_path):
         tmp_path / "e.png",
     )
     assert (tmp_path / "e.png").is_file() and plotting.CYCLE
+
+
+def test_sim_telarray_fails_when_input_block_is_skipped(tmp_path):
+    def runner(argv, log, cwd=None):
+        (tmp_path / "run.simtel").write_bytes(b"")
+        log.write_text(
+            "Cannot extend I/O buffer of length 32768 by another 1279967280 bytes\n"
+            "I/O buffer too small; I/O block is skipped\n"
+            "Run(s) completed as expected after 1 events (1 showers).\n"
+        )
+
+    with pytest.raises(RuntimeError, match="dropped input"):
+        common.sim_telarray(tmp_path, "in.iact", "run", {}, runner=runner)
+
+
+@pytest.mark.parametrize("create_output", [False, True])
+def test_sim_telarray_reports_error_reading_input(tmp_path, create_output):
+    def runner(argv, log, cwd=None):
+        if create_output:
+            (tmp_path / "run.simtel").write_bytes(b"")
+        log.write_text("Error reading input block\n")
+
+    with pytest.raises(RuntimeError, match="dropped input.*Error reading input block"):
+        common.sim_telarray(tmp_path, "in.iact", "run", {}, runner=runner)
+
+
+def test_simtel_dropped_input_ignores_normal_logs():
+    text = (
+        "I/O block extended by 122878 to 1122878 bytes\nRun(s) completed as expected\n"
+    )
+    assert common.simtel_dropped_input(text) == []
