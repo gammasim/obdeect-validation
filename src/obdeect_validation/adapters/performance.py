@@ -322,9 +322,8 @@ def main():
     args = parser.parse_args()
     root = Path.cwd().resolve()
     # Stream files go to a container-local directory (PERF_WORK_DIR), not the bind-mounted results.
-    work = Path(
-        os.environ.get("PERF_WORK_DIR") or tempfile.mkdtemp(prefix="perf-stages-")
-    )
+    work_dir = os.environ.get("PERF_WORK_DIR")
+    work = Path(work_dir or tempfile.mkdtemp(prefix="perf-stages-"))
     work.mkdir(parents=True, exist_ok=True)
     source = select_input(
         args.input.resolve(), args.events, work / "showers-input.iact"
@@ -528,17 +527,18 @@ def main():
 
     common.write_results(metrics, details, root)
 
-    for path in (
-        work / "showers.gst",
-        work / "roundtrip.iact",
-        work / "propagated.gst",
-        work / "traced.gst",
-        work / "direct.simtel",
-        work / "direct.hdata",
-        work / "roundtrip.hdata",
-    ):
-        path.unlink(missing_ok=True)
-    shutil.rmtree(work, ignore_errors=True)
+    if work_dir is None:
+        for path in (
+            work / "showers.gst",
+            work / "roundtrip.iact",
+            work / "propagated.gst",
+            work / "traced.gst",
+            work / "direct.simtel",
+            work / "direct.hdata",
+            work / "roundtrip.hdata",
+        ):
+            path.unlink(missing_ok=True)
+        shutil.rmtree(work, ignore_errors=True)
 
 
 if __name__ == "__main__":

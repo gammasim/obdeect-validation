@@ -79,6 +79,11 @@
       "atol": 0
     },
     {
+      "metric": "photon_gate_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
       "metric": "tel1_camera_only_missing",
       "expected": 0,
       "atol": 0

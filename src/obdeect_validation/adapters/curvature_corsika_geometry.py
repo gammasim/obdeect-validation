@@ -323,9 +323,10 @@ def read_shower_file(path) -> dict:
     """Bunches and header of one IACT file, in metres, ns and degrees.
 
     Returns a dict with per-bunch arrays (zem_m, photons, cx, cy, x_rel_m, y_rel_m, time_ns,
-    x_ground_m, y_ground_m, core_distance_m, event), per-event arrays (zenith_deg, azimuth_deg,
-    core_x_m, core_y_m) and the observation level. Telescope ids are 1-based indices into the
-    telescope positions of the run (TELESCOPE rows, see eventio TelescopeDefinition).
+    x_ground_m, y_ground_m, core_distance_m, core_x_m, core_y_m, event), per-event arrays
+    (zenith_deg, azimuth_deg) and the observation level. The core coordinates are repeated for
+    each photon bunch. Keys in ``event.photon_bunches`` are 0-based indices into the telescope
+    positions of the run (TELESCOPE rows, see eventio TelescopeDefinition).
     """
     columns = {
         key: []

@@ -102,9 +102,8 @@ def main() -> None:
     parser.add_argument("--reps", type=int, default=REPS)
     args = parser.parse_args()
     root = Path.cwd().resolve()
-    work = Path(
-        os.environ.get("PERF_WORK_DIR") or tempfile.mkdtemp(prefix="perf-pipe-")
-    )
+    work_dir = os.environ.get("PERF_WORK_DIR")
+    work = Path(work_dir or tempfile.mkdtemp(prefix="perf-pipe-"))
     work.mkdir(parents=True, exist_ok=True)
     source = performance.select_input(
         args.input.resolve(), args.events, work / "showers-input.iact"
@@ -141,7 +140,8 @@ def main() -> None:
     metrics.update(budgets)
     details["budget_reasons"] = reasons
     common.write_results(metrics, details, root)
-    shutil.rmtree(work, ignore_errors=True)
+    if work_dir is None:
+        shutil.rmtree(work, ignore_errors=True)
 
 
 if __name__ == "__main__":
