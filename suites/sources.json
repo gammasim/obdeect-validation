@@ -11,6 +11,7 @@
     "../cases/sources/muon-track.json",
     "../cases/sources/illuminator-illn-01.json",
     "../cases/sources/illuminator-ills-01.json",
-    "../cases/sources/night-sky-camera.json"
+    "../cases/sources/night-sky-camera.json",
+    "../cases/sources/laser-beam-scattered.json"
   ]
 }

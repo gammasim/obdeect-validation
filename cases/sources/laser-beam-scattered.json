@@ -1,0 +1,18 @@
+{
+  "id": "sources.laser-beam-scattered",
+  "name": "Laser beam scattered light: obdeect single scattering versus analytic integral (ls-beam recorded)",
+  "requires": ["obdeect", "ls-beam", "python3"],
+  "commands": [
+    {
+      "name": "compare-laser-beam-scattered",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.scattered_light"],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {"metric": "scattered_yield_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "cos_theta_mean_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "cos2_theta_mean_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "altitude_mean_limit_exceeded", "expected": 0, "atol": 0}
+  ]
+}

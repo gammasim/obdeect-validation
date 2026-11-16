@@ -189,12 +189,13 @@ def test_shower_candidate_passes_the_thread_setting_to_trace_stream(
 
 def test_bin_envelope_bounds_the_qe_and_the_table_restores_it() -> None:
     qe = np.array([0.0, 0.5, 1.0])
-    bound, table = performance_chain.bin_envelope(qe)
+    headroom = performance_chain.headroom_for(0.063)
+    bound, table = performance_chain.bin_envelope(qe, headroom)
     assert np.all(bound >= qe)
     assert np.all(table <= 1.0)
     assert bound[0] == performance_chain.ENVELOPE_FLOOR and table[0] == 0.0
     assert np.allclose(bound * table, qe)
-    assert table[1] == table[2] == performance_chain.ENVELOPE_HEADROOM
+    assert table[1] == table[2] == pytest.approx(headroom)
 
 
 def test_envelope_is_constant_on_each_nm_bin(tmp_path: Path) -> None:
@@ -229,12 +230,14 @@ def test_envelope_files_write_the_table_under_the_config_file_name(
     qe.write_text(
         "\n".join(f"{n} {0.2 if n >= 250 else 0.0}" for n in range(200, 801, 50))
     )
-    files = performance_chain.envelope_files(tmp_path / "work", qe)
+    headroom = performance_chain.headroom_for(0.063)
+    files = performance_chain.envelope_files(tmp_path / "work", qe, headroom)
     assert files["table_dir"] == tmp_path / "work" / "qe-table"
     table = np.loadtxt(files["table_dir"] / qe.name)
     assert table.shape == (len(performance_chain.WAVELENGTH_GRID), 2)
-    assert set(np.round(table[table[:, 0] >= 250, 1], 6)) == {0.8}
-    assert files["bound_max"] == pytest.approx(0.2 / 0.8)
+    assert set(np.round(table[table[:, 0] >= 250, 1], 6)) == {round(headroom, 6)}
+    assert files["bound_max"] == pytest.approx(0.2 / headroom)
+    assert files["headroom"] == headroom
 
 
 SIM_ARGV = ["sim_telarray", "-", "-C", "Bypass_Optics=3"]
@@ -259,7 +262,7 @@ def test_envelope_pipeline_thins_with_the_qe_bound_on_one_telescope() -> None:
     ]
     stage = dict(stages)
     assert option(stage["propagation"], "--envelope") == "qe=envelope.dat"
-    assert option(stage["propagation"], "--telescopes") == "1"
+    assert "--telescopes" not in stage["propagation"]
     assert (
         "--mode" not in stage["propagation"]
         and "--wavelength-range" not in stage["propagation"]

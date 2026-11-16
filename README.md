@@ -11,7 +11,7 @@ From the workspace root (checkouts `obdeect`, `simtools`, `sim_telarray`,
 bash obdeect-validation/containers/run-validation.sh full obdeect-validation/results/full
 ```
 
-Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `chain`, `curvature`, `full`,
+Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `chain`, `curvature`, `endtoend`, `full`,
 `performance` (report only). The launcher builds obdeect and simtools from the
 checkouts on a digest-pinned simtools-prod image and mounts this repository
 (`/validation`), sim_telarray (`/reference`) and the models (`/models`) read-only.
@@ -72,12 +72,16 @@ workspace project-notes/projects/cta/202611/full-simulation-chain/{plan.md,pr.md
 
 | Group | Cases | Reference |
 |---|---|---|
-| stream | LED to EventIO; CORSIKA round trip incl. stdin/tee variants | eventio reader, sim_telarray camera |
+| stream | LED to EventIO; CORSIKA round trip incl. stdin/tee variants; EventIO headers of the 16 physics-matrix shower inputs vs CORSIKA logs | eventio reader, sim_telarray camera, CORSIKA logs |
 | propagation | analytic Beer–Lambert; sim_telarray tables; refraction/time | sim_telarray tables, compiled CORSIKA atmo |
 | curvature | Chapman extinction; spherical geometry; curved Bouguer refraction; input guards (no showers); curved flag, emission geometry and curved extinction of CORSIKA CURVED showers; high-zenith chain | analytic, independent ray tracer, CORSIKA CURVED, sim_telarray (plane-parallel) |
-| sources | LED, flasher dish/secondary, point source, beam scan, laser, night sky, muon | pixled, ff-1m, ff-gct, xyzls, xyls, ls-beam, nsbls, fake-muon (+ camera) |
+| sources | LED, flasher dish/secondary, point source, beam scan, laser, night sky, muon; illuminators ILLN-01/ILLS-01 at 3 distances; night-sky camera p.e.; scattered laser beam | pixled, ff-1m, ff-gct, xyzls, xyls, ls-beam, nsbls, fake-muon, analytic expectation (+ camera) |
 | optics | LST, MST, SST: D80, effective area, focal length, 0–4 deg | simtools-validate-optics, both backends |
-| chain | near-threshold round trip; obdeect atmosphere; obdeect optics + Bypass_Optics=1 | direct sim_telarray |
+| chain | near-threshold round trip; obdeect atmosphere; obdeect optics + Bypass_Optics=1 (LST, MST, SST; 40/60 deg, azimuth 180, proton, South); mode-3 envelope (Bypass_Optics=3, QE envelope) | direct sim_telarray |
+| endtoend | photon-identical output across threads, chunking and pipes; tee fan-out to two models; tampered efficiency ledgers rejected; damaged streams fail cleanly | exact equality, separate full runs, analytic controls |
+| performance | air-shower array and proton, pipe timing (report only) | sim_telarray on the same input |
+
+Known FAIL: `sources.illuminator-illn-01` (`half_cx_mean` limit, one of three distances). It fails the same way on the main obdeect build, so it is not caused by the stream or propagation changes; the cause is open.
 
 ### Curvature suite
 
@@ -91,15 +95,15 @@ CORSIKA CURVED showers at 65 and 75 deg (`stream.corsika-curved-flag`,
 files are generated on a host with the curved CORSIKA binary (variants in
 `$SIMTOOLS_CORSIKA_PATH/build_opts.yml`) with
 `python -m obdeect_validation.adapters.curved_showers run --geometry curved --zenith 65 ...`,
-then copied to `inputs/` (hashes in `fixtures/inputs.json`, `null` until generated). The run
+then copied to `inputs/` (hashes in `fixtures/inputs.json`). The run
 checks the CURVED banner of the CORSIKA log, so a flat binary cannot pass as curved.
 sim_telarray applies a plane-parallel airmass 1/|cz| also to CURVED input, so the chain case
 tests the predicted curved-to-plane-parallel ratio, not a zero difference. The comparison with the
 CORSIKA `DISTIP`/`TOFIP` tables needs an instrumented CORSIKA run, see
 `docs/curvature-corsika-tables.md`. Details of all curvature cases: `docs/curvature-validation.md`.
 
-Optics limits (2% D80, 1% area, 0.2% focal length) are provisional, taken from the
-largest deviations measured in the old validation, pending scientific approval.
+Optics limits (2% D80, 1% area, 0.2% focal length) are approved 2026-11-15, taken from the
+largest deviations measured in the old validation.
 Current verdicts and open issues are in the workspace project notes.
 
 Exit status: 0 pass, 1 scientific difference, 2 execution/configuration error,

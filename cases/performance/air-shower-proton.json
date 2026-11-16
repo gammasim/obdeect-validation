@@ -1,0 +1,122 @@
+{
+  "id": "performance.air-shower-proton",
+  "name": "Air shower, proton input (20 deg, 300-10000 GeV), same chain and budgets as performance.air-shower; blocked until the input exists",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config",
+    "python3"
+  ],
+  "inputs": [
+    "/validation/inputs/proton-20deg-300-10000GeV.iact"
+  ],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "measure-air-shower",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_chain",
+        "air-shower",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg",
+        "--input",
+        "/validation/inputs/proton-20deg-300-10000GeV.iact"
+      ],
+      "timeout": 7200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "reference_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_threads1_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_threadsdefault_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_threads1_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "physics_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "from_corsika_propagation_cpu_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "envelope_from_corsika_propagation_cpu_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_wall_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_cpu_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_threads1_wall_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_threads1_cpu_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "equal_statistics_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_threads1_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

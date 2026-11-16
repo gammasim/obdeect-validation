@@ -443,7 +443,7 @@
         },
         {
           "file": "optics_relative_difference.png",
-          "caption": "obdeect / sim_telarray − 1 against off-axis angle, per offset direction; shaded band = provisional limit."
+          "caption": "obdeect / sim_telarray − 1 against off-axis angle, per offset direction; shaded band = limit."
         }
       ],
       "links": {

@@ -344,7 +344,9 @@ def read_shower_file(path) -> dict:
             "event",
         )
     }
-    events = {"zenith_deg": [], "azimuth_deg": [], "core_x_m": [], "core_y_m": []}
+    # Per-event values. The core position is kept per bunch only: a per-event core array
+    # under the same key would overwrite the per-bunch one in the result below.
+    events = {"zenith_deg": [], "azimuth_deg": []}
     with IACTFile(str(path)) as stream:
         run = stream.header
         site_m = (
@@ -355,12 +357,12 @@ def read_shower_file(path) -> dict:
             events["zenith_deg"].append(math.degrees(float(event.header["zenith"])))
             events["azimuth_deg"].append(math.degrees(float(event.header["azimuth"])))
             core_x, core_y = float(event.impact_x) * 0.01, float(event.impact_y) * 0.01
-            events["core_x_m"].append(core_x)
-            events["core_y_m"].append(core_y)
             for telescope, bunches in event.photon_bunches.items():
                 if len(bunches) == 0:
                     continue
-                index = int(telescope) - 1
+                # eventio photon_bunches keys are the 0-based telescope indices of the
+                # TELESCOPE rows (checked on the 65 and 75 deg curved files: keys 0, 1, 2).
+                index = int(telescope)
                 if not 0 <= index < len(positions):
                     raise ValueError(
                         f"telescope id {telescope} has no TELESCOPE position"

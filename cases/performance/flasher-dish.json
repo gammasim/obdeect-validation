@@ -1,16 +1,37 @@
 {
   "id": "performance.flasher-dish",
-  "name": "flasher-dish: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (report only)",
-  "requires": ["obdeect", "python3"],
+  "name": "Flasher-dish, wall time budget: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (candidate wall <= reference wall)",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
   "commands": [
     {
       "name": "measure-flasher-dish",
-      "argv": ["{python}", "-m", "obdeect_validation.adapters.performance_chain", "flasher-dish"],
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_chain",
+        "flasher-dish"
+      ],
       "timeout": 7200
     }
   ],
   "metrics": [
-    {"metric": "reference_completed", "expected": 1, "atol": 0},
-    {"metric": "candidate_threads1_completed", "expected": 1, "atol": 0}
+    {
+      "metric": "reference_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_threads1_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_threads1_wall_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
   ]
 }

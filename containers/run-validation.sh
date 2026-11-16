@@ -16,6 +16,12 @@ image=obdeect-validation:local
 # MODE3=1 runs the suite with sim_telarray Bypass_Optics=3 (containers/Dockerfile.mode3, tag obdeect-validation:mode3).
 run_image=$image
 extra_env=()
+# Environment file of the run (environments/<name>.json): workspace (all suites), performance (timing).
+environment=${ENVIRONMENT:-workspace}
+if [[ ! "$environment" =~ ^[a-z0-9-]+$ || ! -f "obdeect-validation/environments/$environment.json" ]]; then
+  echo "unknown environment: $environment" >&2
+  exit 2
+fi
 
 mkdir -p "$output"
 output=$(cd "$output" && pwd)
@@ -60,5 +66,5 @@ podman run --rm "${mounts[@]}" ${extra_env[@]+"${extra_env[@]}"} \
   "$run_image" \
   obdeect-validate run \
     --suite "/validation/suites/$suite.json" \
-    --environment /validation/environments/workspace.json \
+    --environment "/validation/environments/$environment.json" \
     --output /results --non-interactive

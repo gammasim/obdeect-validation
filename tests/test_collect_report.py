@@ -180,3 +180,48 @@ def test_curvature_cases_have_their_own_step_and_detail_values(tmp_path):
     assert "65°: p.e. ratio 1.2500 vs predicted 1.2400" in readme
     # A details field that is absent gives the missing mark, not an error.
     assert collect_report.format_row("{showers[5][x]}", {"showers": []}) == "–"
+
+
+def test_add_renders_gated_budget_checks_and_blocked_cases(tmp_path):
+    run = tmp_path / "perf"
+    case = run / "performance.air-shower"
+    case.mkdir(parents=True)
+    (case / "metrics.json").write_text(json.dumps({"ratio_wall_threads1": 2.5}))
+    checks = [
+        {
+            "metric": "reference_completed",
+            "expected": 1,
+            "atol": 0,
+            "actual": 1,
+            "status": "PASS",
+        },
+        {
+            "metric": "candidate_envelope_wall_budget_exceeded",
+            "expected": 0,
+            "atol": 0,
+            "actual": 1,
+            "status": "FAIL",
+        },
+    ]
+    summary = {
+        "suite": "performance",
+        "status": "FAIL",
+        "cases": [
+            {"id": "performance.air-shower", "status": "FAIL", "metrics": checks},
+            {
+                "id": "performance.air-shower-proton",
+                "status": "BLOCKED",
+                "missing_inputs": ["/validation/inputs/proton.iact"],
+            },
+        ],
+    }
+    (run / "summary.json").write_text(json.dumps(summary))
+    report = tmp_path / "2099-01-01"
+    report.mkdir()
+    collect_report.collect(run, report, add=True)
+    readme = collect_report.write_readme(report).read_text()
+    assert "| `candidate_envelope_wall_budget_exceeded` | 1 | 0 ± 0 | FAIL |" in readme
+    assert "1/2 gated checks pass" in readme
+    assert "air-shower-proton" in readme
+    assert "BLOCKED" in readme and "/validation/inputs/proton.iact" in readme
+    assert "REPORT ONLY" not in readme.split("## 1.")[0]

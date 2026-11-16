@@ -1,0 +1,123 @@
+{
+  "id": "sources.simtools-flasher-chain",
+  "name": "simtools flasher: obdeect photon stream (obdeect_flasher stream_to_simtel sim_telarray Bypass_Optics=1) vs default LightEmission chain, LSFS-design, LSTS-01 South 7.0.0, 40 events, 1e6 photons per event, instrument seed 1",
+  "requires": [
+    "obdeect",
+    "simtools-simulate-flasher",
+    "sim_telarray"
+  ],
+  "commands": [
+    {
+      "name": "simtools-flasher-reference",
+      "argv": [
+        "simtools-simulate-flasher",
+        "--run_mode",
+        "full_simulation",
+        "--light_source",
+        "LSFS-design",
+        "--telescopes",
+        "LSTS-01",
+        "--site",
+        "South",
+        "--model_version",
+        "7.0.0",
+        "--number_of_events",
+        "40",
+        "--instrument_seed",
+        "1",
+        "--flasher_photons",
+        "1000000",
+        "--simulation_models_path",
+        "/models",
+        "--log_level",
+        "INFO",
+        "--output_path",
+        "/results/reference"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "simtools-flasher-candidate",
+      "argv": [
+        "simtools-simulate-flasher",
+        "--run_mode",
+        "full_simulation",
+        "--light_source",
+        "LSFS-design",
+        "--telescopes",
+        "LSTS-01",
+        "--site",
+        "South",
+        "--model_version",
+        "7.0.0",
+        "--number_of_events",
+        "40",
+        "--instrument_seed",
+        "1",
+        "--flasher_photons",
+        "1000000",
+        "--simulation_models_path",
+        "/models",
+        "--log_level",
+        "INFO",
+        "--output_path",
+        "/results/candidate",
+        "--simulation_software",
+        "obdeect_flasher",
+        "stream_to_simtel",
+        "sim_telarray:bypass_optics=1"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "compare-flasher-chain",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.simtools_flasher_chain",
+        "--reference",
+        "/results/reference/sim_telarray/full_simulation_run000001_South_7.0.0_simulate_flasher_LSTS-01.simtel.zst",
+        "--candidate",
+        "/results/candidate/sim_telarray/full_simulation_run000001_South_7.0.0_simulate_flasher_LSTS-01.simtel.zst"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "candidate_pipeline_complete",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "reference_event_count",
+      "expected": 40,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_event_count",
+      "expected": 40,
+      "atol": 0
+    },
+    {
+      "metric": "event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pe_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "image_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pixel_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

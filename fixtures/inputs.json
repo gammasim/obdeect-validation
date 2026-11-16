@@ -10,15 +10,15 @@
       "card": "corsika/gamma-20deg-20-100GeV.card"
     },
     "gamma-65deg-300-5000GeV-curved.iact": {
-      "sha256": null,
+      "sha256": "0699dd674062c2f48463767f889326fb7024db1dc75ea2cd58f32eeb1c555ac4",
       "card": "corsika/gamma-65deg-300-5000GeV-curved.card"
     },
     "gamma-65deg-300-5000GeV-flat.iact": {
-      "sha256": null,
+      "sha256": "d78cfb6cabfd0070a624a0860a501580691680e89e78ac7e80c4ba700d294e9c",
       "card": "corsika/gamma-65deg-300-5000GeV-flat.card"
     },
     "gamma-75deg-1000-10000GeV-curved.iact": {
-      "sha256": null,
+      "sha256": "fedf998b6937d7a8af2f2e62e3b915b8d707a6ef226d306ea6448c57c8c3cafa",
       "card": "corsika/gamma-75deg-1000-10000GeV-curved.card"
     },
     "gamma-40deg-100-3000GeV.iact": {

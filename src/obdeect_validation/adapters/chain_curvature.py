@@ -15,8 +15,9 @@ Checks per zenith angle (65 and 75 deg):
      carries both, so an unweighted (transmission-only) prediction is biased high at large zenith
      angles (details: predicted_ratio_transmission_only).
   2. sim_telarray is plane-parallel: its 'Not absorbed/max. Q.E.' count of the reference over that of
-     the unit run, against the plane-parallel prediction weighted by quantum efficiency (that stage
-     counts the quantum efficiency once, the mirror reflectivity not at all).
+     the unit run, against the plane-parallel prediction weighted by the detection weight. That stage
+     draws against sim_telarray's element quantum_efficiency array, which is Q.E. x mirror
+     reflectivity (sim_absorb.c; mc_aux.h), so the weight is the same as in check 1.
 Camera event matching and trigger decisions are reported in the details only: the candidate is
 curved by design, so trigger decisions of borderline events may change at high zenith.
 """
@@ -46,6 +47,9 @@ QE_TABLE = "cfg/CTA/qe_lst1_20200318_high+low.dat"  # LST-1 config: first column
 MIRROR_TABLE = (
     "cfg/CTA/ref_LST_2020-04-23.dat"  # LST mirror reflectivity, column 2 (fraction)
 )
+# LST camera window (camera_filter in CTA-PROD6-LST.cfg). sim_config.c multiplies it into the
+# element quantum_efficiency array, at the bin centre (rpolate_1d at lambda + 0.5).
+WINDOW_TABLE = "cfg/CTA/transmission_lst_window_No7-10_ave.dat"
 
 # Limits fixed before looking at results. Each entry: (rule, justification).
 LIMITS = {
@@ -95,13 +99,21 @@ class DetectionWeights:
     """Wavelength weights of the sim_telarray detection stages, from the LST-1 configuration.
 
     quantum: quantum efficiency (zero outside the table, which ends at 800 nm with zero QE).
-    detection: quantum efficiency x mirror reflectivity (the reflectivity table must cover the band).
+    detection: element efficiency of sim_telarray (sim_config.c, sim_absorb.c): quantum efficiency
+    x mirror reflectivity x camera window transmission (evaluated at lambda + 0.5, as sim_config.c
+    does; zero below 259 nm). Every factor that sim_telarray multiplies into el->quantum_efficiency
+    before the photon draw is included. The funnel efficiency is applied after the draw (per pixel
+    type, in the photoelectron stage), so it is not in this weight; the 'Not absorbed' stage does
+    not reach it. The mirror table must cover every wavelength where the quantum efficiency is
+    non-zero; outside the quantum table the weight is zero by definition, so a wider Cherenkov band
+    (CORSIKA: 100 to 2000 nm) is accepted there.
     """
 
     def __init__(self, reference=common.REFERENCE):
         reference = Path(reference)
         self._qe = read_two_column(reference / QE_TABLE)
         self._mirror = read_two_column(reference / MIRROR_TABLE)
+        self._window = read_two_column(reference / WINDOW_TABLE)
         if np.any(self._mirror[:, 1] < 0.0) or np.any(self._mirror[:, 1] > 1.0):
             raise ValueError("mirror reflectivity must be a fraction between 0 and 1")
 
@@ -111,14 +123,20 @@ class DetectionWeights:
 
     def detection(self, nm):
         nm = np.asarray(nm, dtype=float)
-        if nm.size and (
-            nm.min() < self._mirror[0, 0] or nm.max() > self._mirror[-1, 0]
+        quantum = self.quantum(nm)
+        active = nm[quantum > 0.0]
+        if active.size and (
+            active.min() < self._mirror[0, 0] or active.max() > self._mirror[-1, 0]
         ):
             raise ValueError(
-                "mirror reflectivity table does not cover the wavelength band"
+                "mirror reflectivity table does not cover the wavelength band where the "
+                "quantum efficiency is non-zero"
             )
         reflectivity = np.interp(nm, self._mirror[:, 0], self._mirror[:, 1])
-        return self.quantum(nm) * reflectivity
+        window = np.interp(
+            nm + 0.5, self._window[:, 0], self._window[:, 1], left=0.0, right=0.0
+        )
+        return quantum * reflectivity * window
 
 
 def run_simtel(work, input_file, name, zenith_deg, extra=()):
@@ -201,14 +219,17 @@ def analyse(root, source, zenith, table, cut_path, zero_path, weights) -> dict:
     detected = curved.expectation(
         zem, cz, photons, table, band, h_t, weight=weights.detection
     )
+    # The 'Not absorbed/max. Q.E.' stage draws against sim_telarray's element quantum_efficiency
+    # array, which is Q.E. x mirror reflectivity (sim_absorb.c), so its prediction uses the
+    # detection weight as well.
     quantum = curved.expectation(
-        zem, cz, photons, table, band, h_t, weight=weights.quantum
+        zem, cz, photons, table, band, h_t, weight=weights.detection
     )
     for name, result in (("detection", detected), ("quantum", quantum)):
         if abs(result["live_fraction"] - 1.0) > 1e-9:
             raise ValueError(f"{name} weight does not vanish at and above 1000 nm")
     unit_standard_error = ce.weighted_standard_error(
-        np.full(photons.size, ce.unit_variance(band, weights.quantum)), photons
+        np.full(photons.size, ce.unit_variance(band, weights.detection)), photons
     )
 
     work = Path(root) / f"gamma-{zenith:g}deg"

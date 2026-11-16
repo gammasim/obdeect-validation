@@ -162,6 +162,9 @@ def sim_telarray_argv(
     """argv and output path of sim_telarray on input_file (input_file "-" reads standard input).
 
     options become -C key=value; extra holds further sim_telarray arguments.
+    min_photons = 0 unless an adapter sets it: sim_telarray otherwise skips a telescope event
+    with fewer photons than the configuration's min_photons (120 for LSTN-01), so the two sides
+    of a comparison must use the same setting to simulate the same event set.
     """
     output = root / f"{name}.simtel"
     options = {
@@ -170,6 +173,7 @@ def sim_telarray_argv(
         "random_seed": SIMTEL_SEED,
         "save_photons": 2,
         "store_photoelectrons": 0,
+        "min_photons": 0,
         **options,
     }
     argv = [

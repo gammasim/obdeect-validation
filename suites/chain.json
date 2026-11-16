@@ -11,6 +11,7 @@
     "../cases/chain/optics-bypass1-msts.json",
     "../cases/chain/optics-bypass1-proton.json",
     "../cases/chain/optics-bypass1-south.json",
-    "../cases/chain/optics-bypass1-ssts.json"
+    "../cases/chain/optics-bypass1-ssts.json",
+    "../cases/chain/mode3-envelope.json"
   ]
 }

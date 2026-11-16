@@ -308,6 +308,25 @@ def bypass_from_log(log):
     return int(values.pop())
 
 
+def propagation_table(root):
+    """Zero-depth table for obdeect propagation: its rows must be below 1000 nm.
+
+    The fixture's last row (1000 nm) is dropped; the table is zero everywhere. sim_telarray keeps
+    the full table (common.write_zero_depth_table).
+    """
+    path = common.write_zero_depth_table(
+        root, UNIT_ATMOSPHERE, name="unit-propagation.dat"
+    )
+    kept = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        fields = line.split()
+        if fields and fields[0].isdigit() and int(fields[0]) >= 1000:
+            continue
+        kept.append(line)
+    path.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    return path
+
+
 def candidate_stream(
     root,
     source,
@@ -318,17 +337,51 @@ def candidate_stream(
     zenith=str(ZENITH_DEG),
     azimuth=str(AZIMUTH_DEG),
     mirror_class=1,
+    site_altitude_m,
 ):
-    """showers.iact -> candidate.iact (camera frame, sim_telarray input). No atmosphere.
+    """showers.iact -> candidate.iact (camera frame, sim_telarray input).
+
+    The atmosphere stage is obdeect propagation with the zero-optical-depth table (state applied,
+    which obdeect stream to-simtel requires for camera-frame photons). The table ends at 999 nm
+    (propagation accepts integer wavelengths below 1000 nm only), so photons above 1000 nm are
+    dropped: 10315831 of 10888516 photons and 5.26 % of the weight in the validation run, which
+    matches 5.3 % for a 1/lambda^2 spectrum over 100-2000 nm. They give no photoelectrons: the QE
+    table is zero above about 760 nm. The p.e. bias moves by 0.17 % (-0.107 % +/- 0.216 % against
+    +0.063 % +/- 0.187 % without the stage), within the errors. --no-extinction keeps the photons
+    but leaves the factor pending, which to-simtel rejects.
 
     Returns (iact path, Bypass_Optics value of the converted telescope).
     """
-    native, traced = root / "showers.gst", root / "traced.gst"
+    native, propagated, traced = (
+        root / "showers.gst",
+        root / "propagated.gst",
+        root / "traced.gst",
+    )
     model, iact = root / "telescope.model", root / "candidate.iact"
     common.command(
         ["obdeect", "stream", "from-corsika", source],
         root / "from-corsika.log",
         stdout_file=native,
+    )
+    common.command(
+        [
+            "obdeect",
+            "propagation",
+            "run",
+            "--transmission",
+            propagation_table(root),
+            "--site-altitude",
+            f"{site_altitude_m:g}",
+            "--seed",
+            SEED,
+            "--mode",
+            "weighted",
+            "-i",
+            native,
+            "-o",
+            propagated,
+        ],
+        root / "propagate.log",
     )
     common.command(
         [
@@ -370,7 +423,7 @@ def candidate_stream(
             "--telescope-transmission",
             "full",
             "-i",
-            native,
+            propagated,
             "-o",
             traced,
         ],
@@ -489,6 +542,7 @@ def main():
             zenith=zenith,
             azimuth=azimuth,
             mirror_class=mirror_class,
+            site_altitude_m=altitude,
         )
         metrics["candidate_pipeline_complete"] = 1
     except RuntimeError as error:

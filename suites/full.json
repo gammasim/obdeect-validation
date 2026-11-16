@@ -43,6 +43,11 @@
     "../cases/determinism/determinism-photons.json",
     "../cases/fanout/fanout-tee-models.json",
     "../cases/ledger/efficiency-ledger.json",
-    "../cases/robustness/stream-damage.json"
+    "../cases/robustness/stream-damage.json",
+    "../cases/sources/laser-beam-scattered.json",
+    "../cases/chain/mode3-envelope.json",
+    "../cases/performance/air-shower-array.json",
+    "../cases/performance/air-shower-proton.json",
+    "../cases/performance/stream-pipe.json"
   ]
 }

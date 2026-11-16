@@ -15,7 +15,10 @@ Hand-written text goes into blocks of README.md and is kept when it is rewritten
 A collection replaces the report: case directories and run files of an earlier collection
 into the same directory are removed first (README.md and its notes are kept). Cases of a
 separate run (e.g. performance) are added with --add; they are listed in report_only.json
-and shown as REPORT ONLY. The README shows only the cases of summary.json and that list.
+and shown as REPORT ONLY. A report-only case keeps its verdict from the run (verdict.json in its
+directory: status, gated checks with actual values and limits, what is missing); a case with gated
+checks, or BLOCKED / ERROR / FAIL, shows that status instead of REPORT ONLY. The README shows only
+the cases of summary.json and that list.
 
     python scripts/collect_report.py results/full-integrated reports/2026-11-13
     python scripts/collect_report.py --add results/perf reports/2026-11-13
@@ -34,6 +37,18 @@ KEEP_NAMES = {"metrics.json", "details.json"}
 KEEP_SUFFIXES = {".png", ".svg"}
 TOP_LEVEL = ("summary.json", "junit.xml", "report.html")
 REPORT_ONLY = "report_only.json"
+VERDICT = "verdict.json"
+VERDICT_KEYS = (
+    "name",
+    "status",
+    "metrics",
+    "missing",
+    "missing_inputs",
+    "missing_modules",
+    "reason",
+    "error",
+    "metric_error",
+)
 MAX_BYTES = 2_000_000
 LAYOUT = Path(__file__).with_name("report_layout.json")
 NOTES = re.compile(r"<!-- notes:([\w-]+) -->\n(.*?)<!-- /notes -->", re.DOTALL)
@@ -47,11 +62,25 @@ def collect(run: Path, report: Path, add: bool = False) -> list[Path]:
     copied = []
     report.mkdir(parents=True, exist_ok=True)
     if add:
+        run_cases = {
+            case["id"]: case
+            for case in _read_json(run / "summary.json").get("cases", [])
+            if isinstance(case, dict) and "id" in case
+        }
         listed = set(_read_json(report / REPORT_ONLY).get("cases", []))
         listed.update(path.parent.name for path in run.glob("*/metrics.json"))
+        listed.update(run_cases)
         (report / REPORT_ONLY).write_text(
             json.dumps({"cases": sorted(listed)}, indent=2) + "\n", encoding="utf-8"
         )
+        for case_id, case in run_cases.items():
+            target = report / case_id
+            target.mkdir(parents=True, exist_ok=True)
+            verdict = {key: case[key] for key in VERDICT_KEYS if key in case}
+            (target / VERDICT).write_text(
+                json.dumps(verdict, indent=2) + "\n", encoding="utf-8"
+            )
+            copied.append(target / VERDICT)
     else:
         for path in report.iterdir():
             if path.is_dir():
@@ -111,7 +140,7 @@ def format_row(template: str, values: dict) -> str:
         return MISSING
     try:
         return template.format(**values)
-    except (ValueError, TypeError, KeyError, IndexError):
+    except ValueError, TypeError, KeyError, IndexError:
         return MISSING
 
 
@@ -197,6 +226,35 @@ def _notes(notes: dict, key: str) -> list[str]:
     ]
 
 
+def _report_only_case(case_id: str, verdict: dict) -> dict:
+    """A report-only case from its run verdict: its status, or REPORT ONLY when it has no gated
+    checks and completed (blocked, failed and errored cases always show their status)."""
+    gated = bool(verdict.get("metrics"))
+    status = verdict.get("status", "UNKNOWN")
+    if not gated and status not in ("BLOCKED", "ERROR", "FAIL"):
+        status = "REPORT ONLY"
+    return {**verdict, "id": case_id, "status": status, "report_only": True}
+
+
+def _gated_table(case: dict) -> list[str]:
+    """Markdown table of the gated checks of a report-only case: actual value and limit."""
+    lines = ["| Gated check | Actual | Limit | Verdict |", "|---|---|---|---|"]
+    for check in case["metrics"]:
+        actual = check.get("actual")
+        actual = (
+            MISSING
+            if actual is None
+            else f"{actual:.4g}"
+            if isinstance(actual, float)
+            else str(actual)
+        )
+        limit = f"{check['expected']:g} ± {check['atol']:g}"
+        lines.append(
+            f"| `{check['metric']}` | {actual} | {limit} | {check.get('status', MISSING)} |"
+        )
+    return lines + [""]
+
+
 def _headline(entry: dict, metrics: dict) -> str:
     """Comma-separated parts of the headline; parts with a missing metric are left out."""
     if "headline" in entry:
@@ -207,6 +265,15 @@ def _headline(entry: dict, metrics: dict) -> str:
         return MISSING
     value = format_row(rows[0]["text"], metrics)
     return f"{rows[0]['label']}: {value}" if value != MISSING else MISSING
+
+
+def _gated_headline(case: dict) -> str:
+    """Headline of a case without a layout entry: its gated checks that pass, in words."""
+    metrics = case.get("metrics", [])
+    if not metrics:
+        return MISSING
+    passed = sum(1 for metric in metrics if metric.get("status") == "PASS")
+    return f"{passed}/{len(metrics)} gated checks pass"
 
 
 def _title(entry: dict, case: dict, step: dict) -> str:
@@ -226,7 +293,7 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
     # Cases of a separate run added with --add (report_only.json); other directories are ignored.
     known = {case["id"] for case in cases}
     cases += [
-        {"id": case_id, "status": "REPORT ONLY"}
+        _report_only_case(case_id, _read_json(report / case_id / VERDICT))
         for case_id in _read_json(report / REPORT_ONLY).get("cases", [])
         if case_id not in known and (report / case_id).is_dir()
     ]
@@ -250,9 +317,9 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
             steps.append(step)
     order = [step["key"] for step in layout["steps"]]
     steps.sort(
-        key=lambda step: order.index(step["key"])
-        if step["key"] in order
-        else len(order)
+        key=lambda step: (
+            order.index(step["key"]) if step["key"] in order else len(order)
+        )
     )
 
     lines += ["| Step | Case | Headline | Verdict |", "|---|---|---|---|"]
@@ -264,7 +331,8 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
             entry = _case_layout(layout, case["id"])
             lines.append(
                 f"| {number}. {step['title']} | [{_title(entry, case, step)}](#{_anchor(case['id'])}) "
-                f"| {_headline(entry, metrics)} | {case.get('status', MISSING)} |"
+                f"| {_headline(entry, metrics) if entry else _gated_headline(case)} "
+                f"| {case.get('status', MISSING)} |"
             )
     lines.append("")
 
@@ -307,6 +375,8 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
                     for row in entry["rows"]
                 ]
                 lines.append("")
+            if case.get("report_only") and case.get("metrics"):
+                lines += _gated_table(case)
             files = [
                 f"[{name}]({case['id']}/{name})"
                 for name in ("metrics.json", "details.json")

@@ -1,0 +1,112 @@
+{
+  "id": "performance.air-shower-array",
+  "name": "Air shower, North array (LSTN-01..04, MSTN-03, MSTN-15; 7.0.0): CORSIKA IACT -> sim_telarray with all six telescopes versus per-telescope obdeect envelope pipes (sim_telarray Bypass_Optics=3); chain time without compiles; per-telescope photoelectron bias; timing budgets",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config",
+    "python3"
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.corsika.log"
+  ],
+  "timeout": 14400,
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "LSTN-02",
+        "LSTN-03",
+        "LSTN-04",
+        "MSTN-03",
+        "MSTN-15",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "measure-air-shower-array",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_array",
+        "air-shower-array",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg"
+      ],
+      "timeout": 14400
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "reference_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_envelope_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "physics_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "array_chain_wall_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "array_chain_cpu_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "equal_statistics_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tel1_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tel2_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tel3_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tel4_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tel5_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "tel6_camera_only_missing",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}
