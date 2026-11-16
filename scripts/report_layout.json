@@ -44,6 +44,28 @@
       "intro": "obdeect stages inserted into the CORSIKA → sim_telarray chain, compared event by event with the direct sim_telarray run on the same showers and seeds. Bias = obdeect / reference − 1 of camera photoelectrons, with its standard error."
     },
     {
+      "key": "curvature",
+      "cases": [
+        "stream.corsika-curved-flag",
+        "propagation.curvature-*",
+        "propagation.refraction-curved-ray",
+        "chain.curvature-*"
+      ],
+      "title": "Earth curvature (large zenith angles)",
+      "intro": "At large zenith angles the plane-parallel atmosphere is no longer accurate. obdeect propagation has two curved modes: `spherical` (obdeect applies curvature: emission altitude, extinction and refraction in spherical shells) and `corsika` (CORSIKA with the CURVED option has already curved the shower; obdeect applies the curved extinction only). These cases check the curved geometry and extinction against analytic results and an independent ray tracer, the CURVED flags from CORSIKA through the stream, the mode rules, and CURVED CORSIKA showers at 65° and 75° through obdeect and sim_telarray. sim_telarray itself is plane-parallel, so at these angles it is a reference for the method, not for the result."
+    },
+    {
+      "key": "endtoend",
+      "cases": [
+        "determinism.*",
+        "fanout.*",
+        "ledger.*",
+        "robustness.*"
+      ],
+      "title": "End-to-end robustness and determinism",
+      "intro": "Whole-chain properties that do not compare with a reference program: identical output for identical input (threads, chunking, pipes, tee fan-out), rejection of tampered efficiency ledgers, and graceful failure on damaged streams. Pass means zero mismatches and zero silent accepts, with positive controls accepted."
+    },
+    {
       "key": "performance",
       "prefix": "performance.",
       "title": "Performance",
@@ -421,7 +443,7 @@
         },
         {
           "file": "optics_relative_difference.png",
-          "caption": "obdeect / sim_telarray − 1 against off-axis angle, per offset direction; shaded band = provisional limit."
+          "caption": "obdeect / sim_telarray − 1 against off-axis angle, per offset direction; shaded band = limit."
         }
       ],
       "links": {
@@ -528,6 +550,292 @@
           "caption": "Photons per second for each stage."
         }
       ]
+    },
+    "stream.corsika-curved-flag": {
+      "title": "CURVED flag: CORSIKA → stream",
+      "headline": "flag mismatches {word79_flag_mismatch}, run keys missing {run_key_missing_count}",
+      "description": "A flat and a CURVED CORSIKA shower file at 65°: the CURVED flags of the CORSIKA event header (EVTH word 79, IACT bit of word 77) must reach the obdeect stream as run key `curvature_applied` (1 for the curved file, 0 for the flat one), through the CLI and the Python API, and the CORSIKA log must name the CURVED option.",
+      "rows": [
+        {
+          "label": "curvature_applied: curved / flat file",
+          "text": "{curved_file_curvature_applied} / {flat_file_curvature_applied}"
+        },
+        {
+          "label": "Word 79 / IACT bit / refraction bit mismatches",
+          "text": "{word79_flag_mismatch} / {iact_curved_bit_mismatch} / {refraction_bit_mismatch}"
+        },
+        {
+          "label": "Run keys missing",
+          "text": "{run_key_missing_count}"
+        },
+        {
+          "label": "CURVED log pattern mismatches",
+          "text": "{curved_log_pattern_mismatch}"
+        }
+      ]
+    },
+    "propagation.curvature-chapman": {
+      "title": "Curved extinction vs Chapman integral",
+      "headline": "transmission vs Chapman ≤ {max_transmission_relative_error_vs_chapman:.1e}, flat limit {flat_limit_max_relative_error:.1e}",
+      "description": "Exponential atmosphere (scale height 8 km, site 2 km): transmission along the straight slant path through a spherical atmosphere against the Chapman integral, zenith up to the horizon; with a very large Earth radius it must reproduce the plane-parallel result.",
+      "rows": [
+        {
+          "label": "Samples",
+          "text": "{sample_count}"
+        },
+        {
+          "label": "Largest relative error vs reference integral",
+          "text": "{max_transmission_relative_error_vs_reference:.1e}"
+        },
+        {
+          "label": "Largest relative error vs Chapman approximation",
+          "text": "{max_transmission_relative_error_vs_chapman:.1e}"
+        },
+        {
+          "label": "Flat limit, largest relative difference",
+          "text": "{flat_limit_max_relative_error:.1e}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "curvature-chapman.png",
+          "caption": "Left: transmission against zenith angle for obdeect, Chapman (dashed) and plane-parallel (dotted). Right: obdeect / Chapman − 1."
+        }
+      ]
+    },
+    "propagation.curvature-geometry": {
+      "title": "Spherical geometry: emission altitude and arrival",
+      "headline": "altitude ≤ {max_zem_error_m:.1e} m, position ≤ {max_position_error_m:.1e} m, time ≤ {max_time_error_ns:.1e} ns",
+      "description": "Sky-frame photons through mode `spherical` without extinction: emission altitude above the curved Earth, arrival position and time, photons that miss the ground, against closed-form sphere geometry; with a very large Earth radius the result must equal mode `none`.",
+      "rows": [
+        {
+          "label": "Samples",
+          "text": "{sample_count}"
+        },
+        {
+          "label": "Largest emission-altitude error",
+          "text": "{max_zem_error_m:.1e} m"
+        },
+        {
+          "label": "Largest position / time error",
+          "text": "{max_position_error_m:.1e} m / {max_time_error_ns:.1e} ns"
+        },
+        {
+          "label": "Lateral shift vs d²/(2R), relative error",
+          "text": "{lateral_shift_relative_error:.1e}"
+        },
+        {
+          "label": "Flat limit, largest difference",
+          "text": "{flat_limit_max_difference:.1e}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "curvature-geometry.png",
+          "caption": "Emission altitude above the curved Earth minus the flat one against the lateral distance of emission: obdeect, closed-form sphere, and the approximation d²/(2R)."
+        }
+      ]
+    },
+    "propagation.refraction-curved-ray": {
+      "title": "Curved refraction vs independent ray tracer",
+      "headline": "shift error ≤ {max_shift_error_m:.1e} m, time within {max_time_error_ns_normalised:.2f} of its limit",
+      "description": "Refraction and air delay in spherical shells (Bouguer's law n r sin θ = const) of obdeect against an independent numpy ray tracer on the same atmospheric profile; with a very large Earth radius the plane-parallel result must follow.",
+      "rows": [
+        {
+          "label": "Samples",
+          "text": "{sample_count}"
+        },
+        {
+          "label": "Largest lateral-shift error",
+          "text": "{max_shift_error_m:.1e} m"
+        },
+        {
+          "label": "Shift / time error in units of their limits",
+          "text": "{max_shift_error_normalised:.2f} / {max_time_error_ns_normalised:.2f}"
+        },
+        {
+          "label": "Direction scale error",
+          "text": "{max_direction_scale_error:.1e}"
+        },
+        {
+          "label": "Plane-parallel limit (in units of its limit)",
+          "text": "{plane_limit_max_difference:.2f}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "refraction-curved-ray.png",
+          "caption": "Bending, air delay and the deviation of obdeect from the ray tracer against emission height, per zenith angle at the telescope."
+        }
+      ]
+    },
+    "propagation.curvature-input-guards": {
+      "title": "Curvature mode rules",
+      "headline": "{guard_case_count} rules, {guard_unexpected_outcome_count} unexpected outcomes",
+      "description": "The atmosphere stage must refuse inputs where curvature would be applied twice or forgotten (e.g. mode `none` with `curvature_applied` = 1, mode `spherical` with 1) and accept the valid combinations, through the CLI and the Python API, naming the offending key in the error.",
+      "rows": [
+        {
+          "label": "Rules checked",
+          "text": "{guard_case_count}"
+        },
+        {
+          "label": "Unexpected outcomes",
+          "text": "{guard_unexpected_outcome_count}"
+        },
+        {
+          "label": "Messages without the offending key",
+          "text": "{guard_message_mismatch_count}"
+        }
+      ]
+    },
+    "propagation.curvature-corsika-geometry": {
+      "title": "CURVED CORSIKA geometry (65°, 75°)",
+      "headline": "zenith error ≤ {mean_zenith_error_max_deg:.2f}°, {header_flag_mismatch_count} header mismatches",
+      "description": "Checks of what obdeect's mode `corsika` assumes about CURVED CORSIKA output, on real shower files at 65° and 75° and without obdeect code: emission altitudes above sea level at the expected slant depth, directions in the detector frame, bunch format, header flags and log.",
+      "rows": [
+        {
+          "label": "Files",
+          "text": "{file_count}"
+        },
+        {
+          "label": "Median emission slant depth outside the X_max band",
+          "text": "{median_slant_depth_outside_range_count}"
+        },
+        {
+          "label": "Largest mean zenith error",
+          "text": "{mean_zenith_error_max_deg:.2f}°"
+        },
+        {
+          "label": "Bunch-format / header / log problems",
+          "text": "{long_format_violation_count} / {header_flag_mismatch_count} / {curved_log_missing_count}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "slant-depth-vs-zenith.png",
+          "caption": "Slant depth of the median emission altitude against zenith angle, curved and plane-parallel, with the expected X_max band."
+        },
+        {
+          "file": "zem-histograms.png",
+          "caption": "Emission altitudes of the bunches per file."
+        }
+      ]
+    },
+    "propagation.curvature-corsika-extinction": {
+      "title": "Curved extinction of CURVED CORSIKA showers",
+      "headline": "{file_count} files, {curved_transmission_limit_exceeded} beyond limit, 65°: obdeect {showers[0][observed_transmission]:.4f} vs curved {showers[0][curved_expectation]:.4f}",
+      "description": "CURVED CORSIKA showers at 65° and 75° through `obdeect propagation run --curvature corsika` (production table): the photon-weighted mean transmission of obdeect against the curved slant-depth expectation of the same bunches (independent numpy code); the plane-parallel expectation, which sim_telarray applies, is shown for scale.",
+      "rows": [
+        {
+          "label": "Zenith 65°: obdeect / curved / plane-parallel",
+          "text": "{showers[0][observed_transmission]:.4f} / {showers[0][curved_expectation]:.4f} / {showers[0][plane_expectation]:.4f}"
+        },
+        {
+          "label": "Zenith 75°: obdeect / curved / plane-parallel",
+          "text": "{showers[1][observed_transmission]:.4f} / {showers[1][curved_expectation]:.4f} / {showers[1][plane_expectation]:.4f}"
+        },
+        {
+          "label": "Files beyond limit",
+          "text": "{curved_transmission_limit_exceeded}"
+        },
+        {
+          "label": "Dropped photons",
+          "text": "{propagation_dropped_photons}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "curvature-corsika-extinction.png",
+          "caption": "Left: mean transmission against zenith angle, obdeect (curved) with the curved and plane-parallel expectations. Right: obdeect / plane-parallel expectation and the predicted curved / plane ratio."
+        }
+      ]
+    },
+    "propagation.curvature-corsika-tables": {
+      "title": "CORSIKA CURVED refraction tables",
+      "headline": "table interpolation ≤ {table_interpolation_max_relative_error:.1e}",
+      "description": "Traced CURVED CORSIKA run (patched output of the DISTIP and TOFIP tables): CORSIKA's table interpolation at the traced bunches is reproduced; the mapping to obdeect's spherical refraction is recorded in details only. Needs the traced input files; without them the case is blocked.",
+      "rows": [
+        {
+          "label": "Files / traced bunches",
+          "text": "{file_count} / {bunch_count}"
+        },
+        {
+          "label": "Largest interpolation error",
+          "text": "{table_interpolation_max_relative_error:.1e}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "interpolation_error.png",
+          "caption": "Relative interpolation error of the CORSIKA tables at the traced bunches against emission altitude."
+        },
+        {
+          "file": "mapping_residuals.png",
+          "caption": "Residuals of the mapping between the CORSIKA tables and obdeect's spherical refraction (recorded only)."
+        }
+      ]
+    },
+    "chain.curvature-*": {
+      "title": "CURVED showers: obdeect atmosphere + sim_telarray (65°, 75°)",
+      "headline": "65°: p.e. ratio {showers[0][pe_ratio][measured_ratio]:.4f} vs predicted {showers[0][pe_ratio][predicted_ratio]:.4f}, 75°: {showers[1][pe_ratio][measured_ratio]:.4f} vs {showers[1][pe_ratio][predicted_ratio]:.4f}",
+      "description": "CURVED CORSIKA showers at 65° and 75°, LST-1 configuration. Reference: sim_telarray with its own (plane-parallel) atmosphere. Candidate: obdeect `--curvature corsika` extinction, then sim_telarray without atmosphere. The two must differ: their detected p.e. ratio is compared with the curved / plane-parallel ratio predicted from the same bunches, weighted with quantum efficiency and mirror reflectivity. A second check confirms that sim_telarray is plane-parallel.",
+      "rows": [
+        {
+          "label": "Zenith 65°: detected p.e. ratio measured / predicted",
+          "text": "{showers[0][pe_ratio][measured_ratio]:.4f} / {showers[0][pe_ratio][predicted_ratio]:.4f} ± {showers[0][pe_ratio][ratio_error]:.4f}"
+        },
+        {
+          "label": "Zenith 75°: detected p.e. ratio measured / predicted",
+          "text": "{showers[1][pe_ratio][measured_ratio]:.4f} / {showers[1][pe_ratio][predicted_ratio]:.4f} ± {showers[1][pe_ratio][ratio_error]:.4f}"
+        },
+        {
+          "label": "Ratio checks beyond limit / sim_telarray plane-parallel checks beyond limit",
+          "text": "{pe_ratio_vs_prediction_limit_exceeded} / {simtel_plane_parallel_limit_exceeded}"
+        },
+        {
+          "label": "Dropped photons",
+          "text": "{propagation_dropped_photons}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "chain-curvature-high-zenith.png",
+          "caption": "Left: detected p.e. ratio obdeect (curved) / sim_telarray (plane-parallel) against zenith angle, measured and predicted. Right: sim_telarray's own 'not absorbed' ratio against the plane-parallel prediction."
+        }
+      ],
+      "differences": "obdeect and sim_telarray are expected to disagree here: obdeect applies the curved atmosphere, sim_telarray the plane-parallel one. The case passes when the size of the disagreement matches the prediction ({showers[0][pe_ratio][predicted_ratio]:.4f} at 65°, {showers[1][pe_ratio][predicted_ratio]:.4f} at 75°)."
+    },
+    "stream.matrix-inputs-headers": {
+      "title": "CORSIKA shower inputs of the physics matrix: EventIO headers vs logs",
+      "description": "The 16 shower inputs (7 cards: 20/40/60 deg, azimuth 180, South, array-north, r1300, proton) are read with the eventio reader and their headers compared with the CORSIKA logs."
+    },
+    "sources.illuminator-illn-01": {
+      "title": "Illuminator ILLN-01 vs xyzls",
+      "description": "Illuminator ILLN-01 against xyzls at three distances: emission (photon yield, directions, times, wavelengths) and camera stage in details.json."
+    },
+    "sources.illuminator-ills-01": {
+      "title": "Illuminator ILLS-01 vs xyzls",
+      "description": "Illuminator ILLS-01 against xyzls at three distances: emission (photon yield, directions, times, wavelengths) and camera stage in details.json."
+    },
+    "sources.night-sky-camera": {
+      "title": "Night-sky camera p.e. vs analytic expectation",
+      "description": "Night-sky background through sim_telarray's camera, against the analytic expectation (rate x area x solid angle x efficiencies). No nsbls comparison."
+    },
+    "determinism.photons": {
+      "title": "Determinism of trace-stream and propagation",
+      "description": "Photon-by-photon equality across thread counts (1, 4, all), input chunk sizes (1024, 65536) and file, pipe or in-process use; a changed seed must be detected."
+    },
+    "fanout.tee-and-models": {
+      "title": "Fan-out of one atmosphere stream to tee branches and models",
+      "description": "One atmosphere stream fanned out to tee branches (same LSTN-01 twice, LST and MST consumers) against separate full runs: photons and sim_telarray camera must be identical."
+    },
+    "ledger.efficiency-tamper": {
+      "title": "Efficiency ledger: tampered chains rejected",
+      "description": "Tampered efficiency chains (missing atmosphere, factor applied twice or pending, undeclared envelope, backward state, angular t0) must be rejected with a message naming the factor; positive controls must be accepted."
+    },
+    "robustness.stream-damage": {
+      "title": "Stream damage: truncated, corrupt and mismatched streams",
+      "description": "Truncated, corrupt, version-mismatched and empty streams through the pipe chain must fail cleanly: no crash, no hang, no silent success; early consumer exit is included."
     }
   },
   "since": "2026-11-14",

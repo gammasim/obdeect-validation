@@ -386,7 +386,7 @@ def ff_gct_time_metrics(native, ref, min_abs_cz=FF_GCT_MIN_ABS_CZ):
 
 def emission_times(native, ref, time_correction):
     """Arrival times compared in stage 1: obdeect times moved to the reference plane
-    (time_correction 'geometric', 'geometric_air' or 'none') and the photons compared.
+    (time_correction 'geometric', 'geometric_air', 'bent' or 'none') and the photons compared.
 
     Returns t_native, native_ok, ref_ok and the native 'heading for the plane' mask (None
     without a time correction).
@@ -394,6 +394,11 @@ def emission_times(native, ref, time_correction):
     t_native = native["t"].copy()
     native_ok = np.ones(t_native.size, dtype=bool)
     toward = None
+    if time_correction == "bent":
+        # Native photons already propagated to the plane z = 0 by obdeect with the atmosphere
+        # (bent rays, air delay): t and x, y are the arrival values; no further correction.
+        native_ok = 100.0 * np.hypot(native["x"], native["y"]) < TIME_RADIUS_CM
+        return t_native, native_ok, ref["r"] < TIME_RADIUS_CM, toward
     if time_correction in ("geometric", "geometric_air"):
         cz = native["cz"]
         if np.any(cz == 0):

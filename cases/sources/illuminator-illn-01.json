@@ -1,0 +1,194 @@
+{
+  "id": "sources.illuminator-illn-01",
+  "name": "Illuminator ILLN-01 versus xyzls at 3 distances (emission; camera stage in details.json)",
+  "requires": ["obdeect", "xyzls", "sim_telarray", "python3"],
+  "commands": [
+    {
+      "name": "compare-illuminator-illn-01",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.illuminator", "ILLN-01"],
+      "timeout": 3600
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "nominal_photon_ratio_accepted_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_cx_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_cy_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_cx_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_cy_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_t_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_t_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_wavelength_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_wavelength_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_camera_pe_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_camera_image_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nominal_camera_pixel_map_reduced_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_photon_ratio_accepted_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_cx_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_cy_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_cx_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_cy_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_t_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_t_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_wavelength_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_wavelength_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_camera_pe_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_camera_image_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "x2_camera_pixel_map_reduced_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_photon_ratio_accepted_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_cx_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_cy_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_cx_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_cy_ks_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_t_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_t_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_wavelength_mean_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_wavelength_rms_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_camera_pe_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_camera_image_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "half_camera_pixel_map_reduced_chi2_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

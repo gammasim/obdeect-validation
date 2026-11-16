@@ -2,7 +2,6 @@ import importlib
 import itertools
 import math
 
-import numpy as np
 import pytest
 
 pytest.importorskip("eventio")
@@ -167,11 +166,18 @@ def test_trigger_difference_paired(monkeypatch):
     rows = chain_optics.trigger_difference(reference, candidate, ["100", "101"])
     assert rows[1]["difference"] == pytest.approx(0.5)
     assert rows[2]["difference"] == pytest.approx(0.5)
-    assert rows[1]["se"] == pytest.approx(np.std([0, 1], ddof=1) / np.sqrt(2))
+    # one discordant pair per telescope: se = sqrt(discordant - diff^2 / n) / n
+    assert rows[1]["se"] == pytest.approx(math.sqrt(0.5) / 2)
+    assert (rows[1]["candidate_only"], rows[1]["reference_only"]) == (1, 0)
 
 
 def test_trigger_difference_identical_samples_not_flagged(monkeypatch):
     monkeypatch.setattr(chain_optics, "TELESCOPES", (1,))
     events = {"100": {"telescope_events": {"1": {}}}, "101": {"telescope_events": {}}}
-    rows = chain_optics.trigger_difference(events, events, ["100", "101"])
-    assert rows[1] == {"difference": 0.0, "se": 0.0, "flag": 0}
+    row = chain_optics.trigger_difference(events, events, ["100", "101"])[1]
+    assert (row["difference"], row["se"], row["flag"], row["mcnemar_p"]) == (
+        0.0,
+        0.0,
+        0,
+        1.0,
+    )

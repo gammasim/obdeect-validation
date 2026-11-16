@@ -146,3 +146,82 @@ def test_links_are_listed_not_embedded(tmp_path):
         "simtools plots: [extra.png](sources.flasher-dish/extra.png)"
     )
     assert not any(line.startswith("![") for line in lines)
+
+
+def test_curvature_cases_have_their_own_step_and_detail_values(tmp_path):
+    report = tmp_path / "2099-01-01"
+    shower = {
+        "pe_ratio": {
+            "measured_ratio": 1.25,
+            "predicted_ratio": 1.24,
+            "ratio_error": 0.01,
+        }
+    }
+    cases = {
+        "propagation.extinction-analytic": ({"sample_count": 16}, {}),
+        "propagation.curvature-chapman": ({"sample_count": 30}, {}),
+        "chain.curvature-high-zenith": (
+            {"file_count": 2, "pe_ratio_vs_prediction_limit_exceeded": 0},
+            {"showers": [shower, shower]},
+        ),
+    }
+    for case_id, (metrics, details) in cases.items():
+        (report / case_id).mkdir(parents=True)
+        (report / case_id / "metrics.json").write_text(json.dumps(metrics))
+        (report / case_id / "details.json").write_text(json.dumps(details))
+    summary = {"suite": "s", "status": "PASS", "cases": []}
+    summary["cases"] = [{"id": c, "status": "PASS", "metrics": []} for c in cases]
+    (report / "summary.json").write_text(json.dumps(summary))
+    readme = collect_report.write_readme(report).read_text()
+    atmosphere = readme.split("## 1. Atmosphere (propagation)")[1].split("## 2.")[0]
+    curvature = readme.split("## 2. Earth curvature (large zenith angles)")[1]
+    assert "extinction-analytic" in atmosphere and "curvature-chapman" not in atmosphere
+    assert "curvature-chapman" in curvature and "curvature-high-zenith" in curvature
+    assert "65°: p.e. ratio 1.2500 vs predicted 1.2400" in readme
+    # A details field that is absent gives the missing mark, not an error.
+    assert collect_report.format_row("{showers[5][x]}", {"showers": []}) == "–"
+
+
+def test_add_renders_gated_budget_checks_and_blocked_cases(tmp_path):
+    run = tmp_path / "perf"
+    case = run / "performance.air-shower"
+    case.mkdir(parents=True)
+    (case / "metrics.json").write_text(json.dumps({"ratio_wall_threads1": 2.5}))
+    checks = [
+        {
+            "metric": "reference_completed",
+            "expected": 1,
+            "atol": 0,
+            "actual": 1,
+            "status": "PASS",
+        },
+        {
+            "metric": "candidate_envelope_wall_budget_exceeded",
+            "expected": 0,
+            "atol": 0,
+            "actual": 1,
+            "status": "FAIL",
+        },
+    ]
+    summary = {
+        "suite": "performance",
+        "status": "FAIL",
+        "cases": [
+            {"id": "performance.air-shower", "status": "FAIL", "metrics": checks},
+            {
+                "id": "performance.air-shower-proton",
+                "status": "BLOCKED",
+                "missing_inputs": ["/validation/inputs/proton.iact"],
+            },
+        ],
+    }
+    (run / "summary.json").write_text(json.dumps(summary))
+    report = tmp_path / "2099-01-01"
+    report.mkdir()
+    collect_report.collect(run, report, add=True)
+    readme = collect_report.write_readme(report).read_text()
+    assert "| `candidate_envelope_wall_budget_exceeded` | 1 | 0 ± 0 | FAIL |" in readme
+    assert "1/2 gated checks pass" in readme
+    assert "air-shower-proton" in readme
+    assert "BLOCKED" in readme and "/validation/inputs/proton.iact" in readme
+    assert "REPORT ONLY" not in readme.split("## 1.")[0]

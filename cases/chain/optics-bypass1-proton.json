@@ -1,0 +1,78 @@
+{
+  "id": "chain.optics-bypass1-proton",
+  "name": "CORSIKA -> obdeect trace-stream -> sim_telarray Bypass_Optics (candidate) vs direct sim_telarray, LSTN-01 North, protons, zenith 19-21 deg (mean 20.1), N->E azimuth 180 deg, unit atmosphere",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config"
+  ],
+  "inputs": [
+    "/validation/inputs/proton-20deg-300-10000GeV.iact"
+  ],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "chain-optics-proton",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.chain_optics",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg",
+        "--telescope",
+        "LSTN-01",
+        "--site",
+        "North",
+        "--model-version",
+        "7.0.0",
+        "--input",
+        "/validation/inputs/proton-20deg-300-10000GeV.iact",
+        "--azimuth",
+        "180"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "candidate_pipeline_complete",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "image_shape_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "arrival_time_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "trigger_probability_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

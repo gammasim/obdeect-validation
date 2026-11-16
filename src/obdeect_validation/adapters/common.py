@@ -19,6 +19,45 @@ SIMTEL_SEED = 20261113
 VALIDATION = Path(os.environ.get("VALIDATION_ROOT", "/validation"))
 SHOWERS = VALIDATION / "inputs/gamma-20deg-100-3000GeV.iact"
 TRANSMISSION_TABLE = REFERENCE / "cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"
+UNIT_TRANSMISSION = VALIDATION / "fixtures/unit-transmission.dat"
+#: Bottom (H2, m a.s.l.) of zero-optical-depth tables. Below the lowest emission height of every
+#: validation case: 2147.01 m (South CORSIKA showers, site 2147 m) and 2147.5 m (ground sources).
+ZERO_DEPTH_BOTTOM_M = 2140.0
+_H2_HEADER = re.compile(r"H2=\s*[0-9.]+")
+
+
+def zero_depth_table(text: str, bottom_m: float = ZERO_DEPTH_BOTTOM_M) -> str:
+    """Sim_telarray transmission table with zero optical depth and its bottom (H2) at bottom_m.
+
+    sim_telarray returns zero transmission for emission below H2 (atmospheric_transmission2,
+    zem < h2), so a table whose bottom lies above a source's emission heights removes those photons.
+    The header H2 is replaced; wavelength rows keep their wavelength and get zero in every column.
+    """
+    if not _H2_HEADER.search(text):
+        raise ValueError("transmission table has no H2 header")
+    lines = []
+    for line in text.splitlines():
+        fields = line.split()
+        if fields and fields[0].isdigit():
+            lines.append(" ".join([fields[0]] + ["0"] * (len(fields) - 1)))
+        else:
+            lines.append(_H2_HEADER.sub(f"H2= {bottom_m / 1000.0:.3f}", line, count=1))
+    return "\n".join(lines) + "\n"
+
+
+def write_zero_depth_table(
+    root: Path,
+    source: Path = UNIT_TRANSMISSION,
+    bottom_m: float = ZERO_DEPTH_BOTTOM_M,
+    name: str = "unit-atmosphere.dat",
+) -> Path:
+    """Write zero_depth_table(source) to root/name and return the path (for -C atmospheric_transmission)."""
+    path = Path(root) / name
+    path.write_text(
+        zero_depth_table(Path(source).read_text(encoding="utf-8"), bottom_m),
+        encoding="utf-8",
+    )
+    return path
 
 
 def reference_config_dir() -> Path:
@@ -123,6 +162,9 @@ def sim_telarray_argv(
     """argv and output path of sim_telarray on input_file (input_file "-" reads standard input).
 
     options become -C key=value; extra holds further sim_telarray arguments.
+    min_photons = 0 unless an adapter sets it: sim_telarray otherwise skips a telescope event
+    with fewer photons than the configuration's min_photons (120 for LSTN-01), so the two sides
+    of a comparison must use the same setting to simulate the same event set.
     """
     output = root / f"{name}.simtel"
     options = {
@@ -131,6 +173,7 @@ def sim_telarray_argv(
         "random_seed": SIMTEL_SEED,
         "save_photons": 2,
         "store_photoelectrons": 0,
+        "min_photons": 0,
         **options,
     }
     argv = [

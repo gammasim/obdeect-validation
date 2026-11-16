@@ -1,0 +1,169 @@
+{
+  "id": "chain.simtools-bypass3",
+  "name": "simtools simulation chain: obdeect atmosphere + optics + mode-3 sim_telarray (Bypass_Optics=3, camera only) vs simtools direct chain",
+  "requires": [
+    "obdeect",
+    "simtools-simulate-prod",
+    "corsika-interaction-tables",
+    "sim_telarray-bypass-optics-3"
+  ],
+  "commands": [
+    {
+      "name": "simtools-chainA",
+      "argv": [
+        "simtools-simulate-prod",
+        "--site",
+        "North",
+        "--model_version",
+        "7.0.0",
+        "--array_layout_name",
+        "LSTN-01",
+        "--primary",
+        "gamma",
+        "--zenith_angle",
+        "20",
+        "--azimuth_angle",
+        "180",
+        "--energy_range",
+        "100",
+        "GeV",
+        "3000",
+        "GeV",
+        "--core_scatter",
+        "5 700 m",
+        "--showers_per_run",
+        "50",
+        "--corsika_seeds",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--simulation_seed",
+        "1",
+        "2",
+        "--instrument_seed",
+        "1",
+        "--corsika_interaction_table_path",
+        "/validation/inputs/corsika-interaction-tables",
+        "--simulation_models_path",
+        "/models",
+        "--log_level",
+        "DEBUG",
+        "--output_path",
+        "/results/chainA",
+        "--label",
+        "chainA",
+        "--simulation_software",
+        "corsika",
+        "sim_telarray"
+      ],
+      "timeout": 2400
+    },
+    {
+      "name": "simtools-chainC",
+      "argv": [
+        "simtools-simulate-prod",
+        "--site",
+        "North",
+        "--model_version",
+        "7.0.0",
+        "--array_layout_name",
+        "LSTN-01",
+        "--primary",
+        "gamma",
+        "--zenith_angle",
+        "20",
+        "--azimuth_angle",
+        "180",
+        "--energy_range",
+        "100",
+        "GeV",
+        "3000",
+        "GeV",
+        "--core_scatter",
+        "5 700 m",
+        "--showers_per_run",
+        "50",
+        "--corsika_seeds",
+        "1",
+        "2",
+        "3",
+        "4",
+        "--simulation_seed",
+        "1",
+        "2",
+        "--instrument_seed",
+        "1",
+        "--corsika_interaction_table_path",
+        "/validation/inputs/corsika-interaction-tables",
+        "--simulation_models_path",
+        "/models",
+        "--log_level",
+        "DEBUG",
+        "--output_path",
+        "/results/chainC",
+        "--label",
+        "chainC",
+        "--simulation_software",
+        "corsika",
+        "corsika_to_stream",
+        "obdeect_atmosphere",
+        "obdeect_optics",
+        "stream_to_simtel",
+        "sim_telarray:bypass_optics=3"
+      ],
+      "timeout": 2400
+    },
+    {
+      "name": "compare-bypass3",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.simtools_chain",
+        "--reference",
+        "chainA/sim_telarray/run000001/gamma_run000001_za20deg_azm180deg_North_LSTN-01_7.0.0_chainA.simtel.zst",
+        "--candidate",
+        "chainC/sim_telarray/run000001/gamma_run000001_za20deg_azm180deg_North_LSTN-01_7.0.0_chainC.simtel.zst",
+        "--candidate-log",
+        "chainC/sim_telarray/run000001/gamma_run000001_za20deg_azm180deg_North_LSTN-01_7.0.0_chainC.simtel.err.gz",
+        "--expected-atmosphere",
+        "atmospheric_transmission-2.0.0-OBS-North.dat",
+        "--reduced",
+        "chainA/sim_telarray/run000001/gamma_run000001_za20deg_azm180deg_North_LSTN-01_7.0.0_chainA.reduced_event_data.hdf5"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "candidate_pipeline_complete",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "image_shape_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "arrival_time_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "trigger_probability_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "atmosphere_table_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

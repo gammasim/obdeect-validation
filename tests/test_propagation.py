@@ -30,7 +30,7 @@ def test_cut_table_removes_rows_at_or_above_limit_and_keeps_header():
 
 def test_zero_table_keeps_structure_with_unit_transmission():
     zero = chain.zero_table(TABLE).splitlines()
-    assert zero[0] == TABLE.splitlines()[0]
+    assert zero[0] == "# H2= 2.140, H1=    2.206     2.256"
     assert zero[2:] == ["200 0 0", "999 0 0", "1000 0 0"]
 
 

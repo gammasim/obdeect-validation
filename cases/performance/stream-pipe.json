@@ -1,0 +1,41 @@
+{
+  "id": "performance.stream-pipe",
+  "name": "Stream pipe throughput, budget >= 1 GB/s: cat | tee and cat | obdeect stream to-simtel on the CORSIKA native stream",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "measure-pipes",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_pipe"
+      ],
+      "timeout": 3600
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "cat_tee_pipe_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "to_simtel_pipe_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "cat_tee_pipe_throughput_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "to_simtel_pipe_throughput_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

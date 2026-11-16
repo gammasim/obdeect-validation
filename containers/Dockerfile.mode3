@@ -1,0 +1,43 @@
+# sim_telarray with Bypass_Optics=3 (mode 3), built from the sim_telarray checkout in the workspace.
+# Build via containers/run-validation.sh MODE3=1 (base image, git archive of sim_telarray as build context 'simtel').
+ARG VALIDATION_IMAGE=obdeect-validation:local
+
+FROM ${VALIDATION_IMAGE} AS builder
+USER root
+# hessio at HESSIO_REV, from the named build context 'hessio' (git archive; run-validation.sh).
+# Prepare and build as in the build.sh flow (hessioxxx-prepare, then make in hessioxxx).
+ARG HESSIO_REV=604578331f4696703001e4af3b95a19cdcaa3852
+COPY --from=hessio . /opt/hessio-git
+RUN cp -a /opt/hessio-git /opt/hessio-src && \
+    cd /opt/hessio-src && \
+    sed -i 's|hessioxxx-prepare: build-doc doc/eventio_en.pdf doc/hessio_refman.pdf|hessioxxx-prepare:|' Makefile && \
+    touch Makefile.LaTeX Makefile.Common ChangeLog && mkdir -p doc && \
+    touch doc/eventio_en.pdf doc/hessio_refman.pdf && \
+    make hessioxxx-prepare && \
+    cd hessioxxx && make -j2 CDEBUGFLAGS='-O2 -DCTA_PROD6 -DMAXIMUM_TELESCOPES=99' EXTRA_DEFINES='-DCTA_PROD6 -DMAXIMUM_TELESCOPES=99'
+ARG GSL_SHA256=6a99eeed15632c6354895b1dd542ed5a855c0f15d9ad1326c6fe2b2c9e423190
+# GSL headers only (the base image has the GSL libraries in /usr/local/lib).
+RUN wget -q https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz -O /tmp/gsl.tar.gz && \
+    echo "${GSL_SHA256}  /tmp/gsl.tar.gz" | sha256sum -c - && \
+    mkdir -p /tmp/gsl-source /opt/gsl-include/gsl && python3 -c "import tarfile; tarfile.open('/tmp/gsl.tar.gz').extractall('/tmp/gsl-source')" && \
+    find /tmp/gsl-source -name 'gsl*.h' -exec cp '{}' /opt/gsl-include/gsl/ \;
+# Named build context 'simtel': git archive of sim_telarray at SIMTEL_REF (set by run-validation.sh).
+ARG SIMTEL_REF=b8f2494
+COPY --from=simtel . /opt/mode3-src
+RUN cd /opt/mode3-src && find common corsika hess -name '*.o' -delete && \
+    make -j2 sim_telarray HESSIO_PATH=/opt/hessio-src/hessioxxx \
+    EXTRA_DEFINES='-DCTA_PROD6 -DMAXIMUM_TELESCOPES=99 -DWITH_GSL -DWITH_GSL_RNG' \
+    EXTRA_CFLAGS=-I/opt/gsl-include CDEBUGFLAGS=-O2 && \
+    grep -c "camera only" sim_telarray && \
+    mkdir -p /opt/mode3/lib && \
+    cp /opt/mode3-src/sim_telarray /opt/mode3/sim_telarray.bin && \
+    cp -L /opt/hessio-src/hessioxxx/lib/*.so* /opt/mode3/lib/ && \
+    cp /workdir/simulation_software/sim_telarray/bin/pfp /opt/mode3/pfp && \
+    printf '%s\n' '#!/bin/sh' 'LD_LIBRARY_PATH=/opt/mode3/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} exec /opt/mode3/sim_telarray.bin "$@"' > /opt/mode3/sim_telarray && \
+    chmod 755 /opt/mode3/sim_telarray /opt/mode3/sim_telarray.bin /opt/mode3/pfp
+
+FROM ${VALIDATION_IMAGE}
+USER root
+COPY --from=builder /opt/mode3 /opt/mode3
+RUN chmod 755 /opt/mode3/sim_telarray /opt/mode3/sim_telarray.bin /opt/mode3/pfp
+USER 1000:1000

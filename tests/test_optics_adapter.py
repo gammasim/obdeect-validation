@@ -199,7 +199,7 @@ def test_execute_writes_application_config_outputs_and_compares_paired_offsets(
         (tmp_path / "output" / "details.json").read_text(encoding="utf-8")
     )
     assert details["status"].startswith(
-        "provisional, from obdeect-validation-org docs/phase1.md"
+        "approved 2026-11-15, from obdeect-validation-org docs/phase1.md"
     )
     assert (tmp_path / "output" / "optics_relative_difference.png").stat().st_size > 0
 

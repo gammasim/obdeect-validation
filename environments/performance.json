@@ -1,0 +1,45 @@
+{
+  "env": {
+    "PATH": "/workdir/simulation_software/sim_telarray/LightEmission:/workdir/simulation_software/sim_telarray/bin:/workdir/env/bin:/usr/local/bin:/usr/bin:/bin",
+    "PYTHONPATH": "/validation/src",
+    "SIMTEL_CONFIG_PATH": "/reference/cfg/common",
+    "SIMTEL_REFERENCE_SOURCE": "/reference",
+    "SIMTEL_BINARY": "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+    "SIMTOOLS_SIM_TELARRAY_PATH": "/workdir/simulation_software/sim_telarray",
+    "SIMULATION_MODELS": "/models",
+    "CORSIKA_ATMO_DIR": "/workdir/simulation_software/sim_telarray/corsika",
+    "ATMOSPHERE_PROFILE": "/reference/cfg/common/atmprof1.dat",
+    "CORSIKA_DATA_DIR": "/workdir/simulation_software/corsika7",
+    "CORSIKA_SUPPORT_DIR": "/workdir/simulation_software/hessioxxx/src",
+    "CORSIKA_INCLUDE_DIRS": "/workdir/simulation_software/hessioxxx/include:/workdir/simulation_software/hessioxxx/src:/workdir/simulation_software/sim_telarray/common",
+    "EXTINCTION_TABLE": "/reference/cfg/common/atm_trans_2158_1_10_0_0_0.dat"
+  },
+  "requires": [
+    "obdeect",
+    "python3",
+    "sim_telarray"
+  ],
+  "modules": [
+    "astropy",
+    "eventio",
+    "eventio.iact",
+    "matplotlib",
+    "numpy",
+    "obdeect.propagation",
+    "obdeect.ray_tracing",
+    "obdeect.stream",
+    "scipy",
+    "simtools.ray_tracing.backends.obdeect"
+  ],
+  "inputs": [
+    "../src/obdeect_validation/adapters/compare-led-camera.txt",
+    "/reference/cfg/CTA/CTA-PROD6-LST.cfg",
+    "/reference/cfg/common/atm_profile_model_1.dat",
+    "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat",
+    "/reference/cfg/common/atm_trans_2158_1_10_0_0_0.dat",
+    "/reference/cfg/common/atmprof1.dat",
+    "/validation/fixtures/unit-transmission.dat",
+    "/validation/inputs/gamma-20deg-100-3000GeV.iact",
+    "/workdir/simulation_software/sim_telarray/bin/sim_telarray"
+  ]
+}

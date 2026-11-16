@@ -1,4 +1,4 @@
-"""Matched end-to-end timing: obdeect pipelines against their reference programs (report only).
+"""Matched end-to-end timing: obdeect pipelines against their reference programs, with budgets.
 
 Each case times a reference pipeline and an obdeect pipeline on the same physical input and
 photon counts. The reference is CORSIKA IACT -> sim_telarray with full optics (air shower) or
@@ -7,17 +7,19 @@ sim_telarray camera stage (Bypass_Optics=1 for the air shower, as in cases/chain
 Every child process is timed with performance.run_timed. A pipeline total is the sum of its stage
 wall and CPU times and the maximum of its stage peak RSS (stages run one after another).
 
-The air-shower case also times an optimised candidate (candidate_envelope): from-corsika,
-propagation (QE bound, thinned), trace-stream and to-simtel run as one pipe; sim_telarray then
-reads a QE / bound table, so the product is the model QE. A physics check compares its camera
-output with sim_telarray on the same input (unit atmosphere on both sides, report only).
+The air-shower case also times an optimised candidate (candidate_envelope, obdeect default threads;
+candidate_envelope_threads1 for the single-core comparison): from-corsika, propagation (QE bound,
+thinned), trace-stream and to-simtel run as one pipe; sim_telarray then reads a QE / bound table, so
+the product is the model QE. A physics check compares its camera output with sim_telarray on the
+same input (unit atmosphere on both sides); its photoelectron bias is the equal-statistics condition
+of the wall and CPU budgets (performance_budget).
 
 Only ray-tracing trace-stream is multithreaded. The air-shower candidate therefore runs with
 threads=1 and with the obdeect default (0 = every core); the source pipelines are single-threaded
-and run once. Ratios (candidate / reference) are informational: no performance limit is defined.
+and run once. Budgets (performance_budget): *_budget_exceeded metrics, 0 = pass.
 
 Usage (inside the container, in an empty case directory):
-    python -m obdeect_validation.adapters.performance_chain air-shower --config cfg/model/7.0.0/CTAO.cfg
+    python -m obdeect_validation.adapters.performance_chain air-shower --config cfg/model/7.0.0/CTAO.cfg [--events N] [--reps N]
     python -m obdeect_validation.adapters.performance_chain flasher-dish
     python -m obdeect_validation.adapters.performance_chain point-source
 """
@@ -31,6 +33,7 @@ import shutil
 import statistics
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import traceback
@@ -41,8 +44,14 @@ from eventio.iact import IACTFile
 
 from obdeect_validation.adapters import chain_optics as co
 from obdeect_validation.adapters import chain_showers as cs
-from obdeect_validation.adapters import common, performance, source_camera
-from obdeect_validation.adapters.performance import iact_weight, run_timed
+from obdeect_validation.adapters import (
+    common,
+    performance,
+    performance_budget,
+    source_camera,
+)
+from obdeect_validation.adapters.performance import iact_weight
+from obdeect_validation.adapters.performance import run_timed as _run_timed
 
 REPS = 3
 # Production atmosphere of the LSTN-01 model (CTAO.cfg, set only under #if TELESCOPE == 0). The
@@ -51,10 +60,10 @@ ATMOSPHERE_FILE = "atmospheric_transmission-2.0.0-OBS-North.dat"
 ENVELOPE_FACTOR = "qe"
 # An efficiency bound must be positive: bins with QE 0 keep this bound (their table value is 0).
 ENVELOPE_FLOOR = 1e-6
-# Table maximum of the sim_telarray QE / bound table. sim_telarray's first-cut probability is
-# p2 * max_qe_rel (pixel qe_variation, 0.063 in LSTN-01), so a table at 1 saturates for upward
-# pixel fluctuations and loses photons (clustered bias -6.6 % at headroom 1, 0 % at 0.8).
-ENVELOPE_HEADROOM = 0.8
+# The table maximum (headroom) is not a constant: it is derived from the model's qe_variation by
+# headroom_for(). sim_telarray's first-cut probability is p2 * max_qe_rel with max_qe_rel up to
+# 1 + 6 * qe_variation; a table maximum above 1 / (1 + 6 * qe_variation) saturates for upward
+# pixel fluctuations and loses photons (clustered bias -6.6 % at headroom 1 in LSTN-01).
 # Second node of each nm bin: the linear bound is constant on [n, n + 1) nm.
 ENVELOPE_NODE_WIDTH = 0.999999
 # CORSIKA Cherenkov band (EVTH words 96-97) on sim_telarray's integer nm bins.
@@ -63,11 +72,56 @@ TRACE_SUMMARY = re.compile(r"trace-stream: \d+ events, (\d+) photons in, (\d+) o
 ALL_PHOTONS = re.compile(r"All photons:\s+(\d+)")
 # sim_telarray for the candidate camera stage (Bypass_Optics=3 build); None: the production binary.
 CANDIDATE_SIMTEL = os.environ.get("SIMTEL_CANDIDATE_BINARY") or None
+# Extra sim_telarray arguments of the candidate camera stage only (chain_mode3 adds "-v": sim_telarray
+# logs the QE table file only at verbose level; verbosity does not change the simulation).
+CANDIDATE_OPTIONS = ()
 THREAD_VARIANTS = (
     ("threads1", 1),
     ("threadsdefault", 0),
 )  # 0 = obdeect default, every core
+# Envelope candidate: the default-threads label is the legacy name (candidate_envelope_completed).
+ENVELOPE_VARIANTS = (
+    ("candidate_envelope", 0),
+    ("candidate_envelope_threads1", 1),
+)
 PHOTON_KEYS = ("wall_s", "cpu_s", "peak_rss_mb")
+# obdeect wrapper subcommands that run as native programs in candidate pipelines. The wrapper adds
+# ~0.1 s per call (light-start-up measurements); the native program takes the same arguments and
+# gives byte-identical output (checked for flasher, point-source, propagation, to-simtel, from-corsika
+# with the same seeds). trace-stream and the model compile have no native program here: they stay
+# on the wrapper.
+NATIVE_PROGRAMS = {
+    ("sources", "flasher"): ("obdeect.sources", "obdeect-sources-flasher"),
+    ("sources", "point-source"): ("obdeect.sources", "obdeect-sources-point-source"),
+    ("propagation", "run"): ("obdeect.propagation", "obdeect-propagation-run"),
+    ("stream", "to-simtel"): ("obdeect.stream", "obdeect-stream-to-simtel"),
+    ("stream", "from-corsika"): ("obdeect.stream", "obdeect-stream-from-corsika"),
+}
+
+
+def native_argv(argv):
+    """argv with an obdeect wrapper subcommand replaced by its native program (same arguments).
+
+    Other commands, and subcommands without a native program, are returned unchanged.
+    """
+    argv = list(argv)
+    if (
+        len(argv) < 3
+        or argv[0] != "obdeect"
+        or (argv[1], argv[2]) not in NATIVE_PROGRAMS
+    ):
+        return argv
+    from obdeect.stream.cli import program_path
+
+    package, program = NATIVE_PROGRAMS[(argv[1], argv[2])]
+    return [program_path(package, program), *argv[3:]]
+
+
+def run_timed(argv, log, **kwargs):
+    """performance.run_timed of the native form of argv (see native_argv)."""
+    return _run_timed(native_argv(argv), log, **kwargs)
+
+
 SKY_PROPAGATION = [
     "--no-extinction",
     "--site-altitude",
@@ -136,6 +190,13 @@ def ratio(value, reference):
     return value / reference if reference and reference > 0 else None
 
 
+#: sim_telarray skips a telescope event below min_photons (sim_telarray.c, "photons <
+#: min_photons"), counting the photons of the bunches it reads. A thinned stream carries one photon
+#: per surviving bunch, so the configured threshold (120 LST, 450 MST) is not comparable with the
+#: reference's raw photon count. Both sides therefore run with 0 and simulate the same events.
+MIN_PHOTONS = 0
+
+
 def telescope_arguments(config_dir, atmosphere=None):
     """sim_telarray arguments of the matched one-telescope model (as in chain_optics)."""
     extra = [
@@ -145,6 +206,8 @@ def telescope_arguments(config_dir, atmosphere=None):
         f"maximum_telescopes={len(co.TELESCOPES)}",
         "-C",
         "trigger_telescopes=1",  # one telescope: the default array trigger needs two
+        "-C",
+        f"min_photons={MIN_PHOTONS}",
     ]
     if atmosphere:
         extra += ["-C", f"atmospheric_transmission={atmosphere}"]
@@ -470,11 +533,11 @@ def sim_telarray_qe(path, grid=WAVELENGTH_GRID):
     return np.interp(grid, table[:, 0], table[:, 1])
 
 
-def bin_envelope(qe, headroom=ENVELOPE_HEADROOM):
+def bin_envelope(qe, headroom):
     """Efficiency bound per nm bin (QE / headroom, at least ENVELOPE_FLOOR) and the table QE / bound.
 
-    The bound is at least the QE in every bin, and the table is at most headroom (0.8), so
-    bound times table is the QE again.
+    The bound is at least the QE in every bin, and the table is at most headroom (see headroom_for),
+    so bound times table is the QE again.
     """
     qe = np.asarray(qe, dtype=float)
     bound = np.where(qe > 0, qe / headroom, ENVELOPE_FLOOR)
@@ -510,7 +573,7 @@ def headroom_for(qe_variation, sigmas=6):
     return 1.0 / (1.0 + sigmas * float(qe_variation))
 
 
-def envelope_files(work, qe_path, headroom=ENVELOPE_HEADROOM):
+def envelope_files(work, qe_path, headroom):
     """Efficiency bound for propagation, and the QE / bound table in a directory that holds
     a file of the config's name, so that sim_telarray reads it instead of the model's QE table."""
     bound, scaled = bin_envelope(sim_telarray_qe(qe_path), headroom=headroom)
@@ -559,7 +622,7 @@ def envelope_pipeline(
     """One pipe: from-corsika | propagation | trace-stream | to-simtel | sim_telarray.
 
     envelope None gives the unthinned chain (weighted propagation, no scaled table). Only the
-    telescope is propagated and traced. sim_argv reads standard input ("-") and is the last stage.
+    telescope is traced (trace-stream); propagation covers all telescopes. sim_argv reads standard input ("-") and is the last stage.
     """
     thinned = envelope is not None
     propagation = [
@@ -574,9 +637,7 @@ def envelope_pipeline(
         28,
         "--seed",
         123,
-        "--telescopes",
-        str(telescope),
-    ]
+    ]  # no --telescopes: the image's obdeect has none; thinning and wavelengths are keyed by telescope
     if thinned:
         propagation += ["--envelope", f"{ENVELOPE_FACTOR}={envelope}"]
     else:
@@ -644,7 +705,7 @@ def run_pipeline(stages, output, logs):
     try:
         for index, (name, argv) in enumerate(stages):
             last = index == len(stages) - 1
-            argv = [str(arg) for arg in argv]
+            argv = native_argv([str(arg) for arg in argv])
             with Path(logs[name]).open("wb") as log:
                 if last:
                     with Path(output).open("wb") as out:
@@ -725,9 +786,10 @@ def simtel_candidate(work, inputs, files=None, name="candidate"):
     The atmosphere is applied upstream by propagation, so sim_telarray gets the same config
     (CTAO.cfg) without an atmosphere override only through its mirror and QE settings.
     """
-    extra = list(
-        telescope_arguments(inputs["config_dir"], inputs["reference_atmosphere"])
-    )
+    extra = [
+        *CANDIDATE_OPTIONS,
+        *telescope_arguments(inputs["config_dir"], inputs["reference_atmosphere"]),
+    ]
     if files is not None:
         extra = [f"-I{files['table_dir']}", *extra]
     argv, output = cs.simulate_argv(
@@ -840,14 +902,16 @@ def child_metrics(prefix, summaries):
     return metrics
 
 
-def physics_check(root, source, inputs, qe_path, headroom, metrics, details):
+def physics_check(
+    root, source, inputs, qe_path, headroom, metrics, details, work_root=None
+):
     """Camera comparison of the optimised chain with sim_telarray on the same input (report only).
 
     Normal atmosphere everywhere: reference = sim_telarray Bypass_Optics=0 with the config's
     atmosphere; candidates = obdeect propagation with the same atmosphere. Controls:
     the unthinned pipe (weighted propagation, QE applied by sim_telarray).
     """
-    work = root / "work" / "physics"
+    work = (work_root or root / "work") / "physics"
     work.mkdir(parents=True, exist_ok=True)
     reference = cs.camera_events(
         _reference_sim(
@@ -866,7 +930,7 @@ def physics_check(root, source, inputs, qe_path, headroom, metrics, details):
     files = envelope_files(envelope_dir, qe_path, headroom)
     optimised = _pipe_camera(envelope_dir, source, inputs, files)
     details["counts"]["physics_envelope"] = pipeline_counts(envelope_dir)
-    shower_ids = [str(event.event_number) for event in IACTFile(source)]
+    shower_ids = co.camera_keys(source)
     pairs = {
         "unthinned": (reference, unthinned),
         "envelope": (reference, optimised),
@@ -885,6 +949,15 @@ def physics_check(root, source, inputs, qe_path, headroom, metrics, details):
             metrics[f"physics_{label}_trigger_difference_tel{tel}"] = row["difference"]
             metrics[f"physics_{label}_trigger_difference_se_tel{tel}"] = row["se"]
         details["physics"][label] = {"triggers": triggers}
+    return {
+        "reference": reference,
+        "unthinned": unthinned,
+        "envelope": optimised,
+        "envelope_dir": envelope_dir,
+        "files": files,
+        "work": work,
+        "shower_ids": shower_ids,
+    }
 
 
 def _pipe_camera(work, source, inputs, files):
@@ -906,7 +979,23 @@ def _pipe_camera(work, source, inputs, files):
     return cs.camera_events(output)
 
 
-def run_air_shower(root, source, config, reps, metrics, details):
+def _camera_only_lines(work):
+    """Camera-only lines of the envelope pipe's sim_telarray (stdout and log), see performance_budget."""
+    text = "".join(
+        (work / name).read_text(errors="replace")
+        for name in ("candidate.stdout", "sim_telarray.log")
+        if (work / name).is_file()
+    )
+    return performance_budget.count_camera_only(text)
+
+
+def prepare_inputs(root, config):
+    """Inputs of the LSTN-01 air-shower chains from the simtools sim_telarray config (CTAO.cfg).
+
+    Returns (inputs, cfg_text); the unit table and the cut atmosphere are written to root.
+    The propagation atmosphere is the production table cut below 1000 nm (propagation needs
+    integer wavelengths there); the reference keeps the full table.
+    """
     config = config.resolve()
     config_dir = config.parent
     cfg_text = (config_dir / "CTAO-LSTN-01.cfg").read_text()
@@ -921,10 +1010,15 @@ def run_air_shower(root, source, config, reps, metrics, details):
         "atmosphere": root / "atmosphere-below-1000nm.dat",
         "reference_atmosphere": config_dir / ATMOSPHERE_FILE,
     }
-    shutil.copyfile(co.UNIT_ATMOSPHERE, inputs["unit"])
-    # Propagation needs integer wavelengths below 1000 nm, so the reference atmosphere is cut there
-    # for propagation (candidate); the reference keeps the full table.
+    inputs["unit"] = common.write_zero_depth_table(root, co.UNIT_ATMOSPHERE)
     performance.restrict_table(inputs["reference_atmosphere"], inputs["atmosphere"])
+    return inputs, cfg_text
+
+
+def run_air_shower(root, work_root, source, config, reps, metrics, details):
+    inputs, cfg_text = prepare_inputs(work_root, config)
+    config_dir = inputs["config_dir"]
+    config = inputs["config"]
     headroom = headroom_for(inputs["qe_variation"])
     details["settings"].update(
         {
@@ -934,9 +1028,11 @@ def run_air_shower(root, source, config, reps, metrics, details):
             "candidate_atmosphere": "obdeect propagation (reference atmosphere below 1000 nm, 250-700 nm); sim_telarray unit table",
             "telescopes": list(co.TELESCOPES),
             "pointing": f"zenith {co.ZENITH_DEG} deg, azimuth {co.AZIMUTH_DEG} deg",
+            "candidate_sim_telarray": CANDIDATE_SIMTEL
+            or "production (SIMTEL_CANDIDATE_BINARY unset)",
         }
     )
-    reference_dir = root / "work" / "reference"
+    reference_dir = work_root / "reference"
     reference_dir.mkdir(parents=True, exist_ok=True)
     reference_ok = _run(
         "reference",
@@ -950,7 +1046,7 @@ def run_air_shower(root, source, config, reps, metrics, details):
     candidates = []
     for name, threads in THREAD_VARIANTS:
         label = f"candidate_{name}"
-        work = root / "work" / name
+        work = work_root / name
         work.mkdir(parents=True, exist_ok=True)
         if _run(
             label,
@@ -965,36 +1061,52 @@ def run_air_shower(root, source, config, reps, metrics, details):
     details["counts"]["reference"] = {
         "into_simtel_weight": iact_telescope_weight(source)
     }
-    env_label = "candidate_envelope"
-    env_work = root / "work" / "envelope"
-    files = envelope_files(env_work, inputs["qe"], headroom)
-    if _run(
-        env_label,
-        envelope_candidate(env_work, source, inputs, files, threads=0),
-        reps,
-        metrics,
-        details,
-    ):
-        metrics.update(
-            child_metrics(env_label, details["stages"][env_label]["pipeline"])
-        )
-        details["counts"][env_label] = pipeline_counts(env_work)
-    metrics["candidate_envelope_headroom"] = headroom
-    details["threads"][env_label] = 0
-    candidates.append(env_label)
+    files = envelope_files(work_root / "envelope", inputs["qe"], headroom)
+    for env_label, threads in ENVELOPE_VARIANTS:
+        env_work = work_root / env_label.removeprefix("candidate_")
+        env_work.mkdir(parents=True, exist_ok=True)
+        if _run(
+            env_label,
+            envelope_candidate(env_work, source, inputs, files, threads=threads),
+            reps,
+            metrics,
+            details,
+        ):
+            metrics.update(
+                child_metrics(env_label, details["stages"][env_label]["pipeline"])
+            )
+            details["counts"][env_label] = pipeline_counts(env_work)
+            camera_only = _camera_only_lines(env_work)
+            metrics[f"{env_label}_camera_only_lines"] = camera_only
+            metrics[f"{env_label}_camera_only_missing"] = int(camera_only == 0)
+        metrics["candidate_envelope_headroom"] = headroom
+        details["threads"][env_label] = threads
+        candidates.append(env_label)
     try:
-        physics_check(root, source, inputs, inputs["qe"], headroom, metrics, details)
+        physics_check(
+            root,
+            source,
+            inputs,
+            inputs["qe"],
+            headroom,
+            metrics,
+            details,
+            work_root=work_root,
+        )
         metrics["physics_completed"] = 1
     except (RuntimeError, OSError, ValueError) as error:  # reported, not hidden
         metrics["physics_completed"] = 0
         details["failures"]["physics"] = str(error)[:400]
     _ratios(metrics, reference_ok, candidates)
+    budgets, reasons = performance_budget.shower_budgets(metrics)
+    metrics.update(budgets)
+    details["budget_reasons"] = reasons
 
 
-def run_source(root, name, reps, metrics, details):
+def run_source(root, work_root, name, reps, metrics, details):
     spec = SOURCES[name]
-    reference_dir = root / "work" / "reference"
-    candidate_dir = root / "work" / "candidate"
+    reference_dir = work_root / "reference"
+    candidate_dir = work_root / "candidate"
     reference_dir.mkdir(parents=True, exist_ok=True)
     candidate_dir.mkdir(parents=True, exist_ok=True)
     details["settings"].update(
@@ -1018,6 +1130,9 @@ def run_source(root, name, reps, metrics, details):
         "1 (all stages single-threaded; default is the same)"
     )
     _ratios(metrics, reference_ok, ["candidate_threads1"])
+    budgets, reasons = performance_budget.source_budgets(metrics, "candidate_threads1")
+    metrics.update(budgets)
+    details["budget_reasons"] = reasons
 
 
 def _plot(path, stages_by_pipeline):
@@ -1057,11 +1172,26 @@ def main():
         "--config", type=Path, help="sim_telarray config from simtools (air-shower)"
     )
     parser.add_argument("--input", type=Path, default=performance.INPUT)
+    parser.add_argument(
+        "--events",
+        type=int,
+        default=None,
+        help="air-shower: first N showers (default all)",
+    )
     parser.add_argument("--reps", type=int, default=REPS)
     args = parser.parse_args()
     if args.case == "air-shower" and args.config is None:
         parser.error("air-shower needs --config")
     root = Path.cwd().resolve()
+    # Work files (pipes, photon streams, sim_telarray output) go to a container-local directory:
+    # a bind-mounted results directory would measure the mount, not the chain.
+    work_root = Path(
+        os.environ.get("PERF_WORK_DIR") or tempfile.mkdtemp(prefix="perf-chain-")
+    )
+    work_root.mkdir(parents=True, exist_ok=True)
+    showers = performance.select_input(
+        args.input.resolve(), args.events, work_root / "showers-input.iact"
+    )
     metrics = {}
     details = {
         "case": args.case,
@@ -1077,11 +1207,12 @@ def main():
         "failures": {},
     }
     if args.case == "air-shower":
+        details["settings"]["showers"] = performance.shower_count(showers)
         run_air_shower(
-            root, args.input.resolve(), args.config, args.reps, metrics, details
+            root, work_root, showers, args.config, args.reps, metrics, details
         )
     else:
-        run_source(root, args.case, args.reps, metrics, details)
+        run_source(root, work_root, args.case, args.reps, metrics, details)
     walls = {
         label: {name: _median(records, "wall_s") for name, records in per_stage.items()}
         for label, per_stage in details["stages"].items()
@@ -1089,7 +1220,7 @@ def main():
     if walls:
         _plot(root / "wall-by-stage.png", walls)
     common.write_results(metrics, details, root)
-    shutil.rmtree(root / "work", ignore_errors=True)
+    shutil.rmtree(work_root, ignore_errors=True)
 
 
 if __name__ == "__main__":

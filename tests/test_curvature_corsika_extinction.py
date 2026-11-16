@@ -159,13 +159,26 @@ def test_detection_weights_are_quantum_efficiency_times_reflectivity(tmp_path):
     (tmp_path / chain.QE_TABLE).write_text("200 0.1\n400 0.4\n800 0.0\n")
     (tmp_path / chain.MIRROR_TABLE).parent.mkdir(parents=True, exist_ok=True)
     (tmp_path / chain.MIRROR_TABLE).write_text("200 0.5 0.0\n1000 0.9 0.0\n")
+    (tmp_path / chain.WINDOW_TABLE).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / chain.WINDOW_TABLE).write_text("200 1.0\n1000 1.0\n")  # open window
     weights = chain.DetectionWeights(tmp_path)
     assert weights.quantum([300.0, 900.0]).tolist() == pytest.approx([0.25, 0.0])
     # 400 nm: QE 0.4, reflectivity 0.5 + (200 / 800) * 0.4 = 0.6 (linear between 200 and 1000 nm)
     detection = weights.detection([400.0])
     assert detection[0] == pytest.approx(0.4 * 0.6)
+    # Outside the quantum table the weight is zero by definition, even without mirror data there.
+    assert weights.detection([1200.0])[0] == 0.0
+    # Non-zero quantum efficiency beyond the mirror table is an error.
+    short = tmp_path / "short"
+    for name, text in (
+        (chain.QE_TABLE, "200 0.1\n400 0.4\n800 0.0\n"),
+        (chain.MIRROR_TABLE, "200 0.5 0.0\n300 0.9 0.0\n"),
+        (chain.WINDOW_TABLE, "200 1.0\n1000 1.0\n"),
+    ):
+        (short / name).parent.mkdir(parents=True, exist_ok=True)
+        (short / name).write_text(text)
     with pytest.raises(ValueError, match="does not cover"):
-        weights.detection([1200.0])
+        chain.DetectionWeights(short).detection([400.0])
 
 
 def test_ratio_violations_and_helpers_are_pure():

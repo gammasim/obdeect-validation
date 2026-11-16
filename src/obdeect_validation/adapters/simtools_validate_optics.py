@@ -11,7 +11,9 @@ from pathlib import Path
 from typing import Any
 
 METRICS = ("psf_cm", "eff_area", "eff_flen")
-LIMIT_STATUS = "provisional, from obdeect-validation-org docs/phase1.md measured maxima, pending scientific approval"
+LIMIT_STATUS = (
+    "approved 2026-11-15, from obdeect-validation-org docs/phase1.md measured maxima"
+)
 LIMIT_BASIS = (
     "phase1.md 0-4 deg maxima: D80 1.1%, effective area 0.45%, effective focal length 0.1%; "
     "limits are about 2x these maxima"
@@ -268,7 +270,7 @@ def _plot(
     """Relative obd/sim difference per metric against off-axis angle.
 
     Colour is the telescope (same colour in every figure), marker and line the offset
-    direction; the shaded band is the provisional limit.
+    direction; the shaded band is the limit.
     """
     from obdeect_validation.adapters import plotting
 
@@ -301,7 +303,7 @@ def _plot(
         axis.set_ylabel(f"{metric} obd/sim - 1 [%]")
         axis.legend(ncols=3)
     axes[-1, 0].set_xlabel("off-axis angle [deg]")
-    fig.suptitle(f"{label}: shaded band = provisional limit", fontsize="small")
+    fig.suptitle(f"{label}: shaded band = limit", fontsize="small")
     plotting.save(fig, path)
 
 

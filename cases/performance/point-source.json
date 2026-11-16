@@ -1,16 +1,37 @@
 {
   "id": "performance.point-source",
-  "name": "point-source: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (report only)",
-  "requires": ["obdeect", "python3"],
+  "name": "Point-source, wall time budget: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (candidate wall <= reference wall)",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
   "commands": [
     {
       "name": "measure-point-source",
-      "argv": ["{python}", "-m", "obdeect_validation.adapters.performance_chain", "point-source"],
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_chain",
+        "point-source"
+      ],
       "timeout": 7200
     }
   ],
   "metrics": [
-    {"metric": "reference_completed", "expected": 1, "atol": 0},
-    {"metric": "candidate_threads1_completed", "expected": 1, "atol": 0}
+    {
+      "metric": "reference_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_threads1_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_threads1_wall_budget_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
   ]
 }

@@ -3,6 +3,15 @@
   "cases": [
     "../cases/chain/stream-roundtrip-threshold.json",
     "../cases/chain/atmosphere-substitution.json",
-    "../cases/chain/optics-bypass1.json"
+    "../cases/chain/optics-bypass1.json",
+    "../cases/chain/optics-bypass1-40deg.json",
+    "../cases/chain/optics-bypass1-60deg.json",
+    "../cases/chain/optics-bypass1-az180.json",
+    "../cases/chain/optics-bypass1-mstn.json",
+    "../cases/chain/optics-bypass1-msts.json",
+    "../cases/chain/optics-bypass1-proton.json",
+    "../cases/chain/optics-bypass1-south.json",
+    "../cases/chain/optics-bypass1-ssts.json",
+    "../cases/chain/mode3-envelope.json"
   ]
 }

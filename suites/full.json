@@ -27,6 +27,26 @@
     "../cases/stream/corsika-curved-flag.json",
     "../cases/propagation/curvature-corsika-geometry.json",
     "../cases/propagation/curvature-corsika-extinction.json",
-    "../cases/chain/curvature-high-zenith.json"
+    "../cases/chain/curvature-high-zenith.json",
+    "../cases/stream/inputs-headers.json",
+    "../cases/sources/illuminator-illn-01.json",
+    "../cases/sources/illuminator-ills-01.json",
+    "../cases/sources/night-sky-camera.json",
+    "../cases/chain/optics-bypass1-40deg.json",
+    "../cases/chain/optics-bypass1-60deg.json",
+    "../cases/chain/optics-bypass1-az180.json",
+    "../cases/chain/optics-bypass1-mstn.json",
+    "../cases/chain/optics-bypass1-msts.json",
+    "../cases/chain/optics-bypass1-proton.json",
+    "../cases/chain/optics-bypass1-south.json",
+    "../cases/chain/optics-bypass1-ssts.json",
+    "../cases/determinism/determinism-photons.json",
+    "../cases/fanout/fanout-tee-models.json",
+    "../cases/ledger/efficiency-ledger.json",
+    "../cases/robustness/stream-damage.json",
+    "../cases/sources/laser-beam-scattered.json",
+    "../cases/performance/air-shower-array.json",
+    "../cases/performance/air-shower-proton.json",
+    "../cases/performance/stream-pipe.json"
   ]
 }

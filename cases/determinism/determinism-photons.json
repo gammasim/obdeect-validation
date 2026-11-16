@@ -1,0 +1,190 @@
+{
+  "id": "determinism.photons",
+  "name": "Determinism: trace-stream and propagation with threads 1/4/all, input chunk sizes 1024/65536, file vs pipe vs fused in-process API; photon-by-photon, plus a seed-change control",
+  "requires": [
+    "obdeect"
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-20-100GeV.iact",
+    "/validation/inputs/gamma-20deg-20-100GeV.corsika.log",
+    "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"
+  ],
+  "commands": [
+    {
+      "name": "determinism-chain",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.determinism_chain"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "threads_4_vs_1_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "threads_4_vs_1_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "threads_4_vs_1_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "threads_0_vs_1_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "threads_0_vs_1_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "threads_0_vs_1_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "control_seed_change_detected",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "input_chunk1024_vs_original_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "input_chunk1024_vs_original_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "input_chunk1024_vs_original_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "input_chunk65536_vs_original_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "input_chunk65536_vs_original_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "input_chunk65536_vs_original_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pipe_stage_failures",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pipe_vs_file_threads_4_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pipe_vs_file_threads_4_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pipe_vs_file_threads_4_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "propagation_api_threads_4_vs_file_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "propagation_api_threads_4_vs_file_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "propagation_api_threads_4_vs_file_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "propagation_api_threads_all_vs_file_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "propagation_api_threads_all_vs_file_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "propagation_api_threads_all_vs_file_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_1_vs_file_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_1_vs_file_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_1_vs_file_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_4_vs_file_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_4_vs_file_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_4_vs_file_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_0_vs_file_photon_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_0_vs_file_column_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fused_api_threads_0_vs_file_empty_comparison",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "file_stage_failures",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

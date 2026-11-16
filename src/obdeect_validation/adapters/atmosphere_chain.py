@@ -18,6 +18,8 @@ import math
 import re
 from pathlib import Path
 
+from obdeect_validation.adapters import common
+
 MAX_LAMBDA_NM = 1000.0  # sim_telarray skips bunches at or above MAX_LAMBDA; obdeect table ends at 999 nm
 SITE_ALTITUDE_M = 2156.0
 PATHLEN_M = 28.0
@@ -91,10 +93,12 @@ def cut_table(text, max_nm):
 
 
 def zero_table(text):
-    """Same table with all optical depths set to zero, i.e. unit transmission at every height."""
-    header, rows = table_lines(text)
-    zeroed = [" ".join([fields[0]] + ["0"] * (len(fields) - 1)) for _, fields in rows]
-    return "\n".join(header + zeroed) + "\n"
+    """Same table with all optical depths zero (unit transmission) and its bottom below the sources.
+
+    The bottom is common.ZERO_DEPTH_BOTTOM_M, not the table's own H2 (2156 m): photons emitted below
+    the bottom get zero transmission in sim_telarray.
+    """
+    return common.zero_depth_table(text)
 
 
 def photon_statistics(log_text):
@@ -220,7 +224,6 @@ def main():
     import numpy as np
 
     from obdeect_validation.adapters import chain_showers as cs
-    from obdeect_validation.adapters import common
     from obdeect_validation.adapters.extinction_reference import table_reference
 
     parser = argparse.ArgumentParser()

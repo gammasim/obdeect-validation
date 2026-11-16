@@ -1,0 +1,150 @@
+{
+  "id": "ledger.efficiency-tamper",
+  "name": "Efficiency ledger: tampered chains (missing atmosphere, factor pending/applied twice, envelope undeclared, backward state, angular t0) must be rejected with a message naming the factor; positive controls accepted",
+  "requires": [
+    "obdeect"
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-20-100GeV.iact",
+    "/validation/inputs/gamma-20deg-20-100GeV.corsika.log",
+    "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"
+  ],
+  "commands": [
+    {
+      "name": "ledger-tamper",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.ledger_tamper"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "setup_stage_failures",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "missing_atmosphere_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "missing_atmosphere_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "camera_mirror_pending_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "camera_mirror_pending_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "ground_mirror_applied_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "ground_mirror_applied_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "ground_tt_applied_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "ground_tt_applied_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "qe_envelope_undeclared_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "qe_envelope_undeclared_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "qe_applied_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "qe_applied_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "trace_on_applied_mirror_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "trace_on_applied_mirror_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "angular_t0_undeclared_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "angular_t0_undeclared_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "backward_state_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "backward_state_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "retrace_camera_frame_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "retrace_camera_frame_no_factor_in_message",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "control_camera_chain_rejected",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "control_qe_scaled_rejected",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "control_angular_allow_pending_rejected",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "crash_or_hang_total",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

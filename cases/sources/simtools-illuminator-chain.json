@@ -1,0 +1,119 @@
+{
+  "id": "sources.simtools-illuminator-chain",
+  "name": "simtools illuminator: obdeect chain (obdeect_illuminator obdeect_atmosphere obdeect_optics stream_to_simtel sim_telarray Bypass_Optics=1) vs default LightEmission chain, ILLS-01 LSTS-01 South 7.0.0, 40 events, instrument seed 1",
+  "requires": [
+    "obdeect",
+    "simtools-simulate-illuminator",
+    "sim_telarray"
+  ],
+  "commands": [
+    {
+      "name": "simtools-illuminator-reference",
+      "argv": [
+        "simtools-simulate-illuminator",
+        "--light_source",
+        "ILLS-01",
+        "--telescope",
+        "LSTS-01",
+        "--site",
+        "South",
+        "--model_version",
+        "7.0.0",
+        "--number_of_events",
+        "40",
+        "--instrument_seed",
+        "1",
+        "--simulation_models_path",
+        "/models",
+        "--log_level",
+        "INFO",
+        "--output_path",
+        "/results/reference"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "simtools-illuminator-candidate",
+      "argv": [
+        "simtools-simulate-illuminator",
+        "--light_source",
+        "ILLS-01",
+        "--telescope",
+        "LSTS-01",
+        "--site",
+        "South",
+        "--model_version",
+        "7.0.0",
+        "--number_of_events",
+        "40",
+        "--instrument_seed",
+        "1",
+        "--simulation_models_path",
+        "/models",
+        "--log_level",
+        "INFO",
+        "--output_path",
+        "/results/candidate",
+        "--simulation_software",
+        "obdeect_illuminator",
+        "obdeect_atmosphere",
+        "obdeect_optics",
+        "stream_to_simtel",
+        "sim_telarray:bypass_optics=1"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "compare-illuminator-chain",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.simtools_flasher_chain",
+        "--reference",
+        "/results/reference/sim_telarray/illuminator_South_ILLS-01_7.0.0_simulate_illuminator_LSTS-01_300nm.simtel.zst",
+        "--candidate",
+        "/results/candidate/sim_telarray/illuminator_South_ILLS-01_7.0.0_simulate_illuminator_LSTS-01_300nm.simtel.zst",
+        "--gate",
+        "moments"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "candidate_pipeline_complete",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "reference_event_count",
+      "expected": 40,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_event_count",
+      "expected": 40,
+      "atol": 0
+    },
+    {
+      "metric": "event_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pe_ratio_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "centroid_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "width_length_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

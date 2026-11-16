@@ -4,14 +4,17 @@ import argparse
 import os
 import platform
 import re
+import shutil
 import statistics
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from pathlib import Path
 
 import numpy as np
+from eventio import EventIOFile
 from eventio.iact import IACTFile
 
 from obdeect_validation.adapters import chain_showers, common
@@ -134,6 +137,55 @@ def iact_weight(path):
             for photons in event.photon_bunches.values():
                 total += float(np.sum(photons["photons"], dtype=np.float64))
     return total
+
+
+EVENT_HEADER = (
+    1202  # eventio type of a CORSIKA IACT event header; the event's blocks follow it
+)
+EVENT_TYPES = range(
+    1202, 1210
+)  # EventHeader .. EventEnd (1203-1209: the event's telescope blocks)
+BLOCK_HEADER_BYTES = 16  # eventio block header in front of each top-level block payload
+
+
+def _top_level_blocks(path):
+    """(type, start, end) byte range of each top-level eventio block, header included."""
+    with EventIOFile(path) as stream:
+        for block in stream:
+            start = block.address - BLOCK_HEADER_BYTES
+            yield block.header.type, start, block.address + block.size
+
+
+def shower_count(path):
+    """Number of showers (event headers) of a CORSIKA IACT file."""
+    return sum(
+        1 for block_type, _, _ in _top_level_blocks(path) if block_type == EVENT_HEADER
+    )
+
+
+def subset_showers(source, target, events):
+    """Copy the first `events` showers of an IACT file as raw eventio blocks; the run header and
+    the blocks after the events (run end) are kept. Returns the number of showers written."""
+    if events < 0:
+        raise ValueError("number of showers must not be negative")
+    kept = seen = 0
+    with Path(source).open("rb") as raw, Path(target).open("wb") as out:
+        for block_type, start, end in _top_level_blocks(source):
+            if block_type == EVENT_HEADER:
+                seen += 1
+            if block_type not in EVENT_TYPES or seen <= events:
+                kept += block_type == EVENT_HEADER
+                raw.seek(start)
+                out.write(raw.read(end - start))
+    return kept
+
+
+def select_input(source, events, target):
+    """The input to measure: source itself (events None), or its first `events` showers in target."""
+    if events is None:
+        return source
+    subset_showers(source, target, events)
+    return target
 
 
 def restrict_table(source, target, limit=1000.0):
@@ -260,12 +312,22 @@ def _plot(path, stages, metrics):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=INPUT)
+    parser.add_argument(
+        "--events",
+        type=int,
+        default=None,
+        help="measure the first N showers (default all)",
+    )
     parser.add_argument("--reps", type=int, default=REPS)
     args = parser.parse_args()
     root = Path.cwd().resolve()
-    work = root / "work"
-    work.mkdir(exist_ok=True)
-    source = args.input.resolve()
+    # Stream files go to a container-local directory (PERF_WORK_DIR), not the bind-mounted results.
+    work_dir = os.environ.get("PERF_WORK_DIR")
+    work = Path(work_dir or tempfile.mkdtemp(prefix="perf-stages-"))
+    work.mkdir(parents=True, exist_ok=True)
+    source = select_input(
+        args.input.resolve(), args.events, work / "showers-input.iact"
+    )
     table = work / "transmission-below-1000nm.dat"
     restrict_table(TRANSMISSION, table)
     metrics = {}
@@ -277,6 +339,8 @@ def main():
         "settings": {
             "reps": args.reps,
             "input": str(source),
+            "showers": shower_count(source),
+            "work_dir": str(work),
             "transmission": str(TRANSMISSION),
             "wavelength_limit_nm": 1000,
             "propagation_seed": 123,
@@ -463,16 +527,18 @@ def main():
 
     common.write_results(metrics, details, root)
 
-    for path in (
-        work / "showers.gst",
-        work / "roundtrip.iact",
-        work / "propagated.gst",
-        work / "traced.gst",
-        work / "direct.simtel",
-        work / "direct.hdata",
-        work / "roundtrip.hdata",
-    ):
-        path.unlink(missing_ok=True)
+    if work_dir is None:
+        for path in (
+            work / "showers.gst",
+            work / "roundtrip.iact",
+            work / "propagated.gst",
+            work / "traced.gst",
+            work / "direct.simtel",
+            work / "direct.hdata",
+            work / "roundtrip.hdata",
+        ):
+            path.unlink(missing_ok=True)
+        shutil.rmtree(work, ignore_errors=True)
 
 
 if __name__ == "__main__":

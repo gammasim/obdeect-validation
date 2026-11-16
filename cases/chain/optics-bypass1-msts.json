@@ -1,0 +1,78 @@
+{
+  "id": "chain.optics-bypass1-msts",
+  "name": "CORSIKA -> obdeect trace-stream -> sim_telarray Bypass_Optics (candidate) vs direct sim_telarray, MSTS-01 (FlashCam, model 7.0.0, South, zenith 20 deg, N->E azimuth 180 deg, gamma, South shower: South atmosphere, North MAGNET/ARRANG), unit atmosphere",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config"
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-South-100-3000GeV.iact"
+  ],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "South",
+        "--array_element_list",
+        "MSTS-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "chain-optics-msts",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.chain_optics",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg",
+        "--telescope",
+        "MSTS-01",
+        "--site",
+        "South",
+        "--model-version",
+        "7.0.0",
+        "--input",
+        "/validation/inputs/gamma-20deg-South-100-3000GeV.iact",
+        "--azimuth",
+        "180"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "candidate_pipeline_complete",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "image_shape_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "arrival_time_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "trigger_probability_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}
