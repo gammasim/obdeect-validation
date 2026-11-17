@@ -41,8 +41,9 @@ Adapters also write details.json and PNG figures; `report.html` links them per c
 
 Reports: `python scripts/collect_report.py RUN reports/DATE` copies verdicts, metrics,
 details and figures of a run and writes `reports/DATE/README.md`, the page to read: overview
-table, then one section per validation step (stream, propagation, sources, optics, chain,
-performance) with each case's verdict, headline numbers and captioned figures. Titles,
+table, then one section per validation step (stream, propagation, sources, optics, chain)
+with each case's verdict, headline numbers and captioned figures. Performance results come
+last, as their own section with an overview table and per-stage tables. Titles,
 headline numbers and captions are set in `scripts/report_layout.json`. Hand-written text
 (run, versions, findings) goes into the `<!-- notes:KEY -->` blocks of the README; they are
 kept when it is rewritten (`--readme-only reports/DATE` rewrites without copying).

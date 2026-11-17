@@ -1,0 +1,3749 @@
+{
+  "case": "air-shower",
+  "host": {
+    "nproc": 6,
+    "cpu_model": "0x000",
+    "machine": "aarch64",
+    "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
+    "obdeect_version": "obdeect-stream 0.9.2.dev7+gd19279a3a\nobdeect-propagation 0.9.2.dev7+gd19279a3a\nobdeect-sources 0.9.2.dev7+gd19279a3a\nobdeect-ray-tracing 0.9.2.dev7+gd19279a3a\nphoton-stream format 1.0"
+  },
+  "settings": {
+    "reps": 3,
+    "timing": "wall and CPU: wait4 rusage per child; peak RSS: sampled /proc VmHWM on Linux",
+    "showers": 20,
+    "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
+    "config": "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+    "reference_atmosphere": null,
+    "candidate_atmosphere": "obdeect propagation (reference atmosphere below 1000 nm, 250-700 nm); sim_telarray unit table",
+    "telescopes": [
+      1
+    ],
+    "pointing": "zenith 20 deg, azimuth 180 deg",
+    "candidate_sim_telarray": "/opt/mode3/sim_telarray"
+  },
+  "threads": {
+    "candidate_threads1": 1,
+    "candidate_threadsdefault": 0,
+    "candidate_envelope": 0,
+    "candidate_envelope_threads1": 1,
+    "candidate_unthinned_threads1": 1
+  },
+  "stages": {
+    "reference": {
+      "sim_telarray": [
+        {
+          "wall_s": 4.311184686026536,
+          "cpu_s": 4.072709,
+          "peak_rss_mb": 83.03515625,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=0",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 4.09500792901963,
+          "cpu_s": 3.889665,
+          "peak_rss_mb": 83.1796875,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=0",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 4.1955213049659505,
+          "cpu_s": 4.0037899999999995,
+          "peak_rss_mb": 83.0546875,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=0",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        }
+      ]
+    },
+    "candidate_threads1": {
+      "from_corsika": [
+        {
+          "wall_s": 0.613544735009782,
+          "cpu_s": 0.537613,
+          "peak_rss_mb": 76.91015625,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.6735047120600939,
+          "cpu_s": 0.5894459999999999,
+          "peak_rss_mb": 77.0,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.630086776916869,
+          "cpu_s": 0.5466899999999999,
+          "peak_rss_mb": 76.94140625,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        }
+      ],
+      "propagation": [
+        {
+          "wall_s": 1.1914133080281317,
+          "cpu_s": 1.1508049999999999,
+          "peak_rss_mb": 12.6796875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threads1/showers.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 1.083338823984377,
+          "cpu_s": 1.047633,
+          "peak_rss_mb": 12.88671875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threads1/showers.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 1.062518250895664,
+          "cpu_s": 1.028044,
+          "peak_rss_mb": 12.796875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threads1/showers.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/propagated.gst"
+            ]
+          ]
+        }
+      ],
+      "compile_model": [
+        {
+          "wall_s": 0.3467645599739626,
+          "cpu_s": 0.541491,
+          "peak_rss_mb": 39.22265625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.33321263594552875,
+          "cpu_s": 0.570117,
+          "peak_rss_mb": 39.27734375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.29760226502548903,
+          "cpu_s": 0.53521,
+          "peak_rss_mb": 39.47265625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/threads1/lst.model"
+            ]
+          ]
+        }
+      ],
+      "trace_stream": [
+        {
+          "wall_s": 3.8108980050310493,
+          "cpu_s": 4.007892,
+          "peak_rss_mb": 70.87109375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "trace-stream",
+              "--model",
+              "/tmp/perf-chain-22d3pj_x/threads1/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "1",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threads1/propagated.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.336468219058588,
+          "cpu_s": 3.5810709999999997,
+          "peak_rss_mb": 70.48828125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "trace-stream",
+              "--model",
+              "/tmp/perf-chain-22d3pj_x/threads1/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "1",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threads1/propagated.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.2902953330194578,
+          "cpu_s": 3.486185,
+          "peak_rss_mb": 71.2109375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "trace-stream",
+              "--model",
+              "/tmp/perf-chain-22d3pj_x/threads1/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "1",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threads1/propagated.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "to_simtel": [
+        {
+          "wall_s": 0.316820467938669,
+          "cpu_s": 0.305336,
+          "peak_rss_mb": 63.0703125,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/perf-chain-22d3pj_x/threads1/camera-map.txt",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/candidate.iact",
+              "/tmp/perf-chain-22d3pj_x/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2505756310420111,
+          "cpu_s": 0.24218800000000001,
+          "peak_rss_mb": 63.09375,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/perf-chain-22d3pj_x/threads1/camera-map.txt",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/candidate.iact",
+              "/tmp/perf-chain-22d3pj_x/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.23559712700080127,
+          "cpu_s": 0.205886,
+          "peak_rss_mb": 63.23046875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/perf-chain-22d3pj_x/threads1/camera-map.txt",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threads1/candidate.iact",
+              "/tmp/perf-chain-22d3pj_x/threads1/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "sim_telarray": [
+        {
+          "wall_s": 3.261198529973626,
+          "cpu_s": 3.132142,
+          "peak_rss_mb": 93.48046875,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/threads1/candidate.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/threads1/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/perf-chain-22d3pj_x/unit-atmosphere.dat",
+              "/tmp/perf-chain-22d3pj_x/threads1/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.0110792719060555,
+          "cpu_s": 2.8870739999999997,
+          "peak_rss_mb": 93.52734375,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/threads1/candidate.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/threads1/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/perf-chain-22d3pj_x/unit-atmosphere.dat",
+              "/tmp/perf-chain-22d3pj_x/threads1/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.2564616670133546,
+          "cpu_s": 3.1238699999999997,
+          "peak_rss_mb": 93.453125,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/threads1/candidate.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/threads1/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/perf-chain-22d3pj_x/unit-atmosphere.dat",
+              "/tmp/perf-chain-22d3pj_x/threads1/candidate.iact"
+            ]
+          ]
+        }
+      ]
+    },
+    "candidate_threadsdefault": {
+      "from_corsika": [
+        {
+          "wall_s": 0.8879980569472536,
+          "cpu_s": 0.764804,
+          "peak_rss_mb": 77.00390625,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.8486837369855493,
+          "cpu_s": 0.749641,
+          "peak_rss_mb": 76.83984375,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.6581419989233837,
+          "cpu_s": 0.579914,
+          "peak_rss_mb": 76.875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            ]
+          ]
+        }
+      ],
+      "propagation": [
+        {
+          "wall_s": 1.3849903289228678,
+          "cpu_s": 1.334952,
+          "peak_rss_mb": 12.91796875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/showers.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 1.8051812089979649,
+          "cpu_s": 1.1302029999999998,
+          "peak_rss_mb": 12.94921875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/showers.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 1.3204063220182434,
+          "cpu_s": 1.153427,
+          "peak_rss_mb": 12.84765625,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/showers.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/propagated.gst"
+            ]
+          ]
+        }
+      ],
+      "compile_model": [
+        {
+          "wall_s": 0.307593947974965,
+          "cpu_s": 0.54858,
+          "peak_rss_mb": 39.5703125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.3342876329552382,
+          "cpu_s": 0.58439,
+          "peak_rss_mb": 39.19921875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.24733455607201904,
+          "cpu_s": 0.553422,
+          "peak_rss_mb": 39.03125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/lst.model"
+            ]
+          ]
+        }
+      ],
+      "trace_stream": [
+        {
+          "wall_s": 1.5864514149725437,
+          "cpu_s": 4.00179,
+          "peak_rss_mb": 73.65625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "trace-stream",
+              "--model",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "0",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/propagated.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 1.6101829400286078,
+          "cpu_s": 3.979287,
+          "peak_rss_mb": 73.59375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "trace-stream",
+              "--model",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "0",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/propagated.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 1.9972673179581761,
+          "cpu_s": 3.792249,
+          "peak_rss_mb": 73.63671875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "trace-stream",
+              "--model",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "0",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/propagated.gst",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "to_simtel": [
+        {
+          "wall_s": 0.2895492009120062,
+          "cpu_s": 0.279267,
+          "peak_rss_mb": 63.26171875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/camera-map.txt",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.iact",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.24973230005707592,
+          "cpu_s": 0.238969,
+          "peak_rss_mb": 63.1875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/camera-map.txt",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.iact",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2455284349853173,
+          "cpu_s": 0.236392,
+          "peak_rss_mb": 63.26171875,
+          "argv": [
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/camera-map.txt",
+              "-o",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.iact",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "sim_telarray": [
+        {
+          "wall_s": 3.1545092930318788,
+          "cpu_s": 3.019445,
+          "peak_rss_mb": 93.453125,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/perf-chain-22d3pj_x/unit-atmosphere.dat",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.197630853042938,
+          "cpu_s": 3.067322,
+          "peak_rss_mb": 93.546875,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/perf-chain-22d3pj_x/unit-atmosphere.dat",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.4165965209249407,
+          "cpu_s": 3.27522,
+          "peak_rss_mb": 93.671875,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.hdata",
+              "-C",
+              "output_file=/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/results/performance.air-shower/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/perf-chain-22d3pj_x/unit-atmosphere.dat",
+              "/tmp/perf-chain-22d3pj_x/threadsdefault/candidate.iact"
+            ]
+          ]
+        }
+      ]
+    },
+    "candidate_envelope": {
+      "compile_model": [
+        {
+          "wall_s": 0.32177037198562175,
+          "cpu_s": 0.571531,
+          "peak_rss_mb": 39.09765625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/envelope/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.30136929696891457,
+          "cpu_s": 0.551512,
+          "peak_rss_mb": 39.13671875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/envelope/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2883782050339505,
+          "cpu_s": 0.536223,
+          "peak_rss_mb": 38.96484375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/envelope/lst.model"
+            ]
+          ]
+        }
+      ],
+      "pipeline": [
+        {
+          "wall_s": 3.5845636060694233,
+          "cpu_s": 5.583584,
+          "peak_rss_mb": 76.89453125,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.532346402062103,
+              "cpu_s": 0.585801,
+              "peak_rss_mb": 76.89453125,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.5380320539698005,
+              "cpu_s": 1.270721,
+              "peak_rss_mb": 12.48046875,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.565979277016595,
+              "cpu_s": 1.123987,
+              "peak_rss_mb": 45.94140625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.5663393180584535,
+              "cpu_s": 0.042801,
+              "peak_rss_mb": 12.984375,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 3.5845636060694233,
+              "cpu_s": 2.560274,
+              "peak_rss_mb": 49.55078125,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 3.6063051350647584,
+          "cpu_s": 5.535296,
+          "peak_rss_mb": 76.953125,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.555046761990525,
+              "cpu_s": 0.542567,
+              "peak_rss_mb": 76.953125,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.5611121220281348,
+              "cpu_s": 1.2677509999999999,
+              "peak_rss_mb": 12.42578125,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.5774617480346933,
+              "cpu_s": 1.124017,
+              "peak_rss_mb": 46.4609375,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.577840246958658,
+              "cpu_s": 0.034115,
+              "peak_rss_mb": 12.90625,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 3.6063051350647584,
+              "cpu_s": 2.566846,
+              "peak_rss_mb": 49.578125,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 3.5051744270604104,
+          "cpu_s": 5.283145,
+          "peak_rss_mb": 76.953125,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.458788292016834,
+              "cpu_s": 0.451974,
+              "peak_rss_mb": 76.953125,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.4645227360306308,
+              "cpu_s": 1.240052,
+              "peak_rss_mb": 12.53125,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.4790942000690848,
+              "cpu_s": 1.091008,
+              "peak_rss_mb": 46.28515625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.479374199057929,
+              "cpu_s": 0.033590999999999996,
+              "peak_rss_mb": 12.91796875,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 3.5051744270604104,
+              "cpu_s": 2.46652,
+              "peak_rss_mb": 49.81640625,
+              "returncode": 0
+            }
+          ]
+        }
+      ]
+    },
+    "candidate_envelope_threads1": {
+      "compile_model": [
+        {
+          "wall_s": 0.3228861609240994,
+          "cpu_s": 0.488818,
+          "peak_rss_mb": 39.02734375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2896381589816883,
+          "cpu_s": 0.525738,
+          "peak_rss_mb": 39.20703125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.3395923279458657,
+          "cpu_s": 0.5376259999999999,
+          "peak_rss_mb": 39.08984375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model"
+            ]
+          ]
+        }
+      ],
+      "pipeline": [
+        {
+          "wall_s": 3.5454869529930875,
+          "cpu_s": 5.355888,
+          "peak_rss_mb": 76.828125,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.502884932910092,
+              "cpu_s": 0.44762199999999996,
+              "peak_rss_mb": 76.828125,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.5078549209283665,
+              "cpu_s": 1.263291,
+              "peak_rss_mb": 12.6171875,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.521308886935003,
+              "cpu_s": 1.06498,
+              "peak_rss_mb": 45.82421875,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.5216644699685276,
+              "cpu_s": 0.031935,
+              "peak_rss_mb": 12.83203125,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 3.5454869529930875,
+              "cpu_s": 2.54806,
+              "peak_rss_mb": 49.0625,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 3.5188078930368647,
+          "cpu_s": 5.331085,
+          "peak_rss_mb": 76.91015625,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.4744168360484764,
+              "cpu_s": 0.48195599999999994,
+              "peak_rss_mb": 76.91015625,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.479788698023185,
+              "cpu_s": 1.246143,
+              "peak_rss_mb": 12.53125,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.497153864009306,
+              "cpu_s": 1.077005,
+              "peak_rss_mb": 45.765625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.497561404015869,
+              "cpu_s": 0.032382999999999995,
+              "peak_rss_mb": 12.8359375,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 3.5188078930368647,
+              "cpu_s": 2.493598,
+              "peak_rss_mb": 49.30078125,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 3.5043535539880395,
+          "cpu_s": 5.3321309999999995,
+          "peak_rss_mb": 77.01171875,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.45916499895975,
+              "cpu_s": 0.460422,
+              "peak_rss_mb": 77.01171875,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--envelope",
+                "qe=/tmp/perf-chain-22d3pj_x/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.4647775680059567,
+              "cpu_s": 1.268252,
+              "peak_rss_mb": 12.53125,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.482210109010339,
+              "cpu_s": 1.0398939999999999,
+              "peak_rss_mb": 46.0390625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.4825439830310643,
+              "cpu_s": 0.03562,
+              "peak_rss_mb": 12.93359375,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/perf-chain-22d3pj_x/envelope/qe-table",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 3.5043535539880395,
+              "cpu_s": 2.527943,
+              "peak_rss_mb": 49.078125,
+              "returncode": 0
+            }
+          ]
+        }
+      ]
+    },
+    "candidate_unthinned_threads1": {
+      "compile_model": [
+        {
+          "wall_s": 0.2943052320042625,
+          "cpu_s": 0.533701,
+          "peak_rss_mb": 39.19921875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/unthinned/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2851124620065093,
+          "cpu_s": 0.5331349999999999,
+          "peak_rss_mb": 39.41796875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/unthinned/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2708250390132889,
+          "cpu_s": 0.529396,
+          "peak_rss_mb": 39.55859375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-22d3pj_x/unthinned/lst.model"
+            ]
+          ]
+        }
+      ],
+      "pipeline": [
+        {
+          "wall_s": 4.052088493015617,
+          "cpu_s": 5.850752,
+          "peak_rss_mb": 76.91015625,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 4.002327866037376,
+              "cpu_s": 0.501737,
+              "peak_rss_mb": 76.91015625,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 4.006617230013944,
+              "cpu_s": 0.99605,
+              "peak_rss_mb": 12.328125,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 4.024975726963021,
+              "cpu_s": 1.790666,
+              "peak_rss_mb": 55.83203125,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              "wall_s": 4.026535972952843,
+              "cpu_s": 0.081434,
+              "peak_rss_mb": 31.49609375,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 4.052088493015617,
+              "cpu_s": 2.480865,
+              "peak_rss_mb": 59.046875,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 4.015303001040593,
+          "cpu_s": 5.760944,
+          "peak_rss_mb": 76.953125,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.9663180380593985,
+              "cpu_s": 0.530506,
+              "peak_rss_mb": 76.953125,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.97033232008107,
+              "cpu_s": 0.9727319999999999,
+              "peak_rss_mb": 12.57421875,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.98760715208482,
+              "cpu_s": 1.748055,
+              "peak_rss_mb": 55.98046875,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.988699108012952,
+              "cpu_s": 0.078069,
+              "peak_rss_mb": 31.53515625,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 4.015303001040593,
+              "cpu_s": 2.431582,
+              "peak_rss_mb": 59.2421875,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 3.934773865970783,
+          "cpu_s": 5.706275,
+          "peak_rss_mb": 76.95703125,
+          "argv": [
+            [
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              ],
+              "wall_s": 3.8832052430370823,
+              "cpu_s": 0.47475799999999996,
+              "peak_rss_mb": 76.95703125,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/perf-chain-22d3pj_x/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.887416066019796,
+              "cpu_s": 0.97645,
+              "peak_rss_mb": 12.56640625,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "obdeect",
+                "ray-tracing",
+                "trace-stream",
+                "--model",
+                "/tmp/perf-chain-22d3pj_x/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.9047342729754746,
+              "cpu_s": 1.755774,
+              "peak_rss_mb": 55.91796875,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/perf-chain-22d3pj_x/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              "wall_s": 3.905672020977363,
+              "cpu_s": 0.081764,
+              "peak_rss_mb": 31.69921875,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/opt/mode3/sim_telarray",
+                "-c",
+                "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/perf-chain-22d3pj_x/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/results/performance.air-shower/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 3.934773865970783,
+              "cpu_s": 2.417529,
+              "peak_rss_mb": 59.26953125,
+              "returncode": 0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pipelines": {
+    "reference": [
+      {
+        "wall_s": 4.311184686026536,
+        "cpu_s": 4.072709,
+        "peak_rss_mb": 83.03515625
+      },
+      {
+        "wall_s": 4.09500792901963,
+        "cpu_s": 3.889665,
+        "peak_rss_mb": 83.1796875
+      },
+      {
+        "wall_s": 4.1955213049659505,
+        "cpu_s": 4.0037899999999995,
+        "peak_rss_mb": 83.0546875
+      }
+    ],
+    "candidate_threads1": [
+      {
+        "wall_s": 9.54063960595522,
+        "cpu_s": 9.675279,
+        "peak_rss_mb": 93.48046875
+      },
+      {
+        "wall_s": 8.688179293996654,
+        "cpu_s": 8.917529,
+        "peak_rss_mb": 93.52734375
+      },
+      {
+        "wall_s": 8.772561419871636,
+        "cpu_s": 8.925885,
+        "peak_rss_mb": 93.453125
+      }
+    ],
+    "candidate_threadsdefault": [
+      {
+        "wall_s": 7.611092242761515,
+        "cpu_s": 9.948838,
+        "peak_rss_mb": 93.453125
+      },
+      {
+        "wall_s": 8.045698672067374,
+        "cpu_s": 9.749811999999999,
+        "peak_rss_mb": 93.546875
+      },
+      {
+        "wall_s": 7.88527515088208,
+        "cpu_s": 9.590624,
+        "peak_rss_mb": 93.671875
+      }
+    ],
+    "candidate_envelope": [
+      {
+        "wall_s": 3.906333978055045,
+        "cpu_s": 6.155115,
+        "peak_rss_mb": 76.89453125
+      },
+      {
+        "wall_s": 3.907674432033673,
+        "cpu_s": 6.0868079999999996,
+        "peak_rss_mb": 76.953125
+      },
+      {
+        "wall_s": 3.793552632094361,
+        "cpu_s": 5.819368,
+        "peak_rss_mb": 76.953125
+      }
+    ],
+    "candidate_envelope_threads1": [
+      {
+        "wall_s": 3.868373113917187,
+        "cpu_s": 5.844706,
+        "peak_rss_mb": 76.828125
+      },
+      {
+        "wall_s": 3.808446052018553,
+        "cpu_s": 5.856823,
+        "peak_rss_mb": 76.91015625
+      },
+      {
+        "wall_s": 3.843945881933905,
+        "cpu_s": 5.869757,
+        "peak_rss_mb": 77.01171875
+      }
+    ],
+    "candidate_unthinned_threads1": [
+      {
+        "wall_s": 4.34639372501988,
+        "cpu_s": 6.384453,
+        "peak_rss_mb": 76.91015625
+      },
+      {
+        "wall_s": 4.300415463047102,
+        "cpu_s": 6.294079,
+        "peak_rss_mb": 76.953125
+      },
+      {
+        "wall_s": 4.205598904984072,
+        "cpu_s": 6.235671,
+        "peak_rss_mb": 76.95703125
+      }
+    ]
+  },
+  "counts": {
+    "candidate_threads1": {
+      "into_simtel_weight": 7242808.0,
+      "into_trace_photons": 3723604,
+      "out_of_trace_photons": 7242808
+    },
+    "candidate_threadsdefault": {
+      "into_simtel_weight": 7242808.0,
+      "into_trace_photons": 3723604,
+      "out_of_trace_photons": 7242808
+    },
+    "reference": {
+      "into_simtel_weight": 18605134.335775957
+    },
+    "candidate_envelope": {
+      "into_trace_photons": 1370276,
+      "out_of_trace_photons": 777500,
+      "into_simtel_photons": 777500
+    },
+    "candidate_envelope_threads1": {
+      "into_trace_photons": 1370276,
+      "out_of_trace_photons": 777500,
+      "into_simtel_photons": 777500
+    },
+    "candidate_unthinned_threads1": {
+      "into_trace_photons": 1849435,
+      "out_of_trace_photons": 2362125,
+      "into_simtel_photons": 2362125
+    },
+    "physics_envelope": {
+      "into_trace_photons": 1370276,
+      "out_of_trace_photons": 777500,
+      "into_simtel_photons": 777500
+    }
+  },
+  "failures": {},
+  "physics": {
+    "unthinned": {
+      "triggers": {
+        "1": {
+          "difference": 0.0,
+          "se": 0.0,
+          "mcnemar_p": 1.0,
+          "flag": 0,
+          "both": 100,
+          "reference_only": 0,
+          "candidate_only": 0
+        }
+      }
+    },
+    "envelope": {
+      "triggers": {
+        "1": {
+          "difference": 0.0,
+          "se": 0.0,
+          "mcnemar_p": 1.0,
+          "flag": 0,
+          "both": 100,
+          "reference_only": 0,
+          "candidate_only": 0
+        }
+      }
+    },
+    "envelope_vs_unthinned": {
+      "triggers": {
+        "1": {
+          "difference": 0.0,
+          "se": 0.0,
+          "mcnemar_p": 1.0,
+          "flag": 0,
+          "both": 100,
+          "reference_only": 0,
+          "candidate_only": 0
+        }
+      }
+    }
+  },
+  "budget_reasons": {},
+  "timing_reliability": {
+    "spread_limit": 0.05,
+    "load_limit": 1.0,
+    "reasons": [
+      "reference wall spread 0.052 > 0.05",
+      "candidate_threads1 wall spread 0.097 > 0.05",
+      "candidate_threadsdefault wall spread 0.055 > 0.05",
+      "host_loadavg_before 4.77 > 1.0"
+    ]
+  }
+}

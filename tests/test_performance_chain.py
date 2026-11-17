@@ -394,9 +394,216 @@ def test_child_metrics_are_medians_per_member() -> None:
         for w in (1.0, 3.0, 2.0)
     ]
     assert performance_chain.child_metrics("candidate_envelope", summaries) == {
-        "candidate_envelope_trace_stream_wall_s": 2.0,
+        "candidate_envelope_trace_stream_exit_s": 2.0,
         "candidate_envelope_trace_stream_cpu_s": 4.0,
     }
+
+
+def test_aggregate_gives_range_and_relative_spread() -> None:
+    records = [
+        {"wall_s": w, "cpu_s": 1.0, "peak_rss_mb": 1.0} for w in (9.0, 10.0, 11.0)
+    ]
+    metrics = performance_chain._aggregate("reference", records)
+    assert metrics["reference_wall_s_min"] == 9.0
+    assert metrics["reference_wall_s_max"] == 11.0
+    assert metrics["reference_cpu_s_min"] == metrics["reference_cpu_s_max"] == 1.0
+    assert metrics["reference_wall_s_spread"] == pytest.approx(2.0 / 10.0)
+    zero = [{"wall_s": 0.0, "cpu_s": 0.0, "peak_rss_mb": 0.0}] * 2
+    assert "x_wall_s_spread" not in performance_chain._aggregate("x", zero)
+
+
+def test_timing_reliability_flags_spread_and_load() -> None:
+    quiet = {"reference_wall_s_spread": 0.01, "host_loadavg_before": 0.4}
+    assert performance_chain.timing_reliability(quiet, ["reference"])[0] == 0
+    noisy = {
+        "reference_wall_s_spread": 0.08,
+        "candidate_threads1_wall_s_spread": 0.01,
+        "host_loadavg_before": 1.5,
+    }
+    flag, details = performance_chain.timing_reliability(
+        noisy, ["reference", "candidate_threads1"]
+    )
+    assert flag == 1
+    assert len(details["reasons"]) == 2
+    assert "reference wall spread" in details["reasons"][0]
+    assert "host_loadavg_before" in details["reasons"][1]
+    assert performance_chain.timing_reliability({}, ["reference"]) == (
+        0,
+        {
+            "spread_limit": performance_chain.SPREAD_LIMIT,
+            "load_limit": performance_chain.LOAD_LIMIT,
+            "reasons": [],
+        },
+    )
+
+
+def test_loadavg_is_none_where_the_host_does_not_report_it(monkeypatch) -> None:
+    def unavailable():
+        raise OSError("no load average")
+
+    monkeypatch.setattr(performance_chain.os, "getloadavg", unavailable)
+    assert performance_chain.loadavg() is None
+    monkeypatch.delattr(performance_chain.os, "getloadavg")
+    assert performance_chain.loadavg() is None
+
+
+def test_normalised_metrics_per_shower_per_photon_and_cpu_shares() -> None:
+    metrics = {
+        "reference_wall_s": 100.0,
+        "reference_cpu_s": 50.0,
+        "candidate_threads1_wall_s": 40.0,
+        "candidate_threads1_cpu_s": 20.0,
+        "candidate_threads1_compile_model_cpu_s": 4.0,
+        "candidate_threads1_propagation_cpu_s": 4.0,
+        "candidate_threads1_trace_stream_cpu_s": 8.0,
+        "candidate_threads1_to_simtel_cpu_s": 2.0,
+        "candidate_threads1_sim_telarray_cpu_s": 2.0,
+        "candidate_threads1_from_corsika_cpu_s": 0.0,
+        "candidate_envelope_threads1_wall_s": 10.0,
+        "candidate_envelope_threads1_cpu_s": 12.0,
+        "candidate_envelope_threads1_pipeline_cpu_s": 9.0,
+        "candidate_envelope_threads1_compile_model_cpu_s": 3.0,
+        "candidate_envelope_threads1_propagation_cpu_s": 3.0,
+        "candidate_envelope_threads1_sim_telarray_cpu_s": 6.0,
+        "telescope_photons": 1e6,
+    }
+    details = {
+        "settings": {"showers": 10},
+        "pipelines": {"reference": [], "candidate_threads1": []},
+        "stages": {
+            "candidate_threads1": {
+                "compile_model": [],
+                "propagation": [],
+                "trace_stream": [],
+                "to_simtel": [],
+                "sim_telarray": [],
+                "from_corsika": [],
+            },
+            "candidate_envelope_threads1": {
+                "compile_model": [],
+                "pipeline": [
+                    {
+                        "children": [
+                            {"name": "propagation"},
+                            {"name": "sim_telarray"},
+                        ]
+                    }
+                ],
+            },
+        },
+    }
+    out = performance_chain.normalised_metrics(metrics, details)
+    assert out["reference_s_per_shower"] == 10.0
+    assert out["candidate_threads1_cpu_s_per_shower"] == 2.0
+    assert out["reference_cpu_ns_per_photon"] == pytest.approx(50.0 * 1e9 / 1e6)
+    # candidate_threads1: denominator is its CPU without compile_model (16 s).
+    assert out["candidate_threads1_propagation_cpu_share"] == pytest.approx(4 / 16)
+    assert out["candidate_threads1_trace_stream_cpu_share"] == pytest.approx(0.5)
+    assert "candidate_threads1_compile_model_cpu_share" not in out
+    # envelope: pipe members over the pipe stage (9 s).
+    assert out["candidate_envelope_threads1_propagation_cpu_share"] == pytest.approx(
+        3 / 9
+    )
+    assert out["candidate_envelope_threads1_sim_telarray_cpu_share"] == pytest.approx(
+        6 / 9
+    )
+    assert "candidate_envelope_threads1_compile_model_cpu_share" not in out
+
+
+def test_normalised_metrics_leave_out_what_is_not_measured() -> None:
+    details = {
+        "settings": {},
+        "pipelines": {"reference": []},
+        "stages": {},
+    }
+    metrics = {"reference_wall_s": 5.0, "reference_cpu_s": 3.0}
+    out = performance_chain.normalised_metrics(metrics, details)
+    assert out == {}
+
+
+def test_reference_optics_is_the_difference_of_the_two_sim_telarray_runs() -> None:
+    metrics = {
+        "reference_sim_telarray_cpu_s": 10.0,
+        "reference_sim_telarray_wall_s": 12.0,
+        "candidate_threads1_sim_telarray_cpu_s": 2.0,
+        "candidate_threads1_sim_telarray_wall_s": 3.0,
+        "candidate_threads1_trace_stream_cpu_s": 4.0,
+    }
+    details = {}
+    out = performance_chain.reference_optics_metrics(metrics, details)
+    assert out == {
+        "reference_optics_cpu_s": 8.0,
+        "reference_optics_wall_s": 9.0,
+        "reference_camera_cpu_s": 2.0,
+        "trace_stream_vs_reference_optics_cpu_ratio": 0.5,
+    }
+    assert details == {}
+
+
+def test_reference_optics_ratio_is_omitted_and_explained_when_not_positive() -> None:
+    metrics = {
+        "reference_sim_telarray_cpu_s": 2.0,
+        "candidate_threads1_sim_telarray_cpu_s": 2.5,
+        "candidate_threads1_trace_stream_cpu_s": 4.0,
+    }
+    details = {}
+    out = performance_chain.reference_optics_metrics(metrics, details)
+    assert out["reference_optics_cpu_s"] == pytest.approx(-0.5)
+    assert "trace_stream_vs_reference_optics_cpu_ratio" not in out
+    assert details["reference_optics"]["trace_stream_ratio"].startswith("omitted")
+
+
+def test_gain_metrics_thinning_and_piping_without_compile_model() -> None:
+    metrics = {
+        "candidate_unthinned_threads1_cpu_s": 30.0,
+        "candidate_unthinned_threads1_wall_s": 15.0,
+        "candidate_unthinned_threads1_compile_model_cpu_s": 2.0,
+        "candidate_unthinned_threads1_compile_model_wall_s": 1.0,
+        "candidate_envelope_threads1_cpu_s": 10.0,
+        "candidate_envelope_threads1_wall_s": 5.0,
+        "candidate_envelope_threads1_compile_model_cpu_s": 2.0,
+        "candidate_envelope_threads1_compile_model_wall_s": 1.0,
+        "candidate_threads1_cpu_s": 50.0,
+        "candidate_threads1_wall_s": 40.0,
+        "candidate_threads1_compile_model_cpu_s": 4.0,
+        "candidate_threads1_compile_model_wall_s": 2.0,
+    }
+    out = performance_chain.gain_metrics(metrics)
+    assert out["thinning_gain_cpu"] == pytest.approx(28.0 / 8.0)
+    assert out["thinning_gain_wall"] == pytest.approx(14.0 / 4.0)
+    assert out["piping_gain_cpu"] == pytest.approx(46.0 / 28.0)
+    assert out["piping_gain_wall"] == pytest.approx(38.0 / 14.0)
+    assert performance_chain.gain_metrics({}) == {}
+
+
+def test_unthinned_candidate_is_one_pipe_without_envelope_or_scaled_table(
+    tmp_path: Path, monkeypatch
+) -> None:
+    captured = []
+    monkeypatch.setattr(
+        performance_chain,
+        "_checked_pipeline",
+        lambda stages, output, logs: captured.append(dict(stages)),
+    )
+    inputs = {
+        "rotation": 0.0,
+        "atmosphere": tmp_path / "atmosphere.dat",
+        "models": "/models",
+        "config": tmp_path / "CTAO.cfg",
+        "config_dir": tmp_path,
+        "reference_atmosphere": tmp_path / "reference.dat",
+    }
+    steps = performance_chain.envelope_candidate(
+        tmp_path, tmp_path / "in.iact", inputs, None, threads=1
+    )
+    assert [name for name, _ in steps] == ["compile_model", "pipeline"]
+    steps[1][1]()
+    stage = captured[0]
+    assert "--envelope" not in stage["propagation"]
+    assert option(stage["propagation"], "--mode") == "weighted"
+    assert option(stage["trace_stream"], "--threads") == 1
+    assert "--scaled-factor" not in stage["to_simtel"]
+    assert not any("qe-table" in str(arg) for arg in stage["sim_telarray"])
 
 
 def test_variant_counts_parse_the_trace_summary(tmp_path: Path, monkeypatch) -> None:

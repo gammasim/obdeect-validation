@@ -182,6 +182,66 @@ def test_curvature_cases_have_their_own_step_and_detail_values(tmp_path):
     assert collect_report.format_row("{showers[5][x]}", {"showers": []}) == "–"
 
 
+def test_table_fills_row_keys_and_marks_missing_cells():
+    table = {
+        "row_label": "Stage",
+        "rows": [
+            {"key": "propagation", "label": "propagation"},
+            {"key": "compile_model", "label": "compile model"},
+            {"key": "to_simtel", "label": "to-simtel"},
+        ],
+        "columns": [
+            {"label": "Wall s", "metric": "{row}_wall_s_median", "format": ".2f"},
+            {"label": "Share", "metric": "{row}_cpu_share", "format": ".0%"},
+            {"label": "Profiled", "metric": "{row}_profiled"},
+        ],
+    }
+    metrics = {
+        "propagation_wall_s_median": 2.2372,
+        "propagation_cpu_share": 0.25,
+        "propagation_profiled": True,
+        "to_simtel_wall_s_median": "x",
+    }
+    assert collect_report._table(table, metrics) == [
+        "| Stage | Wall s | Share | Profiled |",
+        "|---|---|---|---|",
+        "| propagation | 2.24 | 25% | True |",
+        "",
+    ]
+    # Missing or wrong-typed values give the missing mark; a row with no value is left out.
+    assert collect_report._table(table, {"to_simtel_cpu_share": 0.5}) == [
+        "| Stage | Share |",
+        "|---|---|",
+        "| to-simtel | 50% |",
+        "",
+    ]  # columns without any value are left out
+    assert collect_report._table(table, {}) == []
+    assert collect_report._table(table, {"to_simtel_wall_s_median": "x"}) == []
+
+
+def test_performance_stage_table_in_readme(tmp_path):
+    report = tmp_path / "2099-01-01"
+    case = report / "performance.stages"
+    case.mkdir(parents=True)
+    metrics = {
+        "trace_stream_wall_s_median": 12.1,
+        "trace_stream_cpu_s_median": 10.31,
+        "trace_stream_cpu_share": 0.8,
+        "simtel_direct_wall_s_median": 11.68,
+        "timing_unreliable": False,
+    }
+    (case / "metrics.json").write_text(json.dumps(metrics))
+    summary = {"suite": "performance", "status": "PASS", "cases": []}
+    summary["cases"] = [{"id": "performance.stages", "status": "REPORT ONLY"}]
+    (report / "summary.json").write_text(json.dumps(summary))
+    readme = collect_report.write_readme(report).read_text()
+    # Columns without any value (photons/s, ns per photon, spread) are left out.
+    assert "| Stage | Wall s (median) | CPU s (median) | CPU share |" in readme
+    assert "| trace-stream | 12.10 | 10.31 | 80% |" in readme
+    assert "| propagation |" not in readme  # no values, so no row
+    assert "trace-stream 12.1 s, sim_telarray direct 11.7 s" in readme
+
+
 def test_add_renders_gated_budget_checks_and_blocked_cases(tmp_path):
     run = tmp_path / "perf"
     case = run / "performance.air-shower"
@@ -225,3 +285,38 @@ def test_add_renders_gated_budget_checks_and_blocked_cases(tmp_path):
     assert "air-shower-proton" in readme
     assert "BLOCKED" in readme and "/validation/inputs/proton.iact" in readme
     assert "REPORT ONLY" not in readme.split("## 1.")[0]
+
+
+def test_performance_is_a_separate_section_at_the_bottom(tmp_path):
+    run = _run(tmp_path, "full", ["stream.a", "sources.b"])
+    report = tmp_path / "2099-01-01"
+    collect_report.collect(run, report)
+    perf = _run(
+        tmp_path,
+        "perf",
+        ["performance.stages", "performance.profile", "performance.air-shower"],
+    )
+    (perf / "performance.air-shower" / "metrics.json").write_text(
+        json.dumps({"reference_wall_s": 20.0, "timing_unreliable": 0})
+    )
+    collect_report.collect(perf, report, add=True)
+    readme = collect_report.write_readme(report).read_text()
+    top, bottom = readme.split("## Scope and limits")
+    # Validation overview and result count: no performance cases.
+    assert (
+        "performance."
+        not in top.split("## How to read")[0].split("[3. Performance]")[0]
+    )
+    assert "**Result: 2 PASS**" in top
+    assert "[3. Performance](#step-performance) is at the bottom: 3 REPORT ONLY." in top
+    assert "## 3. Performance" not in top and '<a id="step-performance">' in bottom
+    # Own overview table, then the cases in the layout's case_order.
+    assert "| Case | Headline | Verdict |" in bottom
+    order = [
+        bottom.index(f'<a id="performance-{name}"></a>')
+        for name in ("air-shower", "stages", "profile")
+    ]
+    assert order == sorted(order)
+    # Quantity rows without a value are left out in the performance section.
+    assert "| Reference wall s | 20.00 |" in bottom
+    assert "| Reference CPU s |" not in bottom

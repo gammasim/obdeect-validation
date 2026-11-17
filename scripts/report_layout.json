@@ -69,7 +69,20 @@
       "key": "performance",
       "prefix": "performance.",
       "title": "Performance",
-      "intro": "Wall and CPU time of the obdeect chain against sim_telarray on the same input and machine. Informational, no limits."
+      "intro": "Report only, apart from the timing budgets. Wall and CPU time of the obdeect chain against sim_telarray on the same input and machine, ordered from the whole chain to its parts: whole chain (gamma, proton), bottleneck inside the pipe, separate stages, fixed versus per-shower cost and threads, array, stream pipes, light sources, profiles. Timings with timing unreliable = 1 come from a loaded machine or noisy repetitions.",
+      "appendix": true,
+      "case_order": [
+        "performance.air-shower",
+        "performance.air-shower-proton",
+        "performance.bottleneck",
+        "performance.stages",
+        "performance.scaling",
+        "performance.air-shower-array",
+        "performance.stream-pipe",
+        "performance.flasher-dish",
+        "performance.point-source",
+        "performance.profile"
+      ]
     }
   ],
   "cases": {
@@ -542,14 +555,767 @@
       ]
     },
     "performance.stages": {
-      "title": "Stage throughput",
-      "description": "Throughput of each chain stage on one CORSIKA input.",
+      "title": "Stage timing (wall and CPU)",
+      "description": "Each chain stage on one CORSIKA input, repeated; the table gives the medians, the wall-time spread over the repetitions and each stage's share of the CPU time.",
+      "headline": "trace-stream {trace_stream_wall_s_median:.1f} s, sim_telarray direct {simtel_direct_wall_s_median:.1f} s (wall median), timing unreliable: {timing_unreliable}",
+      "rows": [
+        {
+          "label": "Timing unreliable (1 = loaded machine or noisy repetitions)",
+          "text": "{timing_unreliable}"
+        },
+        {
+          "label": "Host load average before the run",
+          "text": "{host_loadavg_before:.2f}"
+        }
+      ],
+      "tables": [
+        {
+          "row_label": "Stage",
+          "rows": [
+            {
+              "key": "from_corsika",
+              "label": "from-corsika"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "propagation_envelope",
+              "label": "propagation (envelope)"
+            },
+            {
+              "key": "compile_model",
+              "label": "compile model"
+            },
+            {
+              "key": "trace_stream",
+              "label": "trace-stream"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            },
+            {
+              "key": "simtel_direct",
+              "label": "sim_telarray (direct)"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Wall s (median)",
+              "metric": "{row}_wall_s_median",
+              "format": ".2f"
+            },
+            {
+              "label": "CPU s (median)",
+              "metric": "{row}_cpu_s_median",
+              "format": ".2f"
+            },
+            {
+              "label": "Photons/s",
+              "metric": "{row}_photons_per_s",
+              "format": ".3g"
+            },
+            {
+              "label": "CPU share",
+              "metric": "{row}_cpu_share",
+              "format": ".0%"
+            },
+            {
+              "label": "CPU ns per photon",
+              "metric": "{row}_ns_per_photon_cpu",
+              "format": ".0f"
+            },
+            {
+              "label": "Wall spread",
+              "metric": "{row}_wall_s_spread",
+              "format": ".1%"
+            }
+          ]
+        }
+      ],
       "figures": [
         {
           "file": "photons-per-second.png",
           "caption": "Photons per second for each stage."
         }
       ]
+    },
+    "performance.air-shower": {
+      "title": "Air shower: obdeect chain against sim_telarray",
+      "description": "Reference: CORSIKA IACT → sim_telarray with full optics. Candidate: the obdeect chain up to the camera stage (optics bypassed, same photons). Envelope candidate: from-corsika, propagation (QE bound, thinned), trace-stream and to-simtel as one pipe, then sim_telarray for the camera. Run with one thread and with the obdeect default thread count. Stage shares are of the candidate's CPU time.",
+      "headline": "envelope chain / sim_telarray: wall {ratio_wall_envelope_threads1:.2f}, CPU {ratio_cpu_envelope_threads1:.2f} (threads=1); trace-stream / sim_telarray optics CPU {trace_stream_vs_reference_optics_cpu_ratio:.2f}",
+      "rows": [
+        {
+          "label": "Reference wall s",
+          "text": "{reference_wall_s:.2f}"
+        },
+        {
+          "label": "Reference CPU s",
+          "text": "{reference_cpu_s:.2f}"
+        },
+        {
+          "label": "Reference optics CPU s",
+          "text": "{reference_optics_cpu_s:.2f}"
+        },
+        {
+          "label": "Reference camera CPU s",
+          "text": "{reference_camera_cpu_s:.2f}"
+        },
+        {
+          "label": "Candidate CPU s, threads=1",
+          "text": "{candidate_threads1_cpu_s:.2f}"
+        },
+        {
+          "label": "Envelope candidate CPU s, threads=1",
+          "text": "{candidate_envelope_threads1_cpu_s:.2f}"
+        },
+        {
+          "label": "Unthinned candidate CPU s, threads=1",
+          "text": "{candidate_unthinned_threads1_cpu_s:.2f}"
+        },
+        {
+          "label": "Trace-stream CPU / reference optics CPU",
+          "text": "{trace_stream_vs_reference_optics_cpu_ratio:.2f}"
+        },
+        {
+          "label": "Thinning gain, CPU",
+          "text": "{thinning_gain_cpu:.2f}"
+        },
+        {
+          "label": "Piping gain, CPU",
+          "text": "{piping_gain_cpu:.2f}"
+        },
+        {
+          "label": "Envelope / reference wall, threads=1",
+          "text": "{ratio_wall_envelope_threads1:.2f}"
+        },
+        {
+          "label": "Envelope / reference CPU, threads=1",
+          "text": "{ratio_cpu_envelope_threads1:.2f}"
+        },
+        {
+          "label": "Timing unreliable (1 = loaded machine or noisy repetitions)",
+          "text": "{timing_unreliable}"
+        }
+      ],
+      "tables": [
+        {
+          "row_label": "Stage",
+          "rows": [
+            {
+              "key": "from_corsika",
+              "label": "from-corsika"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "trace_stream",
+              "label": "trace-stream"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            },
+            {
+              "key": "sim_telarray",
+              "label": "sim_telarray"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Candidate CPU share, threads=1",
+              "metric": "candidate_threads1_{row}_cpu_share",
+              "format": ".0%"
+            },
+            {
+              "label": "Envelope CPU s, threads=1",
+              "metric": "candidate_envelope_threads1_{row}_cpu_s",
+              "format": ".2f"
+            },
+            {
+              "label": "Envelope CPU share, threads=1",
+              "metric": "candidate_envelope_threads1_{row}_cpu_share",
+              "format": ".0%"
+            }
+          ]
+        },
+        {
+          "row_label": "Candidate",
+          "rows": [
+            {
+              "key": "reference",
+              "label": "reference"
+            },
+            {
+              "key": "candidate_threads1",
+              "label": "candidate, threads=1"
+            },
+            {
+              "key": "candidate_envelope_threads1",
+              "label": "envelope candidate, threads=1"
+            }
+          ],
+          "columns": [
+            {
+              "label": "s per shower",
+              "metric": "{row}_s_per_shower",
+              "format": ".2f"
+            },
+            {
+              "label": "CPU ns per photon",
+              "metric": "{row}_cpu_ns_per_photon",
+              "format": ".2f"
+            }
+          ]
+        }
+      ],
+      "figures": [
+        {
+          "file": "wall-by-stage.png",
+          "caption": "Wall time per stage: reference and candidates on the same shower input."
+        }
+      ]
+    },
+    "performance.air-shower-proton": {
+      "title": "Air shower (proton): obdeect chain against sim_telarray",
+      "description": "Same comparison as the gamma air shower, on a proton shower input. Reference: CORSIKA IACT → sim_telarray with full optics. Candidates: the obdeect chain up to the camera stage, and the envelope pipe (thinned, QE bound). Stage shares are of the candidate's CPU time.",
+      "headline": "envelope chain / sim_telarray: wall {ratio_wall_envelope_threads1:.2f}, CPU {ratio_cpu_envelope_threads1:.2f} (threads=1); trace-stream / sim_telarray optics CPU {trace_stream_vs_reference_optics_cpu_ratio:.2f}",
+      "rows": [
+        {
+          "label": "Reference wall s",
+          "text": "{reference_wall_s:.2f}"
+        },
+        {
+          "label": "Reference CPU s",
+          "text": "{reference_cpu_s:.2f}"
+        },
+        {
+          "label": "Reference optics CPU s",
+          "text": "{reference_optics_cpu_s:.2f}"
+        },
+        {
+          "label": "Reference camera CPU s",
+          "text": "{reference_camera_cpu_s:.2f}"
+        },
+        {
+          "label": "Candidate CPU s, threads=1",
+          "text": "{candidate_threads1_cpu_s:.2f}"
+        },
+        {
+          "label": "Envelope candidate CPU s, threads=1",
+          "text": "{candidate_envelope_threads1_cpu_s:.2f}"
+        },
+        {
+          "label": "Unthinned candidate CPU s, threads=1",
+          "text": "{candidate_unthinned_threads1_cpu_s:.2f}"
+        },
+        {
+          "label": "Trace-stream CPU / reference optics CPU",
+          "text": "{trace_stream_vs_reference_optics_cpu_ratio:.2f}"
+        },
+        {
+          "label": "Thinning gain, CPU",
+          "text": "{thinning_gain_cpu:.2f}"
+        },
+        {
+          "label": "Piping gain, CPU",
+          "text": "{piping_gain_cpu:.2f}"
+        },
+        {
+          "label": "Envelope / reference wall, threads=1",
+          "text": "{ratio_wall_envelope_threads1:.2f}"
+        },
+        {
+          "label": "Envelope / reference CPU, threads=1",
+          "text": "{ratio_cpu_envelope_threads1:.2f}"
+        },
+        {
+          "label": "Timing unreliable (1 = loaded machine or noisy repetitions)",
+          "text": "{timing_unreliable}"
+        }
+      ],
+      "tables": [
+        {
+          "row_label": "Stage",
+          "rows": [
+            {
+              "key": "from_corsika",
+              "label": "from-corsika"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "trace_stream",
+              "label": "trace-stream"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            },
+            {
+              "key": "sim_telarray",
+              "label": "sim_telarray"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Candidate CPU share, threads=1",
+              "metric": "candidate_threads1_{row}_cpu_share",
+              "format": ".0%"
+            },
+            {
+              "label": "Envelope CPU s, threads=1",
+              "metric": "candidate_envelope_threads1_{row}_cpu_s",
+              "format": ".2f"
+            },
+            {
+              "label": "Envelope CPU share, threads=1",
+              "metric": "candidate_envelope_threads1_{row}_cpu_share",
+              "format": ".0%"
+            }
+          ]
+        },
+        {
+          "row_label": "Candidate",
+          "rows": [
+            {
+              "key": "reference",
+              "label": "reference"
+            },
+            {
+              "key": "candidate_threads1",
+              "label": "candidate, threads=1"
+            },
+            {
+              "key": "candidate_envelope_threads1",
+              "label": "envelope candidate, threads=1"
+            }
+          ],
+          "columns": [
+            {
+              "label": "s per shower",
+              "metric": "{row}_s_per_shower",
+              "format": ".2f"
+            },
+            {
+              "label": "CPU ns per photon",
+              "metric": "{row}_cpu_ns_per_photon",
+              "format": ".2f"
+            }
+          ]
+        }
+      ],
+      "figures": [
+        {
+          "file": "wall-by-stage.png",
+          "caption": "Wall time per stage: reference and candidates on the same proton shower input."
+        }
+      ]
+    },
+    "performance.air-shower-array": {
+      "title": "Array of six telescopes: chain against one sim_telarray run",
+      "description": "Reference: one sim_telarray run with all telescopes, full optics. Candidate: the obdeect chain per telescope, one pipe per telescope, and the variant with a tee (fan-out).",
+      "headline": "tee / per-telescope CPU {tee_vs_per_telescope_cpu_ratio:.2f}, candidate tee wall {candidate_tee_wall_s:.1f} s, reference wall {reference_wall_s:.1f} s",
+      "rows": [
+        {
+          "label": "Candidate with tee, wall s",
+          "text": "{candidate_tee_wall_s:.2f}"
+        },
+        {
+          "label": "Candidate with tee, CPU s",
+          "text": "{candidate_tee_cpu_s:.2f}"
+        },
+        {
+          "label": "Reference wall s",
+          "text": "{reference_wall_s:.2f}"
+        },
+        {
+          "label": "Reference CPU s",
+          "text": "{reference_cpu_s:.2f}"
+        },
+        {
+          "label": "Tee / per-telescope CPU",
+          "text": "{tee_vs_per_telescope_cpu_ratio:.2f}"
+        },
+        {
+          "label": "Timing unreliable (1 = loaded machine or noisy repetitions)",
+          "text": "{timing_unreliable}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "wall-by-stage.png",
+          "caption": "Wall time per stage, reference and candidate."
+        }
+      ]
+    },
+    "performance.stream-pipe": {
+      "title": "Stream pipes: throughput",
+      "description": "The native photon stream of the CORSIKA input read by cat and piped into tee (copy to disk) or into obdeect stream to-simtel. Throughput in decimal GB/s; the budget is 1 GB/s.",
+      "rows": [
+        {
+          "label": "cat → tee, GB/s",
+          "text": "{cat_tee_pipe_gb_per_s:.2f}"
+        },
+        {
+          "label": "cat → obdeect stream to-simtel, GB/s",
+          "text": "{to_simtel_pipe_gb_per_s:.2f}"
+        }
+      ],
+      "headline": "to-simtel {to_simtel_pipe_gb_per_s:.2f} GB/s, cat → tee {cat_tee_pipe_gb_per_s:.2f} GB/s"
+    },
+    "performance.flasher-dish": {
+      "title": "Flasher on the dish: chain against LightEmission",
+      "description": "Reference: LightEmission (ff-1m) → sim_telarray. Candidate: obdeect light source → chain → sim_telarray, one thread.",
+      "headline": "candidate / reference wall {candidate_threads1_wall_ratio:.2f} (threads=1)",
+      "rows": [
+        {
+          "label": "Reference wall s",
+          "text": "{reference_wall_s:.2f}"
+        },
+        {
+          "label": "Candidate wall s, threads=1",
+          "text": "{candidate_threads1_wall_s:.2f}"
+        },
+        {
+          "label": "Candidate / reference wall, threads=1",
+          "text": "{candidate_threads1_wall_ratio:.2f}"
+        }
+      ],
+      "tables": [
+        {
+          "row_label": "Stage",
+          "rows": [
+            {
+              "key": "sources",
+              "label": "light source"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            },
+            {
+              "key": "sim_telarray",
+              "label": "sim_telarray"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Wall s, threads=1",
+              "metric": "candidate_threads1_{row}_wall_s",
+              "format": ".2f"
+            }
+          ]
+        }
+      ],
+      "figures": [
+        {
+          "file": "wall-by-stage.png",
+          "caption": "Wall time per stage, reference and candidate."
+        }
+      ]
+    },
+    "performance.point-source": {
+      "title": "Point source: chain against LightEmission",
+      "description": "Reference: LightEmission → sim_telarray. Candidate: obdeect light source → chain → sim_telarray, one thread.",
+      "headline": "candidate / reference wall {candidate_threads1_wall_ratio:.2f} (threads=1)",
+      "rows": [
+        {
+          "label": "Reference wall s",
+          "text": "{reference_wall_s:.2f}"
+        },
+        {
+          "label": "Candidate wall s, threads=1",
+          "text": "{candidate_threads1_wall_s:.2f}"
+        },
+        {
+          "label": "Candidate / reference wall, threads=1",
+          "text": "{candidate_threads1_wall_ratio:.2f}"
+        }
+      ],
+      "tables": [
+        {
+          "row_label": "Stage",
+          "rows": [
+            {
+              "key": "sources",
+              "label": "light source"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            },
+            {
+              "key": "sim_telarray",
+              "label": "sim_telarray"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Wall s, threads=1",
+              "metric": "candidate_threads1_{row}_wall_s",
+              "format": ".2f"
+            }
+          ]
+        }
+      ],
+      "figures": [
+        {
+          "file": "wall-by-stage.png",
+          "caption": "Wall time per stage, reference and candidate."
+        }
+      ]
+    },
+    "performance.bottleneck": {
+      "title": "Bottleneck of the envelope pipe",
+      "description": "Prefix pipes: the pipe is run with its first 1, 2, … 5 members, the last one writing to /dev/null. The wall time a member adds (marginal) is what it costs inside the pipe; the member with the largest one is the bottleneck. CPU s is the member's own CPU time in the full pipe.",
+      "rows": [
+        {
+          "label": "Bottleneck member",
+          "text": "{bottleneck_stage}"
+        },
+        {
+          "label": "Full pipe wall s (median)",
+          "text": "{prefix5_wall_s:.2f}"
+        },
+        {
+          "label": "Full pipe wall spread over repetitions",
+          "text": "{bottleneck_wall_s_spread:.1%}"
+        }
+      ],
+      "tables": [
+        {
+          "row_label": "Member",
+          "rows": [
+            {
+              "key": "from_corsika",
+              "label": "from-corsika"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "trace_stream",
+              "label": "trace-stream"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            },
+            {
+              "key": "sim_telarray",
+              "label": "sim_telarray"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Marginal wall s",
+              "metric": "bottleneck_{row}_marginal_wall_s",
+              "format": ".2f"
+            },
+            {
+              "label": "Wall share",
+              "metric": "bottleneck_{row}_wall_share",
+              "format": ".0%"
+            },
+            {
+              "label": "CPU s",
+              "metric": "bottleneck_{row}_cpu_s",
+              "format": ".2f"
+            }
+          ]
+        }
+      ],
+      "figures": [
+        {
+          "file": "bottleneck.png",
+          "caption": "Wall time per member of the envelope pipe, and the bottleneck."
+        }
+      ],
+      "headline": "bottleneck {bottleneck_stage}, pipe wall {prefix5_wall_s:.1f} s"
+    },
+    "performance.scaling": {
+      "title": "Scaling: fixed and per-shower cost, trace-stream threads",
+      "description": "Wall time of each stage split into a fixed part and a part per shower. Trace-stream speedup and efficiency for 1, 2, 4 and 8 threads.",
+      "rows": [
+        {
+          "label": "Cores on the host",
+          "text": "{host_nproc}"
+        }
+      ],
+      "tables": [
+        {
+          "row_label": "Stage",
+          "rows": [
+            {
+              "key": "from_corsika",
+              "label": "from-corsika"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "compile_model",
+              "label": "compile model"
+            },
+            {
+              "key": "trace_stream",
+              "label": "trace-stream"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Fixed wall s",
+              "metric": "{row}_fixed_wall_s",
+              "format": ".2f"
+            },
+            {
+              "label": "Per-shower wall s",
+              "metric": "{row}_per_shower_wall_s",
+              "format": ".3g"
+            },
+            {
+              "label": "Fixed CPU s",
+              "metric": "{row}_fixed_cpu_s",
+              "format": ".2f"
+            },
+            {
+              "label": "Per-shower CPU s",
+              "metric": "{row}_per_shower_cpu_s",
+              "format": ".3g"
+            },
+            {
+              "label": "Fixed share at N",
+              "metric": "{row}_fixed_share_at_N",
+              "format": ".0%"
+            }
+          ]
+        },
+        {
+          "row_label": "Trace-stream threads",
+          "rows": [
+            {
+              "key": "1",
+              "label": "1"
+            },
+            {
+              "key": "2",
+              "label": "2"
+            },
+            {
+              "key": "4",
+              "label": "4"
+            },
+            {
+              "key": "8",
+              "label": "8"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Wall s",
+              "metric": "trace_stream_threads{row}_wall_s",
+              "format": ".2f"
+            },
+            {
+              "label": "CPU s",
+              "metric": "trace_stream_threads{row}_cpu_s",
+              "format": ".2f"
+            },
+            {
+              "label": "Speedup",
+              "metric": "trace_stream_threads{row}_speedup",
+              "format": ".2f"
+            },
+            {
+              "label": "Efficiency",
+              "metric": "trace_stream_threads{row}_efficiency",
+              "format": ".0%"
+            }
+          ]
+        }
+      ],
+      "figures": [
+        {
+          "file": "scaling.png",
+          "caption": "Wall time against number of showers per stage, and trace-stream speedup against threads."
+        }
+      ],
+      "headline": "trace-stream 8 threads: speedup {trace_stream_threads8_speedup:.1f}, fixed share of trace-stream {trace_stream_fixed_share_at_N:.0%}"
+    },
+    "performance.profile": {
+      "title": "Profile: top function per stage",
+      "description": "Per stage: the share of the profiled time in its top function, and whether the stage was profiled. The full profiler reports are linked below the table.",
+      "headline": "{trace_stream_top1_percent:.0f} % of trace-stream time in its top function",
+      "tables": [
+        {
+          "row_label": "Stage",
+          "rows": [
+            {
+              "key": "from_corsika",
+              "label": "from-corsika"
+            },
+            {
+              "key": "propagation",
+              "label": "propagation"
+            },
+            {
+              "key": "propagation_envelope",
+              "label": "propagation (envelope)"
+            },
+            {
+              "key": "trace_stream",
+              "label": "trace-stream"
+            },
+            {
+              "key": "to_simtel",
+              "label": "to-simtel"
+            }
+          ],
+          "columns": [
+            {
+              "label": "Top function, %",
+              "metric": "{row}_top1_percent",
+              "format": ".1f"
+            },
+            {
+              "label": "Samples",
+              "metric": "{row}_perf_samples",
+              "format": "d"
+            },
+            {
+              "label": "Profiled",
+              "metric": "{row}_profiled"
+            }
+          ]
+        }
+      ],
+      "links": {
+        "label": "Profiler reports",
+        "files": [
+          "*-perf-report.txt"
+        ]
+      }
     },
     "stream.corsika-curved-flag": {
       "title": "CURVED flag: CORSIKA → stream",

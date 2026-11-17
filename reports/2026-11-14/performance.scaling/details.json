@@ -1,0 +1,262 @@
+{
+  "host": {
+    "nproc": 6,
+    "cpu_model": "0x000",
+    "machine": "aarch64",
+    "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
+    "obdeect_version": "obdeect-stream 0.9.2.dev7+gd19279a3a\nobdeect-propagation 0.9.2.dev7+gd19279a3a\nobdeect-sources 0.9.2.dev7+gd19279a3a\nobdeect-ray-tracing 0.9.2.dev7+gd19279a3a\nphoton-stream format 1.0"
+  },
+  "settings": {
+    "events": 10,
+    "reps": 3,
+    "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
+    "config": "/results/performance.scaling/cfg/model/7.0.0/CTAO.cfg",
+    "work_dir": "/tmp/perf-scaling-dr_vrlnv/scaling-work",
+    "threads_tested": [
+      1,
+      2,
+      4
+    ],
+    "stage_programs": {
+      "from_corsika": "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
+      "propagation": "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+      "compile_model": "obdeect",
+      "trace_stream": "obdeect",
+      "to_simtel": "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel"
+    },
+    "timing": "wait4 rusage of each child; wall time around the child",
+    "fit": "least squares, fixed + per_shower x showers, wall and CPU separately"
+  },
+  "points": {
+    "0": {
+      "showers": 0,
+      "stages": {
+        "from_corsika": {
+          "wall_s": 0.00180136994458735,
+          "cpu_s": 0.001521,
+          "reps": 3
+        },
+        "propagation": {
+          "wall_s": 0.005521652987226844,
+          "cpu_s": 0.005128,
+          "reps": 3
+        },
+        "compile_model": {
+          "wall_s": 0.3001352170249447,
+          "cpu_s": 0.519343,
+          "reps": 3
+        },
+        "trace_stream": {
+          "wall_s": 0.16702400508802384,
+          "cpu_s": 0.490282,
+          "reps": 3
+        },
+        "to_simtel": {
+          "wall_s": 0.002021535998210311,
+          "cpu_s": 0.0016899999999999999,
+          "reps": 3
+        }
+      },
+      "failures": {},
+      "skipped": []
+    },
+    "10": {
+      "showers": 10,
+      "stages": {
+        "from_corsika": {
+          "wall_s": 0.14593972300644964,
+          "cpu_s": 0.140426,
+          "reps": 3
+        },
+        "propagation": {
+          "wall_s": 0.5622769029578194,
+          "cpu_s": 0.5424829999999999,
+          "reps": 3
+        },
+        "compile_model": {
+          "wall_s": 0.34931292897090316,
+          "cpu_s": 0.49641399999999997,
+          "reps": 3
+        },
+        "trace_stream": {
+          "wall_s": 1.9340481400722638,
+          "cpu_s": 2.070719,
+          "reps": 3
+        },
+        "to_simtel": {
+          "wall_s": 0.11380330205429345,
+          "cpu_s": 0.10200399999999998,
+          "reps": 3
+        }
+      },
+      "failures": {},
+      "skipped": []
+    },
+    "20": {
+      "showers": 20,
+      "stages": {
+        "from_corsika": {
+          "wall_s": 0.5130852750735357,
+          "cpu_s": 0.375187,
+          "reps": 3
+        },
+        "propagation": {
+          "wall_s": 1.2795149239245802,
+          "cpu_s": 1.061767,
+          "reps": 3
+        },
+        "compile_model": {
+          "wall_s": 0.38066376803908497,
+          "cpu_s": 0.405367,
+          "reps": 3
+        },
+        "trace_stream": {
+          "wall_s": 3.2775352810276672,
+          "cpu_s": 3.2917270000000003,
+          "reps": 3
+        },
+        "to_simtel": {
+          "wall_s": 0.25881756900344044,
+          "cpu_s": 0.201537,
+          "reps": 3
+        }
+      },
+      "failures": {},
+      "skipped": []
+    }
+  },
+  "fits": {
+    "from_corsika": {
+      "points": [
+        [
+          0,
+          0.00180136994458735,
+          0.001521
+        ],
+        [
+          10,
+          0.14593972300644964,
+          0.140426
+        ],
+        [
+          20,
+          0.5130852750735357,
+          0.375187
+        ]
+      ],
+      "fixed_wall_s": -0.035366496556283405,
+      "per_shower_wall_s": 0.025564195256447434,
+      "fixed_cpu_s": -0.014455000000000122,
+      "per_shower_cpu_s": 0.018683300000000017
+    },
+    "propagation": {
+      "points": [
+        [
+          0,
+          0.005521652987226844,
+          0.005128
+        ],
+        [
+          10,
+          0.5622769029578194,
+          0.5424829999999999
+        ],
+        [
+          20,
+          1.2795149239245802,
+          1.061767
+        ]
+      ],
+      "fixed_wall_s": -0.021225475512134884,
+      "per_shower_wall_s": 0.06369966354686771,
+      "fixed_cpu_s": 0.008139833333333268,
+      "per_shower_cpu_s": 0.052831950000000016
+    },
+    "compile_model": {
+      "points": [
+        [
+          0,
+          0.3001352170249447,
+          0.519343
+        ],
+        [
+          10,
+          0.34931292897090316,
+          0.49641399999999997
+        ],
+        [
+          20,
+          0.38066376803908497,
+          0.405367
+        ]
+      ],
+      "fixed_wall_s": 0.3433706380116443,
+      "per_shower_wall_s": 0.0,
+      "fixed_cpu_s": 0.47370799999999996,
+      "per_shower_cpu_s": 0.0
+    },
+    "trace_stream": {
+      "points": [
+        [
+          0,
+          0.16702400508802384,
+          0.490282
+        ],
+        [
+          10,
+          1.9340481400722638,
+          2.070719
+        ],
+        [
+          20,
+          3.2775352810276672,
+          3.2917270000000003
+        ]
+      ],
+      "fixed_wall_s": 0.23761350409282894,
+      "per_shower_wall_s": 0.1555255637969823,
+      "fixed_cpu_s": 0.5501868333333327,
+      "per_shower_cpu_s": 0.1400722500000001
+    },
+    "to_simtel": {
+      "points": [
+        [
+          0,
+          0.002021535998210311,
+          0.0016899999999999999
+        ],
+        [
+          10,
+          0.11380330205429345,
+          0.10200399999999998
+        ],
+        [
+          20,
+          0.25881756900344044,
+          0.201537
+        ]
+      ],
+      "fixed_wall_s": -0.0035172141506337284,
+      "per_shower_wall_s": 0.012839801650261516,
+      "fixed_cpu_s": 0.001820166666666607,
+      "per_shower_cpu_s": 0.009992350000000006
+    }
+  },
+  "threads": {
+    "rows": {
+      "1": {
+        "wall_s": 1.6957159379962832,
+        "cpu_s": 1.834496
+      },
+      "2": {
+        "wall_s": 1.1330008261138573,
+        "cpu_s": 1.748877
+      },
+      "4": {
+        "wall_s": 0.886958725983277,
+        "cpu_s": 1.879313
+      }
+    },
+    "failures": {}
+  }
+}

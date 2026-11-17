@@ -1,0 +1,46 @@
+{
+  "id": "performance.profile",
+  "name": "In-process perf profile of the obdeect stages (from-corsika, propagation, propagation with QE envelope, trace-stream, to-simtel) on LSTN-01 7.0.0 showers",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "profile-stages",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_profile",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg"
+      ],
+      "timeout": 3600
+    }
+  ],
+  "metrics": [
+    {"metric": "from_corsika_profile_completed", "expected": 1, "atol": 0},
+    {"metric": "propagation_profile_completed", "expected": 1, "atol": 0},
+    {"metric": "propagation_envelope_profile_completed", "expected": 1, "atol": 0},
+    {"metric": "trace_stream_profile_completed", "expected": 1, "atol": 0},
+    {"metric": "to_simtel_profile_completed", "expected": 1, "atol": 0}
+  ]
+}

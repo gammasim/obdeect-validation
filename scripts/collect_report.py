@@ -4,6 +4,8 @@ Keeps verdicts, metrics, details and figures; drops photon files, simulator
 output, logs and generated model configurations. README.md is the entry point of
 a report: overview table, then one section per validation step with each case's
 verdict, headline numbers and figures (layout in scripts/report_layout.json).
+Performance comes last, after "Scope and limits", with its own overview table and its
+cases in a fixed order (layout step 'appendix' and 'case_order').
 
 Hand-written text goes into blocks of README.md and is kept when it is rewritten:
 
@@ -255,6 +257,44 @@ def _gated_table(case: dict) -> list[str]:
     return lines + [""]
 
 
+def _cell(column: dict, key: str, metrics: dict) -> str:
+    """Value of one table cell: the column metric with {row} replaced by the row key. A column
+    without 'format' shows the value as it is (flags); a number column shows '–' for other types."""
+    value = metrics.get(column["metric"].format(row=key))
+    if value is None:
+        return MISSING
+    if "format" not in column:
+        return str(value)
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        return MISSING
+    return format(value, column["format"])
+
+
+def _table(table: dict, metrics: dict) -> list[str]:
+    """Markdown table of a layout 'tables' entry: one line per row, columns from metric names
+    with {row} filled in. A missing value gives '–'; a row or column without any value is left out."""
+    columns, rows = table["columns"], table["rows"]
+    grid = [[_cell(column, row["key"], metrics) for column in columns] for row in rows]
+    # A column without any value (a metric this run does not write) is left out.
+    keep = [
+        i for i in range(len(columns)) if any(cells[i] != MISSING for cells in grid)
+    ]
+    lines = []
+    for row, cells in zip(rows, grid, strict=True):
+        cells = [cells[i] for i in keep]
+        if any(cell != MISSING for cell in cells):
+            lines.append(f"| {row['label']} | " + " | ".join(cells) + " |")
+    if not lines:
+        return []
+    header = [table["row_label"]] + [columns[i]["label"] for i in keep]
+    return [
+        "| " + " | ".join(header) + " |",
+        "|" + "---|" * len(header),
+        *lines,
+        "",
+    ]
+
+
 def _headline(entry: dict, metrics: dict) -> str:
     """Comma-separated parts of the headline; parts with a missing metric are left out."""
     if "headline" in entry:
@@ -285,8 +325,119 @@ def _title(entry: dict, case: dict, step: dict) -> str:
     return case.get("name") or case["id"]
 
 
+def _ordered(step: dict, cases: list[dict]) -> list[dict]:
+    """Cases of a step in the order of its 'case_order' patterns; unmatched cases follow in run order."""
+    patterns = step.get("case_order", [])
+
+    def rank(case: dict) -> int:
+        for index, pattern in enumerate(patterns):
+            if fnmatch.fnmatchcase(case["id"], pattern):
+                return index
+        return len(patterns)
+
+    return sorted(cases, key=rank)
+
+
+def _counts(cases: list[dict]) -> str:
+    statuses = [case.get("status", "UNKNOWN") for case in cases]
+    return ", ".join(
+        f"{statuses.count(status)} {status}" for status in sorted(set(statuses))
+    )
+
+
+def _overview(
+    numbered: list, layout: dict, report: Path, step_column: bool
+) -> list[str]:
+    """Overview table of (number, step, cases): one line per case, linked to its section."""
+    header = (
+        "| Step | Case | Headline | Verdict |"
+        if step_column
+        else "| Case | Headline | Verdict |"
+    )
+    lines = [header, "|---" * header.count("|", 1) + "|"]
+    for number, step, cases in numbered:
+        for case in cases:
+            entry = _case_layout(layout, case["id"])
+            metrics = _values(report / case["id"])
+            cells = [
+                f"[{_title(entry, case, step)}](#{_anchor(case['id'])})",
+                _headline(entry, metrics) if entry else _gated_headline(case),
+                case.get("status", MISSING),
+            ]
+            if step_column:
+                cells.insert(0, f"{number}. {step['title']}")
+            lines.append("| " + " | ".join(cells) + " |")
+    return lines + [""]
+
+
+def _step_section(
+    number: int,
+    step: dict,
+    cases: list[dict],
+    layout: dict,
+    report: Path,
+    notes: dict,
+    current: bool,
+) -> list[str]:
+    """One step: title, intro, notes, then each case with its headline numbers and figures. An
+    appendix step (performance) starts with its own overview table."""
+    lines = [f"## {number}. {step['title']}", "", step.get("intro", ""), ""]
+    if step.get("appendix"):
+        lines = [f'<a id="step-{step["key"]}"></a>', "", *lines]
+    lines += _notes(notes, step["key"])
+    if step.get("appendix"):
+        lines += _overview([(number, step, cases)], layout, report, step_column=False)
+    for case in cases:
+        case_dir = report / case["id"]
+        metrics = _values(case_dir)
+        entry = _case_layout(layout, case["id"])
+        lines += [
+            f'<a id="{_anchor(case["id"])}"></a>',
+            "",
+            f"### {_title(entry, case, step)} — {case.get('status', MISSING)}",
+            "",
+        ]
+        if case.get("name") and case["name"] != _title(entry, case, step):
+            lines += [f"Case: {case['name']}", ""]
+        if entry.get("description"):
+            lines += [entry["description"], ""]
+        rows = [
+            (row["label"], format_row(row["text"], metrics))
+            for row in entry.get("rows", [])
+        ]
+        if step.get(
+            "appendix"
+        ):  # performance runs differ in what they measure: no empty rows
+            rows = [(label, value) for label, value in rows if value != MISSING]
+        if rows:
+            lines += ["| Quantity | Value |", "|---|---|"]
+            lines += [f"| {label} | {value} |" for label, value in rows]
+            lines.append("")
+        for table in entry.get("tables", []):
+            lines += _table(table, metrics)
+        if case.get("report_only") and case.get("metrics"):
+            lines += _gated_table(case)
+        files = [
+            f"[{name}]({case['id']}/{name})"
+            for name in ("metrics.json", "details.json")
+            if (case_dir / name).is_file()
+        ]
+        lines += [f"`{case['id']}`: {_checks(case)}. " + " · ".join(files), ""]
+        lines += _figures(case_dir, entry, report)
+        if current and entry.get("differences"):
+            text = format_row(entry["differences"], metrics)
+            if text != MISSING:
+                lines += [f"> **Expected differences.** {text}", ""]
+    return lines
+
+
 def render_readme(report: Path, layout: dict, notes: dict) -> str:
-    """Return README.md of a report directory from summary.json and the case directories."""
+    """Return README.md of a report directory from summary.json and the case directories.
+
+    Validation steps come first (overview table, reading guide, one section per step, scope and
+    limits). Steps marked 'appendix' in the layout (performance) follow at the bottom, each with
+    its own overview table; their cases are not in the validation overview or result count.
+    """
     summary = _read_json(report / "summary.json")
     cases = list(summary.get("cases", []))
     # Case directories from a separate run (e.g. performance) are shown as report only.
@@ -297,12 +448,33 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
         for case_id in _read_json(report / REPORT_ONLY).get("cases", [])
         if case_id not in known and (report / case_id).is_dir()
     ]
-    statuses = [case.get("status", "UNKNOWN") for case in cases]
-    counts = ", ".join(
-        f"{statuses.count(status)} {status}" for status in sorted(set(statuses))
+    steps = []
+    for case in cases:
+        step = _step_of(layout, case["id"])
+        if step not in steps:
+            steps.append(step)
+    order = [step["key"] for step in layout["steps"]]
+    # Appendix steps (performance) last, after every validation step and "Other cases".
+    steps.sort(
+        key=lambda step: (
+            bool(step.get("appendix")),
+            order.index(step["key"]) if step["key"] in order else len(order),
+        )
     )
+    numbered = [
+        (
+            number,
+            step,
+            _ordered(step, [c for c in cases if _step_of(layout, c["id"]) == step]),
+        )
+        for number, step in enumerate(steps, start=1)
+    ]
+    validation = [item for item in numbered if not item[1].get("appendix")]
+    appendix = [item for item in numbered if item[1].get("appendix")]
+
     lines = [f"# {layout['title']}, {report.name}", ""]
     lines += _notes(notes, "intro")
+    counts = _counts([case for _, _, step_cases in validation for case in step_cases])
     result = (
         f"**Result: {counts or 'no cases'}** (suite `{summary.get('suite', MISSING)}`, "
         f"status {summary.get('status', MISSING)}). Each case below shows what is compared, "
@@ -310,31 +482,13 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
         "limits and settings in `details.json`."
     )
     lines += [result, ""]
-    steps = []
-    for case in cases:
-        step = _step_of(layout, case["id"])
-        if step not in steps:
-            steps.append(step)
-    order = [step["key"] for step in layout["steps"]]
-    steps.sort(
-        key=lambda step: (
-            order.index(step["key"]) if step["key"] in order else len(order)
-        )
-    )
-
-    lines += ["| Step | Case | Headline | Verdict |", "|---|---|---|---|"]
-    for number, step in enumerate(steps, start=1):
-        for case in cases:
-            if _step_of(layout, case["id"]) != step:
-                continue
-            metrics = _values(report / case["id"])
-            entry = _case_layout(layout, case["id"])
-            lines.append(
-                f"| {number}. {step['title']} | [{_title(entry, case, step)}](#{_anchor(case['id'])}) "
-                f"| {_headline(entry, metrics) if entry else _gated_headline(case)} "
-                f"| {case.get('status', MISSING)} |"
-            )
-    lines.append("")
+    for number, step, step_cases in appendix:
+        lines += [
+            f"[{number}. {step['title']}](#step-{step['key']}) "
+            f"is at the bottom: {_counts(step_cases)}.",
+            "",
+        ]
+    lines += _overview(validation, layout, report, step_column=True)
 
     # The reading guide and the expected-differences texts describe the figures and the cases
     # from layout["since"] on; older reports get a short note instead.
@@ -349,47 +503,12 @@ def render_readme(report: Path, layout: dict, notes: dict) -> str:
     elif layout.get("before_since"):
         lines += [layout["before_since"], ""]
 
-    for number, step in enumerate(steps, start=1):
-        lines += [f"## {number}. {step['title']}", "", step.get("intro", ""), ""]
-        lines += _notes(notes, step["key"])
-        for case in cases:
-            if _step_of(layout, case["id"]) != step:
-                continue
-            case_dir = report / case["id"]
-            metrics = _values(case_dir)
-            entry = _case_layout(layout, case["id"])
-            lines += [
-                f'<a id="{_anchor(case["id"])}"></a>',
-                "",
-                f"### {_title(entry, case, step)} — {case.get('status', MISSING)}",
-                "",
-            ]
-            if case.get("name") and case["name"] != _title(entry, case, step):
-                lines += [f"Case: {case['name']}", ""]
-            if entry.get("description"):
-                lines += [entry["description"], ""]
-            if entry.get("rows"):
-                lines += ["| Quantity | Value |", "|---|---|"]
-                lines += [
-                    f"| {row['label']} | {format_row(row['text'], metrics)} |"
-                    for row in entry["rows"]
-                ]
-                lines.append("")
-            if case.get("report_only") and case.get("metrics"):
-                lines += _gated_table(case)
-            files = [
-                f"[{name}]({case['id']}/{name})"
-                for name in ("metrics.json", "details.json")
-                if (case_dir / name).is_file()
-            ]
-            lines += [f"`{case['id']}`: {_checks(case)}. " + " · ".join(files), ""]
-            lines += _figures(case_dir, entry, report)
-            if current and entry.get("differences"):
-                text = format_row(entry["differences"], metrics)
-                if text != MISSING:
-                    lines += [f"> **Expected differences.** {text}", ""]
+    for number, step, step_cases in validation:
+        lines += _step_section(number, step, step_cases, layout, report, notes, current)
     lines += ["## Scope and limits", ""]
     lines += _notes(notes, "end")
+    for number, step, step_cases in appendix:
+        lines += _step_section(number, step, step_cases, layout, report, notes, current)
     return "\n".join(lines).rstrip("\n") + "\n"
 
 

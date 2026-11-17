@@ -19,6 +19,8 @@ Change against the 6.0.2 run (same cases, same limits):
 
 **Result: 19 PASS** (suite `full`, status PASS). Each case below shows what is compared, its headline numbers and figures; all metrics are in the case's `metrics.json`, limits and settings in `details.json`.
 
+[6. Performance](#step-performance) is at the bottom: 3 FAIL, 6 PASS.
+
 | Step | Case | Headline | Verdict |
 |---|---|---|---|
 | 1. Photon stream format | [LED stream → sim_telarray EventIO, strict reader](#stream-led-eventio) | photons 60 / 60, block order as CORSIKA: 1 | PASS |
@@ -536,3 +538,453 @@ sim_telarray branch `bypass-obdeect-mode-3`, in review), dual-mirror shower chai
 laser light, zenith angles other than 20° in the shower chain, per-mirror and incident-angle
 optics cases.
 <!-- /notes -->
+
+<a id="step-performance"></a>
+
+## 6. Performance
+
+Report only, apart from the timing budgets. Wall and CPU time of the obdeect chain against sim_telarray on the same input and machine, ordered from the whole chain to its parts: whole chain (gamma, proton), bottleneck inside the pipe, separate stages, fixed versus per-shower cost and threads, array, stream pipes, light sources, profiles. Timings with timing unreliable = 1 come from a loaded machine or noisy repetitions.
+
+<!-- notes:performance -->
+Run 2026-11-17 (`results/perf-2026-11-17`): image `obdeect-validation:perf` = `obdeect-validation:local` (obdeect d19279a, this validation tree) plus the mode-3 sim_telarray from `obdeect-validation:mode3`; podman VM with 6 cores, 8 GB. Other containers were running on the same VM (load average 3–7), so every timed case has timing unreliable = 1. Whole-pipe walls repeat within 1–11 %, but single stages vary by up to 83 %. Read the ratios as indicative.
+
+- **Whole chain.** The envelope pipe takes 0.92× (gamma) and 0.90× (proton) the wall time of sim_telarray, and 1.46× and 1.38× its CPU time. The wall budgets pass and the CPU budgets fail. Physics is unchanged: the p.e. bias is within its limits in all three comparisons.
+- **Where the CPU goes** in the envelope pipe (gamma, threads=1, 5.86 s against 4.00 s for the reference):
+
+  | Stage | CPU s | Share |
+  |---|---|---|
+  | sim_telarray camera | 2.53 | 47 % |
+  | propagation | 1.26 | 24 % |
+  | trace-stream | 1.06 | 20 % |
+  | from-corsika | 0.46 | 9 % |
+  | to-simtel | 0.03 | 1 % |
+
+  The camera stage costs less than in the reference (2.53 against 3.12 s), because the stream reaching it is thinned. The extra CPU comes from from-corsika and propagation, 1.72 s together, work that sim_telarray does inside its optics (0.88 s). Trace-stream on the thinned stream (1.06 s) costs about as much as the reference optics. On the unthinned stream it costs 4.1× the reference optics (gamma) and 9.8× (proton).
+- **Bottleneck** (wall time each member adds to the pipe): propagation 1.26 s (37 %), sim_telarray 1.19 s (35 %), trace-stream 0.54 s (16 %), from-corsika 0.34 s (10 %), to-simtel 0.07 s (2 %). **Gain:** propagation is both the wall bottleneck and the largest CPU item without a counterpart in the reference.
+- **Gains of the current design.** Thinning saves 1.08× CPU (gamma) and 1.16× (proton). Piping saves 1.46× and 1.86× against separate stages with intermediate files.
+- **Fixed and per-shower cost.** The fixed costs are the model compile (0.34 s wall, 0.47 s CPU, every run, not cached) and the trace-stream start (0.24 s wall, 0.55 s CPU). Every other stage scales with the number of showers; their small negative fixed values are noise.
+- **Trace-stream threads.** 2 threads give a 1.50× speedup and 4 threads 1.91×, with efficiency falling to 48 %. 8 threads were not run because the VM has 6 cores.
+- **Array** (six telescopes, tee fan-out): wall 10.8 s against 45.3 s for one sim_telarray run (0.24×), CPU 24.4 s against 43.6 s (0.56×). The tee needs 0.76× the CPU of one pipe per telescope. The per-telescope p.e. bias ranges from −0.3 % to +1.1 %, all within limits. The ungated `trigger_pattern_mismatches` equals the number of matched samples: it compares the reference's six-telescope trigger pattern with a one-telescope candidate, so it means nothing here.
+- **Stream pipes.** `cat | tee` itself reaches only 0.81 GB/s on this VM's file system, so the 1 GB/s budget can't be met here. `to-simtel` reaches 0.48 GB/s.
+- **Light sources.** Flasher 0.70× and point source 0.78× the reference wall time; sim_telarray is almost all of it.
+- **Not run.** `performance.profile`: `perf` is not in the image.
+<!-- /notes -->
+
+| Case | Headline | Verdict |
+|---|---|---|
+| [Air shower: obdeect chain against sim_telarray](#performance-air-shower) | envelope chain / sim_telarray: wall 0.92, CPU 1.46 (threads=1); trace-stream / sim_telarray optics CPU 4.07 | FAIL |
+| [Air shower (proton): obdeect chain against sim_telarray](#performance-air-shower-proton) | envelope chain / sim_telarray: wall 0.90, CPU 1.38 (threads=1); trace-stream / sim_telarray optics CPU 9.80 | FAIL |
+| [Bottleneck of the envelope pipe](#performance-bottleneck) | bottleneck propagation, pipe wall 3.4 s | PASS |
+| [Stage timing (wall and CPU)](#performance-stages) | trace-stream 3.8 s, sim_telarray direct 4.3 s (wall median), timing unreliable: 1 | PASS |
+| [Scaling: fixed and per-shower cost, trace-stream threads](#performance-scaling) | fixed share of trace-stream 13% | PASS |
+| [Array of six telescopes: chain against one sim_telarray run](#performance-air-shower-array) | tee / per-telescope CPU 0.76, candidate tee wall 10.8 s, reference wall 45.3 s | PASS |
+| [Stream pipes: throughput](#performance-stream-pipe) | to-simtel 0.48 GB/s, cat → tee 0.81 GB/s | FAIL |
+| [Flasher on the dish: chain against LightEmission](#performance-flasher-dish) | candidate / reference wall 0.70 (threads=1) | PASS |
+| [Point source: chain against LightEmission](#performance-point-source) | candidate / reference wall 0.78 (threads=1) | PASS |
+
+<a id="performance-air-shower"></a>
+
+### Air shower: obdeect chain against sim_telarray — FAIL
+
+Case: Air shower, one LST (LSTN-01 7.0.0, 20 deg gamma): CORSIKA IACT -> sim_telarray full optics versus obdeect envelope chain (threads=1 and default) and unthinned chain; timing budgets
+
+Reference: CORSIKA IACT → sim_telarray with full optics. Candidate: the obdeect chain up to the camera stage (optics bypassed, same photons). Envelope candidate: from-corsika, propagation (QE bound, thinned), trace-stream and to-simtel as one pipe, then sim_telarray for the camera. Run with one thread and with the obdeect default thread count. Stage shares are of the candidate's CPU time.
+
+| Quantity | Value |
+|---|---|
+| Reference wall s | 4.20 |
+| Reference CPU s | 4.00 |
+| Reference optics CPU s | 0.88 |
+| Reference camera CPU s | 3.12 |
+| Candidate CPU s, threads=1 | 8.93 |
+| Envelope candidate CPU s, threads=1 | 5.86 |
+| Unthinned candidate CPU s, threads=1 | 6.29 |
+| Trace-stream CPU / reference optics CPU | 4.07 |
+| Thinning gain, CPU | 1.08 |
+| Piping gain, CPU | 1.46 |
+| Envelope / reference wall, threads=1 | 0.92 |
+| Envelope / reference CPU, threads=1 | 1.46 |
+| Timing unreliable (1 = loaded machine or noisy repetitions) | 1 |
+
+| Stage | Candidate CPU share, threads=1 | Envelope CPU s, threads=1 | Envelope CPU share, threads=1 |
+|---|---|---|---|
+| from-corsika | 6% | 0.46 | 9% |
+| propagation | 12% | 1.26 | 24% |
+| trace-stream | 42% | 1.06 | 20% |
+| to-simtel | 3% | 0.03 | 1% |
+| sim_telarray | 37% | 2.53 | 47% |
+
+| Candidate | s per shower | CPU ns per photon |
+|---|---|---|
+| reference | 0.21 | 215.20 |
+| candidate, threads=1 | 0.44 | 479.75 |
+| envelope candidate, threads=1 | 0.19 | 314.80 |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `reference_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threadsdefault_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_envelope_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_envelope_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_unthinned_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `physics_completed` | 1 | 1 ± 0 | PASS |
+| `from_corsika_propagation_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `envelope_from_corsika_propagation_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `candidate_envelope_wall_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `candidate_envelope_threads1_wall_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_threads1_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `equal_statistics_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_camera_only_missing` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_threads1_camera_only_missing` | 0 | 0 ± 0 | PASS |
+
+`performance.air-shower`: 12/16 gated checks pass; failed: `from_corsika_propagation_cpu_budget_exceeded`, `envelope_from_corsika_propagation_cpu_budget_exceeded`, `candidate_envelope_cpu_budget_exceeded`, `candidate_envelope_threads1_cpu_budget_exceeded`. [metrics.json](performance.air-shower/metrics.json) · [details.json](performance.air-shower/details.json)
+
+![Wall time per stage: reference and candidates on the same shower input.](performance.air-shower/wall-by-stage.png)
+
+*Wall time per stage: reference and candidates on the same shower input.*
+
+Other figures:
+
+![camera-comparison](performance.air-shower/physics/envelope/camera-comparison.png)
+![camera-comparison](performance.air-shower/physics/envelope_vs_unthinned/camera-comparison.png)
+![camera-comparison](performance.air-shower/physics/unthinned/camera-comparison.png)
+
+<a id="performance-air-shower-proton"></a>
+
+### Air shower (proton): obdeect chain against sim_telarray — FAIL
+
+Case: Air shower, proton input (20 deg, 300-10000 GeV), same chain and budgets as performance.air-shower; blocked until the input exists
+
+Same comparison as the gamma air shower, on a proton shower input. Reference: CORSIKA IACT → sim_telarray with full optics. Candidates: the obdeect chain up to the camera stage, and the envelope pipe (thinned, QE bound). Stage shares are of the candidate's CPU time.
+
+| Quantity | Value |
+|---|---|
+| Reference wall s | 9.30 |
+| Reference CPU s | 8.85 |
+| Reference optics CPU s | 1.07 |
+| Reference camera CPU s | 7.78 |
+| Candidate CPU s, threads=1 | 25.84 |
+| Envelope candidate CPU s, threads=1 | 12.23 |
+| Unthinned candidate CPU s, threads=1 | 14.09 |
+| Trace-stream CPU / reference optics CPU | 9.80 |
+| Thinning gain, CPU | 1.16 |
+| Piping gain, CPU | 1.86 |
+| Envelope / reference wall, threads=1 | 0.90 |
+| Envelope / reference CPU, threads=1 | 1.38 |
+| Timing unreliable (1 = loaded machine or noisy repetitions) | 1 |
+
+| Stage | Candidate CPU share, threads=1 | Envelope CPU s, threads=1 | Envelope CPU share, threads=1 |
+|---|---|---|---|
+| from-corsika | 7% | 1.09 | 9% |
+| propagation | 14% | 3.33 | 28% |
+| trace-stream | 42% | 1.97 | 17% |
+| to-simtel | 6% | 0.07 | 1% |
+| sim_telarray | 31% | 5.24 | 45% |
+
+| Candidate | s per shower | CPU ns per photon |
+|---|---|---|
+| reference | 0.21 | 168.72 |
+| candidate, threads=1 | 0.60 | 492.84 |
+| envelope candidate, threads=1 | 0.19 | 233.18 |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `reference_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threadsdefault_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_envelope_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_envelope_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_unthinned_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `physics_completed` | 1 | 1 ± 0 | PASS |
+| `from_corsika_propagation_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `envelope_from_corsika_propagation_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `candidate_envelope_wall_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `candidate_envelope_threads1_wall_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_threads1_cpu_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `equal_statistics_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_camera_only_missing` | 0 | 0 ± 0 | PASS |
+| `candidate_envelope_threads1_camera_only_missing` | 0 | 0 ± 0 | PASS |
+
+`performance.air-shower-proton`: 12/16 gated checks pass; failed: `from_corsika_propagation_cpu_budget_exceeded`, `envelope_from_corsika_propagation_cpu_budget_exceeded`, `candidate_envelope_cpu_budget_exceeded`, `candidate_envelope_threads1_cpu_budget_exceeded`. [metrics.json](performance.air-shower-proton/metrics.json) · [details.json](performance.air-shower-proton/details.json)
+
+![Wall time per stage: reference and candidates on the same proton shower input.](performance.air-shower-proton/wall-by-stage.png)
+
+*Wall time per stage: reference and candidates on the same proton shower input.*
+
+Other figures:
+
+![camera-comparison](performance.air-shower-proton/physics/envelope/camera-comparison.png)
+![camera-comparison](performance.air-shower-proton/physics/envelope_vs_unthinned/camera-comparison.png)
+![camera-comparison](performance.air-shower-proton/physics/unthinned/camera-comparison.png)
+
+<a id="performance-bottleneck"></a>
+
+### Bottleneck of the envelope pipe — PASS
+
+Case: Bottleneck of the envelope pipe (LSTN-01 7.0.0, 20 deg gamma): prefix pipes from-corsika to sim_telarray, marginal wall per member (report only)
+
+Prefix pipes: the pipe is run with its first 1, 2, … 5 members, the last one writing to /dev/null. The wall time a member adds (marginal) is what it costs inside the pipe; the member with the largest one is the bottleneck. CPU s is the member's own CPU time in the full pipe.
+
+| Quantity | Value |
+|---|---|
+| Bottleneck member | propagation |
+| Full pipe wall s (median) | 3.41 |
+| Full pipe wall spread over repetitions | 2.0% |
+
+| Member | Marginal wall s | Wall share | CPU s |
+|---|---|---|---|
+| from-corsika | 0.34 | 10% | 0.37 |
+| propagation | 1.26 | 37% | 1.24 |
+| trace-stream | 0.54 | 16% | 1.05 |
+| to-simtel | 0.07 | 2% | 0.03 |
+| sim_telarray | 1.19 | 35% | 2.46 |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `prefix1_completed` | 1 | 1 ± 0 | PASS |
+| `prefix2_completed` | 1 | 1 ± 0 | PASS |
+| `prefix3_completed` | 1 | 1 ± 0 | PASS |
+| `prefix4_completed` | 1 | 1 ± 0 | PASS |
+| `prefix5_completed` | 1 | 1 ± 0 | PASS |
+
+`performance.bottleneck`: 5/5 gated checks pass. [metrics.json](performance.bottleneck/metrics.json) · [details.json](performance.bottleneck/details.json)
+
+![Wall time per member of the envelope pipe, and the bottleneck.](performance.bottleneck/bottleneck.png)
+
+*Wall time per member of the envelope pipe, and the bottleneck.*
+
+<a id="performance-stages"></a>
+
+### Stage timing (wall and CPU) — PASS
+
+Case: Per-stage throughput on the fixed CORSIKA IACT input, air-shower setup (LSTN-01 7.0.0; report only, no performance gates)
+
+Each chain stage on one CORSIKA input, repeated; the table gives the medians, the wall-time spread over the repetitions and each stage's share of the CPU time.
+
+| Quantity | Value |
+|---|---|
+| Timing unreliable (1 = loaded machine or noisy repetitions) | 1 |
+| Host load average before the run | 6.77 |
+
+| Stage | Wall s (median) | CPU s (median) | Photons/s | CPU share | CPU ns per photon | Wall spread |
+|---|---|---|---|---|---|---|
+| from-corsika | 1.46 | 1.12 | 3.72e+07 | 17% | 21 | 83.0% |
+| propagation | 1.65 | 1.27 | 3.29e+07 | 19% | 23 | 24.3% |
+| propagation (envelope) | 1.36 | 1.24 | 3.98e+07 | 18% | 23 | 10.1% |
+| compile model | 0.52 | 0.41 | – | – | – | 47.7% |
+| trace-stream | 3.83 | 3.92 | 9.9e+06 | 58% | 103 | 2.9% |
+| to-simtel | 0.54 | 0.50 | 1.01e+08 | 7% | 9 | 54.6% |
+| sim_telarray (direct) | 4.29 | 3.98 | 1.26e+07 | 59% | 73 | 20.1% |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `stages_failed` | 0 | 0 ± 0 | PASS |
+| `stages_completed` | 6 | 6 ± 0 | PASS |
+| `from_corsika_completed` | 1 | 1 ± 0 | PASS |
+| `to_simtel_completed` | 1 | 1 ± 0 | PASS |
+| `propagation_completed` | 1 | 1 ± 0 | PASS |
+| `propagation_envelope_completed` | 1 | 1 ± 0 | PASS |
+| `compile_model_completed` | 1 | 1 ± 0 | PASS |
+| `trace_stream_completed` | 1 | 1 ± 0 | PASS |
+| `simtel_direct_completed` | 1 | 1 ± 0 | PASS |
+| `from_corsika_reps` | 3 | 3 ± 0 | PASS |
+| `to_simtel_reps` | 3 | 3 ± 0 | PASS |
+| `propagation_reps` | 3 | 3 ± 0 | PASS |
+| `propagation_envelope_reps` | 3 | 3 ± 0 | PASS |
+| `compile_model_reps` | 3 | 3 ± 0 | PASS |
+| `trace_stream_reps` | 3 | 3 ± 0 | PASS |
+| `simtel_direct_reps` | 3 | 3 ± 0 | PASS |
+| `iact_input_vs_stream_weight_relative_delta` | 1.847e-11 | 0 ± 1e-06 | PASS |
+| `from_corsika_to_simtel_weight_relative_delta` | 1.847e-11 | 0 ± 1e-06 | PASS |
+
+`performance.stages`: 18/18 gated checks pass. [metrics.json](performance.stages/metrics.json) · [details.json](performance.stages/details.json)
+
+![Photons per second for each stage.](performance.stages/photons-per-second.png)
+
+*Photons per second for each stage.*
+
+<a id="performance-scaling"></a>
+
+### Scaling: fixed and per-shower cost, trace-stream threads — PASS
+
+Case: Air shower, one LST (LSTN-01 7.0.0, 20 deg gamma): fixed vs per-shower cost of each chain stage (0, N, 2N showers) and trace-stream thread scaling (report only)
+
+Wall time of each stage split into a fixed part and a part per shower. Trace-stream speedup and efficiency for 1, 2, 4 and 8 threads.
+
+| Quantity | Value |
+|---|---|
+| Cores on the host | 6 |
+
+| Stage | Fixed wall s | Per-shower wall s | Fixed CPU s | Per-shower CPU s | Fixed share at N |
+|---|---|---|---|---|---|
+| from-corsika | -0.04 | 0.0256 | -0.01 | 0.0187 | -16% |
+| propagation | -0.02 | 0.0637 | 0.01 | 0.0528 | -3% |
+| compile model | 0.34 | 0 | 0.47 | 0 | 100% |
+| trace-stream | 0.24 | 0.156 | 0.55 | 0.14 | 13% |
+| to-simtel | -0.00 | 0.0128 | 0.00 | 0.00999 | -3% |
+
+| Trace-stream threads | Wall s | CPU s | Speedup | Efficiency |
+|---|---|---|---|---|
+| 1 | 1.70 | 1.83 | 1.00 | 100% |
+| 2 | 1.13 | 1.75 | 1.50 | 75% |
+| 4 | 0.89 | 1.88 | 1.91 | 48% |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `from_corsika_scaling_completed` | 1 | 1 ± 0 | PASS |
+| `propagation_scaling_completed` | 1 | 1 ± 0 | PASS |
+| `compile_model_scaling_completed` | 1 | 1 ± 0 | PASS |
+| `trace_stream_scaling_completed` | 1 | 1 ± 0 | PASS |
+| `to_simtel_scaling_completed` | 1 | 1 ± 0 | PASS |
+| `thread_scaling_completed` | 1 | 1 ± 0 | PASS |
+
+`performance.scaling`: 6/6 gated checks pass. [metrics.json](performance.scaling/metrics.json) · [details.json](performance.scaling/details.json)
+
+![Wall time against number of showers per stage, and trace-stream speedup against threads.](performance.scaling/scaling.png)
+
+*Wall time against number of showers per stage, and trace-stream speedup against threads.*
+
+<a id="performance-air-shower-array"></a>
+
+### Array of six telescopes: chain against one sim_telarray run — PASS
+
+Case: Air shower, North array (LSTN-01..04, MSTN-03, MSTN-15; 7.0.0): CORSIKA IACT -> sim_telarray with all six telescopes versus an obdeect tee candidate (one QE-envelope propagation per telescope group, FIFO fan-out to one sim_telarray camera stage per telescope, Bypass_Optics=3); chain time without compiles; per-telescope photoelectron bias; timing budgets
+
+Reference: one sim_telarray run with all telescopes, full optics. Candidate: the obdeect chain per telescope, one pipe per telescope, and the variant with a tee (fan-out).
+
+| Quantity | Value |
+|---|---|
+| Candidate with tee, wall s | 10.79 |
+| Candidate with tee, CPU s | 24.44 |
+| Reference wall s | 45.33 |
+| Reference CPU s | 43.55 |
+| Tee / per-telescope CPU | 0.76 |
+| Timing unreliable (1 = loaded machine or noisy repetitions) | 1 |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `reference_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_tee_completed` | 1 | 1 ± 0 | PASS |
+| `physics_completed` | 1 | 1 ± 0 | PASS |
+| `array_chain_wall_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `array_chain_cpu_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `equal_statistics_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `photon_gate_budget_exceeded` | 0 | 0 ± 0 | PASS |
+| `tel1_camera_only_missing` | 0 | 0 ± 0 | PASS |
+| `tel2_camera_only_missing` | 0 | 0 ± 0 | PASS |
+| `tel3_camera_only_missing` | 0 | 0 ± 0 | PASS |
+| `tel4_camera_only_missing` | 0 | 0 ± 0 | PASS |
+| `tel5_camera_only_missing` | 0 | 0 ± 0 | PASS |
+| `tel6_camera_only_missing` | 0 | 0 ± 0 | PASS |
+
+`performance.air-shower-array`: 13/13 gated checks pass. [metrics.json](performance.air-shower-array/metrics.json) · [details.json](performance.air-shower-array/details.json)
+
+![Wall time per stage, reference and candidate.](performance.air-shower-array/wall-by-stage.png)
+
+*Wall time per stage, reference and candidate.*
+
+Other figures:
+
+![camera-comparison](performance.air-shower-array/physics/candidate_per_telescope_tel1-LSTN-01/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/candidate_per_telescope_tel2-LSTN-02/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/candidate_per_telescope_tel3-LSTN-03/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/candidate_per_telescope_tel4-LSTN-04/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/candidate_per_telescope_tel5-MSTN-03/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/candidate_per_telescope_tel6-MSTN-15/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/tel1-LSTN-01/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/tel2-LSTN-02/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/tel3-LSTN-03/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/tel4-LSTN-04/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/tel5-MSTN-03/camera-comparison.png)
+![camera-comparison](performance.air-shower-array/physics/tel6-MSTN-15/camera-comparison.png)
+
+<a id="performance-stream-pipe"></a>
+
+### Stream pipes: throughput — FAIL
+
+Case: Stream pipe throughput, budget >= 1 GB/s: cat | tee and cat | obdeect stream to-simtel on the CORSIKA native stream
+
+The native photon stream of the CORSIKA input read by cat and piped into tee (copy to disk) or into obdeect stream to-simtel. Throughput in decimal GB/s; the budget is 1 GB/s.
+
+| Quantity | Value |
+|---|---|
+| cat → tee, GB/s | 0.81 |
+| cat → obdeect stream to-simtel, GB/s | 0.48 |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `cat_tee_pipe_completed` | 1 | 1 ± 0 | PASS |
+| `to_simtel_pipe_completed` | 1 | 1 ± 0 | PASS |
+| `cat_tee_pipe_throughput_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+| `to_simtel_pipe_throughput_budget_exceeded` | 1 | 0 ± 0 | FAIL |
+
+`performance.stream-pipe`: 2/4 gated checks pass; failed: `cat_tee_pipe_throughput_budget_exceeded`, `to_simtel_pipe_throughput_budget_exceeded`. [metrics.json](performance.stream-pipe/metrics.json) · [details.json](performance.stream-pipe/details.json)
+
+<a id="performance-flasher-dish"></a>
+
+### Flasher on the dish: chain against LightEmission — PASS
+
+Case: Flasher-dish, wall time budget: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (candidate wall <= reference wall)
+
+Reference: LightEmission (ff-1m) → sim_telarray. Candidate: obdeect light source → chain → sim_telarray, one thread.
+
+| Quantity | Value |
+|---|---|
+| Reference wall s | 0.32 |
+| Candidate wall s, threads=1 | 0.22 |
+| Candidate / reference wall, threads=1 | 0.70 |
+
+| Stage | Wall s, threads=1 |
+|---|---|
+| light source | 0.01 |
+| propagation | 0.00 |
+| to-simtel | 0.01 |
+| sim_telarray | 0.20 |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `reference_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threads1_wall_budget_exceeded` | 0 | 0 ± 0 | PASS |
+
+`performance.flasher-dish`: 3/3 gated checks pass. [metrics.json](performance.flasher-dish/metrics.json) · [details.json](performance.flasher-dish/details.json)
+
+![Wall time per stage, reference and candidate.](performance.flasher-dish/wall-by-stage.png)
+
+*Wall time per stage, reference and candidate.*
+
+<a id="performance-point-source"></a>
+
+### Point source: chain against LightEmission — PASS
+
+Case: Point-source, wall time budget: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (candidate wall <= reference wall)
+
+Reference: LightEmission → sim_telarray. Candidate: obdeect light source → chain → sim_telarray, one thread.
+
+| Quantity | Value |
+|---|---|
+| Reference wall s | 0.19 |
+| Candidate wall s, threads=1 | 0.15 |
+| Candidate / reference wall, threads=1 | 0.78 |
+
+| Stage | Wall s, threads=1 |
+|---|---|
+| light source | 0.00 |
+| propagation | 0.00 |
+| to-simtel | 0.00 |
+| sim_telarray | 0.15 |
+
+| Gated check | Actual | Limit | Verdict |
+|---|---|---|---|
+| `reference_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threads1_completed` | 1 | 1 ± 0 | PASS |
+| `candidate_threads1_wall_budget_exceeded` | 0 | 0 ± 0 | PASS |
+
+`performance.point-source`: 3/3 gated checks pass. [metrics.json](performance.point-source/metrics.json) · [details.json](performance.point-source/details.json)
+
+![Wall time per stage, reference and candidate.](performance.point-source/wall-by-stage.png)
+
+*Wall time per stage, reference and candidate.*

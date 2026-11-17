@@ -1,0 +1,71 @@
+{
+  "id": "performance.scaling",
+  "name": "Air shower, one LST (LSTN-01 7.0.0, 20 deg gamma): fixed vs per-shower cost of each chain stage (0, N, 2N showers) and trace-stream thread scaling (report only)",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "measure-scaling",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_scaling",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg"
+      ],
+      "timeout": 7200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "from_corsika_scaling_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "propagation_scaling_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "compile_model_scaling_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "trace_stream_scaling_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "to_simtel_scaling_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "thread_scaling_completed",
+      "expected": 1,
+      "atol": 0
+    }
+  ]
+}
