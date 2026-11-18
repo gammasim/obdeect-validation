@@ -401,7 +401,7 @@ def _overview(
 ) -> list[str]:
     """Overview table of (number, step, cases): one line per case, linked to its section."""
     header = (
-        "| Step | Case | Headline | Verdict |"
+        "| Step | Kind | Case | Headline | Verdict |"
         if step_column
         else "| Case | Headline | Verdict |"
     )
@@ -417,6 +417,7 @@ def _overview(
             ]
             if step_column:
                 cells.insert(0, f"{number}. {step['title']}")
+                cells.insert(1, step.get("kind", MISSING))
             lines.append("| " + " | ".join(cells) + " |")
     return lines + [""]
 
@@ -443,7 +444,10 @@ def _step_section(
 ) -> list[str]:
     """One step: title, intro, notes, then each case with its headline numbers and figures. An
     appendix step (performance) starts with its own overview table."""
-    lines = [f"## {number}. {step['title']}", "", step.get("intro", ""), ""]
+    lines = [f"## {number}. {step['title']}", ""]
+    if step.get("kind"):
+        lines += [f"**Kind of test:** {step['kind']}.", ""]
+    lines += [step.get("intro", ""), ""]
     if step.get("appendix"):
         host = _host(report, cases)
         if host:
