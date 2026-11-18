@@ -16,6 +16,8 @@ Candidate (timed, report only) per_telescope: for each telescope k, one pipe as 
 performance_chain.envelope_pipeline (from-corsika | propagation | trace-stream | to-simtel |
 sim_telarray -DTELESCOPE=k). Each pipe reads CORSIKA and propagates again, so its CPU is overstated
 against the tee. Its metrics carry the prefix candidate_per_telescope_.
+The reference, per-telescope and tee candidates run in one interleaved measurement: their repetitions
+alternate (performance_chain.run_interleaved).
 
 Deviations from a single joint run, recorded in details.json:
   * No joint candidate run: the per-telescope camera streams are not merged into one sim_telarray
@@ -464,8 +466,8 @@ def tee_pipe(telescopes, branches):
         shutil.rmtree(fifo_dir, ignore_errors=True)
 
 
-def tee_candidate(work_root, source, inputs, files, elements, reps, metrics, details):
-    """Tee candidate (gate): its branches, or None when it could not be measured (recorded)."""
+def tee_candidate(work_root, source, inputs, files, elements, metrics, details):
+    """Tee candidate (gate): its branches with the models compiled, or None when the compile failed (recorded)."""
     branches = tee_branches(work_root, source, inputs, files, elements)
     try:
         compile_tee_models(branches, inputs["models"])
@@ -473,12 +475,15 @@ def tee_candidate(work_root, source, inputs, files, elements, reps, metrics, det
         details["failures"]["candidate_tee_compile"] = str(error)[:400]
         metrics["candidate_tee_completed"] = 0
         return None
-    steps = [
+    return branches
+
+
+def tee_steps(branches, elements):
+    """Timed steps of the tee candidate: one pipe per envelope group."""
+    return [
         (group_name(group), lambda g=group: tee_pipe(g, branches))
         for group in tee_groups(elements)
     ]
-    ok = pc._run("candidate_tee", steps, reps, metrics, details)
-    return branches if ok else None
 
 
 def tee_member_cpu(stages):
@@ -664,6 +669,15 @@ def array_budgets(metrics, stages_wall_cpu):
             continue
         out[f"array_chain_{short}_ratio"] = chain / metrics[ref]
         out[f"array_chain_{short}_budget_exceeded"] = int(chain > metrics[ref])
+        # Report only: ratio of the minima over the repetitions (the budget uses the medians).
+        minimum = metrics.get(f"candidate_tee_{key}_min")
+        value = (
+            pc.ratio(minimum, metrics.get(f"reference_{key}_min"))
+            if minimum is not None
+            else None
+        )
+        if value is not None:
+            out[f"array_chain_{short}_ratio_min"] = value
     limits = [
         metrics.get(f"physics_tel{t}_photoelectron_bias_limit_exceeded")
         for t, _ in ARRAY
@@ -727,22 +741,25 @@ def run_array(root, work_root, source, config, reps, metrics, details):
             reference_dir, source, config, str(atmosphere_in)
         )
 
-    reference_ok = pc._run(
-        "reference", [("sim_telarray", reference_step)], reps, metrics, details
-    )
-    reference_path = reference_output["path"] if reference_ok else None
-
     # Report only: one pipe per telescope (each re-reads CORSIKA and propagates again).
     steps, outputs = telescope_steps(work_root, source, inputs, files, elements)
-    per_ok = pc._run("candidate_per_telescope", steps, reps, metrics, details)
+    # Gate: tee candidate (one pipe per envelope group, FIFO branch per telescope); models compiled first.
+    branches = tee_candidate(
+        work_root, source, inputs, files, elements, metrics, details
+    )
+    runs = [
+        ("reference", [("sim_telarray", reference_step)]),
+        ("candidate_per_telescope", steps),
+    ]
+    if branches is not None:
+        runs.append(("candidate_tee", tee_steps(branches, elements)))
+    ok = pc.run_interleaved(runs, reps, metrics, details)
+    reference_path = reference_output["path"] if ok["reference"] else None
+    per_ok = ok["candidate_per_telescope"]
     if per_ok:
         checks(root, reference_path, outputs, metrics, details, REPORT_PREFIX)
 
-    # Gate: tee candidate (one pipe per envelope group, FIFO branch per telescope).
-    branches = tee_candidate(
-        work_root, source, inputs, files, elements, reps, metrics, details
-    )
-    if branches is not None:
+    if branches is not None and ok["candidate_tee"]:
         metrics.update(
             tee_shares(
                 metrics["candidate_tee_cpu_s"],

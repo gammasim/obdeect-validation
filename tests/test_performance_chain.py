@@ -114,6 +114,102 @@ def test_failed_pipeline_is_recorded_and_gives_no_ratio(monkeypatch) -> None:
     assert not any(key.startswith("ratio_") for key in metrics)
 
 
+def _timed_step(calls, label, wall=1.0, cpu=1.0, rss=5.0):
+    """A (name, step) pair that records its label in calls and one timed child in RUSAGE."""
+
+    def run():
+        calls.append(label)
+        performance.RUSAGE.append(
+            {"argv": [label], "wall_s": wall, "cpu_s": cpu, "peak_rss_mb": rss}
+        )
+
+    return "sim", run
+
+
+def test_run_interleaved_alternates_pipelines_and_keeps_the_repetition_count(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(performance, "RUSAGE", [])
+    calls = []
+    metrics, details = {}, {"failures": {}, "stages": {}, "pipelines": {}}
+    ok = performance_chain.run_interleaved(
+        [
+            ("reference", [_timed_step(calls, "reference")]),
+            ("candidate_threads1", [_timed_step(calls, "candidate_threads1")]),
+        ],
+        reps=3,
+        metrics=metrics,
+        details=details,
+    )
+    assert ok == {"reference": True, "candidate_threads1": True}
+    assert calls == ["reference", "candidate_threads1"] * 3
+    assert metrics["reference_reps"] == metrics["candidate_threads1_reps"] == 3
+    assert len(details["pipelines"]["reference"]) == 3
+    assert len(details["stages"]["candidate_threads1"]["sim"]) == 3
+
+
+def test_run_interleaved_failure_skips_only_the_failing_label(monkeypatch) -> None:
+    monkeypatch.setattr(performance, "RUSAGE", [])
+    calls = []
+
+    def missing():
+        calls.append("candidate_bad")
+        raise OSError("missing binary")
+
+    metrics, details = {}, {"failures": {}, "stages": {}, "pipelines": {}}
+    ok = performance_chain.run_interleaved(
+        [
+            ("candidate_bad", [("sim", missing)]),
+            ("reference", [_timed_step(calls, "reference")]),
+        ],
+        reps=3,
+        metrics=metrics,
+        details=details,
+    )
+    assert ok == {"candidate_bad": False, "reference": True}
+    assert calls == ["candidate_bad", "reference", "reference", "reference"]
+    assert metrics["candidate_bad_completed"] == 0
+    assert metrics["reference_completed"] == 1
+    assert metrics["reference_reps"] == 3
+    assert "missing binary" in details["failures"]["candidate_bad"]["error"]
+    assert "candidate_bad" not in details["pipelines"]
+
+
+def test_run_single_label_records_the_same_metrics_as_pipeline_metrics(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(performance, "RUSAGE", [])
+    calls = []
+    step = _timed_step(calls, "reference", wall=2.0, cpu=1.0, rss=5.0)
+    metrics, details = {}, {"failures": {}, "stages": {}, "pipelines": {}}
+    assert performance_chain._run("reference", [step], 2, metrics, details) is True
+    per_stage, totals = performance_chain.measure([step], 2)
+    assert metrics == performance_chain.pipeline_metrics("reference", per_stage, totals)
+    assert details["pipelines"]["reference"] == totals
+
+
+def test_ratios_include_ratio_of_minima_over_repetitions() -> None:
+    metrics = {
+        "reference_wall_s": 2.0,
+        "reference_cpu_s": 4.0,
+        "reference_peak_rss_mb": 20.0,
+        "reference_wall_s_min": 1.0,
+        "reference_cpu_s_min": 3.0,
+        "candidate_threads1_completed": 1,
+        "candidate_threads1_wall_s": 4.0,
+        "candidate_threads1_cpu_s": 2.0,
+        "candidate_threads1_peak_rss_mb": 10.0,
+        "candidate_threads1_wall_s_min": 2.0,
+        "candidate_threads1_cpu_s_min": 1.5,
+    }
+    performance_chain._ratios(metrics, True, ["candidate_threads1"])
+    assert metrics["ratio_wall_threads1"] == 2.0
+    assert metrics["ratio_wall_threads1_min"] == 2.0
+    assert metrics["ratio_cpu_threads1_min"] == 0.5
+    assert "ratio_peak_rss_threads1_min" not in metrics
+    assert performance_chain.ratio_min_metrics("candidate_x", {}) == {}
+
+
 def test_telescope_arguments_use_one_telescope_and_optional_atmosphere() -> None:
     plain = performance_chain.telescope_arguments(Path("/cfg"))
     assert plain[:1] == ["-I/cfg"] and "maximum_telescopes=1" in plain

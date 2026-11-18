@@ -4,114 +4,115 @@
     "cpu_model": "0x000",
     "machine": "aarch64",
     "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
-    "obdeect_version": "obdeect-stream 0.9.2.dev7+gd19279a3a\nobdeect-propagation 0.9.2.dev7+gd19279a3a\nobdeect-sources 0.9.2.dev7+gd19279a3a\nobdeect-ray-tracing 0.9.2.dev7+gd19279a3a\nphoton-stream format 1.0"
+    "obdeect_version": "obdeect-stream 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-propagation 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-sources 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-ray-tracing 0.9.3.dev2+g31749a2a6.d20261117\nphoton-stream format 1.0",
+    "host": "Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs"
   },
   "stages": {
     "from_corsika": {
       "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
-      "output": "/tmp/perf-stages-992ll_t4/showers.gst",
+      "output": "/tmp/perf-stages-hc6r8axq/showers.gst",
       "records": [
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "wall_s": 2.2355409379815683,
-          "cpu_s": 2.071269,
-          "peak_rss_mb": 76.7734375,
+          "wall_s": 0.47571012598928064,
+          "cpu_s": 0.389859,
+          "peak_rss_mb": 76.9765625,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 132.76171875,
+          "rusage_maxrss_mb": 133.01953125,
           "returncode": 0,
-          "loadavg_before": 6.77
+          "loadavg_before": 1.27
         },
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "wall_s": 1.4553945299703628,
-          "cpu_s": 1.1189449999999999,
-          "peak_rss_mb": 76.94140625,
+          "wall_s": 0.4159430790459737,
+          "cpu_s": 0.330179,
+          "peak_rss_mb": 77.01171875,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 132.76171875,
+          "rusage_maxrss_mb": 133.01953125,
           "returncode": 0,
-          "loadavg_before": 6.71
+          "loadavg_before": 1.27
         },
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "wall_s": 1.027810087078251,
-          "cpu_s": 0.823886,
-          "peak_rss_mb": 76.91015625,
+          "wall_s": 0.4203795730136335,
+          "cpu_s": 0.34253399999999995,
+          "peak_rss_mb": 76.89453125,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 132.76171875,
+          "rusage_maxrss_mb": 133.01953125,
           "returncode": 0,
-          "loadavg_before": 6.71
+          "loadavg_before": 1.27
         }
       ]
     },
     "to_simtel": {
-      "input": "/tmp/perf-stages-992ll_t4/showers.gst",
-      "output": "/tmp/perf-stages-992ll_t4/roundtrip.iact",
+      "input": "/tmp/perf-stages-hc6r8axq/showers.gst",
+      "output": "/tmp/perf-stages-hc6r8axq/roundtrip.iact",
       "records": [
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/roundtrip.iact"
+            "/tmp/perf-stages-hc6r8axq/roundtrip.iact"
           ],
-          "wall_s": 0.538777127978392,
-          "cpu_s": 0.499228,
-          "peak_rss_mb": 48.04296875,
+          "wall_s": 0.28873445407953113,
+          "cpu_s": 0.279325,
+          "peak_rss_mb": 47.9921875,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 132.76171875,
+          "rusage_maxrss_mb": 133.01953125,
           "returncode": 0,
-          "loadavg_before": 6.71
+          "loadavg_before": 1.27
         },
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/roundtrip.iact"
+            "/tmp/perf-stages-hc6r8axq/roundtrip.iact"
           ],
-          "wall_s": 0.762350409058854,
-          "cpu_s": 0.622732,
-          "peak_rss_mb": 48.08984375,
+          "wall_s": 0.2706958110211417,
+          "cpu_s": 0.18312699999999998,
+          "peak_rss_mb": 48.046875,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 132.76171875,
+          "rusage_maxrss_mb": 133.01953125,
           "returncode": 0,
-          "loadavg_before": 6.57
+          "loadavg_before": 1.27
         },
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/roundtrip.iact"
+            "/tmp/perf-stages-hc6r8axq/roundtrip.iact"
           ],
-          "wall_s": 0.46839005209039897,
-          "cpu_s": 0.44905699999999993,
-          "peak_rss_mb": 48.16015625,
+          "wall_s": 0.44057383795734495,
+          "cpu_s": 0.184022,
+          "peak_rss_mb": 48.1171875,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 132.76171875,
+          "rusage_maxrss_mb": 133.01953125,
           "returncode": 0,
-          "loadavg_before": 6.57
+          "loadavg_before": 1.27
         }
       ]
     },
     "propagation": {
-      "input": "/tmp/perf-stages-992ll_t4/showers.gst",
-      "output": "/tmp/perf-stages-992ll_t4/propagated.gst",
+      "input": "/tmp/perf-stages-hc6r8axq/showers.gst",
+      "output": "/tmp/perf-stages-hc6r8axq/propagated.gst",
       "records": [
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-stages-992ll_t4/atmosphere-below-1000nm.dat",
+            "/tmp/perf-stages-hc6r8axq/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
@@ -124,87 +125,87 @@
             "250",
             "700",
             "-i",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/propagated.gst"
+            "/tmp/perf-stages-hc6r8axq/propagated.gst"
           ],
-          "wall_s": 1.6460126019082963,
-          "cpu_s": 1.367872,
-          "peak_rss_mb": 12.83984375,
-          "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
-          "returncode": 0,
-          "loadavg_before": 6.57
-        },
-        {
-          "argv": [
-            "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
-            "--transmission",
-            "/tmp/perf-stages-992ll_t4/atmosphere-below-1000nm.dat",
-            "--site-altitude",
-            "2156",
-            "--pathlen",
-            "28",
-            "--seed",
-            "123",
-            "--mode",
-            "weighted",
-            "--wavelength-range",
-            "250",
-            "700",
-            "-i",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
-            "-o",
-            "/tmp/perf-stages-992ll_t4/propagated.gst"
-          ],
-          "wall_s": 1.3713568629464135,
-          "cpu_s": 1.2651729999999999,
-          "peak_rss_mb": 12.8203125,
-          "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
-          "returncode": 0,
-          "loadavg_before": 6.57
-        },
-        {
-          "argv": [
-            "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
-            "--transmission",
-            "/tmp/perf-stages-992ll_t4/atmosphere-below-1000nm.dat",
-            "--site-altitude",
-            "2156",
-            "--pathlen",
-            "28",
-            "--seed",
-            "123",
-            "--mode",
-            "weighted",
-            "--wavelength-range",
-            "250",
-            "700",
-            "-i",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
-            "-o",
-            "/tmp/perf-stages-992ll_t4/propagated.gst"
-          ],
-          "wall_s": 1.7708819600520656,
-          "cpu_s": 1.165573,
+          "wall_s": 2.4453439560020342,
+          "cpu_s": 2.4054,
           "peak_rss_mb": 12.8359375,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.57
+          "loadavg_before": 1.27
+        },
+        {
+          "argv": [
+            "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+            "--transmission",
+            "/tmp/perf-stages-hc6r8axq/atmosphere-below-1000nm.dat",
+            "--site-altitude",
+            "2156",
+            "--pathlen",
+            "28",
+            "--seed",
+            "123",
+            "--mode",
+            "weighted",
+            "--wavelength-range",
+            "250",
+            "700",
+            "-i",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
+            "-o",
+            "/tmp/perf-stages-hc6r8axq/propagated.gst"
+          ],
+          "wall_s": 1.1359868010040373,
+          "cpu_s": 0.9672459999999999,
+          "peak_rss_mb": 12.84765625,
+          "peak_rss_source": "proc-VmHWM-sampled",
+          "rusage_maxrss_mb": 135.1796875,
+          "returncode": 0,
+          "loadavg_before": 1.25
+        },
+        {
+          "argv": [
+            "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
+            "--transmission",
+            "/tmp/perf-stages-hc6r8axq/atmosphere-below-1000nm.dat",
+            "--site-altitude",
+            "2156",
+            "--pathlen",
+            "28",
+            "--seed",
+            "123",
+            "--mode",
+            "weighted",
+            "--wavelength-range",
+            "250",
+            "700",
+            "-i",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
+            "-o",
+            "/tmp/perf-stages-hc6r8axq/propagated.gst"
+          ],
+          "wall_s": 1.1928452680585906,
+          "cpu_s": 0.8872009999999999,
+          "peak_rss_mb": 12.9296875,
+          "peak_rss_source": "proc-VmHWM-sampled",
+          "rusage_maxrss_mb": 135.1796875,
+          "returncode": 0,
+          "loadavg_before": 1.25
         }
       ]
     },
     "propagation_envelope": {
-      "input": "/tmp/perf-stages-992ll_t4/showers.gst",
-      "output": "/tmp/perf-stages-992ll_t4/propagated-envelope.gst",
+      "input": "/tmp/perf-stages-hc6r8axq/showers.gst",
+      "output": "/tmp/perf-stages-hc6r8axq/propagated-envelope.gst",
       "records": [
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-stages-992ll_t4/atmosphere-below-1000nm.dat",
+            "/tmp/perf-stages-hc6r8axq/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
@@ -212,25 +213,25 @@
             "--seed",
             "123",
             "--envelope",
-            "qe=/tmp/perf-stages-992ll_t4/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-stages-hc6r8axq/envelope/qe-envelope.dat",
             "-i",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/propagated-envelope.gst"
+            "/tmp/perf-stages-hc6r8axq/propagated-envelope.gst"
           ],
-          "wall_s": 1.2646750019630417,
-          "cpu_s": 1.174235,
-          "peak_rss_mb": 12.59375,
+          "wall_s": 1.2335983800003305,
+          "cpu_s": 1.199899,
+          "peak_rss_mb": 12.55078125,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.28
+          "loadavg_before": 1.25
         },
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-stages-992ll_t4/atmosphere-below-1000nm.dat",
+            "/tmp/perf-stages-hc6r8axq/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
@@ -238,25 +239,25 @@
             "--seed",
             "123",
             "--envelope",
-            "qe=/tmp/perf-stages-992ll_t4/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-stages-hc6r8axq/envelope/qe-envelope.dat",
             "-i",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/propagated-envelope.gst"
+            "/tmp/perf-stages-hc6r8axq/propagated-envelope.gst"
           ],
-          "wall_s": 1.3621827190509066,
-          "cpu_s": 1.265005,
-          "peak_rss_mb": 12.51953125,
+          "wall_s": 1.1014812620123848,
+          "cpu_s": 1.051694,
+          "peak_rss_mb": 12.6328125,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.28
+          "loadavg_before": 1.23
         },
         {
           "argv": [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-stages-992ll_t4/atmosphere-below-1000nm.dat",
+            "/tmp/perf-stages-hc6r8axq/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
@@ -264,25 +265,25 @@
             "--seed",
             "123",
             "--envelope",
-            "qe=/tmp/perf-stages-992ll_t4/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-stages-hc6r8axq/envelope/qe-envelope.dat",
             "-i",
-            "/tmp/perf-stages-992ll_t4/showers.gst",
+            "/tmp/perf-stages-hc6r8axq/showers.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/propagated-envelope.gst"
+            "/tmp/perf-stages-hc6r8axq/propagated-envelope.gst"
           ],
-          "wall_s": 1.4026934109861031,
-          "cpu_s": 1.2384039999999998,
-          "peak_rss_mb": 12.6015625,
+          "wall_s": 1.110615124925971,
+          "cpu_s": 1.036712,
+          "peak_rss_mb": 12.68359375,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.28
+          "loadavg_before": 1.23
         }
       ]
     },
     "compile_model": {
       "input": "/results/performance.stages/cfg/model/7.0.0/CTAO.cfg",
-      "output": "/tmp/perf-stages-992ll_t4/lst.model",
+      "output": "/tmp/perf-stages-hc6r8axq/lst.model",
       "records": [
         {
           "argv": [
@@ -298,15 +299,15 @@
             "--seed",
             "20261113",
             "--output",
-            "/tmp/perf-stages-992ll_t4/lst.model"
+            "/tmp/perf-stages-hc6r8axq/lst.model"
           ],
-          "wall_s": 0.5242749969474971,
-          "cpu_s": 0.5040830000000001,
-          "peak_rss_mb": 39.0859375,
+          "wall_s": 0.2841931270668283,
+          "cpu_s": 0.5493779999999999,
+          "peak_rss_mb": 39.2734375,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.1
+          "loadavg_before": 1.23
         },
         {
           "argv": [
@@ -322,15 +323,15 @@
             "--seed",
             "20261113",
             "--output",
-            "/tmp/perf-stages-992ll_t4/lst.model"
+            "/tmp/perf-stages-hc6r8axq/lst.model"
           ],
-          "wall_s": 0.3521242969436571,
-          "cpu_s": 0.296606,
-          "peak_rss_mb": 39.1640625,
+          "wall_s": 0.2634614040143788,
+          "cpu_s": 0.5385479999999999,
+          "peak_rss_mb": 39.34375,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.1
+          "loadavg_before": 1.23
         },
         {
           "argv": [
@@ -346,29 +347,27 @@
             "--seed",
             "20261113",
             "--output",
-            "/tmp/perf-stages-992ll_t4/lst.model"
+            "/tmp/perf-stages-hc6r8axq/lst.model"
           ],
-          "wall_s": 0.6020342210540548,
-          "cpu_s": 0.40768699999999997,
-          "peak_rss_mb": 39.2109375,
+          "wall_s": 0.2534403749741614,
+          "cpu_s": 0.52701,
+          "peak_rss_mb": 39.125,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.1
+          "loadavg_before": 1.23
         }
       ]
     },
     "trace_stream": {
-      "input": "/tmp/perf-stages-992ll_t4/propagated.gst",
-      "output": "/tmp/perf-stages-992ll_t4/traced.gst",
+      "input": "/tmp/perf-stages-hc6r8axq/propagated.gst",
+      "output": "/tmp/perf-stages-hc6r8axq/traced.gst",
       "records": [
         {
           "argv": [
-            "obdeect",
-            "ray-tracing",
-            "trace-stream",
+            "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-stages-992ll_t4/lst.model",
+            "/tmp/perf-stages-hc6r8axq/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -382,25 +381,23 @@
             "--telescope-transmission",
             "full",
             "-i",
-            "/tmp/perf-stages-992ll_t4/propagated.gst",
+            "/tmp/perf-stages-hc6r8axq/propagated.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/traced.gst"
+            "/tmp/perf-stages-hc6r8axq/traced.gst"
           ],
-          "wall_s": 3.8299999160226434,
-          "cpu_s": 3.926759,
-          "peak_rss_mb": 70.83984375,
+          "wall_s": 2.080405185930431,
+          "cpu_s": 2.019707,
+          "peak_rss_mb": 31.24609375,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 6.1
+          "loadavg_before": 1.23
         },
         {
           "argv": [
-            "obdeect",
-            "ray-tracing",
-            "trace-stream",
+            "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-stages-992ll_t4/lst.model",
+            "/tmp/perf-stages-hc6r8axq/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -414,25 +411,23 @@
             "--telescope-transmission",
             "full",
             "-i",
-            "/tmp/perf-stages-992ll_t4/propagated.gst",
+            "/tmp/perf-stages-hc6r8axq/propagated.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/traced.gst"
+            "/tmp/perf-stages-hc6r8axq/traced.gst"
           ],
-          "wall_s": 3.913476044079289,
-          "cpu_s": 3.792883,
-          "peak_rss_mb": 71.20703125,
+          "wall_s": 2.22540899598971,
+          "cpu_s": 1.9773809999999998,
+          "peak_rss_mb": 31.0,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 5.85
+          "loadavg_before": 1.29
         },
         {
           "argv": [
-            "obdeect",
-            "ray-tracing",
-            "trace-stream",
+            "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-stages-992ll_t4/lst.model",
+            "/tmp/perf-stages-hc6r8axq/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -446,23 +441,23 @@
             "--telescope-transmission",
             "full",
             "-i",
-            "/tmp/perf-stages-992ll_t4/propagated.gst",
+            "/tmp/perf-stages-hc6r8axq/propagated.gst",
             "-o",
-            "/tmp/perf-stages-992ll_t4/traced.gst"
+            "/tmp/perf-stages-hc6r8axq/traced.gst"
           ],
-          "wall_s": 3.8017876939848065,
-          "cpu_s": 3.9155339999999996,
-          "peak_rss_mb": 71.0703125,
+          "wall_s": 2.133746158098802,
+          "cpu_s": 2.022296,
+          "peak_rss_mb": 31.0234375,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 5.78
+          "loadavg_before": 1.29
         }
       ]
     },
     "simtel_direct": {
       "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
-      "output": "/tmp/perf-stages-992ll_t4/simtel-direct/reference.simtel",
+      "output": "/tmp/perf-stages-hc6r8axq/simtel-direct/reference.simtel",
       "records": [
         {
           "argv": [
@@ -477,9 +472,9 @@
             "-W",
             "random_state=none",
             "-C",
-            "histogram_file=/tmp/perf-stages-992ll_t4/simtel-direct/reference.hdata",
+            "histogram_file=/tmp/perf-stages-hc6r8axq/simtel-direct/reference.hdata",
             "-C",
-            "output_file=/tmp/perf-stages-992ll_t4/simtel-direct/reference.simtel",
+            "output_file=/tmp/perf-stages-hc6r8axq/simtel-direct/reference.simtel",
             "-C",
             "random_seed=20261113",
             "-C",
@@ -510,13 +505,13 @@
             "atmospheric_transmission=/results/performance.stages/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "wall_s": 4.7622558230068535,
-          "cpu_s": 4.287686,
-          "peak_rss_mb": 83.0390625,
+          "wall_s": 3.6068313480354846,
+          "cpu_s": 3.418942,
+          "peak_rss_mb": 83.2578125,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 5.78
+          "loadavg_before": 1.27
         },
         {
           "argv": [
@@ -531,9 +526,9 @@
             "-W",
             "random_state=none",
             "-C",
-            "histogram_file=/tmp/perf-stages-992ll_t4/simtel-direct/reference.hdata",
+            "histogram_file=/tmp/perf-stages-hc6r8axq/simtel-direct/reference.hdata",
             "-C",
-            "output_file=/tmp/perf-stages-992ll_t4/simtel-direct/reference.simtel",
+            "output_file=/tmp/perf-stages-hc6r8axq/simtel-direct/reference.simtel",
             "-C",
             "random_seed=20261113",
             "-C",
@@ -564,13 +559,13 @@
             "atmospheric_transmission=/results/performance.stages/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "wall_s": 4.287264870014042,
-          "cpu_s": 3.977206,
-          "peak_rss_mb": 82.96875,
+          "wall_s": 3.507452938007191,
+          "cpu_s": 3.331141,
+          "peak_rss_mb": 83.28515625,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 5.56
+          "loadavg_before": 1.27
         },
         {
           "argv": [
@@ -585,9 +580,9 @@
             "-W",
             "random_state=none",
             "-C",
-            "histogram_file=/tmp/perf-stages-992ll_t4/simtel-direct/reference.hdata",
+            "histogram_file=/tmp/perf-stages-hc6r8axq/simtel-direct/reference.hdata",
             "-C",
-            "output_file=/tmp/perf-stages-992ll_t4/simtel-direct/reference.simtel",
+            "output_file=/tmp/perf-stages-hc6r8axq/simtel-direct/reference.simtel",
             "-C",
             "random_seed=20261113",
             "-C",
@@ -618,13 +613,13 @@
             "atmospheric_transmission=/results/performance.stages/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
             "/validation/inputs/gamma-20deg-100-3000GeV.iact"
           ],
-          "wall_s": 3.90237052901648,
-          "cpu_s": 3.6827739999999998,
-          "peak_rss_mb": 83.21484375,
+          "wall_s": 3.6364960599457845,
+          "cpu_s": 3.4603159999999997,
+          "peak_rss_mb": 83.0546875,
           "peak_rss_source": "proc-VmHWM-sampled",
-          "rusage_maxrss_mb": 134.6953125,
+          "rusage_maxrss_mb": 135.1796875,
           "returncode": 0,
-          "loadavg_before": 5.28
+          "loadavg_before": 1.25
         }
       ]
     }
@@ -635,11 +630,11 @@
     "reps": 3,
     "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
     "showers": 20,
-    "work_dir": "/tmp/perf-stages-992ll_t4",
+    "work_dir": "/tmp/perf-stages-hc6r8axq",
     "config": "/results/performance.stages/cfg/model/7.0.0/CTAO.cfg",
     "model": "LSTN-01 7.0.0",
     "reference_atmosphere": null,
-    "propagation_atmosphere": "/tmp/perf-stages-992ll_t4/atmosphere-below-1000nm.dat",
+    "propagation_atmosphere": "/tmp/perf-stages-hc6r8axq/atmosphere-below-1000nm.dat",
     "wavelength_limit_nm": 1000,
     "propagation": "weighted 250-700 nm (as shower_candidate); envelope: thinned by the QE bound (as envelope_pipeline)",
     "propagation_seed": 123,

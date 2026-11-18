@@ -219,22 +219,88 @@ def test_run_chain_once_stops_at_failure_and_reports_skipped(tmp_path, monkeypat
     ]
 
 
-def test_measure_point_breaks_repetitions_after_failure(tmp_path, monkeypatch):
-    runs = []
-
+def test_measure_points_breaks_repetitions_after_failure(tmp_path, monkeypatch):
     def fake_run(argv, log, stdout_file=None):
-        runs.append(argv)
         if argv[1] == "ray-tracing" and argv[2] == "trace-stream":
             raise RuntimeError("trace-stream failed")
         return record(1.0, 2.0)
 
     monkeypatch.setattr(performance_chain, "run_timed", fake_run)
-    records, failures, skipped = ps.measure_point(
-        tmp_path, tmp_path / "in.iact", INPUTS, 3
-    )
+    state = ps.measure_points({"only": (tmp_path, tmp_path / "in.iact")}, INPUTS, 3)
+    records, failures, skipped = state["only"]
     assert set(failures) == {"trace_stream"}
     assert skipped == ["to_simtel"]
     assert len(records["propagation"]) == 1  # no repetition after the failure
     summary_ = ps.point_summary(records, failures)
     assert "trace_stream" not in summary_
-    assert summary_["propagation"] == {"wall_s": 1.0, "cpu_s": 2.0, "reps": 1}
+    assert summary_["propagation"] == {
+        "wall_s": 1.0,
+        "cpu_s": 2.0,
+        "wall_s_min": 1.0,
+        "cpu_s_min": 2.0,
+        "reps": 1,
+    }
+
+
+def test_measure_points_alternates_repetitions(tmp_path, monkeypatch):
+    passes = []
+
+    def fake_run(argv, log, stdout_file=None):
+        if log.name == "from-corsika.log":  # first stage: one entry per chain pass
+            passes.append(log.parent.name)
+        return record(1.0)
+
+    monkeypatch.setattr(performance_chain, "run_timed", fake_run)
+    runs = {
+        name: (tmp_path / name, tmp_path / name / "in.iact") for name in ("a", "b", "c")
+    }
+    for work, _ in runs.values():
+        work.mkdir()
+    ps.measure_points(runs, INPUTS, 2)
+    assert passes == ["a", "b", "c", "a", "b", "c"]
+
+
+def test_measure_points_failing_point_does_not_stop_others(tmp_path, monkeypatch):
+    passes = []
+
+    def fake_run(argv, log, stdout_file=None):
+        if log.name == "from-corsika.log":
+            passes.append(log.parent.name)
+        if log.parent.name == "bad" and argv[1] == "propagation":
+            raise RuntimeError("propagation exited 1")
+        return record(1.0)
+
+    monkeypatch.setattr(performance_chain, "run_timed", fake_run)
+    runs = {
+        name: (tmp_path / name, tmp_path / name / "in.iact") for name in ("bad", "good")
+    }
+    for work, _ in runs.values():
+        work.mkdir()
+    state = ps.measure_points(runs, INPUTS, 3)
+    assert passes == ["bad", "good", "good", "good"]  # bad stops after its first pass
+    bad_records, bad_failures, bad_skipped = state["bad"]
+    assert list(bad_failures) == ["propagation"]
+    assert bad_skipped == ["compile_model", "trace_stream", "to_simtel"]
+    assert len(bad_records["from_corsika"]) == 1
+    good_records, good_failures, good_skipped = state["good"]
+    assert good_failures == {} and good_skipped == []
+    assert len(good_records["to_simtel"]) == 3
+
+
+def test_measure_threads_alternates_and_keeps_completed_counts(tmp_path, monkeypatch):
+    order = []
+
+    def fake_run(argv, log, stdout_file=None):
+        threads = argv[argv.index("--threads") + 1]
+        order.append(threads)
+        if threads == 2 and len(order) > 3:  # threads=2 fails on its second repetition
+            raise RuntimeError("trace-stream exited 1")
+        return record(8.0 / threads)
+
+    monkeypatch.setattr(performance_chain, "run_timed", fake_run)
+    rows, failures = ps.measure_threads(tmp_path, 4, 3)
+    assert order == [1, 2, 4, 1, 2, 4, 1, 4]
+    assert set(failures) == {2}
+    assert set(rows) == {1, 4}  # counts that did not fail keep all their repetitions
+    assert rows[4] == (2.0, 2.0)
+    assert ps.assemble(full_points(), 10, rows, 4)[0]["thread_scaling_completed"] == 0

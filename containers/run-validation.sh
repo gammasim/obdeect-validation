@@ -23,6 +23,26 @@ if [[ ! "$environment" =~ ^[a-z0-9-]+$ || ! -f "obdeect-validation/environments/
   exit 2
 fi
 
+# One-line description of the host CPU (the container cannot see it): model, cores, podman VM CPUs.
+host_description() {
+  local text model cores perf eff vm
+  if [[ "$(uname)" == Darwin ]]; then
+    text=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo "unknown CPU")
+    if perf=$(sysctl -n hw.perflevel0.physicalcpu 2>/dev/null) && eff=$(sysctl -n hw.perflevel1.physicalcpu 2>/dev/null); then
+      text="$text ($perf performance + $eff efficiency cores)"
+    fi
+    vm=$(podman machine inspect --format '{{.Resources.CPUs}}' 2>/dev/null || true)
+    if [[ -n "$vm" ]]; then
+      text="$text, podman VM $vm CPUs"
+    fi
+  else
+    model=$(lscpu 2>/dev/null | sed -n 's/^Model name:[[:space:]]*//p' | head -n 1 || true)
+    cores=$(nproc 2>/dev/null || echo "?")
+    text="${model:-unknown CPU}, $cores cores"
+  fi
+  printf '%s\n' "$text"
+}
+
 mkdir -p "$output"
 output=$(cd "$output" && pwd)
 podman build --rm \
@@ -54,8 +74,10 @@ if [[ "${MODE3:-0}" == 1 ]]; then
   extra_env=(--env SIMTEL_CANDIDATE_BINARY=/opt/mode3/sim_telarray)
 fi
 image_id=$(podman image inspect --format '{{.Id}}' "$run_image")
-python3 -c 'import json,sys; json.dump({"base_image":sys.argv[1],"derived_image_id":sys.argv[2],"image":sys.argv[3],"sim_telarray_commit":sys.argv[4],"hessio_rev":sys.argv[5]},open(sys.argv[6],"w"),indent=2); open(sys.argv[6],"a").write(chr(10))' \
-  "$SIMTOOLS_PROD_IMAGE" "$image_id" "$run_image" "${simtel_commit:-}" "${hessio_rev:-}" "$output/container.json"
+host=$(host_description)
+extra_env+=(--env "OBDEECT_VALIDATION_HOST=$host")
+python3 -c 'import json,sys; json.dump({"base_image":sys.argv[1],"derived_image_id":sys.argv[2],"image":sys.argv[3],"sim_telarray_commit":sys.argv[4],"hessio_rev":sys.argv[5],"host":sys.argv[6]},open(sys.argv[7],"w"),indent=2); open(sys.argv[7],"a").write(chr(10))' \
+  "$SIMTOOLS_PROD_IMAGE" "$image_id" "$run_image" "${simtel_commit:-}" "${hessio_rev:-}" "$host" "$output/container.json"
 # Same layout as the development container: checkouts read-only, results writable.
 models=${VALIDATION_MODELS_DIR:-simulation-models-dev}
 mounts=(--volume "$PWD/obdeect-validation:/validation:ro"

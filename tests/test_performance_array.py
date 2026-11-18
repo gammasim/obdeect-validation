@@ -50,6 +50,15 @@ def test_budgets_pass_when_chain_within_reference_and_all_bias_within_limits():
     assert reasons == {}
 
 
+def test_budget_reports_ratio_of_minima_without_changing_the_budget():
+    metrics, chain = _metrics(9.0, 8.0, [0] * 6)
+    metrics.update({"candidate_tee_wall_s_min": 4.0, "reference_wall_s_min": 8.0})
+    out, _ = pa.array_budgets(metrics, chain)
+    assert out["array_chain_wall_ratio_min"] == pytest.approx(0.5)
+    assert out["array_chain_wall_budget_exceeded"] == 0
+    assert "array_chain_cpu_ratio_min" not in out
+
+
 def test_budget_exceeded_when_chain_slower_or_one_telescope_biased():
     metrics, chain = _metrics(11.0, 8.0, [0, 0, 0, 0, 1, 0])
     out, _ = pa.array_budgets(metrics, chain)

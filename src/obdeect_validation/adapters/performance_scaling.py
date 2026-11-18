@@ -257,52 +257,76 @@ def run_chain_once(work, iact, inputs, records, failures):
     return []
 
 
-def measure_point(work, iact, inputs, reps):
-    """Run the chain reps times on one input. Returns (records, failures, skipped stages)."""
-    records = {stage: [] for stage in STAGES}
-    failures, skipped = {}, []
+def measure_points(runs, inputs, reps):
+    """Run the chain reps times on each point; repetitions alternate between points.
+
+    runs: name -> (work dir, iact). Rep 1 of every point, then rep 2 of every point, ...; a point
+    whose stage fails stops repeating, the other points continue.
+    Returns name -> (records, failures, skipped stages of its last pass).
+    """
+    state = {name: ({stage: [] for stage in STAGES}, {}, []) for name in runs}
+    active = list(runs)
     for _ in range(reps):
-        skipped = run_chain_once(work, iact, inputs, records, failures)
-        if failures:
-            break
-    return records, failures, skipped
+        for name in active:
+            work, iact = runs[name]
+            records, failures, _ = state[name]
+            skipped = run_chain_once(work, iact, inputs, records, failures)
+            state[name] = (records, failures, skipped)
+        active = [name for name in active if not state[name][1]]
+    return state
 
 
 def point_summary(records, failures):
-    """Median wall and CPU per stage that ran and did not fail."""
+    """Median, minimum wall and CPU per stage that ran and did not fail."""
     summary = {}
     for stage in STAGES:
         if records[stage] and stage not in failures:
             wall, cpu = median_of(records[stage])
-            summary[stage] = {"wall_s": wall, "cpu_s": cpu, "reps": len(records[stage])}
+            summary[stage] = {
+                "wall_s": wall,
+                "cpu_s": cpu,
+                "wall_s_min": min(r["wall_s"] for r in records[stage]),
+                "cpu_s_min": min(r["cpu_s"] for r in records[stage]),
+                "reps": len(records[stage]),
+            }
     return summary
 
 
 def measure_threads(work, nproc, reps):
     """trace-stream on the propagated stream and model of work (N showers), per thread count.
 
+    Repetitions alternate between thread counts: rep 1 of every count, then rep 2, ...; a count
+    that fails stops repeating, the other counts continue.
     Returns (rows: threads -> (median wall_s, median cpu_s), failures: threads -> message).
     """
     rows, failures = {}, {}
     thread_dir = work / "threads"
     thread_dir.mkdir(parents=True, exist_ok=True)
-    for k in thread_counts(nproc):
-        argv = trace_argv(
+    argvs = {
+        k: trace_argv(
             work / "lst.model",
             work / "propagated.gst",
             thread_dir / f"traced-threads{k}.gst",
             k,
         )
-        records = []
-        try:
-            for _ in range(reps):
-                records.append(
-                    performance_chain.run_timed(argv, thread_dir / f"threads{k}.log")
+        for k in thread_counts(nproc)
+    }
+    records = {k: [] for k in argvs}
+    active = list(argvs)
+    for _ in range(reps):
+        for k in active:
+            try:
+                records[k].append(
+                    performance_chain.run_timed(
+                        argvs[k], thread_dir / f"threads{k}.log"
+                    )
                 )
-        except Exception as error:
-            failures[k] = str(error)
-            break
-        rows[k] = median_of(records)
+            except Exception as error:
+                failures[k] = str(error)
+        active = [k for k in active if k not in failures]
+    for k in argvs:
+        if k not in failures:
+            rows[k] = median_of(records[k])
     return rows, failures
 
 
@@ -348,17 +372,19 @@ def run_scaling(source, work, config, events, reps):
     inputs, _ = performance_chain.prepare_inputs(work, config)
     host = performance.host_info()
     nproc = host["nproc"]
-    points, details_points = {}, {}
+    points, details_points, kept_by, runs = {}, {}, {}, {}
     for requested in (0, events, 2 * events):
         point = work / f"showers-{requested}"
         point.mkdir(parents=True, exist_ok=True)
         iact = point / "showers.iact"
-        kept = performance.subset_showers(source, iact, requested)
-        records, failures, skipped = measure_point(point, iact, inputs, reps)
+        kept_by[requested] = performance.subset_showers(source, iact, requested)
+        runs[requested] = (point, iact)
+    results = measure_points(runs, inputs, reps)
+    for requested, (records, failures, skipped) in results.items():
         summary = point_summary(records, failures)
-        points[requested] = (kept, summary)
+        points[requested] = (kept_by[requested], summary)
         details_points[str(requested)] = {
-            "showers": kept,
+            "showers": kept_by[requested],
             "stages": summary,
             "failures": failures,
             "skipped": skipped,

@@ -228,6 +228,8 @@ def test_performance_stage_table_in_readme(tmp_path):
         "trace_stream_cpu_s_median": 10.31,
         "trace_stream_cpu_share": 0.8,
         "simtel_direct_wall_s_median": 11.68,
+        "trace_stream_ns_per_photon_cpu": 103.3,
+        "simtel_direct_ns_per_photon_cpu": 73.4,
         "timing_unreliable": False,
     }
     (case / "metrics.json").write_text(json.dumps(metrics))
@@ -235,11 +237,14 @@ def test_performance_stage_table_in_readme(tmp_path):
     summary["cases"] = [{"id": "performance.stages", "status": "REPORT ONLY"}]
     (report / "summary.json").write_text(json.dumps(summary))
     readme = collect_report.write_readme(report).read_text()
-    # Columns without any value (photons/s, ns per photon, spread) are left out.
-    assert "| Stage | Wall s (median) | CPU s (median) | CPU share |" in readme
-    assert "| trace-stream | 12.10 | 10.31 | 80% |" in readme
-    assert "| propagation |" not in readme  # no values, so no row
-    assert "trace-stream 12.1 s, sim_telarray direct 11.7 s" in readme
+    # Columns without any value (photons/s, spread) are left out.
+    assert "| Program | Wall s | CPU s | CPU ns per photon |" in readme
+    assert (
+        "| ray-tracing: trace-stream (telescope optics) | 12.10 | 10.31 | 103 |"
+        in readme
+    )
+    assert "| propagation: run (atmosphere) |" not in readme  # no values, so no row
+    assert "trace-stream 103 ns/photon, sim_telarray 73 ns/photon (CPU)" in readme
 
 
 def test_add_renders_gated_budget_checks_and_blocked_cases(tmp_path):
@@ -280,8 +285,10 @@ def test_add_renders_gated_budget_checks_and_blocked_cases(tmp_path):
     report.mkdir()
     collect_report.collect(run, report, add=True)
     readme = collect_report.write_readme(report).read_text()
-    assert "| `candidate_envelope_wall_budget_exceeded` | 1 | 0 ± 0 | FAIL |" in readme
-    assert "1/2 gated checks pass" in readme
+    # Checks in words; the bookkeeping checks (runs completed) in one line.
+    label = "obdeect chain wall ≤ sim_telarray wall (trace-stream on all cores)"
+    assert f"| {label} | 1 | FAIL |" in readme
+    assert "All runs completed with their repetitions (1 checks)." in readme
     assert "air-shower-proton" in readme
     assert "BLOCKED" in readme and "/validation/inputs/proton.iact" in readme
     assert "REPORT ONLY" not in readme.split("## 1.")[0]
@@ -297,18 +304,20 @@ def test_performance_is_a_separate_section_at_the_bottom(tmp_path):
         ["performance.stages", "performance.profile", "performance.air-shower"],
     )
     (perf / "performance.air-shower" / "metrics.json").write_text(
-        json.dumps({"reference_wall_s": 20.0, "timing_unreliable": 0})
+        json.dumps(
+            {"reference_wall_s": 20.0, "reference_cpu_s": 19.0, "timing_unreliable": 0}
+        )
     )
     collect_report.collect(perf, report, add=True)
     readme = collect_report.write_readme(report).read_text()
     top, bottom = readme.split("## Scope and limits")
     # Validation overview and result count: no performance cases.
     assert (
-        "performance."
-        not in top.split("## How to read")[0].split("[3. Performance]")[0]
+        "performance." not in top.split("## How to read")[0].split("[3. Performance")[0]
     )
     assert "**Result: 2 PASS**" in top
-    assert "[3. Performance](#step-performance) is at the bottom: 3 REPORT ONLY." in top
+    title = "3. Performance: obdeect chain against sim_telarray"
+    assert f"[{title}](#step-performance) is at the bottom: 3 REPORT ONLY." in top
     assert "## 3. Performance" not in top and '<a id="step-performance">' in bottom
     # Own overview table, then the cases in the layout's case_order.
     assert "| Case | Headline | Verdict |" in bottom
@@ -318,5 +327,32 @@ def test_performance_is_a_separate_section_at_the_bottom(tmp_path):
     ]
     assert order == sorted(order)
     # Quantity rows without a value are left out in the performance section.
-    assert "| Reference wall s | 20.00 |" in bottom
+    assert "| sim_telarray: wall s, CPU s | 20.00, 19.00 |" in bottom
     assert "| Reference CPU s |" not in bottom
+
+
+def test_performance_section_shows_the_host_of_its_first_case(tmp_path):
+    run = _run(tmp_path, "perf", ["performance.stages", "performance.profile"])
+    (run / "performance.profile" / "details.json").write_text(
+        json.dumps(
+            {"host": {"host": "Apple M3 Pro (6 performance + 6 efficiency cores)"}}
+        )
+    )
+    (run / "performance.stages" / "details.json").write_text(
+        json.dumps({"host_info": {"nproc": 12}})
+    )
+    report = tmp_path / "2099-01-01"
+    collect_report.collect(run, report)
+    readme = collect_report.write_readme(report).read_text()
+    assert "Host: Apple M3 Pro (6 performance + 6 efficiency cores)" in readme
+    assert readme.count("Host: ") == 1
+
+
+def test_no_host_line_without_host_value(tmp_path):
+    run = _run(tmp_path, "perf", ["performance.stages"])
+    (run / "performance.stages" / "details.json").write_text(
+        json.dumps({"host_info": {"nproc": 12, "host": None}})
+    )
+    report = tmp_path / "2099-01-01"
+    collect_report.collect(run, report)
+    assert "Host: " not in collect_report.write_readme(report).read_text()

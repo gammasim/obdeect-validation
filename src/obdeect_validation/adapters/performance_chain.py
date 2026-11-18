@@ -6,6 +6,8 @@ LightEmission -> sim_telarray (sources). The candidate is the obdeect chain endi
 sim_telarray camera stage (Bypass_Optics=1 for the air shower, as in cases/chain/optics-bypass1.json).
 Every child process is timed with performance.run_timed. A pipeline total is the sum of its stage
 wall and CPU times and the maximum of its stage peak RSS (stages run one after another).
+The repetitions alternate between pipelines (rep 1 of each, then rep 2 of each), so a change in host
+state affects all pipelines alike (run_interleaved).
 
 The air-shower case also times an optimised candidate (candidate_envelope, obdeect default threads;
 candidate_envelope_threads1 for the single-core comparison): from-corsika, propagation (QE bound,
@@ -104,6 +106,10 @@ NATIVE_PROGRAMS = {
     ("propagation", "run"): ("obdeect.propagation", "obdeect-propagation-run"),
     ("stream", "to-simtel"): ("obdeect.stream", "obdeect-stream-to-simtel"),
     ("stream", "from-corsika"): ("obdeect.stream", "obdeect-stream-from-corsika"),
+    ("ray-tracing", "trace-stream"): (
+        "obdeect.ray_tracing",
+        "obdeect-ray-tracing-trace-stream",
+    ),
 }
 
 
@@ -309,6 +315,20 @@ def ratio_metrics(label, candidate, reference):
     return out
 
 
+def ratio_min_metrics(label, metrics):
+    """Candidate / reference of the minimum wall and CPU over the repetitions (pipeline totals)."""
+    out = {}
+    for key, name in (("wall_s", "wall"), ("cpu_s", "cpu")):
+        candidate = metrics.get(f"{label}_{key}_min")
+        reference = metrics.get(f"reference_{key}_min")
+        if candidate is None or reference is None:
+            continue
+        value = ratio(candidate, reference)
+        if value is not None:
+            out[f"ratio_{name}_{label.removeprefix('candidate_')}_min"] = value
+    return out
+
+
 def _reference_sim(work, source, config, config_dir, atmosphere, name="reference"):
     """sim_telarray Bypass_Optics=0 on the CORSIKA input; its atmosphere is checked from the log."""
     output = cs.simulate(
@@ -498,8 +518,10 @@ def source_candidate(work, spec):
 
 
 def source_reference(work, spec):
-    """LightEmission -> sim_telarray with the same photon counts and camera options."""
-    reference = work / "reference.dat.gz"
+    """LightEmission -> sim_telarray with the same photon counts and camera options.
+
+    The photon file is uncompressed, as the obdeect side's stream: gzip would add its own time."""
+    reference = work / "reference.dat"
     argv = source_camera._reference_argv(
         spec["reference"](spec["events"], spec["photons"]), work
     )
@@ -517,25 +539,52 @@ def source_reference(work, spec):
     ]
 
 
+def run_interleaved(runs, reps, metrics, details):
+    """Measure several pipelines with their repetitions alternating: rep 1 of each, then rep 2 of each.
+
+    runs: [(label, steps)]. A label that raises is recorded as failed and skipped in the later
+    repetitions; the others still run. Returns {label: completed}.
+    """
+    per_stage = {label: {name: [] for name, _ in steps} for label, steps in runs}
+    totals = {label: [] for label, _ in runs}
+    failed = {}
+    for _ in range(reps):
+        for label, steps in runs:
+            if label in failed:
+                continue
+            try:
+                rep_stages, rep_totals = measure(steps, 1)
+            except (RuntimeError, OSError, ValueError) as error:  # reported, not hidden
+                failed[label] = (error, traceback.format_exc())
+                continue
+            for name, records in rep_stages.items():
+                per_stage[label][name].extend(records)
+            totals[label].extend(rep_totals)
+    ok = {}
+    for label, _ in runs:
+        if label in failed:
+            error, trace = failed[label]
+            metrics[f"{label}_completed"] = 0
+            details["failures"][label] = {
+                "error": str(error)[:400],
+                "traceback": trace[-800:],
+            }
+            ok[label] = False
+            continue
+        metrics.update(pipeline_metrics(label, per_stage[label], totals[label]))
+        details["stages"][label] = per_stage[label]
+        details["pipelines"][label] = totals[label]
+        ok[label] = True
+    return ok
+
+
 def _run(label, steps, reps, metrics, details):
-    """Measure one pipeline; a failure is recorded and the other pipelines still run."""
-    try:
-        per_stage, totals = measure(steps, reps)
-    except (RuntimeError, OSError, ValueError) as error:  # reported, not hidden
-        metrics[f"{label}_completed"] = 0
-        details["failures"][label] = {
-            "error": str(error)[:400],
-            "traceback": traceback.format_exc()[-800:],
-        }
-        return False
-    metrics.update(pipeline_metrics(label, per_stage, totals))
-    details["stages"][label] = per_stage
-    details["pipelines"][label] = totals
-    return True
+    """Measure one pipeline (run_interleaved with one label); a failure is recorded."""
+    return run_interleaved([(label, steps)], reps, metrics, details)[label]
 
 
 def _ratios(metrics, reference_ok, candidates):
-    """Candidate / reference ratios of the pipeline totals (only when both completed)."""
+    """Candidate / reference ratios of the pipeline totals, medians and minima (only when both completed)."""
     if not reference_ok:
         return
     ref = {key: metrics[f"reference_{key}"] for key in PHOTON_KEYS}
@@ -544,6 +593,7 @@ def _ratios(metrics, reference_ok, candidates):
             continue
         cand = {key: metrics[f"{label}_{key}"] for key in PHOTON_KEYS}
         metrics.update(ratio_metrics(label.removeprefix("candidate_"), cand, ref))
+        metrics.update(ratio_min_metrics(label, metrics))
 
 
 def sim_telarray_qe(path, grid=WAVELENGTH_GRID):
@@ -1192,27 +1242,50 @@ def run_air_shower(root, work_root, source, config, reps, metrics, details):
     )
     reference_dir = work_root / "reference"
     reference_dir.mkdir(parents=True, exist_ok=True)
-    reference_ok = _run(
-        "reference",
-        shower_reference(
-            reference_dir, source, config, config_dir, inputs["reference_atmosphere"]
-        ),
-        reps,
-        metrics,
-        details,
+    # Steps are built before any run (building runs nothing); repetitions alternate between labels.
+    runs = [
+        (
+            "reference",
+            shower_reference(
+                reference_dir,
+                source,
+                config,
+                config_dir,
+                inputs["reference_atmosphere"],
+            ),
+        )
+    ]
+    for name, threads in THREAD_VARIANTS:
+        work = work_root / name
+        work.mkdir(parents=True, exist_ok=True)
+        runs.append(
+            (f"candidate_{name}", shower_candidate(work, source, inputs, threads))
+        )
+    files = envelope_files(work_root / "envelope", inputs["qe"], headroom)
+    for env_label, threads in ENVELOPE_VARIANTS:
+        env_work = work_root / env_label.removeprefix("candidate_")
+        env_work.mkdir(parents=True, exist_ok=True)
+        runs.append(
+            (
+                env_label,
+                envelope_candidate(env_work, source, inputs, files, threads=threads),
+            )
+        )
+    unthinned_work = work_root / "unthinned"
+    unthinned_work.mkdir(parents=True, exist_ok=True)
+    runs.append(
+        (
+            UNTHINNED_LABEL,
+            envelope_candidate(unthinned_work, source, inputs, None, threads=1),
+        )
     )
+    ok = run_interleaved(runs, reps, metrics, details)
+    reference_ok = ok["reference"]
     candidates = []
     for name, threads in THREAD_VARIANTS:
         label = f"candidate_{name}"
         work = work_root / name
-        work.mkdir(parents=True, exist_ok=True)
-        if _run(
-            label,
-            shower_candidate(work, source, inputs, threads),
-            reps,
-            metrics,
-            details,
-        ):
+        if ok[label]:
             details["counts"][label] = variant_counts(work, work / "candidate.iact")
         details["threads"][label] = threads
         candidates.append(label)
@@ -1220,17 +1293,9 @@ def run_air_shower(root, work_root, source, config, reps, metrics, details):
         "into_simtel_weight": iact_telescope_weight(source)
     }
     metrics["telescope_photons"] = details["counts"]["reference"]["into_simtel_weight"]
-    files = envelope_files(work_root / "envelope", inputs["qe"], headroom)
     for env_label, threads in ENVELOPE_VARIANTS:
         env_work = work_root / env_label.removeprefix("candidate_")
-        env_work.mkdir(parents=True, exist_ok=True)
-        if _run(
-            env_label,
-            envelope_candidate(env_work, source, inputs, files, threads=threads),
-            reps,
-            metrics,
-            details,
-        ):
+        if ok[env_label]:
             metrics.update(
                 child_metrics(env_label, details["stages"][env_label]["pipeline"])
             )
@@ -1241,15 +1306,7 @@ def run_air_shower(root, work_root, source, config, reps, metrics, details):
         metrics["candidate_envelope_headroom"] = headroom
         details["threads"][env_label] = threads
         candidates.append(env_label)
-    unthinned_work = work_root / "unthinned"
-    unthinned_work.mkdir(parents=True, exist_ok=True)
-    if _run(
-        UNTHINNED_LABEL,
-        envelope_candidate(unthinned_work, source, inputs, None, threads=1),
-        reps,
-        metrics,
-        details,
-    ):
+    if ok[UNTHINNED_LABEL]:
         metrics.update(
             child_metrics(
                 UNTHINNED_LABEL, details["stages"][UNTHINNED_LABEL]["pipeline"]
@@ -1295,16 +1352,16 @@ def run_source(root, work_root, name, reps, metrics, details):
             "bypass_optics": spec["bypass"],
         }
     )
-    reference_ok = _run(
-        "reference", source_reference(reference_dir, spec), reps, metrics, details
-    )
-    _run(
-        "candidate_threads1",
-        source_candidate(candidate_dir, spec),
+    ok = run_interleaved(
+        [
+            ("reference", source_reference(reference_dir, spec)),
+            ("candidate_threads1", source_candidate(candidate_dir, spec)),
+        ],
         reps,
         metrics,
         details,
     )
+    reference_ok = ok["reference"]
     details["threads"]["candidate_threads1"] = (
         "1 (all stages single-threaded; default is the same)"
     )

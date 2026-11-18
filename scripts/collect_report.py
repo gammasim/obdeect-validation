@@ -257,6 +257,57 @@ def _gated_table(case: dict) -> list[str]:
     return lines + [""]
 
 
+def _labelled_checks(case: dict, entry: dict, step: dict, metrics: dict) -> list[str]:
+    """Checks of an appendix case in words: the checks named in the entry's 'check_labels'
+    (label, measured value, result), and one line for the bookkeeping checks (patterns in the
+    step's 'bookkeeping_checks': runs completed, repetitions)."""
+    labels = entry.get("check_labels", {})
+    patterns = step.get("bookkeeping_checks", [])
+    checks = case.get("metrics", [])
+    bookkeeping = [
+        c
+        for c in checks
+        if c["metric"] not in labels
+        and any(fnmatch.fnmatchcase(c["metric"], p) for p in patterns)
+    ]
+    lines = []
+    missing = (
+        case.get("missing", [])
+        + case.get("missing_inputs", [])
+        + case.get("missing_modules", [])
+    )
+    if missing:
+        lines += [
+            "Not run, missing: " + ", ".join(f"`{name}`" for name in missing) + ".",
+            "",
+        ]
+    shown = [c for c in checks if c not in bookkeeping]
+    if shown:
+        lines += ["| Check | Measured | Result |", "|---|---|---|"]
+        for check in shown:
+            label = labels.get(check["metric"], {"label": f"`{check['metric']}`"})
+            value = (
+                format_row(label.get("value", ""), metrics) if "value" in label else ""
+            )
+            if not value or value == MISSING:
+                value = str(check.get("actual", MISSING))
+            lines.append(
+                f"| {label['label']} | {value} | {check.get('status', MISSING)} |"
+            )
+        lines.append("")
+    if bookkeeping:
+        failed = [c["metric"] for c in bookkeeping if c.get("status") != "PASS"]
+        text = (
+            f"All runs completed with their repetitions ({len(bookkeeping)} checks)."
+            if not failed
+            else "Runs that did not complete: "
+            + ", ".join(f"`{m}`" for m in failed)
+            + "."
+        )
+        lines += [text, ""]
+    return lines
+
+
 def _cell(column: dict, key: str, metrics: dict) -> str:
     """Value of one table cell: the column metric with {row} replaced by the row key. A column
     without 'format' shows the value as it is (flags); a number column shows '–' for other types."""
@@ -370,6 +421,17 @@ def _overview(
     return lines + [""]
 
 
+def _host(report: Path, cases: list[dict]) -> str | None:
+    """Host description of the first case whose details carry one (host or host_info)."""
+    for case in cases:
+        details = _read_json(report / case["id"] / "details.json")
+        for key in ("host", "host_info"):
+            host = details.get(key)
+            if isinstance(host, dict) and host.get("host"):
+                return host["host"]
+    return None
+
+
 def _step_section(
     number: int,
     step: dict,
@@ -383,6 +445,9 @@ def _step_section(
     appendix step (performance) starts with its own overview table."""
     lines = [f"## {number}. {step['title']}", "", step.get("intro", ""), ""]
     if step.get("appendix"):
+        host = _host(report, cases)
+        if host:
+            lines += [f"Host: {host}", ""]
         lines = [f'<a id="step-{step["key"]}"></a>', "", *lines]
     lines += _notes(notes, step["key"])
     if step.get("appendix"):
@@ -397,7 +462,11 @@ def _step_section(
             f"### {_title(entry, case, step)} — {case.get('status', MISSING)}",
             "",
         ]
-        if case.get("name") and case["name"] != _title(entry, case, step):
+        if (
+            case.get("name")
+            and case["name"] != _title(entry, case, step)
+            and not step.get("appendix")
+        ):
             lines += [f"Case: {case['name']}", ""]
         if entry.get("description"):
             lines += [entry["description"], ""]
@@ -415,14 +484,20 @@ def _step_section(
             lines.append("")
         for table in entry.get("tables", []):
             lines += _table(table, metrics)
-        if case.get("report_only") and case.get("metrics"):
-            lines += _gated_table(case)
         files = [
             f"[{name}]({case['id']}/{name})"
             for name in ("metrics.json", "details.json")
             if (case_dir / name).is_file()
         ]
-        lines += [f"`{case['id']}`: {_checks(case)}. " + " · ".join(files), ""]
+        if step.get("appendix"):
+            # In words, with a notes block per case for the analysis of its numbers.
+            lines += _labelled_checks(case, entry, step, metrics)
+            lines += _notes(notes, _anchor(case["id"]))
+            lines += [f"Data: `{case['id']}` · " + " · ".join(files), ""]
+        else:
+            if case.get("report_only") and case.get("metrics"):
+                lines += _gated_table(case)
+            lines += [f"`{case['id']}`: {_checks(case)}. " + " · ".join(files), ""]
         lines += _figures(case_dir, entry, report)
         if current and entry.get("differences"):
             text = format_row(entry["differences"], metrics)

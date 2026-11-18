@@ -4,7 +4,8 @@
     "cpu_model": "0x000",
     "machine": "aarch64",
     "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
-    "obdeect_version": "obdeect-stream 0.9.2.dev7+gd19279a3a\nobdeect-propagation 0.9.2.dev7+gd19279a3a\nobdeect-sources 0.9.2.dev7+gd19279a3a\nobdeect-ray-tracing 0.9.2.dev7+gd19279a3a\nphoton-stream format 1.0"
+    "obdeect_version": "obdeect-stream 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-propagation 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-sources 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-ray-tracing 0.9.3.dev2+g31749a2a6.d20261117\nphoton-stream format 1.0",
+    "host": "Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs"
   },
   "pipes": {
     "cat_tee": {
@@ -17,37 +18,37 @@
           "argv": [
             [
               "cat",
-              "/tmp/perf-pipe-t3eun3se/showers.gst"
+              "/tmp/perf-pipe-igyzh8kj/showers.gst"
             ],
             [
               "tee",
-              "/tmp/perf-pipe-t3eun3se/tee-copy.gst"
+              "/tmp/perf-pipe-igyzh8kj/tee-copy.gst"
             ]
           ],
-          "wall_s": 0.4619236510479823,
-          "cpu_s": 0.5218149999999999,
-          "peak_rss_mb": 2.19140625,
+          "wall_s": 0.35227716201916337,
+          "cpu_s": 0.431157,
+          "peak_rss_mb": 2.42578125,
           "children": [
             {
               "name": "cat",
               "argv": [
                 "cat",
-                "/tmp/perf-pipe-t3eun3se/showers.gst"
+                "/tmp/perf-pipe-igyzh8kj/showers.gst"
               ],
-              "wall_s": 0.4619236510479823,
-              "cpu_s": 0.173893,
-              "peak_rss_mb": 2.171875,
+              "wall_s": 0.35227716201916337,
+              "cpu_s": 0.123307,
+              "peak_rss_mb": 2.42578125,
               "returncode": 0
             },
             {
               "name": "tee",
               "argv": [
                 "tee",
-                "/tmp/perf-pipe-t3eun3se/tee-copy.gst"
+                "/tmp/perf-pipe-igyzh8kj/tee-copy.gst"
               ],
-              "wall_s": 0.4618257760303095,
-              "cpu_s": 0.34792199999999995,
-              "peak_rss_mb": 2.19140625,
+              "wall_s": 0.3522117460379377,
+              "cpu_s": 0.30785,
+              "peak_rss_mb": 2.2890625,
               "returncode": 0
             }
           ]
@@ -56,37 +57,37 @@
           "argv": [
             [
               "cat",
-              "/tmp/perf-pipe-t3eun3se/showers.gst"
+              "/tmp/perf-pipe-igyzh8kj/showers.gst"
             ],
             [
               "tee",
-              "/tmp/perf-pipe-t3eun3se/tee-copy.gst"
+              "/tmp/perf-pipe-igyzh8kj/tee-copy.gst"
             ]
           ],
-          "wall_s": 0.41771425993647426,
-          "cpu_s": 0.36764199999999997,
-          "peak_rss_mb": 2.41796875,
+          "wall_s": 0.4100802119355649,
+          "cpu_s": 0.391661,
+          "peak_rss_mb": 2.34375,
           "children": [
             {
               "name": "cat",
               "argv": [
                 "cat",
-                "/tmp/perf-pipe-t3eun3se/showers.gst"
+                "/tmp/perf-pipe-igyzh8kj/showers.gst"
               ],
-              "wall_s": 0.41771425993647426,
-              "cpu_s": 0.096053,
-              "peak_rss_mb": 2.41796875,
+              "wall_s": 0.3089193860068917,
+              "cpu_s": 0.12178499999999999,
+              "peak_rss_mb": 2.34375,
               "returncode": 0
             },
             {
               "name": "tee",
               "argv": [
                 "tee",
-                "/tmp/perf-pipe-t3eun3se/tee-copy.gst"
+                "/tmp/perf-pipe-igyzh8kj/tee-copy.gst"
               ],
-              "wall_s": 0.41763417690526694,
-              "cpu_s": 0.27158899999999997,
-              "peak_rss_mb": 2.28125,
+              "wall_s": 0.4100802119355649,
+              "cpu_s": 0.269876,
+              "peak_rss_mb": 2.2109375,
               "returncode": 0
             }
           ]
@@ -95,46 +96,46 @@
           "argv": [
             [
               "cat",
-              "/tmp/perf-pipe-t3eun3se/showers.gst"
+              "/tmp/perf-pipe-igyzh8kj/showers.gst"
             ],
             [
               "tee",
-              "/tmp/perf-pipe-t3eun3se/tee-copy.gst"
+              "/tmp/perf-pipe-igyzh8kj/tee-copy.gst"
             ]
           ],
-          "wall_s": 0.431172727025114,
-          "cpu_s": 0.28023699999999996,
-          "peak_rss_mb": 2.36328125,
+          "wall_s": 0.38562441105023026,
+          "cpu_s": 0.282778,
+          "peak_rss_mb": 2.35546875,
           "children": [
             {
               "name": "cat",
               "argv": [
                 "cat",
-                "/tmp/perf-pipe-t3eun3se/showers.gst"
+                "/tmp/perf-pipe-igyzh8kj/showers.gst"
               ],
-              "wall_s": 0.35856782307382673,
-              "cpu_s": 0.07779299999999999,
-              "peak_rss_mb": 2.1953125,
+              "wall_s": 0.2548828739672899,
+              "cpu_s": 0.094039,
+              "peak_rss_mb": 2.35546875,
               "returncode": 0
             },
             {
               "name": "tee",
               "argv": [
                 "tee",
-                "/tmp/perf-pipe-t3eun3se/tee-copy.gst"
+                "/tmp/perf-pipe-igyzh8kj/tee-copy.gst"
               ],
-              "wall_s": 0.431172727025114,
-              "cpu_s": 0.20244399999999999,
-              "peak_rss_mb": 2.36328125,
+              "wall_s": 0.38562441105023026,
+              "cpu_s": 0.188739,
+              "peak_rss_mb": 2.2890625,
               "returncode": 0
             }
           ]
         }
       ],
       "gb_per_s_per_rep": [
-        0.7545952392980908,
-        0.8344589146968782,
-        0.8084124207134685
+        0.989463483815163,
+        0.8499931912217443,
+        0.9038986589326601
       ]
     },
     "to_simtel": {
@@ -147,26 +148,67 @@
           "argv": [
             [
               "cat",
-              "/tmp/perf-pipe-t3eun3se/showers.gst"
+              "/tmp/perf-pipe-igyzh8kj/showers.gst"
             ],
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "-o",
-              "/tmp/perf-pipe-t3eun3se/roundtrip.iact"
+              "/tmp/perf-pipe-igyzh8kj/roundtrip.iact"
             ]
           ],
-          "wall_s": 0.7235767130041495,
-          "cpu_s": 0.487437,
-          "peak_rss_mb": 48.15625,
+          "wall_s": 0.572297707083635,
+          "cpu_s": 0.37103200000000003,
+          "peak_rss_mb": 48.05078125,
           "children": [
             {
               "name": "cat",
               "argv": [
                 "cat",
-                "/tmp/perf-pipe-t3eun3se/showers.gst"
+                "/tmp/perf-pipe-igyzh8kj/showers.gst"
               ],
-              "wall_s": 0.7135834869695827,
-              "cpu_s": 0.08680399999999999,
+              "wall_s": 0.5656474240822718,
+              "cpu_s": 0.08023,
+              "peak_rss_mb": 2.25390625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "-o",
+                "/tmp/perf-pipe-igyzh8kj/roundtrip.iact"
+              ],
+              "wall_s": 0.572297707083635,
+              "cpu_s": 0.290802,
+              "peak_rss_mb": 48.05078125,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/perf-pipe-igyzh8kj/showers.gst"
+            ],
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/perf-pipe-igyzh8kj/roundtrip.iact"
+            ]
+          ],
+          "wall_s": 0.5728984150337055,
+          "cpu_s": 0.37402599999999997,
+          "peak_rss_mb": 48.22265625,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/perf-pipe-igyzh8kj/showers.gst"
+              ],
+              "wall_s": 0.528991347993724,
+              "cpu_s": 0.092615,
               "peak_rss_mb": 2.3515625,
               "returncode": 0
             },
@@ -175,11 +217,11 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "-o",
-                "/tmp/perf-pipe-t3eun3se/roundtrip.iact"
+                "/tmp/perf-pipe-igyzh8kj/roundtrip.iact"
               ],
-              "wall_s": 0.7235767130041495,
-              "cpu_s": 0.400633,
-              "peak_rss_mb": 48.15625,
+              "wall_s": 0.5728984150337055,
+              "cpu_s": 0.28141099999999997,
+              "peak_rss_mb": 48.22265625,
               "returncode": 0
             }
           ]
@@ -188,27 +230,27 @@
           "argv": [
             [
               "cat",
-              "/tmp/perf-pipe-t3eun3se/showers.gst"
+              "/tmp/perf-pipe-igyzh8kj/showers.gst"
             ],
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "-o",
-              "/tmp/perf-pipe-t3eun3se/roundtrip.iact"
+              "/tmp/perf-pipe-igyzh8kj/roundtrip.iact"
             ]
           ],
-          "wall_s": 0.5808487730100751,
-          "cpu_s": 0.357438,
-          "peak_rss_mb": 48.1484375,
+          "wall_s": 0.7260685049695894,
+          "cpu_s": 0.341453,
+          "peak_rss_mb": 48.046875,
           "children": [
             {
               "name": "cat",
               "argv": [
                 "cat",
-                "/tmp/perf-pipe-t3eun3se/showers.gst"
+                "/tmp/perf-pipe-igyzh8kj/showers.gst"
               ],
-              "wall_s": 0.5709034650353715,
-              "cpu_s": 0.082227,
-              "peak_rss_mb": 2.34375,
+              "wall_s": 0.48037545301485807,
+              "cpu_s": 0.118562,
+              "peak_rss_mb": 2.25390625,
               "returncode": 0
             },
             {
@@ -216,61 +258,20 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "-o",
-                "/tmp/perf-pipe-t3eun3se/roundtrip.iact"
+                "/tmp/perf-pipe-igyzh8kj/roundtrip.iact"
               ],
-              "wall_s": 0.5808487730100751,
-              "cpu_s": 0.275211,
-              "peak_rss_mb": 48.1484375,
-              "returncode": 0
-            }
-          ]
-        },
-        {
-          "argv": [
-            [
-              "cat",
-              "/tmp/perf-pipe-t3eun3se/showers.gst"
-            ],
-            [
-              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
-              "-o",
-              "/tmp/perf-pipe-t3eun3se/roundtrip.iact"
-            ]
-          ],
-          "wall_s": 1.2911426438950002,
-          "cpu_s": 0.463867,
-          "peak_rss_mb": 48.21875,
-          "children": [
-            {
-              "name": "cat",
-              "argv": [
-                "cat",
-                "/tmp/perf-pipe-t3eun3se/showers.gst"
-              ],
-              "wall_s": 0.7422973749926314,
-              "cpu_s": 0.121392,
-              "peak_rss_mb": 2.29296875,
-              "returncode": 0
-            },
-            {
-              "name": "to_simtel",
-              "argv": [
-                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
-                "-o",
-                "/tmp/perf-pipe-t3eun3se/roundtrip.iact"
-              ],
-              "wall_s": 1.2911426438950002,
-              "cpu_s": 0.342475,
-              "peak_rss_mb": 48.21875,
+              "wall_s": 0.7260685049695894,
+              "cpu_s": 0.22289099999999998,
+              "peak_rss_mb": 48.046875,
               "returncode": 0
             }
           ]
         }
       ],
       "gb_per_s_per_rep": [
-        0.4817255471818937,
-        0.6000966244512561,
-        0.269966598693139
+        0.6090630517746615,
+        0.6084244236903549,
+        0.48007231495959085
       ]
     }
   },
@@ -279,7 +280,7 @@
     "reps": 3,
     "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
     "events": 20,
-    "work_dir": "/tmp/perf-pipe-t3eun3se",
+    "work_dir": "/tmp/perf-pipe-igyzh8kj",
     "native_stream_bytes": 348565388,
     "limit_gb_per_s": 1.0,
     "gigabyte": "decimal, 1e9 bytes",

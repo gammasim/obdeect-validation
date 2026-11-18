@@ -260,6 +260,7 @@ def host_info():
         "machine": platform.machine(),
         "platform": platform.platform(),
         "obdeect_version": version,
+        "host": os.environ.get("OBDEECT_VALIDATION_HOST"),
     }
 
 
