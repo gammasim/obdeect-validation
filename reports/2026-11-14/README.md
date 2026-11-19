@@ -585,7 +585,7 @@ The five obdeect programs are connected by a pipe and run at the same time. The 
 Host: Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs
 
 <!-- notes:performance -->
-**Run.** 18–19 November 2026 (`results/perf-2026-11-18`): the nine cases in one suite call (`final`), then the stand-alone stages again (`stages2`, after a missing `--telescopes` was added to its QE variant) and the array case again (`array`, after a harness bug broke its tee candidate in the first runs). **Everything on one core** (`CPUS=0`), so wall and CPU time are comparable and the five programs of a pipe share that core. obdeect branch `native-trace-stream` plus uncommitted changes (`--telescopes` for propagation in the harness, `StdinBuffer` for `propagation run` and `trace-stream`); sim_telarray with `Bypass_Optics=3` (the checkout of the workspace; `container.json` records no commit). Machine: Apple M3 Pro laptop, podman VM with 6 CPUs, shared with other users (17 logged in, load 1–2.7 before the runs). Every case is flagged "timing unreliable" (load above 1 or repetitions differing by more than 5 %), but the gamma case was measured in all ten suite calls of the day: sim_telarray 14.3–14.7 s CPU, chain 14.1–14.7 s, ratio 0.97–1.01. Final numbers need an idle Linux node.
+**Run (macOS).** 18–19 November 2026: the nine cases, **everything on one core** (`CPUS=0`), so wall and CPU time are comparable and the five programs of a pipe share that core. obdeect branch `native-trace-stream` plus uncommitted changes (`--telescopes` for propagation in the harness, `StdinBuffer` for `propagation run` and `trace-stream`); sim_telarray with `Bypass_Optics=3`. Machine: Apple M3 Pro laptop, podman VM with 6 CPUs, shared with other users (load 1–2.7 before the runs). Every case is flagged "timing unreliable" (load above 1 or repetitions differing by more than 5 %), but the gamma case was measured in all ten suite calls of the day: sim_telarray 14.3–14.7 s CPU, chain 14.1–14.7 s, ratio 0.97–1.01. Final numbers need an idle node.
 
 **In short**
 
@@ -593,10 +593,9 @@ Host: Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs
 2. **Three quarters of the CPU is the sim_telarray camera simulation** (10.6 of 14.1 s for gammas), the same code on both sides. It receives fewer photons in the obdeect chain than in the sim_telarray run (QE pre-selection): 2.2 s less. That pays for the rest of the chain: from-corsika, propagation, trace-stream and to-simtel take 3.6 s, sim_telarray's optics with the atmosphere 1.4 s.
 3. **Reading and atmosphere (from-corsika + propagation) are 20 % (gamma) and 30 % (proton) of the sim_telarray CPU**; the budget is 10 %. This is the part to optimise next.
 4. **The optics are not the problem.** trace-stream traces the preselected photons in 0.83 s (sim_telarray's optics, with the atmosphere: 1.4 s).
-5. **For six telescopes the chain needs 0.43× the CPU of sim_telarray**, but this is not an obdeect gain: the chain costs about 13 s per telescope (as for one LST), while one sim_telarray run for six telescopes costs 30 s per telescope, 2.1× more than for one LST. The cause is not understood (see the case).
+5. **Six telescopes: the chain costs the same CPU per telescope as for one LST**, 13 s on macOS (33 s on Linux). The ratio to sim_telarray (0.43× macOS, 0.59× Linux) is lower only because sim_telarray costs more per telescope in the six-telescope run (30 s against 14 s on macOS, 56 s against 34 s on Linux). This is not an obdeect gain, and the cause is not understood (see the case). Do not quote it as the expected gain for an array.
 6. **Checks.** Failing: reading + atmosphere ≤ 10 %, the wall budget and the all-cores CPU budget for gammas, the wall budget and the all-cores budgets for protons, and the 1 GB/s pipe budget, which a plain copy does not reach here either. All physics checks pass.
 
-**Compared with the first run of 17 November** (20 showers, propagation on all telescopes of the input, `std::cin`): the chain needed 1.23× (gamma) and 1.26× (proton) the CPU of sim_telarray; reading and atmosphere took 0.078 s per shower, now 0.027 s. Two changes were made in between: propagation keeps only the simulated telescope (`--telescopes`), and `propagation run` and `trace-stream` read standard input through `StdinBuffer`. Their separate effects were not measured. With libstdc++ (this container) `std::cin` is not slow, so the telescope selection is the likely cause. The showers also differ (100 instead of 20, other seeds).
 
 #### Linux and macOS compared
 
@@ -614,7 +613,7 @@ The same nine cases, run on the Linux machine (apptainer, 4 cases at once, one c
 
 1. **Same result on both machines.** The obdeect chain needs 1.00× (gamma) and 0.96× (proton) the CPU of sim_telarray on Linux, against 0.99× and 0.96× on macOS. Reading + atmosphere are 18 % and 31 % of the sim_telarray CPU (macOS 20 % and 30 %). The wall budget (≤ 1.00) still fails on Linux, by 10 % for gammas and 6 % for protons (macOS 3 % and 2 %).
 2. **The Linux node is about 2× slower per core** than the M3 Pro (gamma 431 against 211 ns per photon, proton 1.6×), for every program alike. It does not change which program dominates: the sim_telarray camera stays at about 75 % of the CPU.
-3. **Six telescopes: 0.59× the CPU on Linux, 0.43× on macOS.** The chain costs the same per telescope as for one LST (33 s against 34 s). sim_telarray's cost per telescope grows 1.6× from one to six telescopes here (56 s against 34 s), 2.1× on macOS. Still not understood; it is on the sim_telarray side.
+3. **Six telescopes: the chain costs the same per telescope as for one LST** (33 s on Linux, 34 s for one LST). The ratio to sim_telarray, 0.59× on Linux and 0.43× on macOS, comes from sim_telarray costing 1.6× (Linux) and 2.1× (macOS) more per telescope in the six-telescope run. Not understood; it is on the sim_telarray side, so the ratio is not the expected gain for an array.
 4. **Pipes are slower in wall time on Linux** (0.26 GB/s against 0.68 GB/s for `cat | tee`) at the same CPU time: the 1.5 GB input comes from the disk of a shared node, not from a warm page cache. Both machines miss the 1 GB/s budget.
 
 ![obdeect chain and the single programs, macOS against Linux.](linux-vs-macos.png)
@@ -955,7 +954,7 @@ All runs completed with their repetitions (6 checks).
 
 **Per shower** (CPU): from-corsika 0.009 s, propagation 0.013 s, trace-stream 0.063 s, to-simtel 0.005 s.
 
-**Threads.** Not measured: the run was pinned to one core, so only 1 thread was timed (speedup 1.00 by definition). The earlier laptop run (6 cores available) gave 1.7× on 2 threads and 2.4× on 4 (60 % efficiency). The thread scaling needs a multi-core run.
+**Threads.** Not measured in this run: it was pinned to one core, so only 1 thread was timed (speedup 1.00 by definition). The thread scaling needs a multi-core run.
 <!-- /notes -->
 
 Data: `performance.scaling` · [metrics.json](performance.scaling/metrics.json) · [details.json](performance.scaling/details.json)
@@ -999,7 +998,7 @@ Data: `performance.scaling` · [metrics.json](performance.scaling/metrics.json) 
 All runs completed with their repetitions (9 checks).
 
 <!-- notes:performance-air-shower-array -->
-**The chain needs 0.43× the CPU of sim_telarray (77.8 s against 181.8 s), but that is not an obdeect gain.** Where the obdeect time goes (CPU s): six camera stages 66 (10.2–13.0 each), from-corsika and propagation, shared by all telescopes, about 8, trace-stream 3, tee 0.4.
+**The chain needs 0.43× the CPU of sim_telarray (77.8 s against 181.8 s) on macOS, but that is not an obdeect gain.** On Linux the ratio is 0.59× (200 s against 337 s). Where the obdeect time goes (macOS, CPU s): six camera stages 66 (10.2–13.0 each), from-corsika and propagation, shared by all telescopes, about 8, trace-stream 3, tee 0.4.
 
 **Per telescope**, in CPU seconds:
 
@@ -1008,13 +1007,12 @@ All runs completed with their repetitions (9 checks).
 | sim_telarray | 14.3 | 30.3 (181.8 / 6) |
 | obdeect chain | 14.1 | 13.0 (77.8 / 6) |
 
-The obdeect cost per telescope is the same as for one LST. Sharing the reading and the atmosphere between telescopes saves little now: the shared chain needs 0.98× the CPU of one full pipe per telescope (earlier: 0.73×, when propagation was still expensive). What differs is sim_telarray: **2.1× more CPU per telescope** in the six-telescope run than in the one-LST run. If its cameras cost what the obdeect-side cameras cost (66 s in total), its optics and atmosphere would take about 115 s, 19 s per telescope against 1.4 s for one LST. **This is not understood.** It is not the number of photons per telescope: the array input puts fewer photons on each telescope (mean 1.0e5 per telescope and event) than the single-LST input (1.8e5). Open candidates: per-telescope overhead of a sim_telarray run with six telescopes (trigger, array configuration, the MST models), or the larger core scatter (250 m against 100 m). A sim_telarray run for one telescope of this array on this input would separate the causes. Until then, do not quote 0.43 as the expected gain for an array.
+The obdeect cost per telescope is the same as for one LST. Sharing the reading and the atmosphere between telescopes saves little: the shared chain needs 0.98× the CPU of one full pipe per telescope. What differs is sim_telarray: **2.1× more CPU per telescope** (macOS; 1.6× on Linux, 56 s against 34 s) in the six-telescope run than in the one-LST run. If its cameras cost what the obdeect-side cameras cost (66 s in total on macOS), its optics and atmosphere would take about 115 s, 19 s per telescope against 1.4 s for one LST. **This is not understood.** It is not the number of photons per telescope: the array input puts fewer photons on each telescope (mean 1.0e5 per telescope and event) than the single-LST input (1.8e5). Open candidates: per-telescope overhead of a sim_telarray run with six telescopes (trigger, array configuration, the MST models), or the larger core scatter (250 m against 100 m). A sim_telarray run for one telescope of this array on this input, and runs with 1, 2, 4 and 6 identical LSTs, would separate the causes. Until then, the safe statement is: the obdeect chain costs about the same CPU per telescope as sim_telarray for one LST, and sharing the stream between telescopes gives no extra gain. Do not quote 0.43 or 0.59 as the expected gain for an array.
 
 **The showers of the two cases differ.** Single-LST input: seeds 1017…, core scatter 100 m, three telescopes of 12 m radius. Array input: seeds 1617…, scatter 250 m, six telescopes. Within a case, sim_telarray and the obdeect chain read the same file (100 telescope events), so the showers are identical there by construction. Times of different cases are not strictly like for like.
 
 **Physics.** The photoelectron bias is within its limit for all six telescopes (−0.9 % to +0.7 %).
 
-**Harness bug found on the way.** In the first runs the tee candidate failed (`--telescopes given twice`: the harness added the selection once for the single telescope and once for the group); fixed in `with_telescopes`, with a test.
 <!-- /notes -->
 
 Data: `performance.air-shower-array` · [metrics.json](performance.air-shower-array/metrics.json) · [details.json](performance.air-shower-array/details.json)
