@@ -1,0 +1,1864 @@
+
+IACT control parameter line: SPLIT_AUTO 0
+Activating auto-split mode above 10000000 bunches.
+
+IACT control parameter line: IO_BUFFER 800MB
+
+IACT control parameter line: MAX_BUNCHES 1000000
+
+Atmospheric profile 1 with 50 levels read from file atmprof1.dat
+
+Initialize atmosphere ranging from 0.000 to 120.000 km a.s.l.
+
+Results of the atmosphere fit:
+  Layer 1:   0.00 km < h <  10.00 km: a =     -135.704, b =         1174, c =       994186
+  Layer 2:  10.00 km < h <  19.00 km: a =     -21.4758, b =      1265.45, c =       719349
+  Layer 3:  19.00 km < h <  42.50 km: a =     0.587392, b =      1350.33, c =       636143
+  Layer 4:  42.50 km < h < 105.00 km: a =  -0.00057717, b =      560.651, c =       772170
+  Layer 5: 105.00 km < h < 120.00 km: a =   0.00095744, b =            1, c =  1.25334e+10
+  Sum of residuals squared: 0.164606 (compared to 0.222381 with starting layers)
+
+
+Altitude [km]    rho(table)     rho(fit)       thick(table)  thick(fit)
+       0.0      1.16680e-03   1.18087e-03      1.03830e+03   1.03830e+03
+       1.0      1.06510e-03   1.06787e-03      9.26780e+02   9.25958e+02
+       2.0      9.69720e-04   9.65684e-04      8.25110e+02   8.24366e+02
+       3.0      8.75840e-04   8.73276e-04      7.32910e+02   7.32495e+02
+       4.0      7.95120e-04   7.89711e-04      6.49430e+02   6.49416e+02
+       5.0      7.20040e-04   7.14142e-04      5.73730e+02   5.74287e+02
+       6.0      6.50210e-04   6.45805e-04      5.05280e+02   5.06347e+02
+       7.0      5.85520e-04   5.84007e-04      4.43550e+02   4.44908e+02
+       8.0      5.26490e-04   5.28122e-04      3.88000e+02   3.89348e+02
+       9.0      4.70730e-04   4.77585e-04      3.38190e+02   3.39105e+02
+      10.0      4.20660e-04   4.38098e-04      2.93670e+02   2.93670e+02
+      11.0      3.74170e-04   3.81240e-04      2.53970e+02   2.52769e+02
+      12.0      3.32050e-04   3.31761e-04      2.18700e+02   2.17176e+02
+      13.0      2.92370e-04   2.88703e-04      1.87530e+02   1.86203e+02
+      14.0      2.58610e-04   2.51234e-04      1.60010e+02   1.59249e+02
+      15.0      2.25900e-04   2.18628e-04      1.35820e+02   1.35794e+02
+      16.0      1.96420e-04   1.90253e-04      1.14740e+02   1.15383e+02
+      17.0      1.67660e-04   1.65561e-04      9.65740e+01   9.76207e+01
+      18.0      1.38370e-04   1.44074e-04      8.13200e+01   8.21638e+01
+      19.0      1.14510e-04   1.07092e-04      6.87130e+01   6.87130e+01
+      20.0      9.52770e-05   9.15136e-05      5.82530e+01   5.88031e+01
+      21.0      7.94050e-05   7.82016e-05      4.95430e+01   5.03348e+01
+      22.0      6.64200e-05   6.68261e-05      4.22710e+01   4.30983e+01
+      23.0      5.62230e-05   5.71052e-05      3.61530e+01   3.69145e+01
+      24.0      4.77100e-05   4.87984e-05      3.09680e+01   3.16302e+01
+      25.0      4.04630e-05   4.17000e-05      2.65690e+01   2.71146e+01
+      27.5      2.70730e-05   2.81489e-05      1.82390e+01   1.84941e+01
+      30.0      1.83100e-05   1.90014e-05      1.26370e+01   1.26750e+01
+      32.5      1.24950e-05   1.28266e-05      8.83290e+00   8.74694e+00
+      35.0      8.60420e-06   8.65838e-06      6.22560e+00   6.09536e+00
+      37.5      5.97820e-06   5.84469e-06      4.42270e+00   4.30545e+00
+      40.0      4.18570e-06   3.94536e-06      3.16550e+00   3.09721e+00
+      42.5      2.95640e-06   2.95554e-06      2.28160e+00   2.28160e+00
+      45.0      2.09310e-06   2.13810e-06      1.65660e+00   1.65040e+00
+      47.5      1.50010e-06   1.54675e-06      1.21160e+00   1.19378e+00
+      50.0      1.10190e-06   1.11895e-06      8.88900e-01   8.63443e-01
+      55.0      6.03590e-07   5.85591e-07      4.74960e-01   4.51599e-01
+      60.0      3.29160e-07   3.06463e-07      2.48660e-01   2.36064e-01
+      65.0      1.78720e-07   1.60384e-07      1.25490e-01   1.23266e-01
+      70.0      9.23430e-08   8.39351e-08      6.00860e-02   6.42350e-02
+      75.0      4.49110e-08   4.39265e-08      2.71850e-02   3.33416e-02
+      80.0      2.07480e-08   2.29885e-08      1.15400e-02   1.71738e-02
+      85.0      8.66200e-09   1.20308e-08      4.62140e-03   8.71263e-03
+      90.0      3.38740e-09   6.29617e-09      1.81250e-03   4.28455e-03
+      95.0      1.30150e-09   3.29503e-09      7.22170e-04   1.96716e-03
+     100.0      5.28090e-10   1.72442e-09      2.93470e-04   7.54375e-04
+     105.0      2.13780e-10   7.97867e-11      1.19680e-04   1.19680e-04
+     110.0      9.33530e-11   7.97867e-11      4.70090e-05   7.97867e-05
+     115.0      4.18720e-11   7.97867e-11      1.49040e-05   3.98933e-05
+     120.0      2.03200e-11   7.97867e-11      0.00000e+00   0.00000e+00
+
+ Std. dev. in density ratio: 2.704 percent, in thickness ratio: 1.161 percent,
+ including only layers at thickness above 1 g/cm^2 (altitude below 49.049 km).
+
+
+ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+   OOO      OOO     OOOO       OOOO    OO   O      O      O
+  O   O    O   O    O    O    O    O   OO   O    O       O O
+ O        O     O   O     O   O        OO   O  O        O   O
+ O        O     O   O    O     OOOO    OO   OO         O     O
+ O        O     O   OOOO           O   OO   O  O       OOOOOOO
+  O   O    O   O    O   O     O    O   OO   O    O     O     O
+   OOO      OOO     O     O    OOOO    OO   O      O   O     O
+
+ COSMIC RAY SIMULATION FOR KASCADE
+
+ A PROGRAM TO SIMULATE EXTENSIVE AIR SHOWERS IN ATMOSPHERE
+
+ BASED ON A PROGRAM OF P.K.F. GRIEDER, UNIVERSITY BERN, SWITZERLAND
+ QGSJET-III MODEL ACCORDING TO S.S. OSTAPCHENKO, DESY, GERMANY
+ HDPM MODEL ACCORDING TO J.N. CAPDEVIELLE, COLLEGE DE FRANCE, PARIS, FRANCE
+ URQMD-MODEL FROM THE URQMD-COLLABORATION, FRANKFURT(MAIN), GERMANY
+ EGS4 ACCORDING TO W.R. NELSON, H. HIRAYAMA, D.W.O. ROGERS, SLAC, STANFORD, USA
+ NKG FORMULAS FOR FAST SIMULATION OF EL.MAG. PARTICLES
+
+ REFERENCES: D. HECK, J.KNAPP, J.N. CAPDEVIELLE, G. SCHATZ, T. THOUW,
+             REPORT FZKA 6019 (1998)
+             SEE ALSO WEB PAGE https://www.iap.kit.edu/corsika/
+             KARLSRUHE INSTITUTE OF TECHNOLOGY (KIT)
+             INSTITUTE FOR ASTROPARTICLE PHYSICS (IAP)
+             POSTFACH 3640
+             D-76021 KARLSRUHE
+             GERMANY
+
+ IN CASE OF PROBLEMS CONTACT:   Dr. Tanguy Pierog
+                      e-mail:   tanguy.pierog@kit.edu
+                         FAX:   (49) 721-608-24075
+                       PHONE:   (49) 721-608-28134
+   AND SEND YOUR LIST-FILE BY E-MAIL
+
+ NUMBER OF VERSION :  7.8050
+ DATE   OF VERSION : DECEMBER  18, 2025
+
+ VERSION GENERATED FOR UNIX OR COMPATIBLE SYSTEMS
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  (RECL IS DEFINED IN BYTES)
+  WITH TIMERC DATE ROUTINE
+ ZENITH ANGLE DEPENDENCE FOR VOLUME DETECTOR
+
+ INTERFACE FOR EXTERNAL ATMOSPHERIC PROFILES ENABLED
+ ===================================================
+
+ CHERENKOV RADIATION IS GENERATED
+ ================================
+
+ INTERFACE FOR SYSTEMS OF TELESCOPES OR OTHER CHERENKOV DETECTORS ENABLED
+
+ PRIMARY DIRECTION IS SELECTED FROM VIEWING CONE
+ ===============================================
+
+
+ ========== USERS RUN DIRECTIVES FOR THIS SIMULATION ===========================
+
+ DATA CARDS FOR RUN STEERING ARE EXPECTED FROM STANDARD INPUT
+
+RUNNR 1
+EVTNR 1
+NSHOW 100
+PRMPAR 1
+ERANGE 100 3000
+ESLOPE -2.0
+THETAP 20 20
+PHIP 0 0
+SEED 1617 0 0
+SEED 1629 0 0
+SEED 1643 0 0
+SEED 1661 0 0
+OBSLEV 215600
+ATMOSPHERE 1 Y
+MAGNET 20.0 40.0
+ARRANG 0.0
+HADFLG 0 0 0 0 0 2
+ECUTS 0.3 0.3 0.02 0.02
+ELMFLG F F
+CSCAT 5 25000 0.0
+DATDIR /tmp/maierg_ct/t/
+DIRECT ./
+TELESCOPE -7091 -5235 4500 1300
+TELESCOPE -3528 6592 3250 1300
+TELESCOPE 7531 5021 2820 1300
+TELESCOPE 3088 -6378 3280 1300
+TELESCOPE 2686 20854 1140 915
+TELESCOPE 464 -71 2950 915
+TELFIL gamma-20deg-100-3000GeV-array-north-100showers.iact
+IACT SPLIT_AUTO 0
+IACT IO_BUFFER 800MB
+IACT MAX_BUNCHES 1000000
+EXIT
+
+ END OF DATACARD INPUT
+
+ ATMOSPHERIC REFRACTION IS TAKEN INTO ACCOUNT
+ ============================================
+
+
+
+ FITTED ATMOSPHERIC PARAMETERS:
+ HLAY =   0.0000000000000000        1000000.0000000000        1900000.0000000000        4250000.0000000000        10500000.000000000
+ AATM =  -135.70362649423487       -21.475758511741901       0.58739186336366345       -5.7716958726095058E-004   9.5744001493598934E-004
+ BATM =   1174.0036264942348        1265.4464073466547        1350.3280564946865        560.65071282400993        1.0000000000000000
+ CATM =   994186.38000000000        719349.44109273027        636143.04000000004        772170.16000000003        12533422264.372639
+
+ ========== START OF RUN =======================================================
+
+ PRESENT TIME : 19.11.2026  08:51:48 UTC
+ RANDOM NUMBER GENERATOR AT BEGIN OF RUN :
+ SEQUENCE =  1  SEED =      1617  CALLS =         0  BILLIONS =         0
+ SEQUENCE =  2  SEED =      1629  CALLS =         0  BILLIONS =         0
+ SEQUENCE =  3  SEED =      1643  CALLS =         0  BILLIONS =         0
+ SEQUENCE =  4  SEED =      1661  CALLS =         0  BILLIONS =         0
+
+ PARTICLE OUTPUT TO FILE: ./DAT000001
+
+ CHERENKOV OUTPUT TO FILE: ./CER000001
+
+
+ ========== INTERACTION MODELS =================================================
+ QGSJET TREATS HIGH ENERGY HADRONIC INTERACTIONS
+
+ QGSJET CROSS-SECTIONS ARE TAKEN
+ ====================================================
+ |                                                  |
+ |         QUARK GLUON STRING JET - III MODEL       |
+ |                                                  |
+ |         HADRONIC INTERACTION MONTE CARLO         |
+ |                        BY                        |
+ |                 S. OSTAPCHENKO                   |
+ |                                                  |
+ |             e-mail: sergei@tf.phys.ntnu.no       |
+ |                                                  |
+ |                   Version III-01                 |
+ |                                                  |
+ | Publications to be cited when using this program:|
+ | S. Ostapchenko, PRD 109 (2024) 034002; 094019    |
+ |                                                  |
+ | Any modification has to be approved by the author|
+ ====================================================
+
+  qgaini: cross sections readout from the file: qgsdat-III
+  qgaini: hard cross sections read out
+  qgaini: nuclear cross sections readout from the file sectnu-III
+ NUCLEUS PROJECTILES FRAGMENT REALISTICALLY IN THE FIRST INTERACTION
+ FRAGMENTATION WITH EVAPORATION (PT AFTER JACEE)
+
+ URQMD TREATS LOW ENERGY HADRONIC INTERACTIONS
+ ############################################################
+ ##                                                        ##
+ ##     UrQMD 1.3.1  University of Frankfurt               ##
+ ##                  urqmd@th.physik.uni-frankfurt.de      ##
+ ##                                                        ##
+ ############################################################
+ ##                                                        ##
+ ##     please cite when using this model:                 ##
+ ##     S.A.Bass et al. Prog.Part.Nucl.Phys. 41 (1998) 225 ##
+ ##     M.Bleicher et al. J.Phys. G25  (1999) 1859         ##
+ ##                                                        ##
+ ############################################################
+ pwd:/workdir/simulation_software/corsik
+ Generating table...
+ (1/7) ready.
+ (2/7) ready.
+ (3/7) ready.
+ (4/7) ready.
+ (5/7) ready.
+ (6/7) ready.
+ (7/7) ready.
+ Writing new table...
+ O.K.
+ HIGH ENERGY INTERACTION MODEL USED ABOVE    80.000 GEV LAB ENERGY   OR
+                                             12.324 GEV CM  ENERGY
+ MUON/TAU MULTIPLE SCATTERING AFTER MOLIERE
+
+
+ START EGS4  AIR SHOWER SUBROUTINE VERSION
+
+ ELECTROMAGNETIC COMPONENT SIMULATED WITH EGS4
+
+ DATASET EGSDAT6_3. AVAILABLE
+ DATA FOR MEDIUM #  1, WHICH IS: MEDIUM=AIR-NTP                 ,STERNCID=AIR-NTP
+ MIXT,RHO= 6.1250E-09,NE= 4,COMPOSITION IS :
+ ASYM=N ,Z= 7.,A=   14.007,PZ= 5.39228E-02,RHOZ= 7.55280E-01
+ ASYM=O ,Z= 8.,A=   15.999,PZ= 1.44793E-02,RHOZ= 2.31660E-01
+ ASYM=AR,Z=18.,A=   39.948,PZ= 3.20917E-04,RHOZ= 1.28200E-02
+ ASYM=C ,Z= 6.,A=   12.011,PZ= 3.33024E-06,RHOZ= 4.00000E-05
+ EGS SUCCESSFULLY 'HATCHED' FOR ONE MEDIUM.
+ ELECTRONS CAN BE CREATED AND ANY ELECTRON FOLLOWED DOWN TO
+                                             0.00300 GEV KINETIC ENERGY
+ GAMMAS CAN BE CREATED AND ANY GAMMA FOLLOWED DOWN TO
+                                             0.00300 GEV ENERGY
+ ELECTRON HISTORIES ARE TERMINATED AT        0.02051 GEV
+ GAMMA HISTORIES ARE TERMINATED AT           0.02000 GEV
+
+
+
+ ========== CONSTANTS AND PARAMETERS ===========================================
+
+ PHYSICAL CONSTANTS C(1) TO C(50)
+ 6.37131500E+08  6.00000000E+05  2.00000000E+06  0.00000000E+00  0.00000000E+00
+ 4.58059654E-02  5.73089633E-01  5.28304217E-02  2.50000000E+00  2.07000000E+00
+ 8.20000000E+00  1.00000000E-01  0.00000000E+00  0.00000000E+00  1.00002339E+00
+ 9.67266333E-03  1.00000008E+00  5.75170728E-04  0.00000000E+00  0.00000000E+00
+ 3.77000000E+01  1.53287300E-04  9.38641700E+00  2.00000000E-03  2.99792458E+10
+ 1.00000000E+00  5.40302306E-01  1.57000000E+00  7.96326711E-04  2.10000000E-02
+ 0.00000000E+00  0.00000000E+00  0.00000000E+00  2.00000000E+01  0.00000000E+00
+ 0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+ 0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  2.61909598E-01
+ 8.99834275E-01  0.00000000E+00  1.03899198E+00  2.71383371E-01  1.37035999E+02
+
+
+ CONSTANTS FOR KAONS CKA(1) TO CKA(80)
+ 0.00000000E+00  1.00000000E-01  0.00000000E+00  0.00000000E+00  0.00000000E+00
+ 0.00000000E+00  2.50000000E-01  5.00000000E-01  7.50000000E-01  1.00000000E+00
+ 5.00000000E-01  2.00000000E-01  9.26406662E-01  1.12407142E+00  1.49600000E+02
+ 1.49600000E+02  2.35531824E-01  2.06000000E-01  1.35000000E-01  2.22000000E-01
+ 5.00000000E-01  0.00000000E+00  6.35600000E-01  6.92762000E-01  8.74200000E-01
+ 6.78300000E-01  4.06900000E-01  2.44320607E+00  9.12400642E-01  0.00000000E+00
+ 0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  1.00000000E+00
+ 1.00000000E+05  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+ 0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+ 0.00000000E+00  8.42300000E-01  8.98200000E-01  9.48900000E-01  9.82400000E-01
+-2.15400000E-01  1.20000000E-02 -1.01000000E-02  1.27000000E+00  6.38000000E-01
+ 5.70000000E-02  0.00000000E+00  1.84000000E+00  0.00000000E+00  1.00000000E+00
+ 6.78000000E-01  7.60000000E-02  9.90000000E-03  2.22000000E+00  2.98000000E-02
+ 0.00000000E+00  1.28800000E-02  2.96000000E-02  1.96000000E-02  1.19400000E-02
+ 2.82000000E-02  0.00000000E+00  1.31000000E-02  2.82000000E-02  1.38000000E-02
+ 1.24100000E-02  0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00
+
+
+ CONSTANTS FOR ETAS CETA(1) TO CETA(5)
+ 3.97200000E-01  7.26500000E-01  9.57500000E-01  9.00000000E-04  2.07000000E+00
+
+
+ CONSTANTS FOR STRANGE BARYONS CSTRBA(1) TO CSTRBA(11)
+ 0.00000000E+00  0.00000000E+00  0.00000000E+00  0.00000000E+00  6.40900000E-01
+ 5.16300000E-01  0.00000000E+00  0.00000000E+00  0.00000000E+00  6.78000000E-01
+ 9.14000000E-01
+
+
+ ========== ATMOSPHERE =========================================================
+
+  ( EXTERNAL ATMOSPHERE FROM TABLE  1 AS FITTED )
+
+  HEIGHT H IN KM GIVES THICKNESS OF ATMOSPHERE T IN G/CM**2
+ H =   0.0... 10.0 KM ---> T = -1.35704E+02 + 1.1740E+03 * EXP( -H / 9.9419E+00)
+ H =  10.0... 19.0 KM ---> T = -2.14758E+01 + 1.2654E+03 * EXP( -H / 7.1935E+00)
+ H =  19.0... 42.5 KM ---> T =  5.87392E-01 + 1.3503E+03 * EXP( -H / 6.3614E+00)
+ H =  42.5...105.0 KM ---> T = -5.77170E-04 + 5.6065E+02 * EXP( -H / 7.7217E+00)
+ H = 105.0...120.0 KM ---> T =  9.57440E-04 - H / 1.2533E+05
+
+
+ ========== SHOWER PARAMETERS ==================================================
+ PRIMARY PARTICLE IDENTIFICATION IS            1
+ PRIMARY ENERGY IS TAKEN FROM SPECTRUM VIA MONTE CARLO
+      SLOPE OF PRIMARY SPECTRUM                = -2.0000E+00
+      LOWER LIMIT CUT-OFF FOR PRIMARY SPECTRUM =  1.0000E+02 GEV
+      UPPER LIMIT CUT-OFF FOR PRIMARY SPECTRUM =  3.0000E+03 GEV
+
+ HEIGHT OF FIRST INTERACTION IS CHOSEN RANDOMLY
+ TARGET OF FIRST INTERACTION IS AT RANDOM
+ STARTING ALTITUDE AT     12000000.00 CM (=      0.00 G/CM**2)
+                  WHICH IS AT TOP OF ATMOSPHERE
+
+ OBSERVATION LEVEL # IN  CM    AND IN   G/CM**2
+          1       2.15600000E+05       8.10112344E+02
+
+ PARTICLES WITH LORENTZ FACTOR LARGER THAN     1.0000E+11 ARE PRINTED OUT
+ SHOWER PARTICLES ENERGY CUT :
+      FOR HADRONS   :      3.0000E-01 GEV
+      FOR MUONS     :      3.0000E-01 GEV
+      FOR ELECTRONS :      2.0000E-02 GEV
+      FOR GAMMAS    :      2.0000E-02 GEV
+
+Telescope output file: 'gamma-20deg-100-3000GeV-array-north-100showers.iact'
+
+Number of simulated telescopes: 6
+    Telescope 1 at x=-70.91 m, y=-52.35 m, z= 45.00 m with r=13.00 m
+    Telescope 2 at x=-35.28 m, y= 65.92 m, z= 32.50 m with r=13.00 m
+    Telescope 3 at x= 75.31 m, y= 50.21 m, z= 28.20 m with r=13.00 m
+    Telescope 4 at x= 30.88 m, y=-63.78 m, z= 32.80 m with r=13.00 m
+    Telescope 5 at x= 26.86 m, y=208.54 m, z= 11.40 m with r=9.15 m
+    Telescope 6 at x=  4.64 m, y= -0.71 m, z= 29.50 m with r=9.15 m
+
+Number of telescope arrays simulated: 5
+Array centers are at random offsets within 250.00 m radius from core.
+ Impact position correction for bending of primary particle track in geomagnetic field is on.
+Up to 100000 bunches are kept in memory before writing to temporary files.
+When more than 1000000 bunches are collected per telescope, thinning sets in.
+Photon data is automatically split if exceeding a total of 10000000 bunches.
+
+
+Using IACT/ATMO package version 1.70 (2025-08-06) for CORSIKA 7.805
+
+Using a maximum output buffer size of 800 MB for the IACT module.
+
+
+CORSIKA was compiled with the VOLUMEDET option and the IACT option
+automatically adapts to that. This means that all random shower core
+offsets are counted in a plane perpendicular to the shower axis.
+For non-vertical showers, the horizontal offsets can therefore be
+larger than specified in your CORSIKA inputs.
+
+CORSIKA was compiled without the SLANT option and all longitudinal
+distributions are in vertical depth units (the classical way).
+
+Start with event 1 (E=0.104 TeV, first interaction in 31.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 1 written to output file.
+
+
+
+ EARTH MAGNETIC FIELD STRENGTH IS    44.7213593      MICROTESLA
+      WITH INCLINATION ANGLE         63.4349480      DEGREES
+ CHERENKOV WAVELENGTH BAND FROM    100.000000      TO    2000.00000      NANOMETER
+ CHERENKOV BUNCH SIZE IS CALCULATED FOR EACH SHOWER
+ CHERENKOV PHOTONS ARE WRITTEN TO SEPARATE FILE
+
+ NUMBER OF SHOWERS TO GENERATE =         100
+
+
+
+ ========== SHOWER NO          1 ===============================================
+
+ PRESENT TIME : 19.11.2026  08:52:13 UTC
+ AND RANDOM NUMBER GENERATOR AT BEGIN OF EVENT :       1
+ SEQUENCE =  1  SEED =      1617  CALLS =         0  BILLIONS =         0
+ SEQUENCE =  2  SEED =      1629  CALLS =         0  BILLIONS =         0
+ SEQUENCE =  3  SEED =      1643  CALLS =         0  BILLIONS =         0
+ SEQUENCE =  4  SEED =      1661  CALLS =         0  BILLIONS =         0
+ PRIMARY ENERGY =    104.32384922646717       GEV
+
+ TRACKING STARTS AT MARGIN OF ATMOSPHERE
+
+ PRIMARY PARTICLE IS ELECTROMAGNETIC
+
+                    TYPE       GAMMA    COSTHETA      PHIX      PHIY      HEIGHT      TIME       X-CM       Y-CM       GEN/CHI    ALEVEL E ON STACK
+
+  FIRST INTERACTION AT    30962.227500000001       M ALTITUDE
+
+ NO MORE SECONDARIES FOUND ON STACK
+           0 PARTICLES WRITTEN TO STACK
+           0 PARTICLES READ FROM STACK
+           0 BLOCKS MAXIMUM STACK FILE SIZE
+           0 SHIFTS TO EXTERNAL STACK
+           1 PARTICLES WRITTEN TO MPATAP
+           0 CHERENKOV BUNCHES WRITTEN TO MCETAB
+
+
+ ENERGY - MULTIPLICITY MATRIX OF SHOWER NO          1
+ ENERGY RUNS VERTICALLY, MULTIPLICITY HORIZONTALLY
+
+              1         2         3         4         5       6       7       8     9    10    11    12    13   ENERGY RANGE (GEV)
+
+   1          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E-01   2.2E-01
+   2          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E-01   4.6E-01
+   3          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E-01   1.0E+00
+   4          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+00   2.2E+00
+   5          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+00   4.6E+00
+   6          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+00   1.0E+01
+   7          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+01   2.2E+01
+   8          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+01   4.6E+01
+   9          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+01   1.0E+02
+  10          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+02   2.2E+02
+  11          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+02   4.6E+02
+  12          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+02   1.0E+03
+  13          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+03   2.2E+03
+  14          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+03   4.6E+03
+  15          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+03   1.0E+04
+  16          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+04   2.2E+04
+  17          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+04   4.6E+04
+  18          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+04   1.0E+05
+  19          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+05   2.2E+05
+  20          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+05   4.6E+05
+  21          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+05   1.0E+06
+  22          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+06   2.2E+06
+  23          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+06   4.6E+06
+  24          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+06   1.0E+07
+  25          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+07   2.2E+07
+  26          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+07   4.6E+07
+  27          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+07   1.0E+08
+  28          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+08   2.2E+08
+  29          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+08   4.6E+08
+  30          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+08   1.0E+09
+  31          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+09   2.2E+09
+  32          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+09   4.6E+09
+  33          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+09   1.0E+10
+  34          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+10   2.2E+10
+  35          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+10   4.6E+10
+  36          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+10   1.0E+11
+  37          0         0         0         0         0       0       0       0     0     0     0     0     0    1.0E+11   2.2E+11
+  38          0         0         0         0         0       0       0       0     0     0     0     0     0    2.2E+11   4.6E+11
+  39          0         0         0         0         0       0       0       0     0     0     0     0     0    4.6E+11   1.0E+12
+
+ MULT.        1         3         5        11        22      47     101     216   465  1001  2155  4642 10001    LOWER BIN LIMIT
+ RANGE        2         4        10        21        46     100     215     464  1000  2154  4641 10000 21544    UPPER BIN LIMIT
+
+
+ ENERGY - ELASTICITY MATRIX OF SHOWER NO          1
+ ENERGY RUNS VERTICALLY, ELASTICITY HORIZONTALLY
+
+              1        2        3        4        5        6        7        8         9        10   MEAN EL.   ENERGY RANGE (GEV)
+
+    1         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E-01   2.2E-01
+    2         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E-01   4.6E-01
+    3         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E-01   1.0E+00
+    4         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+00   2.2E+00
+    5         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+00   4.6E+00
+    6         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+00   1.0E+01
+    7         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+01   2.2E+01
+    8         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+01   4.6E+01
+    9         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+01   1.0E+02
+   10         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+02   2.2E+02
+   11         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+02   4.6E+02
+   12         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+02   1.0E+03
+   13         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+03   2.2E+03
+   14         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+03   4.6E+03
+   15         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+03   1.0E+04
+   16         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+04   2.2E+04
+   17         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+04   4.6E+04
+   18         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+04   1.0E+05
+   19         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+05   2.2E+05
+   20         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+05   4.6E+05
+   21         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+05   1.0E+06
+   22         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+06   2.2E+06
+   23         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+06   4.6E+06
+   24         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+06   1.0E+07
+   25         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+07   2.2E+07
+   26         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+07   4.6E+07
+   27         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+07   1.0E+08
+   28         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+08   2.2E+08
+   29         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+08   4.6E+08
+   30         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+08   1.0E+09
+   31         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+09   2.2E+09
+   32         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+09   4.6E+09
+   33         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+09   1.0E+10
+   34         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+10   2.2E+10
+   35         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+10   4.6E+10
+   36         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+10   1.0E+11
+   37         0        0        0        0        0        0        0        0         0         0   0.000E+00   1.0E+11   2.2E+11
+   38         0        0        0        0        0        0        0        0         0         0   0.000E+00   2.2E+11   4.6E+11
+   39         0        0        0        0        0        0        0        0         0         0   0.000E+00   4.6E+11   1.0E+12
+
+ ELA.      0.00     0.10     0.20     0.30     0.40     0.50     0.60     0.70      0.80      0.90     LOWER BIN LIMIT
+ RANGE     0.10     0.20     0.30     0.40     0.50     0.60     0.70     0.80      0.90      1.00     UPPER BIN LIMIT
+
+
+ INTERACTIONS PER KINETIC ENERGY INTERVAL OF SHOWER NO          1
+
+
+   BIN    LOWER LIMIT    UPPER LIMIT     NUCLEON       PIONS      KAONS  S.BARYONS      TOTAL
+             IN GEV         IN GEV        EVENTS      EVENTS     EVENTS     EVENTS
+
+     1     0.0000E+00     1.0000E-01           0          0          0          0          0
+     2     1.0000E-01     2.1544E-01           0          0          0          0          0
+     3     2.1544E-01     4.6416E-01           0          0          0          0          0
+     4     4.6416E-01     1.0000E+00           0          0          0          0          0
+     5     1.0000E+00     2.1544E+00           0          0          0          0          0
+     6     2.1544E+00     4.6416E+00           0          0          0          0          0
+     7     4.6416E+00     1.0000E+01           0          0          0          0          0
+     8     1.0000E+01     2.1544E+01           0          0          0          0          0
+     9     2.1544E+01     4.6416E+01           0          0          0          0          0
+    10     4.6416E+01     1.0000E+02           0          0          0          0          0
+    11     1.0000E+02     2.1544E+02           0          0          0          0          0
+    12     2.1544E+02     4.6416E+02           0          0          0          0          0
+    13     4.6416E+02     1.0000E+03           0          0          0          0          0
+    14     1.0000E+03     2.1544E+03           0          0          0          0          0
+    15     2.1544E+03     4.6416E+03           0          0          0          0          0
+    16     4.6416E+03     1.0000E+04           0          0          0          0          0
+    17     1.0000E+04     2.1544E+04           0          0          0          0          0
+    18     2.1544E+04     4.6416E+04           0          0          0          0          0
+    19     4.6416E+04     1.0000E+05           0          0          0          0          0
+    20     1.0000E+05     2.1544E+05           0          0          0          0          0
+    21     2.1544E+05     4.6416E+05           0          0          0          0          0
+    22     4.6416E+05     1.0000E+06           0          0          0          0          0
+    23     1.0000E+06     2.1544E+06           0          0          0          0          0
+    24     2.1544E+06     4.6416E+06           0          0          0          0          0
+    25     4.6416E+06     1.0000E+07           0          0          0          0          0
+    26     1.0000E+07     2.1544E+07           0          0          0          0          0
+    27     2.1544E+07     4.6416E+07           0          0          0          0          0
+    28     4.6416E+07     1.0000E+08           0          0          0          0          0
+    29     1.0000E+08     2.1544E+08           0          0          0          0          0
+    30     2.1544E+08     4.6416E+08           0          0          0          0          0
+    31     4.6416E+08     1.0000E+09           0          0          0          0          0
+    32     1.0000E+09     2.1544E+09           0          0          0          0          0
+    33     2.1544E+09     4.6416E+09           0          0          0          0          0
+    34     4.6416E+09     1.0000E+10           0          0          0          0          0
+    35     1.0000E+10     2.1544E+10           0          0          0          0          0
+    36     2.1544E+10     4.6416E+10           0          0          0          0          0
+    37     4.6416E+10     1.0000E+11           0          0          0          0          0
+    38     1.0000E+11     2.1544E+11           0          0          0          0          0
+    39     2.1544E+11     4.6416E+11           0          0          0          0          0
+    40     4.6416E+11     1.0000E+12           0          0          0          0          0
+
+
+ INTERACTION LENGTH STATISTICS:     1 BIN CORRESPONDS TO 10 G/CM**2 OR 100M FOR MUONS
+
+  BIN      LAMBDA NU   LAMBDA PI   LAMBDA KA   LAMBDA HY   LAMBDA MU   LAMBDA NUCLEUS
+
+    1           0           0           0           0           0           0
+    2           0           0           0           0           0           0
+    3           0           0           0           0           0           0
+    4           0           0           0           0           0           0
+    5           0           0           0           0           0           0
+    6           0           0           0           0           0           0
+    7           0           0           0           0           0           0
+    8           0           0           0           0           0           0
+    9           0           0           0           0           0           0
+   10           0           0           0           0           0           0
+   11           0           0           0           0           0           0
+   12           0           0           0           0           0           0
+   13           0           0           0           0           0           0
+   14           0           0           0           0           0           0
+   15           0           0           0           0           0           0
+   16           0           0           0           0           0           0
+   17           0           0           0           0           0           0
+   18           0           0           0           0           0           0
+   19           0           0           0           0           0           0
+   20           0           0           0           0           0           0
+   21           0           0           0           0           0           0
+   22           0           0           0           0           0           0
+   23           0           0           0           0           0           0
+   24           0           0           0           0           0           0
+   25           0           0           0           0           0           0
+   26           0           0           0           0           0           0
+   27           0           0           0           0           0           0
+   28           0           0           0           0           0           0
+   29           0           0           0           0           0           0
+   30           0           0           0           0           0           0
+   31           0           0           0           0           0           0
+   32           0           0           0           0           0           0
+   33           0           0           0           0           0           0
+   34           0           0           0           0           0           0
+   35           0           0           0           0           0           0
+   36           0           0           0           0           0           0
+   37           0           0           0           0           0           0
+   38           0           0           0           0           0           0
+   39           0           0           0           0           0           0
+   40           0           0           0           0           0           0
+   41           0           0           0           0           0           0
+   42           0           0           0           0           0           0
+   43           0           0           0           0           0           0
+   44           0           0           0           0           0           0
+   45           0           0           0           0           0           0
+   46           0           0           0           0           0           0
+   47           0           0           0           0           0           0
+   48           0           0           0           0           0           0
+   49           0           0           0           0           0           0
+   50           0           0           0           0           0           0
+   51           0           0           0           0           0           0
+   52           0           0           0           0           0           0
+   53           0           0           0           0           0           0
+   54           0           0           0           0           0           0
+   55           0           0           0           0           0           0
+   56           0           0           0           0           0           0
+   57           0           0           0           0           0           0
+   58           0           0           0           0           0           0
+   59           0           0           0           0           0           0
+   60           0           0           0           0           0           0
+   61           0           0           0           0           0           0
+   62           0           0           0           0           0           0
+   63           0           0           0           0           0           0
+   64           0           0           0           0           0           0
+   65           0           0           0           0           0           0
+   66           0           0           0           0           0           0
+   67           0           0           0           0           0           0
+   68           0           0           0           0           0           0
+   69           0           0           0           0           0           0
+   70           0           0           0           0           0           0
+   71           0           0           0           0           0           0
+   72           0           0           0           0           0           0
+   73           0           0           0           0           0           0
+   74           0           0           0           0           0           0
+   75           0           0           0           0           0           0
+   76           0           0           0           0           0           0
+   77           0           0           0           0           0           0
+   78           0           0           0           0           0           0
+   79           0           0           0           0           0           0
+   80           0           0           0           0           0           0
+   81           0           0           0           0           0           0
+   82           0           0           0           0           0           0
+   83           0           0           0           0           0           0
+   84           0           0           0           0           0           0
+   85           0           0           0           0           0           0
+   86           0           0           0           0           0           0
+   87           0           0           0           0           0           0
+   88           0           0           0           0           0           0
+   89           0           0           0           0           0           0
+   90           0           0           0           0           0           0
+   91           0           0           0           0           0           0
+   92           0           0           0           0           0           0
+   93           0           0           0           0           0           0
+   94           0           0           0           0           0           0
+   95           0           0           0           0           0           0
+   96           0           0           0           0           0           0
+   97           0           0           0           0           0           0
+   98           0           0           0           0           0           0
+   99           0           0           0           0           0           0
+  100           0           0           0           0           0           0
+  101           0           0           0           0           0           0
+  102           0           0           0           0           0           0
+  103           0           0           0           0           0           0
+  104           0           0           0           0           0           0
+  105           0           0           0           0           0           0
+  106           0           0           0           0           0           0
+  107           0           0           0           0           0           0
+  108           0           0           0           0           0           0
+  109           0           0           0           0           0           0
+  110           0           0           0           0           0           0
+  111           0           0           0           0           0           0
+  112           0           0           0           0           0           0
+  113           0           0           0           0           0           0
+  114           0           0           0           0           0           0
+  115           0           0           0           0           0           0
+  116           0           0           0           0           0           0
+  117           0           0           0           0           0           0
+  118           0           0           0           0           0           0
+  119           0           0           0           0           0           0
+  120           0           0           0           0           0           0
+  121           0           0           0           0           0           0
+  122           0           0           0           0           0           0
+  123           0           0           0           0           0           0
+  124           0           0           0           0           0           0
+
+ WORDS WRITTEN TO PARTICLE DATA FILE UP TO NOW = 0.000000000000000E+00
+
+ PARTICLES AT DETECTOR LEVEL:
+ FOR LEVEL                     1
+ HEIGHT IN CM          2.156000E+05
+ HEIGHT IN G/CM**2     8.101123E+02
+ NO OF PROTONS      =            0.
+ NO OF ANTIPROTONS  =            0.
+ NO OF NEUTRONS     =            0.
+ NO OF ANTINEUTRONS =            0.
+ NO OF GAMMAS       =  0.000000E+00
+ NO OF POSITRONS    =  1.000000E+00
+ NO OF ELECTRONS    =  0.000000E+00
+ NO OF MU +         =            0.
+ NO OF MU -         =            0.
+ NO OF PI 0         =            0.
+ NO OF PI +         =            0.
+ NO OF PI -         =            0.
+ NO OF K0L          =            0.
+ NO OF K0S          =            0.
+ NO OF K +          =            0.
+ NO OF K -          =            0.
+ NO OF STR. BARYONS =            0.
+ NO OF DEUTERONS    =            0.
+ NO OF TRITONS      =            0.
+ NO OF 3HELIUM      =            0.
+ NO OF ALPHAS       =            0.
+ NO OF OTHER PARTIC.=            0.
+
+ NO OF DECAYED MUONS=            0.
+ NO OF ELIMIN. MUONS=            0.
+
+ NO OF NUCLEONS  PRODUCED IN FIRST HADR. INTERACTION =         0
+ NO OF PIONS     PRODUCED IN FIRST HADR. INTERACTION =         0
+ NO OF ETAS      PRODUCED IN FIRST HADR. INTERACTION =         0
+ NO OF KAONS     PRODUCED IN FIRST HADR. INTERACTION =         0
+ NO OF S.BARYONS PRODUCED IN FIRST HADR. INTERACTION =         0
+ NO OF RHO MESNS PRODUCED IN FIRST HADR. INTERACTION =         0
+ NO OF OTH. HADR.PRODUCED IN FIRST HADR. INTERACTION =         0
+ TOTAL MULTIPLICITY       OF FIRST HADR. INTERACTION =         0
+ ELASTICITY               OF FIRST HADR. INTERACTION =    0.0000
+ VERTICAL DEPTH (G/CM**2) OF FIRST HADR. INTERACTION =    0.0000
+ VERTICAL ALTITUDE (CM)   OF FIRST HADR. INTERACTION =11999999.0
+ CROSS-SECTION MILLIBARN  OF FIRST HADR. INTERACTION =    0.0000
+ TARGET MASS NUMBER       OF FIRST HADR. INTERACTION =    0.0000
+
+
+No vertical profiles switched on and none written to output.
+
+
+Total number of photons in shower: 26600740.244418 in 5367509.000000 bunches
+  Array  0:   12335  29826  22567   9175  11920   6904 photons (array offset:   -28.1  -186.9 m)
+  Array  1:   16943  27571  28756  16996  15780  16226 photons (array offset:   -37.9   -89.4 m)
+  Array  2:   10353  31693  14505   9269  13332   6746 photons (array offset:    21.6  -189.4 m)
+  Array  3:   31933  26849  37452  19870  19832  15545 photons (array offset:    41.2   -69.3 m)
+  Array  4:   10892  23076  30783  10438  11874  11844 photons (array offset:   -66.5  -179.1 m)
+
+Start with event 2 (E=0.272 TeV, first interaction in 21.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 2 written to output file.
+
+ CERCNT =    0.00000000
+ CHERENKOV PH. FROM ELECTRONS =   0.0000000E+00  CHERENKOV PH. FROM HADRONS =   0.0000000E+00
+
+   END OF SHOWER NO          1
+
+Total number of photons in shower: 71345499.049654 in 14389847.000000 bunches
+  Array  0:   57126  81388 110070  47028  46686  53724 photons (array offset:    16.2  -122.9 m)
+  Array  1:  119217  33650  32764 101035   7192  30872 photons (array offset:    -9.1   168.8 m)
+  Array  2:  100452  80900  79719  83171  24083  39222 photons (array offset:   -43.0   -13.3 m)
+  Array  3:   42317  28650  51329 112978   8964  28355 photons (array offset:  -147.8   136.8 m)
+  Array  4:   92886  38838  22894  33435   8552  19641 photons (array offset:   213.5    58.9 m)
+I/O block extended by 122880 to 1122880 bytes
+I/O block extended by 139264 to 1262144 bytes
+I/O block extended by 155648 to 1417792 bytes
+I/O block extended by 172032 to 1589824 bytes
+I/O block extended by 196608 to 1786432 bytes
+I/O block extended by 221184 to 2007616 bytes
+I/O block extended by 245760 to 2253376 bytes
+I/O block extended by 278528 to 2531904 bytes
+I/O block extended by 311296 to 2843200 bytes
+
+Start with event 3 (E=0.243 TeV, first interaction in 20.4 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 3 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 64103279.387045 in 12927749.000000 bunches
+  Array  0:   22573  55013  54623  19156  40335  15633 photons (array offset:   -70.4  -235.0 m)
+  Array  1:  107489  90199  33376  34603  18163  38669 photons (array offset:   132.3   -68.5 m)
+  Array  2:  110179 124429  92165  78332  15064  42211 photons (array offset:   -65.5    31.0 m)
+  Array  3:   26992 107527  77553  28036  39803  24834 photons (array offset:   -34.5  -195.8 m)
+  Array  4:   55734  95884  89196  59880  47477  48456 photons (array offset:   -39.7  -115.6 m)
+I/O block extended by 352256 to 3195456 bytes
+
+Start with event 4 (E=1.162 TeV, first interaction in 26.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 4 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 317898572.996965 in 64097450.000000 bunches
+  Array  0:  118434 228794 537058 187520 125036 115896 photons (array offset:  -187.0  -103.5 m)
+  Array  1:  324177 556126 526866 256189 263629 283822 photons (array offset:    17.0  -104.8 m)
+  Array  2:  119153 291453 514695 168838 265210 119681 photons (array offset:  -134.9  -147.0 m)
+  Array  3:  521889 235411 140002 259174  43515 145185 photons (array offset:   147.9    83.8 m)
+  Array  4:  143778 538990 228101 124809 281675  96922 photons (array offset:    48.7  -196.2 m)
+I/O block extended by 393216 to 3588672 bytes
+I/O block extended by 442368 to 4031040 bytes
+I/O block extended by 499712 to 4530752 bytes
+I/O block extended by 565248 to 5096000 bytes
+I/O block extended by 630784 to 5726784 bytes
+I/O block extended by 712704 to 6439488 bytes
+I/O block extended by 802816 to 7242304 bytes
+I/O block extended by 901120 to 8143424 bytes
+I/O block extended by 1015808 to 9159232 bytes
+I/O block extended by 1138688 to 10297920 bytes
+I/O block extended by 1286144 to 11584064 bytes
+I/O block extended by 1441792 to 13025856 bytes
+I/O block extended by 1622016 to 14647872 bytes
+
+Start with event 5 (E=0.127 TeV, first interaction in 29.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 5 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 32123691.511110 in 6480910.000000 bunches
+  Array  0:   34038  43325  39928  31492   7730  12933 photons (array offset:   -11.5    27.5 m)
+  Array  1:   37075  31561  46351  26897   6012  19212 photons (array offset:   -22.1    83.5 m)
+  Array  2:   27108  37877  23250  13638  15305  17023 photons (array offset:   112.2  -106.2 m)
+  Array  3:   44926  22359  45699  33024   5268  22085 photons (array offset:   -84.8    89.0 m)
+  Array  4:    9534  30141  23127   9338  13932   7414 photons (array offset:   -13.4  -218.0 m)
+
+Start with event 6 (E=0.581 TeV, first interaction in 22.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 6 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 164791799.680013 in 33221333.000000 bunches
+  Array  0:  344517 242428  91724 132008  31823  94706 photons (array offset:   153.2    12.6 m)
+  Array  1:  119654  87060 130808 338734  21719  71500 photons (array offset:  -140.8   134.8 m)
+  Array  2:  159644  62557  66165 190709  14534  52117 photons (array offset:     1.9   219.8 m)
+  Array  3:  323952 112897 131626 305545  21247 138043 photons (array offset:   -42.9   140.5 m)
+  Array  4:  155862 120501 213664 314932  27592 134101 photons (array offset:  -120.8    99.0 m)
+
+Start with event 7 (E=0.124 TeV, first interaction in 20.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 7 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 32713816.160733 in 6597700.000000 bunches
+  Array  0:   44818  16952  10850  21629   3643   9197 photons (array offset:   153.6   175.5 m)
+  Array  1:   38543  34135  56197  40047  15061  17985 photons (array offset:    60.4   -50.0 m)
+  Array  2:   45250  16152  12409  22872   3547   9977 photons (array offset:   117.5   189.0 m)
+  Array  3:   45494  33984  48780  36427   6651  18319 photons (array offset:   -64.2    75.8 m)
+  Array  4:   19470  11338  17156  37229   3682   9129 photons (array offset:  -124.6   198.4 m)
+
+Start with event 8 (E=0.196 TeV, first interaction in 25.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 8 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 52922277.068973 in 10672289.000000 bunches
+  Array  0:   97223  41136 101770  68943   8458  46329 photons (array offset:   -75.1    78.5 m)
+  Array  1:   81320  41769  26630  45867   8150  28380 photons (array offset:   153.0    64.8 m)
+  Array  2:   19495  60591 103059  25153  34894  23909 photons (array offset:   -83.8  -187.7 m)
+  Array  3:   32346  14713  14603  35845   3702  10866 photons (array offset:    13.8   243.4 m)
+  Array  4:   33574  58531  70813  49193  23458  35743 photons (array offset:  -142.9   -82.7 m)
+
+Start with event 9 (E=0.185 TeV, first interaction in 29.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 9 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 47482827.994574 in 9579833.000000 bunches
+  Array  0:   33972  26741  13344  16053   6617  10438 photons (array offset:   224.3    -7.7 m)
+  Array  1:   82678  47785  68634  48823   7997  29001 photons (array offset:   -84.4    69.1 m)
+  Array  2:   54125  35406  30681  53482   6317  35264 photons (array offset:    27.1   123.4 m)
+  Array  3:   61714  61659  49721  56220  12611  22580 photons (array offset:   -41.5    12.2 m)
+  Array  4:   15431  41584  80490  20182  27295  15056 photons (array offset:  -128.1  -181.3 m)
+
+Start with event 10 (E=0.128 TeV, first interaction in 26.9 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 10 written to output file.
+
+ CERCNT =    0.00000000
+
+Total number of photons in shower: 33990235.754941 in 6856472.000000 bunches
+  Array  0:   17015  55854  48664  18087  18421  14302 photons (array offset:   -23.6  -174.2 m)
+  Array  1:    8697  23891  27269  11334  18861   8239 photons (array offset:   -90.7  -231.6 m)
+  Array  2:   19683  11158  11331  24646   2307   7847 photons (array offset:   -14.1   248.8 m)
+  Array  3:   17780  10713  12236  26666   3162   7858 photons (array offset:   -47.9   242.7 m)
+  Array  4:   13571  24876  47074  19941  21618  12564 photons (array offset:  -160.7  -113.8 m)
+
+Start with event 11 (E=0.195 TeV, first interaction in 21.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 11 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 12 (E=0.167 TeV, first interaction in 25.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 12 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 13 (E=0.284 TeV, first interaction in 20.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 13 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 14 (E=0.162 TeV, first interaction in 19.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 14 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 15 (E=0.186 TeV, first interaction in 17.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 15 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 16 (E=0.352 TeV, first interaction in 31.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 16 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 17 (E=0.112 TeV, first interaction in 15.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 17 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 18 (E=0.220 TeV, first interaction in 17.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 18 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 19 (E=0.205 TeV, first interaction in 20.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 19 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 20 (E=0.297 TeV, first interaction in 31.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 20 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 21 (E=0.125 TeV, first interaction in 14.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 21 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 22 (E=0.689 TeV, first interaction in 18.9 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 22 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 23 (E=0.221 TeV, first interaction in 24.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 23 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 24 (E=0.101 TeV, first interaction in 33.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 24 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 25 (E=0.119 TeV, first interaction in 27.4 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 25 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 26 (E=0.112 TeV, first interaction in 18.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 26 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 27 (E=0.216 TeV, first interaction in 39.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 27 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 28 (E=0.101 TeV, first interaction in 27.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 28 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 29 (E=0.299 TeV, first interaction in 24.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 29 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 30 (E=0.137 TeV, first interaction in 21.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 30 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 31 (E=0.240 TeV, first interaction in 36.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 31 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 32 (E=0.130 TeV, first interaction in 13.4 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 32 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 33 (E=0.191 TeV, first interaction in 18.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 33 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 34 (E=0.186 TeV, first interaction in 29.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 34 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 35 (E=0.226 TeV, first interaction in 14.8 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 35 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 36 (E=0.290 TeV, first interaction in 19.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 36 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 37 (E=0.210 TeV, first interaction in 36.9 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 37 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 38 (E=1.599 TeV, first interaction in 18.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 38 written to output file.
+
+ CERCNT =    0.00000000
+I/O block extended by 1826816 to 16474688 bytes
+I/O block extended by 2056192 to 18530880 bytes
+I/O block extended by 2310144 to 20841024 bytes
+I/O block extended by 2605056 to 23446080 bytes
+I/O block extended by 2924544 to 26370624 bytes
+I/O block extended by 3293184 to 29663808 bytes
+I/O block extended by 3702784 to 33366592 bytes
+
+Start with event 39 (E=0.669 TeV, first interaction in 29.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 39 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 40 (E=0.502 TeV, first interaction in 17.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 40 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 41 (E=0.119 TeV, first interaction in 28.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 41 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 42 (E=0.111 TeV, first interaction in 27.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 42 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 43 (E=0.113 TeV, first interaction in 31.8 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 43 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 44 (E=0.376 TeV, first interaction in 20.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 44 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 45 (E=0.157 TeV, first interaction in 20.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 45 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 46 (E=0.181 TeV, first interaction in 23.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 46 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 47 (E=1.161 TeV, first interaction in 16.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 47 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 48 (E=0.658 TeV, first interaction in 21.4 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 48 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 49 (E=0.106 TeV, first interaction in 27.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 49 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 50 (E=0.122 TeV, first interaction in 44.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 50 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 51 (E=0.253 TeV, first interaction in 26.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 51 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 52 (E=1.298 TeV, first interaction in 19.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 52 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 53 (E=0.125 TeV, first interaction in 26.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 53 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 54 (E=0.575 TeV, first interaction in 37.8 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 54 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 55 (E=0.190 TeV, first interaction in 24.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 55 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 56 (E=1.023 TeV, first interaction in 18.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 56 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 57 (E=0.599 TeV, first interaction in 17.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 57 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 58 (E=0.268 TeV, first interaction in 19.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 58 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 59 (E=0.289 TeV, first interaction in 22.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 59 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 60 (E=0.107 TeV, first interaction in 19.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 60 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 61 (E=0.140 TeV, first interaction in 44.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 61 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 62 (E=0.263 TeV, first interaction in 24.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 62 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 63 (E=0.196 TeV, first interaction in 23.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 63 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 64 (E=0.293 TeV, first interaction in 14.4 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 64 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 65 (E=0.773 TeV, first interaction in 18.9 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 65 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 66 (E=0.256 TeV, first interaction in 28.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 66 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 67 (E=0.320 TeV, first interaction in 22.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 67 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 68 (E=0.109 TeV, first interaction in 32.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 68 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 69 (E=0.297 TeV, first interaction in 16.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 69 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 70 (E=0.346 TeV, first interaction in 21.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 70 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 71 (E=0.884 TeV, first interaction in 20.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 71 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 72 (E=0.158 TeV, first interaction in 13.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 72 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 73 (E=0.720 TeV, first interaction in 38.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 73 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 74 (E=0.249 TeV, first interaction in 39.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 74 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 75 (E=0.176 TeV, first interaction in 22.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 75 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 76 (E=2.243 TeV, first interaction in 26.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 76 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 77 (E=0.138 TeV, first interaction in 27.8 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 77 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 78 (E=1.296 TeV, first interaction in 26.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 78 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 79 (E=0.155 TeV, first interaction in 29.9 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 79 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 80 (E=0.175 TeV, first interaction in 34.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 80 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 81 (E=0.104 TeV, first interaction in 20.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 81 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 82 (E=0.117 TeV, first interaction in 30.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 82 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 83 (E=0.100 TeV, first interaction in 24.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 83 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 84 (E=0.106 TeV, first interaction in 40.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 84 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 85 (E=0.141 TeV, first interaction in 24.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 85 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 86 (E=0.130 TeV, first interaction in 30.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 86 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 87 (E=0.181 TeV, first interaction in 29.4 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 87 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 88 (E=0.164 TeV, first interaction in 31.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 88 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 89 (E=1.851 TeV, first interaction in 27.9 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 89 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 90 (E=0.232 TeV, first interaction in 16.9 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 90 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 91 (E=0.238 TeV, first interaction in 29.2 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 91 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 92 (E=0.125 TeV, first interaction in 35.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 92 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 93 (E=0.648 TeV, first interaction in 24.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 93 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 94 (E=0.450 TeV, first interaction in 38.5 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 94 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 95 (E=0.196 TeV, first interaction in 27.7 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 95 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 96 (E=2.921 TeV, first interaction in 43.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 96 written to output file.
+
+ CERCNT =    0.00000000
+I/O block extended by 4169728 to 37536320 bytes
+
+Start with event 97 (E=0.364 TeV, first interaction in 24.3 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 97 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 98 (E=0.207 TeV, first interaction in 27.1 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 98 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 99 (E=0.155 TeV, first interaction in 28.6 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 99 written to output file.
+
+ CERCNT =    0.00000000
+
+Start with event 100 (E=0.475 TeV, first interaction in 32.0 km height)
+Azimuth=  0.00 deg (S->E) which is 180.00 deg (N->E), zenith angle=20.00 deg
+Observation level is at an altitude of 2156 m.
+ 30 telescopes are simulated in 5 arrays.
+Event header of event 100 written to output file.
+
+ CERCNT =    0.00000000
+ CERCNT =    0.00000000
+
+ PRESENT TIME : 19.11.2026  08:55:44 UTC
+ AND RANDOM NUMBER GENERATOR AT END OF EVENT :     100
+ SEQUENCE =  1  SEED =      1617  CALLS =    303823  BILLIONS =         0
+ SEQUENCE =  2  SEED =      1629  CALLS = 247408683  BILLIONS =         0
+ SEQUENCE =  3  SEED =      1643  CALLS = 660501059  BILLIONS =         2
+ SEQUENCE =  4  SEED =      1661  CALLS =      1226  BILLIONS =         0
+
+Total number of photons produced in this run: 10287041854.564072 in 2074292739.000000 bunches
+
+
+--------------------------------------- IACT module end-of-run ---------------------------------------
+
+CORSIKA IACT finished at 2026-11-19 08:55:44 UTC after 235.322754 sec CPU time (236 seconds elapsed).
+Total output written by IACT module: 1709323768 bytes.
+
+------------------------------------------------------------------------------------------------------
+
+
+
+
+ ========== RUN SUMMARY ========================================================
+
+ NUMBER OF GENERATED EVENTS =        100
+ TOTAL TIME USED            =                 211.   SEC
+ TIME PER EVENT             =                   2.11 SEC
+ TOTAL SPACE ON MPATAP USED =               85995. WORDS
+ SPACE PER EVENT ON MPATAP  =                 860. WORDS
+ AVERAGE HEIGHT OF 1ST INT. =     41.472 +-    39.878 G/CM**2
+
+
+
+ ENERGY - MULTIPLICITY MATRIX FOR ALL SHOWERS
+ ENERGY RUNS VERTICALLY, MULTIPLICITY HORIZONTALLY
+
+                1         2         3         4         5       6       7       8     9    10    11    12    13 ENERGY RANGE [GEV]
+
+    1         180         0         0         0         0       0       0       0     0     0     0     0     0  1.00E-01 2.15E-01
+    2          84         0         0        14         0       0       0       0     0     0     0     0     0  2.15E-01 4.64E-01
+    3          57         0         0        13         1       0       0       0     0     0     0     0     0  4.64E-01 1.00E+00
+    4          34         0         0         6         0       0       0       0     0     0     0     0     0  1.00E+00 2.15E+00
+    5          14         0         0         2         2       0       0       0     0     0     0     0     0  2.15E+00 4.64E+00
+    6           5         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+00 1.00E+01
+    7           2         0         0         0         1       0       0       0     0     0     0     0     0  1.00E+01 2.15E+01
+    8           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+01 4.64E+01
+    9           2         0         0         1         0       0       0       0     0     0     0     0     0  4.64E+01 1.00E+02
+   10           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+02 2.15E+02
+   11           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+02 4.64E+02
+   12           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+02 1.00E+03
+   13           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+03 2.15E+03
+   14           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+03 4.64E+03
+   15           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+03 1.00E+04
+   16           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+04 2.15E+04
+   17           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+04 4.64E+04
+   18           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+04 1.00E+05
+   19           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+05 2.15E+05
+   20           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+05 4.64E+05
+   21           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+05 1.00E+06
+   22           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+06 2.15E+06
+   23           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+06 4.64E+06
+   24           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+06 1.00E+07
+   25           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+07 2.15E+07
+   26           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+07 4.64E+07
+   27           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+07 1.00E+08
+   28           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+08 2.15E+08
+   29           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+08 4.64E+08
+   30           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+08 1.00E+09
+   31           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+09 2.15E+09
+   32           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+09 4.64E+09
+   33           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+09 1.00E+10
+   34           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+10 2.15E+10
+   35           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+10 4.64E+10
+   36           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+10 1.00E+11
+   37           0         0         0         0         0       0       0       0     0     0     0     0     0  1.00E+11 2.15E+11
+   38           0         0         0         0         0       0       0       0     0     0     0     0     0  2.15E+11 4.64E+11
+   39           0         0         0         0         0       0       0       0     0     0     0     0     0  4.64E+11 1.00E+12
+
+ MULT.          1         3         5        11        22      47     101     216   465  1001  2155  4642 10001    LOWER BIN LIMIT
+ RANGE          2         4        10        21        46     100     215     464  1000  2154  4641 10000 21544    UPPER BIN LIMIT
+
+
+ ENERGY - ELASTICITY MATRIX FOR ALL SHOWERS
+ ENERGY RUNS VERTICALLY, ELASTICITY HORIZONTALLY
+
+             1        2        3        4        5        6        7         8         9        10   MEAN EL.  ENERGY RANGE [GEV]
+
+   1         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E-01  2.15E-01
+   2         0        0        0        0        0        0        0         0         1         0  8.789E-01  2.15E-01  4.64E-01
+   3         0        0        0        0        0        0        0         1         1         0  7.640E-01  4.64E-01  1.00E+00
+   4         1        0        0        0        0        0        2         0         0         0  4.625E-01  1.00E+00  2.15E+00
+   5         0        2        0        0        1        0        1         1         1         0  4.733E-01  2.15E+00  4.64E+00
+   6         0        1        0        0        1        2        0         0         0         0  4.081E-01  4.64E+00  1.00E+01
+   7         0        0        0        1        1        0        0         0         0         0  3.791E-01  1.00E+01  2.15E+01
+   8         0        1        0        0        1        0        0         0         0         0  2.659E-01  2.15E+01  4.64E+01
+   9         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+01  1.00E+02
+  10         0        0        0        1        0        0        0         0         0         0  3.477E-01  1.00E+02  2.15E+02
+  11         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+02  4.64E+02
+  12         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+02  1.00E+03
+  13         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+03  2.15E+03
+  14         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+03  4.64E+03
+  15         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+03  1.00E+04
+  16         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+04  2.15E+04
+  17         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+04  4.64E+04
+  18         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+04  1.00E+05
+  19         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+05  2.15E+05
+  20         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+05  4.64E+05
+  21         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+05  1.00E+06
+  22         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+06  2.15E+06
+  23         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+06  4.64E+06
+  24         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+06  1.00E+07
+  25         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+07  2.15E+07
+  26         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+07  4.64E+07
+  27         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+07  1.00E+08
+  28         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+08  2.15E+08
+  29         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+08  4.64E+08
+  30         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+08  1.00E+09
+  31         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+09  2.15E+09
+  32         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+09  4.64E+09
+  33         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+09  1.00E+10
+  34         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+10  2.15E+10
+  35         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+10  4.64E+10
+  36         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+10  1.00E+11
+  37         0        0        0        0        0        0        0         0         0         0  0.000E+00  1.00E+11  2.15E+11
+  38         0        0        0        0        0        0        0         0         0         0  0.000E+00  2.15E+11  4.64E+11
+  39         0        0        0        0        0        0        0         0         0         0  0.000E+00  4.64E+11  1.00E+12
+
+ ELA.     0.00     0.10     0.20     0.30     0.40     0.50     0.60      0.70      0.80      0.90     LOWER BIN LIMIT
+ RANGE    0.10     0.20     0.30     0.40     0.50     0.60     0.70      0.80      0.90      1.00     UPPER BIN LIMIT
+
+
+ INTERACTIONS PER KINETIC ENERGY INTERVAL FOR ALL SHOWERS
+
+   BIN    LOWER LIMIT    UPPER LIMIT      NUCLEON        PIONS         KAONS     S.BARYONS          TOTAL
+            IN GEV         IN GEV          EVENTS       EVENTS        EVENTS        EVENTS
+
+
+     1     0.0000E+00     1.0000E-01            0.           80.            0.            0.            80.
+     2     1.0000E-01     2.1544E-01            0.          100.            0.            0.           100.
+     3     2.1544E-01     4.6416E-01           14.           84.            0.            0.            98.
+     4     4.6416E-01     1.0000E+00           12.           59.            0.            0.            71.
+     5     1.0000E+00     2.1544E+00            6.           34.            0.            0.            40.
+     6     2.1544E+00     4.6416E+00            3.           15.            0.            0.            18.
+     7     4.6416E+00     1.0000E+01            0.            5.            0.            0.             5.
+     8     1.0000E+01     2.1544E+01            0.            3.            0.            0.             3.
+     9     2.1544E+01     4.6416E+01            0.            0.            0.            0.             0.
+    10     4.6416E+01     1.0000E+02            0.            3.            0.            0.             3.
+    11     1.0000E+02     2.1544E+02            0.            0.            0.            0.             0.
+    12     2.1544E+02     4.6416E+02            0.            0.            0.            0.             0.
+    13     4.6416E+02     1.0000E+03            0.            0.            0.            0.             0.
+    14     1.0000E+03     2.1544E+03            0.            0.            0.            0.             0.
+    15     2.1544E+03     4.6416E+03            0.            0.            0.            0.             0.
+    16     4.6416E+03     1.0000E+04            0.            0.            0.            0.             0.
+    17     1.0000E+04     2.1544E+04            0.            0.            0.            0.             0.
+    18     2.1544E+04     4.6416E+04            0.            0.            0.            0.             0.
+    19     4.6416E+04     1.0000E+05            0.            0.            0.            0.             0.
+    20     1.0000E+05     2.1544E+05            0.            0.            0.            0.             0.
+    21     2.1544E+05     4.6416E+05            0.            0.            0.            0.             0.
+    22     4.6416E+05     1.0000E+06            0.            0.            0.            0.             0.
+    23     1.0000E+06     2.1544E+06            0.            0.            0.            0.             0.
+    24     2.1544E+06     4.6416E+06            0.            0.            0.            0.             0.
+    25     4.6416E+06     1.0000E+07            0.            0.            0.            0.             0.
+    26     1.0000E+07     2.1544E+07            0.            0.            0.            0.             0.
+    27     2.1544E+07     4.6416E+07            0.            0.            0.            0.             0.
+    28     4.6416E+07     1.0000E+08            0.            0.            0.            0.             0.
+    29     1.0000E+08     2.1544E+08            0.            0.            0.            0.             0.
+    30     2.1544E+08     4.6416E+08            0.            0.            0.            0.             0.
+    31     4.6416E+08     1.0000E+09            0.            0.            0.            0.             0.
+    32     1.0000E+09     2.1544E+09            0.            0.            0.            0.             0.
+    33     2.1544E+09     4.6416E+09            0.            0.            0.            0.             0.
+    34     4.6416E+09     1.0000E+10            0.            0.            0.            0.             0.
+    35     1.0000E+10     2.1544E+10            0.            0.            0.            0.             0.
+    36     2.1544E+10     4.6416E+10            0.            0.            0.            0.             0.
+    37     4.6416E+10     1.0000E+11            0.            0.            0.            0.             0.
+    38     1.0000E+11     2.1544E+11            0.            0.            0.            0.             0.
+    39     2.1544E+11     4.6416E+11            0.            0.            0.            0.             0.
+    40     4.6416E+11     1.0000E+12            0.            0.            0.            0.             0.
+
+ AVERAGE NUMBER OF PARTICLES PER EVENT :
+ FROM LEVEL NUMBER                    1
+ HEIGHT IN CM                     2.156E+05
+ HEIGHT IN G/CM**2                8.101E+02
+ NO OF PROTONS      =           0.0 +-          0.0
+ NO OF ANTIPROTONS  =           0.0 +-          0.0
+ NO OF NEUTRONS     =           0.0 +-          0.0
+ NO OF ANTINEUTRONS =           0.0 +-          0.0
+ NO OF GAMMAS       =  1.538000E+01 +- 2.879281E+01
+Note: The following floating-point exceptions are signalling: IEEE_UNDERFLOW_FLAG
+ NO OF POSITRONS    =  1.160000E+00 +- 2.372911E+00
+ NO OF ELECTRONS    =  1.750000E+00 +- 3.565760E+00
+ NO OF MU +         =           0.0 +-          0.1
+ NO OF MU -         =           0.1 +-          0.2
+ NO OF PI 0         =           0.0 +-          0.0
+ NO OF PI +         =           0.0 +-          0.0
+ NO OF PI -         =           0.0 +-          0.0
+ NO OF K0L          =           0.0 +-          0.0
+ NO OF K0S          =           0.0 +-          0.0
+ NO OF K +          =           0.0 +-          0.0
+ NO OF K -          =           0.0 +-          0.0
+ NO OF STR. BARYONS =           0.0 +-          0.0
+ NO OF DEUTERONS    =           0.0 +-          0.0
+ NO OF TRITONS      =           0.0 +-          0.0
+ NO OF 3HELIUM      =           0.0 +-          0.0
+ NO OF ALPHAS       =           0.0 +-          0.0
+ NO OF OTHER PART.  =           0.0 +-          0.0
+
+ NO OF DECAYED MUON =           0.4 +-
+ NO OF ELIMIN. MUON =           0.2 +-
+
+ PRESENT TIME : 19.11.2026  08:55:44 UTC
+
+ ========== END OF RUN ================================================

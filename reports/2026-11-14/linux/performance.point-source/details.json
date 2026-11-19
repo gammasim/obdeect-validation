@@ -1,0 +1,608 @@
+{
+  "case": "point-source",
+  "host": {
+    "nproc": 1,
+    "cpu_model": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+    "machine": "x86_64",
+    "platform": "Linux-5.14.0-687.66.1.el9_8.x86_64-x86_64-with-glibc2.34",
+    "obdeect_version": "obdeect-stream 0.9.3.dev7+g34d812c61\nobdeect-propagation 0.9.3.dev7+g34d812c61\nobdeect-sources 0.9.3.dev7+g34d812c61\nobdeect-ray-tracing 0.9.3.dev7+g34d812c61\nphoton-stream format 1.0",
+    "host": "Intel Xeon Gold 6130 @ 2.10 GHz (2 sockets, 64 threads), apptainer, case pinned to core 12, up to 4 cases at once"
+  },
+  "settings": {
+    "reps": 3,
+    "timing": "wall and CPU: wait4 rusage per child; peak RSS: sampled /proc VmHWM on Linux",
+    "events": 2,
+    "photons_per_event": 10000000,
+    "bypass_optics": 0
+  },
+  "threads": {
+    "candidate_threads1": "1 (all stages single-threaded; default is the same)"
+  },
+  "stages": {
+    "reference": {
+      "light_emission": [
+        {
+          "wall_s": 0.09773382591083646,
+          "cpu_s": 0.067883,
+          "peak_rss_mb": 12.64453125,
+          "argv": [
+            [
+              "xyzls",
+              "-I/reference/cfg/common",
+              "-N",
+              "2",
+              "-n",
+              "10000000",
+              "-z",
+              "100000",
+              "-a",
+              "isotropic",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.dat"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.06970302492845803,
+          "cpu_s": 0.067711,
+          "peak_rss_mb": 12.0390625,
+          "argv": [
+            [
+              "xyzls",
+              "-I/reference/cfg/common",
+              "-N",
+              "2",
+              "-n",
+              "10000000",
+              "-z",
+              "100000",
+              "-a",
+              "isotropic",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.dat"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.06905784492846578,
+          "cpu_s": 0.06715499999999999,
+          "peak_rss_mb": 12.046875,
+          "argv": [
+            [
+              "xyzls",
+              "-I/reference/cfg/common",
+              "-N",
+              "2",
+              "-n",
+              "10000000",
+              "-z",
+              "100000",
+              "-a",
+              "isotropic",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.dat"
+            ]
+          ]
+        }
+      ],
+      "sim_telarray": [
+        {
+          "wall_s": 0.22573985706549138,
+          "cpu_s": 0.186461,
+          "peak_rss_mb": 57.31640625,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/reference/cfg/CTA/CTA-PROD6-LST.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=1",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "altitude=2150",
+              "-C",
+              "TRIGGER_TELESCOPES=1",
+              "-C",
+              "TELTRIG_MIN_SIGSUM=2",
+              "-C",
+              "PULSE_ANALYSIS=-30",
+              "-C",
+              "MAXIMUM_TELESCOPES=1",
+              "-C",
+              "telescope_theta=0",
+              "-C",
+              "telescope_phi=0",
+              "-C",
+              "Bypass_Optics=0",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.dat"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.19083747698459774,
+          "cpu_s": 0.18339499999999997,
+          "peak_rss_mb": 57.48828125,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/reference/cfg/CTA/CTA-PROD6-LST.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=1",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "altitude=2150",
+              "-C",
+              "TRIGGER_TELESCOPES=1",
+              "-C",
+              "TELTRIG_MIN_SIGSUM=2",
+              "-C",
+              "PULSE_ANALYSIS=-30",
+              "-C",
+              "MAXIMUM_TELESCOPES=1",
+              "-C",
+              "telescope_theta=0",
+              "-C",
+              "telescope_phi=0",
+              "-C",
+              "Bypass_Optics=0",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.dat"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.19523673004005104,
+          "cpu_s": 0.187515,
+          "peak_rss_mb": 57.40234375,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/reference/cfg/CTA/CTA-PROD6-LST.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=1",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "altitude=2150",
+              "-C",
+              "TRIGGER_TELESCOPES=1",
+              "-C",
+              "TELTRIG_MIN_SIGSUM=2",
+              "-C",
+              "PULSE_ANALYSIS=-30",
+              "-C",
+              "MAXIMUM_TELESCOPES=1",
+              "-C",
+              "telescope_theta=0",
+              "-C",
+              "telescope_phi=0",
+              "-C",
+              "Bypass_Optics=0",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/reference/reference.dat"
+            ]
+          ]
+        }
+      ]
+    },
+    "candidate_threads1": {
+      "sources": [
+        {
+          "wall_s": 0.005953027051873505,
+          "cpu_s": 0.00261,
+          "peak_rss_mb": 3.625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/sources/bin/obdeect-sources-point-source",
+              "-N",
+              "2",
+              "-n",
+              "10000000",
+              "-z",
+              "100000",
+              "-a",
+              "isotropic",
+              "--seed",
+              "17",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/native.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.0029070950113236904,
+          "cpu_s": 0.00238,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/sources/bin/obdeect-sources-point-source",
+              "-N",
+              "2",
+              "-n",
+              "10000000",
+              "-z",
+              "100000",
+              "-a",
+              "isotropic",
+              "--seed",
+              "17",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/native.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.0029434210155159235,
+          "cpu_s": 0.002428,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/sources/bin/obdeect-sources-point-source",
+              "-N",
+              "2",
+              "-n",
+              "10000000",
+              "-z",
+              "100000",
+              "-a",
+              "isotropic",
+              "--seed",
+              "17",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/native.gst"
+            ]
+          ]
+        }
+      ],
+      "propagation": [
+        {
+          "wall_s": 0.003560254001058638,
+          "cpu_s": 0.0031139999999999996,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--no-extinction",
+              "--site-altitude",
+              "2150",
+              "--seed",
+              "1",
+              "--wavelength-range",
+              "300",
+              "800",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/native.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.0034034219570457935,
+          "cpu_s": 0.0029709999999999997,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--no-extinction",
+              "--site-altitude",
+              "2150",
+              "--seed",
+              "1",
+              "--wavelength-range",
+              "300",
+              "800",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/native.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.0033963009482249618,
+          "cpu_s": 0.002976,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--no-extinction",
+              "--site-altitude",
+              "2150",
+              "--seed",
+              "1",
+              "--wavelength-range",
+              "300",
+              "800",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/native.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/propagated.gst"
+            ]
+          ]
+        }
+      ],
+      "to_simtel": [
+        {
+          "wall_s": 0.004612140939570963,
+          "cpu_s": 0.004165,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.004597382969222963,
+          "cpu_s": 0.004184,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.0043513880809769034,
+          "cpu_s": 0.00394,
+          "peak_rss_mb": 39.921875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/propagated.gst"
+            ]
+          ]
+        }
+      ],
+      "sim_telarray": [
+        {
+          "wall_s": 0.1895203769672662,
+          "cpu_s": 0.18193399999999998,
+          "peak_rss_mb": 57.44140625,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/reference/cfg/CTA/CTA-PROD6-LST.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=1",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "altitude=2150",
+              "-C",
+              "TRIGGER_TELESCOPES=1",
+              "-C",
+              "TELTRIG_MIN_SIGSUM=2",
+              "-C",
+              "PULSE_ANALYSIS=-30",
+              "-C",
+              "MAXIMUM_TELESCOPES=1",
+              "-C",
+              "telescope_theta=0",
+              "-C",
+              "telescope_phi=0",
+              "-C",
+              "Bypass_Optics=0",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.18913375306874514,
+          "cpu_s": 0.181586,
+          "peak_rss_mb": 57.30078125,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/reference/cfg/CTA/CTA-PROD6-LST.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=1",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "altitude=2150",
+              "-C",
+              "TRIGGER_TELESCOPES=1",
+              "-C",
+              "TELTRIG_MIN_SIGSUM=2",
+              "-C",
+              "PULSE_ANALYSIS=-30",
+              "-C",
+              "MAXIMUM_TELESCOPES=1",
+              "-C",
+              "telescope_theta=0",
+              "-C",
+              "telescope_phi=0",
+              "-C",
+              "Bypass_Optics=0",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.1888163109542802,
+          "cpu_s": 0.181188,
+          "peak_rss_mb": 57.41796875,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/reference/cfg/CTA/CTA-PROD6-LST.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=1",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "altitude=2150",
+              "-C",
+              "TRIGGER_TELESCOPES=1",
+              "-C",
+              "TELTRIG_MIN_SIGSUM=2",
+              "-C",
+              "PULSE_ANALYSIS=-30",
+              "-C",
+              "MAXIMUM_TELESCOPES=1",
+              "-C",
+              "telescope_theta=0",
+              "-C",
+              "telescope_phi=0",
+              "-C",
+              "Bypass_Optics=0",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/point-source/candidate/candidate.iact"
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "pipelines": {
+    "reference": [
+      {
+        "wall_s": 0.32347368297632784,
+        "cpu_s": 0.254344,
+        "peak_rss_mb": 57.31640625
+      },
+      {
+        "wall_s": 0.2605405019130558,
+        "cpu_s": 0.25110599999999994,
+        "peak_rss_mb": 57.48828125
+      },
+      {
+        "wall_s": 0.2642945749685168,
+        "cpu_s": 0.25466999999999995,
+        "peak_rss_mb": 57.40234375
+      }
+    ],
+    "candidate_threads1": [
+      {
+        "wall_s": 0.2036457989597693,
+        "cpu_s": 0.191823,
+        "peak_rss_mb": 57.44140625
+      },
+      {
+        "wall_s": 0.20004165300633758,
+        "cpu_s": 0.19112099999999999,
+        "peak_rss_mb": 57.30078125
+      },
+      {
+        "wall_s": 0.199507420998998,
+        "cpu_s": 0.19053199999999998,
+        "peak_rss_mb": 57.41796875
+      }
+    ]
+  },
+  "counts": {},
+  "failures": {},
+  "budget_reasons": {},
+  "timing_reliability": {
+    "spread_limit": 0.05,
+    "load_limit": 1.0,
+    "reasons": [
+      "reference wall spread 0.238 > 0.05",
+      "host_loadavg_before 21.59 > 1.0"
+    ]
+  }
+}

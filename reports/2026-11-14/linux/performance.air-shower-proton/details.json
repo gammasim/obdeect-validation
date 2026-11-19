@@ -1,0 +1,3749 @@
+{
+  "case": "air-shower",
+  "host": {
+    "nproc": 1,
+    "cpu_model": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+    "machine": "x86_64",
+    "platform": "Linux-5.14.0-687.66.1.el9_8.x86_64-x86_64-with-glibc2.34",
+    "obdeect_version": "obdeect-stream 0.9.3.dev7+g34d812c61\nobdeect-propagation 0.9.3.dev7+g34d812c61\nobdeect-sources 0.9.3.dev7+g34d812c61\nobdeect-ray-tracing 0.9.3.dev7+g34d812c61\nphoton-stream format 1.0",
+    "host": "Intel Xeon Gold 6130 @ 2.10 GHz (2 sockets, 64 threads), apptainer, case pinned to core 12, up to 4 cases at once"
+  },
+  "settings": {
+    "reps": 3,
+    "timing": "wall and CPU: wait4 rusage per child; peak RSS: sampled /proc VmHWM on Linux",
+    "showers": 45,
+    "input": "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact",
+    "config": "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+    "reference_atmosphere": null,
+    "candidate_atmosphere": "obdeect propagation (reference atmosphere below 1000 nm, 250-700 nm); sim_telarray unit table",
+    "telescopes": [
+      1
+    ],
+    "pointing": "zenith 20 deg, azimuth 180 deg",
+    "candidate_sim_telarray": "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray"
+  },
+  "threads": {
+    "candidate_threads1": 1,
+    "candidate_threadsdefault": 0,
+    "candidate_envelope": 0,
+    "candidate_envelope_threads1": 1,
+    "candidate_unthinned_threads1": 1
+  },
+  "stages": {
+    "reference": {
+      "sim_telarray": [
+        {
+          "wall_s": 27.320400648983195,
+          "cpu_s": 26.572368,
+          "peak_rss_mb": 180.265625,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=0",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 26.343798203975894,
+          "cpu_s": 25.660073,
+          "peak_rss_mb": 178.1640625,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=0",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 26.831686109071597,
+          "cpu_s": 26.177561,
+          "peak_rss_mb": 178.49609375,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/reference/reference.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/reference/reference.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=0",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        }
+      ]
+    },
+    "candidate_threads1": {
+      "from_corsika": [
+        {
+          "wall_s": 3.6451652839314193,
+          "cpu_s": 3.550671,
+          "peak_rss_mb": 188.87890625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.6354511799290776,
+          "cpu_s": 3.545,
+          "peak_rss_mb": 189.44140625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.6644101249985397,
+          "cpu_s": 3.5698410000000003,
+          "peak_rss_mb": 190.37890625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        }
+      ],
+      "propagation": [
+        {
+          "wall_s": 4.355092648998834,
+          "cpu_s": 4.244238,
+          "peak_rss_mb": 15.578125,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "--telescopes",
+              "1",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/showers.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 5.909403187921271,
+          "cpu_s": 4.370642,
+          "peak_rss_mb": 15.05859375,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "--telescopes",
+              "1",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/showers.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 5.981954172020778,
+          "cpu_s": 4.562555,
+          "peak_rss_mb": 15.7578125,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "--telescopes",
+              "1",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/showers.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/propagated.gst"
+            ]
+          ]
+        }
+      ],
+      "compile_model": [
+        {
+          "wall_s": 0.21819941606372595,
+          "cpu_s": 0.200175,
+          "peak_rss_mb": 39.39453125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.24533858709037304,
+          "cpu_s": 0.202981,
+          "peak_rss_mb": 40.95703125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2372353969840333,
+          "cpu_s": 0.21415599999999999,
+          "peak_rss_mb": 41.4140625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/lst.model"
+            ]
+          ]
+        }
+      ],
+      "trace_stream": [
+        {
+          "wall_s": 26.393777857068926,
+          "cpu_s": 25.781755,
+          "peak_rss_mb": 52.359375,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+              "--model",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "1",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/propagated.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 29.654538444941863,
+          "cpu_s": 25.727574,
+          "peak_rss_mb": 52.20703125,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+              "--model",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "1",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/propagated.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 30.41476838698145,
+          "cpu_s": 26.305612999999997,
+          "peak_rss_mb": 52.40234375,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+              "--model",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "1",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/propagated.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "to_simtel": [
+        {
+          "wall_s": 2.377270361990668,
+          "cpu_s": 2.308185,
+          "peak_rss_mb": 156.16796875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/camera-map.txt",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 5.604175733053125,
+          "cpu_s": 2.63618,
+          "peak_rss_mb": 155.58984375,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/camera-map.txt",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 7.260115463053808,
+          "cpu_s": 2.765349,
+          "peak_rss_mb": 155.5234375,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/camera-map.txt",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "sim_telarray": [
+        {
+          "wall_s": 21.70176937803626,
+          "cpu_s": 21.019479,
+          "peak_rss_mb": 224.12109375,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unit-atmosphere.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 21.248606046079658,
+          "cpu_s": 20.569286,
+          "peak_rss_mb": 225.77734375,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unit-atmosphere.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 21.593055989942513,
+          "cpu_s": 20.787300000000002,
+          "peak_rss_mb": 223.91015625,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unit-atmosphere.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threads1/candidate.iact"
+            ]
+          ]
+        }
+      ]
+    },
+    "candidate_threadsdefault": {
+      "from_corsika": [
+        {
+          "wall_s": 3.6202047429978848,
+          "cpu_s": 3.531558,
+          "peak_rss_mb": 190.015625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.550206621992402,
+          "cpu_s": 3.462088,
+          "peak_rss_mb": 189.00390625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 3.6661988019477576,
+          "cpu_s": 3.570866,
+          "peak_rss_mb": 189.578125,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+            ]
+          ]
+        }
+      ],
+      "propagation": [
+        {
+          "wall_s": 4.3424028309527785,
+          "cpu_s": 4.236927,
+          "peak_rss_mb": 15.22265625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "--telescopes",
+              "1",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/showers.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 5.802260913071223,
+          "cpu_s": 4.281294,
+          "peak_rss_mb": 15.72265625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "--telescopes",
+              "1",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/showers.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/propagated.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 5.976740205078386,
+          "cpu_s": 4.459845,
+          "peak_rss_mb": 16.5703125,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+              "--transmission",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+              "--site-altitude",
+              "2156",
+              "--pathlen",
+              "28",
+              "--seed",
+              "123",
+              "--mode",
+              "weighted",
+              "--wavelength-range",
+              "250",
+              "700",
+              "--telescopes",
+              "1",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/showers.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/propagated.gst"
+            ]
+          ]
+        }
+      ],
+      "compile_model": [
+        {
+          "wall_s": 0.22484869603067636,
+          "cpu_s": 0.20707799999999998,
+          "peak_rss_mb": 41.0,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2257185330381617,
+          "cpu_s": 0.20641099999999998,
+          "peak_rss_mb": 41.12890625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.27292537095490843,
+          "cpu_s": 0.225308,
+          "peak_rss_mb": 39.65234375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/lst.model"
+            ]
+          ]
+        }
+      ],
+      "trace_stream": [
+        {
+          "wall_s": 25.423508277977817,
+          "cpu_s": 24.935595,
+          "peak_rss_mb": 108.56640625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+              "--model",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "0",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/propagated.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 29.81186014506966,
+          "cpu_s": 26.146404,
+          "peak_rss_mb": 108.68359375,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+              "--model",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "0",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/propagated.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 31.33323825604748,
+          "cpu_s": 26.081057,
+          "peak_rss_mb": 107.92578125,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+              "--model",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/lst.model",
+              "--seed",
+              "20261113",
+              "--threads",
+              "0",
+              "--telescopes",
+              "1",
+              "--pointing-zenith-deg",
+              "20",
+              "--pointing-azimuth-deg",
+              "180",
+              "--telescope-transmission",
+              "full",
+              "-i",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/propagated.gst",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "to_simtel": [
+        {
+          "wall_s": 2.3405201400164515,
+          "cpu_s": 2.272092,
+          "peak_rss_mb": 156.859375,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/camera-map.txt",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 7.307678584009409,
+          "cpu_s": 2.807651,
+          "peak_rss_mb": 154.54296875,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/camera-map.txt",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/traced.gst"
+            ]
+          ]
+        },
+        {
+          "wall_s": 5.620246781036258,
+          "cpu_s": 2.6969649999999996,
+          "peak_rss_mb": 154.140625,
+          "argv": [
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "--camera-map",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/camera-map.txt",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.iact",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/traced.gst"
+            ]
+          ]
+        }
+      ],
+      "sim_telarray": [
+        {
+          "wall_s": 20.97702153190039,
+          "cpu_s": 20.305424,
+          "peak_rss_mb": 225.8046875,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unit-atmosphere.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 21.43921193794813,
+          "cpu_s": 20.764212999999998,
+          "peak_rss_mb": 223.51953125,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unit-atmosphere.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.iact"
+            ]
+          ]
+        },
+        {
+          "wall_s": 21.49405314703472,
+          "cpu_s": 20.816802999999997,
+          "peak_rss_mb": 223.91015625,
+          "argv": [
+            [
+              "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
+              "-c",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+              "-I/reference/cfg/common",
+              "-I/reference/cfg/CTA",
+              "-DCTA_NORTH",
+              "-DLST1",
+              "-DNUM_TELESCOPES=3",
+              "-W",
+              "random_state=none",
+              "-C",
+              "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.hdata",
+              "-C",
+              "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.simtel",
+              "-C",
+              "random_seed=20261113",
+              "-C",
+              "save_photons=2",
+              "-C",
+              "store_photoelectrons=0",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "maximum_telescopes=3",
+              "-C",
+              "altitude=2156",
+              "-C",
+              "telescope_theta=20",
+              "-C",
+              "telescope_phi=180",
+              "-C",
+              "Bypass_Optics=1",
+              "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+              "-DTELESCOPE=1",
+              "-C",
+              "maximum_telescopes=1",
+              "-C",
+              "trigger_telescopes=1",
+              "-C",
+              "min_photons=0",
+              "-C",
+              "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unit-atmosphere.dat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/threadsdefault/candidate.iact"
+            ]
+          ]
+        }
+      ]
+    },
+    "candidate_envelope": {
+      "compile_model": [
+        {
+          "wall_s": 0.2184147760272026,
+          "cpu_s": 0.201323,
+          "peak_rss_mb": 41.07421875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.23441991594154388,
+          "cpu_s": 0.21196399999999999,
+          "peak_rss_mb": 39.59375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.2231279449770227,
+          "cpu_s": 0.20506999999999997,
+          "peak_rss_mb": 41.26171875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model"
+            ]
+          ]
+        }
+      ],
+      "pipeline": [
+        {
+          "wall_s": 28.2924739390146,
+          "cpu_s": 25.099783,
+          "peak_rss_mb": 190.4140625,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 27.948536854004487,
+              "cpu_s": 3.245006,
+              "peak_rss_mb": 190.4140625,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 27.95127107296139,
+              "cpu_s": 4.800405,
+              "peak_rss_mb": 16.6171875,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.065412990981713,
+              "cpu_s": 3.3776889999999997,
+              "peak_rss_mb": 18.4765625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.120575424050912,
+              "cpu_s": 0.256673,
+              "peak_rss_mb": 30.07421875,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 28.2924739390146,
+              "cpu_s": 13.42001,
+              "peak_rss_mb": 89.94140625,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 28.113539810990915,
+          "cpu_s": 24.979983,
+          "peak_rss_mb": 190.46875,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 27.757005909923464,
+              "cpu_s": 3.2484729999999997,
+              "peak_rss_mb": 190.46875,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 27.759880353929475,
+              "cpu_s": 4.810192,
+              "peak_rss_mb": 17.1484375,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 27.871806378941983,
+              "cpu_s": 3.4108490000000002,
+              "peak_rss_mb": 18.578125,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 27.926021880935878,
+              "cpu_s": 0.264944,
+              "peak_rss_mb": 31.625,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 28.113539810990915,
+              "cpu_s": 13.245525,
+              "peak_rss_mb": 91.92578125,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 28.69881550606806,
+          "cpu_s": 25.430428,
+          "peak_rss_mb": 189.984375,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 28.331821158062667,
+              "cpu_s": 3.2652479999999997,
+              "peak_rss_mb": 189.984375,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.332964539062232,
+              "cpu_s": 4.8690180000000005,
+              "peak_rss_mb": 16.53515625,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "0",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.4514001699863,
+              "cpu_s": 3.4460040000000003,
+              "peak_rss_mb": 18.46484375,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.508008575066924,
+              "cpu_s": 0.262063,
+              "peak_rss_mb": 30.453125,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 28.69881550606806,
+              "cpu_s": 13.588095,
+              "peak_rss_mb": 89.21875,
+              "returncode": 0
+            }
+          ]
+        }
+      ]
+    },
+    "candidate_envelope_threads1": {
+      "compile_model": [
+        {
+          "wall_s": 0.21636426099576056,
+          "cpu_s": 0.199202,
+          "peak_rss_mb": 39.40625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.21827648300677538,
+          "cpu_s": 0.20046499999999998,
+          "peak_rss_mb": 39.50390625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.22180473990738392,
+          "cpu_s": 0.203486,
+          "peak_rss_mb": 39.44140625,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model"
+            ]
+          ]
+        }
+      ],
+      "pipeline": [
+        {
+          "wall_s": 28.29382443893701,
+          "cpu_s": 25.001195,
+          "peak_rss_mb": 189.703125,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 28.045694471918978,
+              "cpu_s": 3.242655,
+              "peak_rss_mb": 189.703125,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.04843634192366,
+              "cpu_s": 4.793786,
+              "peak_rss_mb": 17.51171875,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.162552168010734,
+              "cpu_s": 3.209436,
+              "peak_rss_mb": 17.16015625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.218678119941615,
+              "cpu_s": 0.258542,
+              "peak_rss_mb": 30.98046875,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 28.29382443893701,
+              "cpu_s": 13.496775999999999,
+              "peak_rss_mb": 85.80078125,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 28.077833615010604,
+          "cpu_s": 24.835242,
+          "peak_rss_mb": 189.265625,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 27.783342560054734,
+              "cpu_s": 3.268624,
+              "peak_rss_mb": 189.265625,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 27.78563574596774,
+              "cpu_s": 4.810271,
+              "peak_rss_mb": 16.4140625,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 27.901791012031026,
+              "cpu_s": 3.1687350000000003,
+              "peak_rss_mb": 17.0546875,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 27.958439850015566,
+              "cpu_s": 0.2655,
+              "peak_rss_mb": 30.3359375,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 28.077833615010604,
+              "cpu_s": 13.322112,
+              "peak_rss_mb": 91.0859375,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 28.31008045002818,
+          "cpu_s": 25.022538,
+          "peak_rss_mb": 189.62890625,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 28.047356316936202,
+              "cpu_s": 3.2364990000000002,
+              "peak_rss_mb": 189.62890625,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--envelope",
+                "qe=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-envelope.dat",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.04846274596639,
+              "cpu_s": 4.817737,
+              "peak_rss_mb": 17.4296875,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.16034788498655,
+              "cpu_s": 3.2084439999999996,
+              "peak_rss_mb": 17.22265625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/camera-map.txt",
+                "--scaled-factor",
+                "qe",
+                "-o",
+                "-"
+              ],
+              "wall_s": 28.214871636941098,
+              "cpu_s": 0.26280499999999996,
+              "peak_rss_mb": 31.37109375,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope_threads1/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/envelope/qe-table",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 28.31008045002818,
+              "cpu_s": 13.497053000000001,
+              "peak_rss_mb": 90.1484375,
+              "returncode": 0
+            }
+          ]
+        }
+      ]
+    },
+    "candidate_unthinned_threads1": {
+      "compile_model": [
+        {
+          "wall_s": 0.21919930796138942,
+          "cpu_s": 0.201869,
+          "peak_rss_mb": 39.453125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.22729641199111938,
+          "cpu_s": 0.2089,
+          "peak_rss_mb": 41.609375,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.21732236410025507,
+          "cpu_s": 0.199812,
+          "peak_rss_mb": 39.5078125,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model"
+            ]
+          ]
+        }
+      ],
+      "pipeline": [
+        {
+          "wall_s": 35.35102153301705,
+          "cpu_s": 31.118593999999998,
+          "peak_rss_mb": 190.6875,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 35.051403512014076,
+              "cpu_s": 3.2670519999999996,
+              "peak_rss_mb": 190.6875,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 35.051293589989655,
+              "cpu_s": 3.871776,
+              "peak_rss_mb": 14.671875,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 35.1202534630429,
+              "cpu_s": 8.963040999999999,
+              "peak_rss_mb": 26.65234375,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              "wall_s": 35.17756510898471,
+              "cpu_s": 0.7545499999999999,
+              "peak_rss_mb": 81.69140625,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 35.35102153301705,
+              "cpu_s": 14.262175000000001,
+              "peak_rss_mb": 122.59765625,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 35.831647247076035,
+          "cpu_s": 31.592917999999997,
+          "peak_rss_mb": 190.3515625,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 35.602175796055235,
+              "cpu_s": 3.3057119999999998,
+              "peak_rss_mb": 190.3515625,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 35.602036603027955,
+              "cpu_s": 3.928582,
+              "peak_rss_mb": 14.9765625,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 35.677326236036606,
+              "cpu_s": 9.267309,
+              "peak_rss_mb": 26.6875,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              "wall_s": 35.73585654608905,
+              "cpu_s": 0.760432,
+              "peak_rss_mb": 83.0625,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 35.831647247076035,
+              "cpu_s": 14.330883,
+              "peak_rss_mb": 122.77734375,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "wall_s": 34.38310071500018,
+          "cpu_s": 30.438686,
+          "peak_rss_mb": 189.765625,
+          "argv": [
+            [
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ]
+            ]
+          ],
+          "children": [
+            {
+              "name": "from_corsika",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-from-corsika",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/proton-20deg-300-10000GeV.iact"
+              ],
+              "wall_s": 34.17082256008871,
+              "cpu_s": 3.249243,
+              "peak_rss_mb": 189.765625,
+              "returncode": 0
+            },
+            {
+              "name": "propagation",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/propagation/bin/obdeect-propagation-run",
+                "--transmission",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/atmosphere-below-1000nm.dat",
+                "--site-altitude",
+                "2156",
+                "--pathlen",
+                "28",
+                "--seed",
+                "123",
+                "--telescopes",
+                "1",
+                "--mode",
+                "weighted",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 34.170715135056525,
+              "cpu_s": 3.813497,
+              "peak_rss_mb": 14.8828125,
+              "returncode": 0
+            },
+            {
+              "name": "trace_stream",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
+                "--model",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/lst.model",
+                "--seed",
+                "20261113",
+                "--threads",
+                "1",
+                "--telescopes",
+                "1",
+                "--pointing-zenith-deg",
+                "20",
+                "--pointing-azimuth-deg",
+                "180",
+                "--telescope-transmission",
+                "full",
+                "-i",
+                "-",
+                "-o",
+                "-"
+              ],
+              "wall_s": 34.24148085003253,
+              "cpu_s": 8.819823,
+              "peak_rss_mb": 26.69921875,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "--camera-map",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/camera-map.txt",
+                "-o",
+                "-"
+              ],
+              "wall_s": 34.29923886305187,
+              "cpu_s": 0.748888,
+              "peak_rss_mb": 83.3046875,
+              "returncode": 0
+            },
+            {
+              "name": "sim_telarray",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/mode3/sim_telarray",
+                "-c",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/CTAO.cfg",
+                "-I/reference/cfg/common",
+                "-I/reference/cfg/CTA",
+                "-DCTA_NORTH",
+                "-DLST1",
+                "-DNUM_TELESCOPES=3",
+                "-W",
+                "random_state=none",
+                "-C",
+                "histogram_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.hdata",
+                "-C",
+                "output_file=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/air-shower-proton/unthinned/candidate.simtel",
+                "-C",
+                "random_seed=20261113",
+                "-C",
+                "save_photons=2",
+                "-C",
+                "store_photoelectrons=0",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "maximum_telescopes=3",
+                "-C",
+                "altitude=2156",
+                "-C",
+                "telescope_theta=20",
+                "-C",
+                "telescope_phi=180",
+                "-C",
+                "Bypass_Optics=3",
+                "-I/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0",
+                "-DTELESCOPE=1",
+                "-C",
+                "maximum_telescopes=1",
+                "-C",
+                "trigger_telescopes=1",
+                "-C",
+                "min_photons=0",
+                "-C",
+                "atmospheric_transmission=/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/results/air-shower-proton/performance.air-shower-proton/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
+                "-"
+              ],
+              "wall_s": 34.38310071500018,
+              "cpu_s": 13.807235,
+              "peak_rss_mb": 120.0546875,
+              "returncode": 0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "pipelines": {
+    "reference": [
+      {
+        "wall_s": 27.320400648983195,
+        "cpu_s": 26.572368,
+        "peak_rss_mb": 180.265625
+      },
+      {
+        "wall_s": 26.343798203975894,
+        "cpu_s": 25.660073,
+        "peak_rss_mb": 178.1640625
+      },
+      {
+        "wall_s": 26.831686109071597,
+        "cpu_s": 26.177561,
+        "peak_rss_mb": 178.49609375
+      }
+    ],
+    "candidate_threads1": [
+      {
+        "wall_s": 58.691274946089834,
+        "cpu_s": 57.104503,
+        "peak_rss_mb": 224.12109375
+      },
+      {
+        "wall_s": 66.29751317901537,
+        "cpu_s": 57.051663000000005,
+        "peak_rss_mb": 225.77734375
+      },
+      {
+        "wall_s": 69.15153953398112,
+        "cpu_s": 58.204814,
+        "peak_rss_mb": 223.91015625
+      }
+    ],
+    "candidate_threadsdefault": [
+      {
+        "wall_s": 56.928506219876,
+        "cpu_s": 55.488673999999996,
+        "peak_rss_mb": 225.8046875
+      },
+      {
+        "wall_s": 68.13693673512898,
+        "cpu_s": 57.668061,
+        "peak_rss_mb": 223.51953125
+      },
+      {
+        "wall_s": 68.36340256209951,
+        "cpu_s": 57.850843999999995,
+        "peak_rss_mb": 223.91015625
+      }
+    ],
+    "candidate_envelope": [
+      {
+        "wall_s": 28.5108887150418,
+        "cpu_s": 25.301105999999997,
+        "peak_rss_mb": 190.4140625
+      },
+      {
+        "wall_s": 28.34795972693246,
+        "cpu_s": 25.191947,
+        "peak_rss_mb": 190.46875
+      },
+      {
+        "wall_s": 28.92194345104508,
+        "cpu_s": 25.635498,
+        "peak_rss_mb": 189.984375
+      }
+    ],
+    "candidate_envelope_threads1": [
+      {
+        "wall_s": 28.51018869993277,
+        "cpu_s": 25.200397,
+        "peak_rss_mb": 189.703125
+      },
+      {
+        "wall_s": 28.29611009801738,
+        "cpu_s": 25.035707000000002,
+        "peak_rss_mb": 189.265625
+      },
+      {
+        "wall_s": 28.531885189935565,
+        "cpu_s": 25.226024000000002,
+        "peak_rss_mb": 189.62890625
+      }
+    ],
+    "candidate_unthinned_threads1": [
+      {
+        "wall_s": 35.570220840978436,
+        "cpu_s": 31.320462999999997,
+        "peak_rss_mb": 190.6875
+      },
+      {
+        "wall_s": 36.058943659067154,
+        "cpu_s": 31.801817999999997,
+        "peak_rss_mb": 190.3515625
+      },
+      {
+        "wall_s": 34.60042307910044,
+        "cpu_s": 30.638498000000002,
+        "peak_rss_mb": 189.765625
+      }
+    ]
+  },
+  "counts": {
+    "candidate_threads1": {
+      "into_simtel_weight": 44890666.0,
+      "into_trace_photons": 21472037,
+      "out_of_trace_photons": 44890666
+    },
+    "candidate_threadsdefault": {
+      "into_simtel_weight": 44890666.0,
+      "into_trace_photons": 21472037,
+      "out_of_trace_photons": 44890666
+    },
+    "reference": {
+      "into_simtel_weight": 109264466.99228254
+    },
+    "candidate_envelope": {
+      "into_trace_photons": 8583995,
+      "out_of_trace_photons": 4834230,
+      "into_simtel_photons": 4834230
+    },
+    "candidate_envelope_threads1": {
+      "into_trace_photons": 8583995,
+      "out_of_trace_photons": 4834230,
+      "into_simtel_photons": 4834230
+    },
+    "candidate_unthinned_threads1": {
+      "into_trace_photons": 12556534,
+      "out_of_trace_photons": 14719148,
+      "into_simtel_photons": 14719148
+    },
+    "physics_envelope": {
+      "into_trace_photons": 8583995,
+      "out_of_trace_photons": 4834230,
+      "into_simtel_photons": 4834230
+    }
+  },
+  "failures": {},
+  "physics": {
+    "unthinned": {
+      "triggers": {
+        "1": {
+          "difference": -0.0044444444444444444,
+          "se": 0.00443455690284319,
+          "mcnemar_p": 1.0,
+          "flag": 0,
+          "both": 221,
+          "reference_only": 1,
+          "candidate_only": 0
+        }
+      }
+    },
+    "envelope": {
+      "triggers": {
+        "1": {
+          "difference": -0.0044444444444444444,
+          "se": 0.00443455690284319,
+          "mcnemar_p": 1.0,
+          "flag": 0,
+          "both": 221,
+          "reference_only": 1,
+          "candidate_only": 0
+        }
+      }
+    },
+    "envelope_vs_unthinned": {
+      "triggers": {
+        "1": {
+          "difference": 0.0,
+          "se": 0.00628539361054709,
+          "mcnemar_p": 1.0,
+          "flag": 0,
+          "both": 220,
+          "reference_only": 1,
+          "candidate_only": 1
+        }
+      }
+    }
+  },
+  "budget_reasons": {},
+  "timing_reliability": {
+    "spread_limit": 0.05,
+    "load_limit": 1.0,
+    "reasons": [
+      "candidate_threads1 wall spread 0.158 > 0.05",
+      "candidate_threadsdefault wall spread 0.168 > 0.05",
+      "host_loadavg_before 3.20 > 1.0"
+    ]
+  }
+}

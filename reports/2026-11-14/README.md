@@ -597,6 +597,77 @@ Host: Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs
 6. **Checks.** Failing: reading + atmosphere ≤ 10 %, the wall budget and the all-cores CPU budget for gammas, the wall budget and the all-cores budgets for protons, and the 1 GB/s pipe budget, which a plain copy does not reach here either. All physics checks pass.
 
 **Compared with the first run of 17 November** (20 showers, propagation on all telescopes of the input, `std::cin`): the chain needed 1.23× (gamma) and 1.26× (proton) the CPU of sim_telarray; reading and atmosphere took 0.078 s per shower, now 0.027 s. Two changes were made in between: propagation keeps only the simulated telescope (`--telescopes`), and `propagation run` and `trace-stream` read standard input through `StdinBuffer`. Their separate effects were not measured. With libstdc++ (this container) `std::cin` is not slow, so the telescope selection is the likely cause. The showers also differ (100 instead of 20, other seeds).
+
+#### Linux and macOS compared
+
+The same nine cases, run on the Linux machine (apptainer, 4 cases at once, one core each) and on the macOS laptop (podman, one case at a time, one core). Both use the same harness, the same sim_telarray commit (mode 3) and the same obdeect checkout. The CORSIKA showers differ (see **Differences** below), so compare ratios and ns per photon, not seconds.
+
+| | macOS (2026-11-18) | Linux (2026-11-19) |
+|---|---|---|
+| CPU | Apple M3 Pro (6 P + 6 E cores) | Intel Xeon Gold 6130, 2.1 GHz (64 threads, shared) |
+| Cores used per case | 1 | 1 (up to 4 cases at the same time, each pinned to its own core) |
+| Container | podman VM, 6 CPUs | apptainer, `simtools-prod_20261118-v78050` |
+| CORSIKA | 7.8010, QGSJET-II | 7.8050, QGSJET-III |
+| Load before the air-shower case | 1.36 | 2.78 |
+
+**In short**
+
+1. **Same result on both machines.** The obdeect chain needs 1.00× (gamma) and 0.96× (proton) the CPU of sim_telarray on Linux, against 0.99× and 0.96× on macOS. Reading + atmosphere are 18 % and 31 % of the sim_telarray CPU (macOS 20 % and 30 %). The wall budget (≤ 1.00) still fails on Linux, by 10 % for gammas and 6 % for protons (macOS 3 % and 2 %).
+2. **The Linux node is about 2× slower per core** than the M3 Pro (gamma 431 against 211 ns per photon, proton 1.6×), for every program alike. It does not change which program dominates: the sim_telarray camera stays at about 75 % of the CPU.
+3. **Six telescopes: 0.59× the CPU on Linux, 0.43× on macOS.** The chain costs the same per telescope as for one LST (33 s against 34 s). sim_telarray's cost per telescope grows 1.6× from one to six telescopes here (56 s against 34 s), 2.1× on macOS. Still not understood; it is on the sim_telarray side.
+4. **Pipes are slower in wall time on Linux** (0.26 GB/s against 0.68 GB/s for `cat | tee`) at the same CPU time: the 1.5 GB input comes from the disk of a shared node, not from a warm page cache. Both machines miss the 1 GB/s budget.
+
+![obdeect chain and the single programs, macOS against Linux.](linux-vs-macos.png)
+
+**Is the obdeect chain faster than sim_telarray?** Ratio chain / sim_telarray, below 1 = obdeect faster. The two machines agree.
+
+| Case | Ratio | macOS | Linux |
+|---|---|---|---|
+| Gamma, one LST | CPU | 0.99 | 1.00 |
+| | wall | 1.02 | 1.10 |
+| | reading + atmosphere, share of sim_telarray CPU (budget 10 %) | 20 % | 18 % |
+| Proton, one LST | CPU | 0.96 | 0.96 |
+| | wall | 1.00 | 1.05 |
+| | reading + atmosphere, share of sim_telarray CPU (budget 10 %) | 30 % | 31 % |
+| Six telescopes | CPU | 0.43 | 0.59 |
+| | wall | 0.47 | 0.75 |
+| Flasher on the dish | wall | 0.83 | 0.81 |
+| Distant point source | wall | 0.74 | 0.76 |
+
+**How fast is each machine?** CPU time per photon that reaches the telescope (gamma case, one LST, one core). Lower is faster.
+
+| | macOS | Linux | Linux / macOS |
+|---|---|---|---|
+| Gamma: sim_telarray, ns per photon | 211 | 431 | 2.0× |
+| Gamma: obdeect chain, ns per photon | 210 | 432 | 2.1× |
+| Proton: sim_telarray, ns per photon | 151 | 240 | 1.6× |
+| Proton: obdeect chain, ns per photon | 148 | 231 | 1.6× |
+
+**Each program on its own** (the 100-shower gamma file, CPU ns per photon of its input; lower is faster):
+
+| Program | macOS | Linux | Linux / macOS |
+|---|---|---|---|
+| from-corsika | 5.6 | 11.0 | 2.0× |
+| propagation (QE pre-selection) | 6.9 | 13.7 | 2.0× |
+| trace-stream | 144.2 | 305.2 | 2.1× |
+| to-simtel | 3.6 | 7.9 | 2.2× |
+| sim_telarray, full run | 73.4 | 143.4 | 2.0× |
+
+**Photon stream through a pipe** (1 GB/s budget; CPU time is similar, wall time is not):
+
+| | macOS | Linux |
+|---|---|---|
+| `cat \| tee`: GB/s, wall s, CPU s | 0.68, 1.9, 1.7 | 0.26, 5.8, 1.8 |
+| `cat \| to-simtel`: GB/s, wall s, CPU s | 0.87, 1.5, 1.0 | 0.28, 5.5, 2.1 |
+
+**Differences between the two runs, read before comparing seconds**
+
+- **Other showers.** The image has no CORSIKA 7.8010 / QGSJET-II. The Linux inputs were made from the same cards with the image's CORSIKA 7.8050 (`corsika_qgs3_urqmd_flat`, QGSJET-III), so the showers differ: 17 % more photons at the telescope for gammas, 2.1× more for protons. Compare ratios and ns per photon. The CORSIKA logs are in `linux/`.
+- **Four cases at once.** Each case ran on its own core, four at a time (cores 10–13), on a node shared with other users (load 3–23 during the runs). Every case is flagged "timing unreliable". The ratios agree with macOS to within 1–10 %; a quiet-node run is still needed for final numbers.
+- **Build.** sim_telarray (mode 3, commit b8f2494, hessio 6045783) and obdeect (checkout, 0.9.3.dev7, branch `stdinbuffer`) were built with the image's compilers (GCC 11) under apptainer, not in the podman images. simtools is the workspace checkout.
+- **Checks.** The same ones fail as on macOS (reading + atmosphere ≤ 10 %, the wall budget, the all-cores budgets, 1 GB/s pipe). All physics checks pass.
+
+Data: [linux/](linux/) (metrics, details and plots of each case). The macOS data are in the `performance.*` folders.
 <!-- /notes -->
 
 | Case | Headline | Verdict |
