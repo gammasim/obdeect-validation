@@ -1,0 +1,142 @@
+{
+  "id": "performance.air-shower-array-joint",
+  "name": "Air shower, North array (6 telescopes, 7.0.0): joint obdeect chain (one pipe, one QE envelope for all telescopes, one sim_telarray run with all six telescopes and the array trigger) versus one sim_telarray run with full optics; single-telescope trigger and 2-LST stereo trigger; report only",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config",
+    "python3"
+  ],
+  "inputs": [
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north-100showers.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north-100showers.corsika.log"
+  ],
+  "timeout": 14400,
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "LSTN-02",
+        "LSTN-03",
+        "LSTN-04",
+        "MSTN-03",
+        "MSTN-15",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "measure-air-shower-array-joint",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_array_joint",
+        "air-shower-array-joint",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg"
+      ],
+      "timeout": 14400
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "reference_mono_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_joint_mono_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "reference_stereo_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "candidate_joint_stereo_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "joint_mono_physics_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "joint_stereo_physics_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "joint_mono_physics_tel1_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_mono_physics_tel2_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_mono_physics_tel3_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_mono_physics_tel4_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_mono_physics_tel5_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_mono_physics_tel6_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_stereo_physics_tel1_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_stereo_physics_tel2_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_stereo_physics_tel3_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_stereo_physics_tel4_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_stereo_physics_tel5_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "joint_stereo_physics_tel6_photoelectron_bias_limit_exceeded",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

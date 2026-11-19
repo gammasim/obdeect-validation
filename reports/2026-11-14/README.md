@@ -996,7 +996,7 @@ candidate_tee             (the obdeect chain; 3 pipes, one after another)
 
 **Reading the bar chart below.** Each bar is the wall time of one variant, stacked in the order the steps run. `reference` is one block (sim_telarray). `candidate_per_telescope` is six `pipe_telN` blocks (the `compile_telN` blocks are too short to see). `candidate_tee` is the three group pipes `tee_tel1_1`, `tee_tel2_4`, `tee_tel5_6`; the second is the longest because it holds three camera runs. The colours repeat between bars, so read the labels, not the colours.
 
-Not compared: the array trigger. The per-telescope camera outputs are not merged into one file, so each telescope stores its photoelectrons for the same events (`trigger_telescopes=1` on both sides).
+**Array trigger.** The `candidate_tee` outputs are six files and are not merged, so this chain does not do the array-level work of the reference and its time leaves out the merge and the array trigger. Both sides run with `trigger_telescopes=1`. Realistic simulations use a 2-telescope stereo trigger for the LSTs. The **joint chain** below keeps all six telescopes in one stream and one sim_telarray run, so the array trigger is sim_telarray's own; that is the chain to compare with the reference for an array.
 
 | Quantity | Value |
 |---|---|
@@ -1041,6 +1041,39 @@ The obdeect cost per telescope is the same as for one LST. Sharing the reading a
 **The showers of the two cases differ.** Single-LST input: seeds 1017…, core scatter 100 m, three telescopes of 12 m radius. Array input: seeds 1617…, scatter 250 m, six telescopes. Within a case, sim_telarray and the obdeect chain read the same file (100 telescope events), so the showers are identical there by construction. Times of different cases are not strictly like for like.
 
 **Physics.** The photoelectron bias is within its limit for all six telescopes (−0.9 % to +0.7 %).
+
+#### Joint chain: one pipe, one sim_telarray run, array trigger (Linux)
+
+```
+from-corsika ─▶ propagation (6 telescopes, one QE bound) ─▶ trace-stream (6 models) ─▶ to-simtel (camera map of 6) ─▶ sim_telarray (6 telescopes, camera only, array trigger)
+```
+
+No merge tool is needed: `trace-stream --model ID=PATH` traces all telescopes in one stream and `to-simtel` takes a camera map with several telescopes. Propagation takes one QE bound per process, so the bound is the maximum over the six telescopes of QE/headroom; each telescope's QE table is divided by that bound (bound × table = QE). Telescopes with a lower QE than the best one get more photons than they need: the cameras received 8.06 M photons, 3 % more than in the tee chain (+1 % for the LSTs, +15 % for the MSTs). Case `performance.air-shower-array-joint`, adapter `performance_array_joint.py`. Linux, 100 showers (CORSIKA 7.8050), one core per run, one repetition, mono and stereo run at the same time; load 2–4. Results below are with the fixes described under 2.
+
+| | single-telescope trigger | 2-LST stereo trigger |
+|---|---|---|
+| sim_telarray, full optics, six telescopes: CPU s (wall s) | 331.2 | 314.1 |
+| joint chain: CPU s | 301.4 | 286.6 |
+| **joint chain / sim_telarray, CPU** | **0.91** | **0.91** |
+| joint chain / sim_telarray, wall | 1.00 | 1.00 |
+| Events stored: reference, joint chain | 500, 500 | 500, 500 |
+| Events only in the reference, only in the joint chain | 0, 0 | 0, 0 |
+| Telescope images: reference, joint chain | 2970, 2968 | 2970, 2968 |
+| Photoelectron bias per telescope (1 σ) | −0.62 % to +0.19 % (0.17–0.35 %), all within the limit | same |
+| Trigger time of telescope k relative to telescope 1, joint chain − reference | +0.2 to +0.6 ns on average, rms 3.5–5 ns | same |
+
+CPU of the joint chain, single-telescope trigger (s): from-corsika 2.9, propagation 10.6, trace-stream 7.1, to-simtel 0.4, sim-telarray 280.5.
+
+1. **The joint chain reproduces the reference, including the array trigger.** One output file, sim_telarray's own array trigger, photoelectrons per telescope within their limits, the same 500 stored events with either trigger, and the trigger times of the telescopes agree with the reference (a systematic offset of 80 to 217 ns before the fix, 0.2 to 0.6 ns now).
+2. **Before the fix, the stereo trigger lost events.** The first version stored 495 of 500 events with the 2-LST trigger. The 5 lost events were strongly triggered (for example LST 1 and 4 with 369 and 325 photoelectrons). Cause: in camera-only mode sim_telarray had no wavefront delay between the telescopes. The array trigger computes `central time = time_offset + nominal_delay + trigger time`, with `nominal_delay` from the telescope positions and the array viewing direction (reference: 254, 174, 35, 100, 37 ns for telescopes 1 to 5 in one event; joint chain: 0). Three causes, all fixed:
+   - `sim_telarray` set the array viewing direction to zenith when `Bypass_Optics` is set (it showed azimuth 0°, altitude 90°; now 180° and 70° as in the reference).
+   - `obdeect stream to-simtel` wrote the TELPOS heights as 0. The new option `--keep-telpos-height` keeps them (default unchanged).
+   - With real heights, sim_telarray moved and delayed the camera-frame photons by the telescope height (`tel_dist = ztel * airmass`), which took them out of the readout window (0 events stored). In camera-only mode the photons are no longer moved; the height is only used by the array trigger.
+3. **Where the fixes are.** `obdeect` (uncommitted): `to-simtel --keep-telpos-height`, with a unit test, documentation and a changelog fragment. `obdeect-validation`: `containers/patches/sim_telarray-camera-only-array-trigger.patch`, applied by `containers/run-validation.sh` to the pinned mode-3 commit (b8f2494) of sim_telarray. The sim_telarray change should go into the `bypass-obdeect-mode-3` branch itself; the workspace checkout of sim_telarray is on another branch that does not have mode 3.
+4. **The CPU ratio is 0.91.** With the same cameras in one run, the chain costs about the same as the reference. The tee chain looked cheaper because six single-telescope camera runs cost 170 s together, while one run with six telescopes costs about 280 s for the same photons (+3 %). **The extra cost per telescope that sim_telarray shows in the six-telescope run is also there in camera-only mode: it is in sim_telarray's multi-telescope handling, not in the optics.** Cause not yet known. For an array, expect no CPU gain from obdeect as long as the camera dominates.
+5. **Not explained:** the trigger pattern differs in 21 % of the events (105 of 500) and 10 events have a different set of telescopes with data. Telescope multiplicities agree within counting noise (reference/joint, events with 4, 5 and 6 telescopes: 29/39, 187/186, 256/250), so this looks statistical near the MST trigger threshold; it has not been checked.
+
+Open: why a six-telescope sim_telarray run costs 1.6× the six single-telescope runs; a per-telescope QE bound in propagation (would remove the +3 % photons); more showers for the stereo trigger efficiency; the same run on macOS; the sim_telarray patch into the `bypass-obdeect-mode-3` branch.
 
 <!-- /notes -->
 

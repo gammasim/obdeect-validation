@@ -59,6 +59,9 @@ if [[ "${MODE3:-0}" == 1 && "${SKIP_BUILD:-0}" != 1 ]]; then
   simtel_commit=$(git -C sim_telarray rev-parse --verify "$simtel_ref^{commit}")
   simtel_src=$(mktemp -d "${TMPDIR:-/tmp}/simtel-src.XXXXXX")
   git -C sim_telarray archive "$simtel_commit" | tar -x -C "$simtel_src"
+  # Camera-only mode needs the array viewing direction and the telescope heights for the array
+  # trigger (plane-wavefront delay); see containers/patches/. Applies to the mode-3 commit only.
+  patch -p1 -d "$simtel_src" < obdeect-validation/containers/patches/sim_telarray-camera-only-array-trigger.patch
   # hessio at HESSIO_REV (pinned), exported with git archive from the clone HESSIO_REPO.
   hessio_rev=${HESSIO_REV:-604578331f4696703001e4af3b95a19cdcaa3852}
   : "${HESSIO_REPO:?set HESSIO_REPO to a hessio git clone containing $hessio_rev}"
