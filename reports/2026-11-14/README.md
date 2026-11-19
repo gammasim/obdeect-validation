@@ -967,7 +967,36 @@ Data: `performance.scaling` · [metrics.json](performance.scaling/metrics.json) 
 
 ### Array of six telescopes (4 LST, 2 MST) — PASS
 
-100 gamma showers on LSTN-01 to -04, MSTN-03 and MSTN-15. sim_telarray: one run that simulates all six telescopes (atmosphere, optics, cameras), single-threaded. obdeect chain: telescopes with the same QE share one from-corsika → propagation (QE pre-selection); a `tee` copies that photon stream to one trace-stream → to-simtel → sim_telarray (camera only) branch per telescope. The branches are separate processes that run at the same time, so the CPU ratio is the fair comparison; the wall time profits from the parallel branches. Not compared: the array trigger (each telescope has its own sim_telarray run).
+100 gamma showers, six telescopes of the CTAO North array: LSTN-01 to -04 and MSTN-03 and MSTN-15, all on the same CORSIKA file. Three ways to simulate them (single-threaded, one core):
+
+```
+reference            CORSIKA file ─▶ sim_telarray [atmosphere + optics + camera, all 6 telescopes]      1 run, 1 output file
+
+candidate_per_telescope   (baseline, 6 independent pipes, one after another)
+  for k = 1..6:      CORSIKA file ─▶ from-corsika ─▶ propagation ─▶ trace-stream ─▶ to-simtel ─▶ sim_telarray -DTELESCOPE=k
+                                                     (atmosphere, QE pre-selection)  (optics)      (camera only)  6 runs, 6 output files
+
+candidate_tee             (the obdeect chain; 3 pipes, one after another)
+  per QE group g:    CORSIKA file ─▶ from-corsika ─▶ propagation ─┬▶ trace-stream ─▶ to-simtel ─▶ sim_telarray -DTELESCOPE=k1
+                                                                  ├▶ trace-stream ─▶ to-simtel ─▶ sim_telarray -DTELESCOPE=k2
+                                                                  └▶ ...  (one branch per telescope of the group)   6 runs, 6 output files
+```
+
+| | reference | `candidate_per_telescope` | `candidate_tee` (the "obdeect chain") |
+|---|---|---|---|
+| sim_telarray runs and output files | **1** (all six telescopes) | **6** (one per telescope, camera only) | **6** (one per telescope, camera only) |
+| Reads the CORSIKA file | 1× | 6× | 3× (once per QE group) |
+| Atmosphere (propagation) | inside sim_telarray | 6× (one per telescope) | 3× (one per QE group) |
+| Optics | sim_telarray | trace-stream, per telescope | trace-stream, per telescope |
+| Used for | the comparison | baseline: what sharing saves | the headline ratios and the checks |
+
+**The groups are by QE table, not by telescope type.** The propagation applies one QE pre-selection (the "envelope"), so telescopes whose camera has the same QE table share one propagation. In the production 7.0.0 models this gives three groups: LSTN-01 has its own QE table, LSTN-02 to -04 share the LST design table, and the two MSTs share the NectarCam table. So the four LSTs are split in two groups, one telescope against three.
+
+**What `tee_tel1_1`, `tee_tel2_4` and `tee_tel5_6` are.** The name is `tee_tel<first>_<last>`: the telescopes of one group (`tee_tel1_1` = telescope 1 alone, `tee_tel2_4` = telescopes 2, 3 and 4, `tee_tel5_6` = the two MSTs). Each is one complete pipe and **includes the atmosphere**: from-corsika and propagation (run once for the group), the `tee`, and for each telescope of the group trace-stream, to-simtel and the sim_telarray camera. The three pipes run one after another; the chain time is their sum. Inside a group the branches run at the same time, but on a single core they share it, so the CPU time is the fair measure. Model compilation is done before the timing and is not included.
+
+**Reading the bar chart below.** Each bar is the wall time of one variant, stacked in the order the steps run. `reference` is one block (sim_telarray). `candidate_per_telescope` is six `pipe_telN` blocks (the `compile_telN` blocks are too short to see). `candidate_tee` is the three group pipes `tee_tel1_1`, `tee_tel2_4`, `tee_tel5_6`; the second is the longest because it holds three camera runs. The colours repeat between bars, so read the labels, not the colours.
+
+Not compared: the array trigger. The per-telescope camera outputs are not merged into one file, so each telescope stores its photoelectrons for the same events (`trigger_telescopes=1` on both sides).
 
 | Quantity | Value |
 |---|---|
