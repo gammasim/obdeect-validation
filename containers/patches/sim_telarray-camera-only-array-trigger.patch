@@ -1,0 +1,39 @@
+--- a/common/sim_config.c	2026-11-15 20:10:41.000000000 +0100
++++ b/common/sim_config.c	2026-11-19 12:56:48.858391143 +0100
+@@ -3996,6 +3996,11 @@
+    }
+    array->max_tel = max_used_telescopes;
+
++   /* Keep the user-given array viewing direction: the array trigger needs it for the
++      plane-wavefront delay between telescopes (el->nominal_delay), even if the optics
++      pointing is zeroed below for bypass_optics. */
++   double array_pointing_phi = default_setup.telescope_phi;
++   double array_pointing_theta = default_setup.telescope_theta;
+    if ( default_setup.bypass_optics != 0 )
+    {
+       /* No point in telescope pointing if we bypass the optical ray-tracing. */
+@@ -4010,8 +4015,8 @@
+       return -1;
+    }
+    /* Setup of parameters common to telescope arrays */
+-   array->azimuth = default_setup.telescope_phi;
+-   array->altitude = 90. - default_setup.telescope_theta;
++   array->azimuth = array_pointing_phi;
++   array->altitude = 90. - array_pointing_theta;
+    array->source_azimuth = default_setup.source_azimuth;
+    array->source_altitude = default_setup.source_altitude;
+ #if 0
+--- a/common/sim_telarray.c	2026-11-15 20:10:41.000000000 +0100
++++ b/common/sim_telarray.c	2026-11-19 13:11:34.841506442 +0100
+@@ -2756,6 +2756,11 @@
+                      /* Distance between CORSIKA observation level and */
+                      /* telescope fixed position. */
+                      tel_dist = array.ztel[itel] * airmass;
++                     /* Camera-only mode (Bypass_Optics=3): the photons are already at the camera and
++                        their times are relative to it. The telescope height is still needed for the
++                        array trigger (plane-wavefront delay) but must not move or delay the photons. */
++                     if ( options.tel_options[itel].bypass_optics == 3 )
++                        tel_dist = 0.;
+                      /* Position where photon hits CORSIKA observation level. */
+                      /* This level is at -ztel in the telescope frame. */
+                      px = bunches[ibunch].x + tel_dist*cx;
