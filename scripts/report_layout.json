@@ -571,7 +571,7 @@
     },
     "performance.stages": {
       "title": "Each program on its own",
-      "description": "Each obdeect program run alone on the 20 gamma showers (input from a file, output to a file), repeated, with sim_telarray (optics and camera) on the same showers for scale. trace-stream here traces the photons without QE pre-selection, about ten times more than in the production pipe. CPU ns per photon: per photon at the telescope (before the atmosphere).",
+      "description": "Each obdeect program run alone on the 100 gamma showers (input from a file, output to a file), repeated, with sim_telarray (optics and camera) on the same showers for scale. trace-stream here traces the photons without QE pre-selection, about ten times more than in the production pipe. CPU ns per photon: per photon at the telescope (before the atmosphere).",
       "headline": "trace-stream {trace_stream_ns_per_photon_cpu:.0f} ns/photon, sim_telarray {simtel_direct_ns_per_photon_cpu:.0f} ns/photon (CPU)",
       "rows": [
         {
@@ -664,7 +664,7 @@
     },
     "performance.air-shower": {
       "title": "Gamma showers, one LST: obdeect chain against sim_telarray",
-      "description": "20 gamma showers (100 GeV–3 TeV, 20° zenith) on LSTN-01. sim_telarray: CORSIKA file → sim_telarray (atmosphere, optics, camera). obdeect chain: one pipe with QE pre-selection, one thread per program. For comparison also timed: the same pipe without QE pre-selection, and the obdeect programs one after another with files in between (no pipe).",
+      "description": "100 gamma showers (100 GeV–3 TeV, 20° zenith) on LSTN-01. sim_telarray: CORSIKA file → sim_telarray (atmosphere, optics, camera). obdeect chain: one pipe with QE pre-selection, one thread per program. For comparison also timed: the same pipe without QE pre-selection, and the obdeect programs one after another with files in between (no pipe).",
       "headline": "obdeect / sim_telarray: CPU {candidate_envelope_threads1_cpu_ratio:.2f}, wall {candidate_envelope_threads1_wall_ratio:.2f}, p.e. bias {physics_envelope_photoelectron_relative_bias:+.1%}",
       "rows": [
         {
@@ -1036,7 +1036,7 @@
     },
     "performance.air-shower-array": {
       "title": "Array of six telescopes (4 LST, 2 MST)",
-      "description": "20 gamma showers on LSTN-01 to -04, MSTN-03 and MSTN-15. sim_telarray: one run that simulates all six telescopes (atmosphere, optics, cameras), single-threaded. obdeect chain: telescopes with the same QE share one from-corsika → propagation (QE pre-selection); a `tee` copies that photon stream to one trace-stream → to-simtel → sim_telarray (camera only) branch per telescope. The branches are separate processes that run at the same time, so the CPU ratio is the fair comparison; the wall time profits from the parallel branches. Not compared: the array trigger (each telescope has its own sim_telarray run).",
+      "description": "100 gamma showers on LSTN-01 to -04, MSTN-03 and MSTN-15. sim_telarray: one run that simulates all six telescopes (atmosphere, optics, cameras), single-threaded. obdeect chain: telescopes with the same QE share one from-corsika → propagation (QE pre-selection); a `tee` copies that photon stream to one trace-stream → to-simtel → sim_telarray (camera only) branch per telescope. The branches are separate processes that run at the same time, so the CPU ratio is the fair comparison; the wall time profits from the parallel branches. Not compared: the array trigger (each telescope has its own sim_telarray run).",
       "headline": "obdeect / sim_telarray: CPU {array_chain_cpu_ratio:.2f}, wall {array_chain_wall_ratio:.2f}",
       "rows": [
         {
@@ -1151,7 +1151,7 @@
     },
     "performance.stream-pipe": {
       "title": "How fast photons pass between programs",
-      "description": "The photon stream of the 20 gamma showers (about 350 MB) read with `cat` and written to disk by `tee` (a plain copy: the ceiling of this machine), and converted by `stream: to-simtel` (the last obdeect step before sim_telarray). Throughput in GB/s (10^9 bytes per second); the budget is 1 GB/s.",
+      "description": "The photon stream of the 100 gamma showers (about 1.3 GB) read with `cat` and written to disk by `tee` (a plain copy: the ceiling of this machine), and converted by `stream: to-simtel` (the last obdeect step before sim_telarray). Throughput in GB/s (10^9 bytes per second); the budget is 1 GB/s.",
       "headline": "to-simtel {to_simtel_pipe_gb_per_s:.2f} GB/s, plain copy {cat_tee_pipe_gb_per_s:.2f} GB/s",
       "rows": [
         {
@@ -1306,7 +1306,7 @@
     },
     "performance.bottleneck": {
       "title": "Which program limits the obdeect pipe?",
-      "description": "The obdeect pipe with QE pre-selection (20 gamma showers, LSTN-01) is built up one program at a time: from-corsika alone, then from-corsika → propagation, and so on, the last program writing its output nowhere. The wall time a program adds is what it costs inside the pipe; the program that adds most limits the whole chain (the bottleneck). CPU s is the program's own CPU time in the full pipe.",
+      "description": "The obdeect pipe with QE pre-selection (100 gamma showers, LSTN-01) is built up one program at a time: from-corsika alone, then from-corsika → propagation, and so on, the last program writing its output nowhere. The wall time a program adds is what it costs inside the pipe; the program that adds most limits the whole chain (the bottleneck). CPU s is the program's own CPU time in the full pipe.",
       "headline": "bottleneck: {bottleneck_stage}, pipe wall {prefix5_wall_s:.1f} s",
       "rows": [
         {

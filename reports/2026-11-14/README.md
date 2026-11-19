@@ -585,104 +585,104 @@ The five obdeect programs are connected by a pipe and run at the same time. The 
 Host: Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs
 
 <!-- notes:performance -->
-**Run.** 17 November 2026 (`results/perf-2026-11-17b`), each case on its own, one after another. obdeect branch `native-trace-stream` (not yet merged); sim_telarray with `Bypass_Optics=3` (commit 4ebb15d). Machine: Apple M3 Pro laptop, podman VM with 6 CPUs. Another container was running (load 1.2–5 on 12 cores), so every case is flagged "timing unreliable" and single numbers can move by 10–20 %. Final numbers need an idle Linux node.
+**Run.** 18–19 November 2026 (`results/perf-2026-11-18`): the nine cases in one suite call (`final`), then the stand-alone stages again (`stages2`, after a missing `--telescopes` was added to its QE variant) and the array case again (`array`, after a harness bug broke its tee candidate in the first runs). **Everything on one core** (`CPUS=0`), so wall and CPU time are comparable and the five programs of a pipe share that core. obdeect branch `native-trace-stream` plus uncommitted changes (`--telescopes` for propagation in the harness, `StdinBuffer` for `propagation run` and `trace-stream`); sim_telarray with `Bypass_Optics=3` (the checkout of the workspace; `container.json` records no commit). Machine: Apple M3 Pro laptop, podman VM with 6 CPUs, shared with other users (17 logged in, load 1–2.7 before the runs). Every case is flagged "timing unreliable" (load above 1 or repetitions differing by more than 5 %), but the gamma case was measured in all ten suite calls of the day: sim_telarray 14.3–14.7 s CPU, chain 14.1–14.7 s, ratio 0.97–1.01. Final numbers need an idle Linux node.
 
 **In short**
 
-1. On one LST, the obdeect chain needs **1.23× (gamma) and 1.26× (proton) the CPU time** of sim_telarray for the same showers and the same camera images (photoelectron bias −0.09 % ± 0.26 %). Its wall time is shorter (0.86× and 0.88×), because the five programs of the pipe run at the same time.
-2. **About half of the obdeect CPU is the sim_telarray camera simulation**: 2.3 of 4.2 s for gammas. That is the same code on both sides, so obdeect cannot gain there.
-3. **The extra cost is reading the CORSIKA file and the atmosphere.** from-corsika and propagation take 1.55 s together. sim_telarray's whole optics, including the atmosphere, take about 0.5 s. propagation is the next thing to speed up.
-4. **The optics are no longer the problem.** trace-stream traces the preselected photons in 0.27 s, half of sim_telarray's optics (0.49 s).
-5. **For six telescopes the obdeect chain needs less than half the CPU of sim_telarray (0.47×).** Two causes: one reading and one propagation serve all six telescopes (a factor 0.73), and sim_telarray costs 1.9× more per telescope on this input than on the single-LST input (not yet understood). With the single-LST sim_telarray cost the ratio would be about 0.9.
-6. **Checks.** The CPU budgets fail (chain ≤ sim_telarray, and reading + atmosphere ≤ 10 % of sim_telarray), as does the 1 GB/s pipe budget, which this machine cannot reach even with a plain copy. All wall-time budgets and all physics checks pass.
+1. On one LST, with the same showers and the same camera images (photoelectron bias −0.04 % ± 0.15 %), the obdeect chain needs **0.99× (gamma) and 0.96× (proton) the CPU time** of sim_telarray and 1.02× and 1.00× the wall time. The CPU budget of one thread per program passes, the wall budget (≤ 1.00) misses by 2 % for gammas. It is a tie, not a win: single core, QE pre-selection, same camera.
+2. **Three quarters of the CPU is the sim_telarray camera simulation** (10.6 of 14.1 s for gammas), the same code on both sides. It receives fewer photons in the obdeect chain than in the sim_telarray run (QE pre-selection): 2.2 s less. That pays for the rest of the chain: from-corsika, propagation, trace-stream and to-simtel take 3.6 s, sim_telarray's optics with the atmosphere 1.4 s.
+3. **Reading and atmosphere (from-corsika + propagation) are 20 % (gamma) and 30 % (proton) of the sim_telarray CPU**; the budget is 10 %. This is the part to optimise next.
+4. **The optics are not the problem.** trace-stream traces the preselected photons in 0.83 s (sim_telarray's optics, with the atmosphere: 1.4 s).
+5. **For six telescopes the chain needs 0.43× the CPU of sim_telarray**, but this is not an obdeect gain: the chain costs about 13 s per telescope (as for one LST), while one sim_telarray run for six telescopes costs 30 s per telescope, 2.1× more than for one LST. The cause is not understood (see the case).
+6. **Checks.** Failing: reading + atmosphere ≤ 10 %, the wall budget and the all-cores CPU budget for gammas, the wall budget and the all-cores budgets for protons, and the 1 GB/s pipe budget, which a plain copy does not reach here either. All physics checks pass.
+
+**Compared with the first run of 17 November** (20 showers, propagation on all telescopes of the input, `std::cin`): the chain needed 1.23× (gamma) and 1.26× (proton) the CPU of sim_telarray; reading and atmosphere took 0.078 s per shower, now 0.027 s. Two changes were made in between: propagation keeps only the simulated telescope (`--telescopes`), and `propagation run` and `trace-stream` read standard input through `StdinBuffer`. Their separate effects were not measured. With libstdc++ (this container) `std::cin` is not slow, so the telescope selection is the likely cause. The showers also differ (100 instead of 20, other seeds).
 <!-- /notes -->
 
 | Case | Headline | Verdict |
 |---|---|---|
-| [Gamma showers, one LST: obdeect chain against sim_telarray](#performance-air-shower) | obdeect / sim_telarray: CPU 1.23, wall 0.86, p.e. bias -0.1% | FAIL |
-| [Proton showers, one LST: obdeect chain against sim_telarray](#performance-air-shower-proton) | obdeect / sim_telarray: CPU 1.26, wall 0.88, p.e. bias -0.1% | FAIL |
-| [Which program limits the obdeect pipe?](#performance-bottleneck) | bottleneck: sim_telarray, pipe wall 3.0 s | PASS |
-| [Each program on its own](#performance-stages) | trace-stream 53 ns/photon, sim_telarray 63 ns/photon (CPU) | PASS |
-| [Start-up cost and threads](#performance-scaling) | fixed cost: compile 0.26 s, trace-stream 0.01 s; 4 threads: speedup 2.4 | PASS |
-| [Array of six telescopes (4 LST, 2 MST)](#performance-air-shower-array) | obdeect / sim_telarray: CPU 0.47, wall 0.21 | PASS |
-| [How fast photons pass between programs](#performance-stream-pipe) | to-simtel 0.61 GB/s, plain copy 0.90 GB/s | FAIL |
+| [Gamma showers, one LST: obdeect chain against sim_telarray](#performance-air-shower) | obdeect / sim_telarray: CPU 0.99, wall 1.02, p.e. bias -0.0% | FAIL |
+| [Proton showers, one LST: obdeect chain against sim_telarray](#performance-air-shower-proton) | obdeect / sim_telarray: CPU 0.96, wall 1.00, p.e. bias -0.1% | FAIL |
+| [Which program limits the obdeect pipe?](#performance-bottleneck) | bottleneck: sim_telarray, pipe wall 15.2 s | PASS |
+| [Each program on its own](#performance-stages) | trace-stream 144 ns/photon, sim_telarray 73 ns/photon (CPU) | PASS |
+| [Start-up cost and threads](#performance-scaling) | fixed cost: compile 0.19 s | PASS |
+| [Array of six telescopes (4 LST, 2 MST)](#performance-air-shower-array) | obdeect / sim_telarray: CPU 0.43, wall 0.47 | PASS |
+| [How fast photons pass between programs](#performance-stream-pipe) | to-simtel 0.87 GB/s, plain copy 0.68 GB/s | FAIL |
 | [Flasher on the dish (LST calibration light)](#performance-flasher-dish) | obdeect / sim_telarray side, wall 0.83 | PASS |
-| [Distant point source of light](#performance-point-source) | obdeect / sim_telarray side, wall 0.78 | PASS |
+| [Distant point source of light](#performance-point-source) | obdeect / sim_telarray side, wall 0.74 | PASS |
 
 <a id="performance-air-shower"></a>
 
 ### Gamma showers, one LST: obdeect chain against sim_telarray — FAIL
 
-20 gamma showers (100 GeV–3 TeV, 20° zenith) on LSTN-01. sim_telarray: CORSIKA file → sim_telarray (atmosphere, optics, camera). obdeect chain: one pipe with QE pre-selection, one thread per program. For comparison also timed: the same pipe without QE pre-selection, and the obdeect programs one after another with files in between (no pipe).
+100 gamma showers (100 GeV–3 TeV, 20° zenith) on LSTN-01. sim_telarray: CORSIKA file → sim_telarray (atmosphere, optics, camera). obdeect chain: one pipe with QE pre-selection, one thread per program. For comparison also timed: the same pipe without QE pre-selection, and the obdeect programs one after another with files in between (no pipe).
 
 | Quantity | Value |
 |---|---|
-| sim_telarray: wall s, CPU s | 3.54, 3.36 |
-| &nbsp;&nbsp;of which optics, CPU s (estimate: full run minus camera-only run) | 0.49 |
-| &nbsp;&nbsp;of which camera, CPU s | 2.88 |
-| obdeect chain with QE pre-selection: wall s, CPU s | 3.05, 4.15 |
-| obdeect chain without QE pre-selection: wall s, CPU s | 3.35, 4.44 |
-| obdeect programs one after another (files, no pipe): wall s, CPU s | 7.39, 7.24 |
-| ray-tracing: compile, once per run: wall s, CPU s | 0.27, 0.52 |
-| **obdeect chain / sim_telarray, CPU** | **1.23** |
-| **obdeect chain / sim_telarray, wall** | **0.86** |
-| obdeect chain / sim_telarray, CPU, fastest repetitions (compile included) | 1.39 |
-| Saving from QE pre-selection (CPU without / with) | 1.07 × |
-| Saving from the pipe (CPU of programs one after another / pipe) | 1.51 × |
-| Optics: trace-stream CPU without QE pre-selection / sim_telarray optics CPU | 4.01 |
+| sim_telarray: wall s, CPU s | 15.09, 14.28 |
+| &nbsp;&nbsp;of which optics, CPU s (estimate: full run minus camera-only run) | 1.44 |
+| &nbsp;&nbsp;of which camera, CPU s | 12.83 |
+| obdeect chain with QE pre-selection: wall s, CPU s | 15.37, 14.08 |
+| obdeect chain without QE pre-selection: wall s, CPU s | 16.85, 15.47 |
+| obdeect programs one after another (files, no pipe): wall s, CPU s | 24.85, 23.22 |
+| ray-tracing: compile, once per run: wall s, CPU s | 0.20, 0.12 |
+| **obdeect chain / sim_telarray, CPU** | **0.99** |
+| **obdeect chain / sim_telarray, wall** | **1.02** |
+| obdeect chain / sim_telarray, CPU, fastest repetitions (compile included) | 1.01 |
+| Saving from QE pre-selection (CPU without / with) | 1.10 × |
+| Saving from the pipe (CPU of programs one after another / pipe) | 1.49 × |
+| Optics: trace-stream CPU without QE pre-selection / sim_telarray optics CPU | 4.71 |
 | Timing unreliable | 1 |
 
 | Where the obdeect CPU time goes | With QE pre-selection, CPU s | Share | Without, CPU s | One after another (files), CPU s |
 |---|---|---|---|---|
-| stream: from-corsika (read the CORSIKA photons) | 0.42 | 10% | 0.40 | 0.40 |
-| propagation: run (atmosphere) | 1.13 | 27% | 0.92 | 1.03 |
-| ray-tracing: trace-stream (telescope optics) | 0.27 | 7% | 0.72 | 1.95 |
-| stream: to-simtel (hand the photons to sim_telarray) | 0.03 | 1% | 0.07 | 0.25 |
-| sim_telarray, camera only | 2.29 | 55% | 2.34 | 2.88 |
+| stream: from-corsika (read the CORSIKA photons) | 1.17 | 8% | 1.11 | 1.26 |
+| propagation: run (atmosphere) | 1.51 | 11% | 1.24 | 1.36 |
+| ray-tracing: trace-stream (telescope optics) | 0.83 | 6% | 2.22 | 6.79 |
+| stream: to-simtel (hand the photons to sim_telarray) | 0.07 | 1% | 0.17 | 0.86 |
+| sim_telarray, camera only | 10.59 | 75% | 10.71 | 12.83 |
 
 | Per shower | Wall s per shower | CPU s per shower | CPU ns per photon at the telescope |
 |---|---|---|---|
-| sim_telarray | 0.177 | 0.168 | 181 |
-| obdeect chain with QE pre-selection | 0.165 | 0.233 | 251 |
-| obdeect chain without QE pre-selection | 0.180 | 0.248 | 267 |
-| obdeect programs one after another | 0.369 | 0.362 | 389 |
+| sim_telarray | 0.151 | 0.143 | 211 |
+| obdeect chain with QE pre-selection | 0.156 | 0.142 | 210 |
+| obdeect chain without QE pre-selection | 0.170 | 0.156 | 230 |
+| obdeect programs one after another | 0.248 | 0.232 | 343 |
 
 | Check | Measured | Result |
 |---|---|---|
-| Reading + atmosphere (from-corsika + propagation) CPU ≤ 10 % of sim_telarray CPU, programs one after another | 43% | FAIL |
-| Reading + atmosphere CPU ≤ 10 % of sim_telarray CPU, in the pipe with QE pre-selection | 49% | FAIL |
-| obdeect chain wall ≤ sim_telarray wall (trace-stream on all cores) | 0.88 × sim_telarray | PASS |
-| obdeect chain CPU ≤ sim_telarray CPU (trace-stream on all cores) | 1.28 × sim_telarray | FAIL |
-| obdeect chain wall ≤ sim_telarray wall (one thread per program) | 0.86 × sim_telarray | PASS |
-| obdeect chain CPU ≤ sim_telarray CPU (one thread per program) | 1.23 × sim_telarray | FAIL |
-| Same physics: photoelectron bias of the obdeect chain within its limit | -0.09% ± 0.26% | PASS |
+| Reading + atmosphere (from-corsika + propagation) CPU ≤ 10 % of sim_telarray CPU, programs one after another | 18% | FAIL |
+| Reading + atmosphere CPU ≤ 10 % of sim_telarray CPU, in the pipe with QE pre-selection | 20% | FAIL |
+| obdeect chain wall ≤ sim_telarray wall (trace-stream on all cores) | 1.04 × sim_telarray | FAIL |
+| obdeect chain CPU ≤ sim_telarray CPU (trace-stream on all cores) | 1.00 × sim_telarray | FAIL |
+| obdeect chain wall ≤ sim_telarray wall (one thread per program) | 1.02 × sim_telarray | FAIL |
+| obdeect chain CPU ≤ sim_telarray CPU (one thread per program) | 0.99 × sim_telarray | PASS |
+| Same physics: photoelectron bias of the obdeect chain within its limit | -0.04% ± 0.15% | PASS |
 
 All runs completed with their repetitions (9 checks).
 
 <!-- notes:performance-air-shower -->
-**Why FAIL.** Not the physics: the camera images agree (photoelectron bias −0.09 % ± 0.26 %, within limit), and the wall-time budgets pass (0.86×). The case fails because it is *more expensive in CPU time*, as two budgets set in advance demand: obdeect chain CPU ≤ sim_telarray CPU (measured 1.23×), and reading + atmosphere ≤ 10 % of sim_telarray CPU (measured 49 %). Both are efficiency targets, not correctness checks.
+**Why FAIL.** Not the physics (photoelectron bias within its limit) and not by much: the chain needs 0.99× the CPU and 1.02× the wall time of sim_telarray. Two budgets set in advance fail: reading + atmosphere ≤ 10 % of the sim_telarray CPU (measured 20 %), and the chain's wall time ≤ sim_telarray's (1.02×, one thread per program). The variant with trace-stream on all cores fails both budgets by 0 to 4 %, because on one core the extra threads only add overhead. These are efficiency targets, not correctness checks.
 
-**Why obdeect needs 23 % more CPU.** sim_telarray takes 3.36 s: about 0.49 s for the optics with the atmosphere, and 2.88 s for the camera (estimate). The obdeect chain takes 4.15 s:
+**Where the CPU goes.** sim_telarray takes 14.28 s: 1.44 s optics with the atmosphere, 12.83 s camera (estimate). The obdeect chain takes 14.08 s:
 
 | Program | CPU s |
 |---|---|
-| sim_telarray camera | 2.29 |
-| propagation | 1.13 |
-| from-corsika | 0.42 |
-| trace-stream | 0.27 |
-| to-simtel | 0.03 |
+| sim_telarray camera | 10.59 |
+| propagation | 1.51 |
+| from-corsika | 1.17 |
+| trace-stream | 0.83 |
+| to-simtel | 0.07 |
 
-The camera is cheaper in the obdeect chain, because it receives fewer photons. The difference is reading and the atmosphere:
-- sim_telarray reads the CORSIKA bunches directly and applies the atmospheric transmission as a table lookup inside its optics.
-- obdeect first converts the file into its photon stream (from-corsika), then propagates the bunches and draws each photon against the QE pre-selection (propagation).
+The camera costs 2.2 s less than in sim_telarray's own run, because it receives only the preselected photons. This pays for reading, the atmosphere and the optics (3.6 s against 1.4 s in sim_telarray).
 
-Together that is 1.55 s, three times sim_telarray's whole optics.
+**QE pre-selection saves 10 %** (15.47 s without it). It drops about nine of ten photons. Without it, the photons stay in CORSIKA's bunches, and trace-stream drops most of them itself before tracing (2.22 s against 0.83 s with it); the extra draw in propagation costs 0.27 s.
 
-**Why QE pre-selection saves only 7 %.** It drops about nine of ten photons. Without it, the photons stay in CORSIKA's bunches, and trace-stream drops most of them itself before tracing. The saving is in trace-stream (0.72 → 0.27 s), and the extra draw in propagation eats part of it (0.92 → 1.13 s).
+**Files.** The obdeect chain writes no intermediate files: its programs are connected by pipes, and only the last program writes (sim_telarray's output, in a container-local work directory, not on the results mount). The "one after another" column is a baseline only, to show what a file-based run would cost: 1.6× the CPU (23.2 s), with 350 MB of intermediate files in the same local directory and a camera that receives photon bunches that were not preselected. It is not a mode of the chain.
 
-**Why the pipe matters.** Running the programs one after another, with files in between, costs 1.5× the CPU (7.2 s). It writes and reads 350 MB of intermediate files, and the camera receives photon bunches that were not preselected.
+**Showers.** 100 CORSIKA showers (seeds 1017…), each used at 5 core positions: 100 telescope events. sim_telarray and the chain read the same file, so the showers are identical within the case. The input file is not hashed in the report (its SHA-256 is in `fixtures/inputs.json`).
 
-**Repeatability.** The sim_telarray repetitions differed by 19 % (busy machine). The fastest-repetition ratio, 1.39, includes the model compile (0.52 s CPU); without the compile it matches 1.23.
+**Repeatability.** The three repetitions agree to 1–2 % in CPU time (wall spread up to 10 % for one variant). Across the ten suite calls of the day the ratio was 0.97–1.01 (sim_telarray 14.3–14.7 s CPU, chain 14.1–14.7 s).
 <!-- /notes -->
 
 Data: `performance.air-shower` · [metrics.json](performance.air-shower/metrics.json) · [details.json](performance.air-shower/details.json)
@@ -705,59 +705,60 @@ Other figures:
 
 | Quantity | Value |
 |---|---|
-| sim_telarray: wall s, CPU s | 8.29, 7.87 |
-| &nbsp;&nbsp;of which optics, CPU s (estimate: full run minus camera-only run) | 0.80 |
-| &nbsp;&nbsp;of which camera, CPU s | 7.08 |
-| obdeect chain with QE pre-selection: wall s, CPU s | 7.33, 9.89 |
-| obdeect chain without QE pre-selection: wall s, CPU s | 8.03, 10.91 |
-| obdeect programs one after another (files, no pipe): wall s, CPU s | 20.57, 18.82 |
-| ray-tracing: compile, once per run: wall s, CPU s | 0.29, 0.54 |
-| **obdeect chain / sim_telarray, CPU** | **1.26** |
-| **obdeect chain / sim_telarray, wall** | **0.88** |
-| obdeect chain / sim_telarray, CPU, fastest repetitions (compile included) | 1.31 |
-| Saving from QE pre-selection (CPU without / with) | 1.10 × |
-| Saving from the pipe (CPU of programs one after another / pipe) | 1.67 × |
-| Optics: trace-stream CPU without QE pre-selection / sim_telarray optics CPU | 7.49 |
+| sim_telarray: wall s, CPU s | 8.44, 7.93 |
+| &nbsp;&nbsp;of which optics, CPU s (estimate: full run minus camera-only run) | 1.09 |
+| &nbsp;&nbsp;of which camera, CPU s | 6.84 |
+| obdeect chain with QE pre-selection: wall s, CPU s | 8.41, 7.64 |
+| obdeect chain without QE pre-selection: wall s, CPU s | 9.86, 8.98 |
+| obdeect programs one after another (files, no pipe): wall s, CPU s | 16.69, 15.58 |
+| ray-tracing: compile, once per run: wall s, CPU s | 0.20, 0.11 |
+| **obdeect chain / sim_telarray, CPU** | **0.96** |
+| **obdeect chain / sim_telarray, wall** | **1.00** |
+| obdeect chain / sim_telarray, CPU, fastest repetitions (compile included) | 0.99 |
+| Saving from QE pre-selection (CPU without / with) | 1.18 × |
+| Saving from the pipe (CPU of programs one after another / pipe) | 1.72 × |
+| Optics: trace-stream CPU without QE pre-selection / sim_telarray optics CPU | 5.12 |
 | Timing unreliable | 1 |
 
 | Where the obdeect CPU time goes | With QE pre-selection, CPU s | Share | Without, CPU s | One after another (files), CPU s |
 |---|---|---|---|---|
-| stream: from-corsika (read the CORSIKA photons) | 1.06 | 11% | 1.05 | 1.24 |
-| propagation: run (atmosphere) | 3.02 | 31% | 2.48 | 3.00 |
-| ray-tracing: trace-stream (telescope optics) | 0.75 | 8% | 2.03 | 5.97 |
-| stream: to-simtel (hand the photons to sim_telarray) | 0.07 | 1% | 0.18 | 0.98 |
-| sim_telarray, camera only | 4.98 | 50% | 5.17 | 7.08 |
+| stream: from-corsika (read the CORSIKA photons) | 0.96 | 13% | 0.95 | 1.23 |
+| propagation: run (atmosphere) | 1.15 | 15% | 0.96 | 1.05 |
+| ray-tracing: trace-stream (telescope optics) | 0.67 | 9% | 1.89 | 5.57 |
+| stream: to-simtel (hand the photons to sim_telarray) | 0.06 | 1% | 0.16 | 0.78 |
+| sim_telarray, camera only | 4.77 | 62% | 5.02 | 6.84 |
 
 | Per shower | Wall s per shower | CPU s per shower | CPU ns per photon at the telescope |
 |---|---|---|---|
-| sim_telarray | 0.184 | 0.175 | 150 |
-| obdeect chain with QE pre-selection | 0.169 | 0.232 | 199 |
-| obdeect chain without QE pre-selection | 0.185 | 0.254 | 218 |
-| obdeect programs one after another | 0.457 | 0.418 | 359 |
+| sim_telarray | 0.188 | 0.176 | 151 |
+| obdeect chain with QE pre-selection | 0.191 | 0.172 | 148 |
+| obdeect chain without QE pre-selection | 0.223 | 0.202 | 173 |
+| obdeect programs one after another | 0.371 | 0.346 | 297 |
 
 | Check | Measured | Result |
 |---|---|---|
-| Reading + atmosphere (from-corsika + propagation) CPU ≤ 10 % of sim_telarray CPU, programs one after another | 54% | FAIL |
-| Reading + atmosphere CPU ≤ 10 % of sim_telarray CPU, in the pipe with QE pre-selection | 57% | FAIL |
-| obdeect chain wall ≤ sim_telarray wall (trace-stream on all cores) | 0.93 × sim_telarray | PASS |
-| obdeect chain CPU ≤ sim_telarray CPU (trace-stream on all cores) | 1.33 × sim_telarray | FAIL |
-| obdeect chain wall ≤ sim_telarray wall (one thread per program) | 0.88 × sim_telarray | PASS |
-| obdeect chain CPU ≤ sim_telarray CPU (one thread per program) | 1.26 × sim_telarray | FAIL |
+| Reading + atmosphere (from-corsika + propagation) CPU ≤ 10 % of sim_telarray CPU, programs one after another | 29% | FAIL |
+| Reading + atmosphere CPU ≤ 10 % of sim_telarray CPU, in the pipe with QE pre-selection | 30% | FAIL |
+| obdeect chain wall ≤ sim_telarray wall (trace-stream on all cores) | 1.05 × sim_telarray | FAIL |
+| obdeect chain CPU ≤ sim_telarray CPU (trace-stream on all cores) | 1.01 × sim_telarray | FAIL |
+| obdeect chain wall ≤ sim_telarray wall (one thread per program) | 1.00 × sim_telarray | PASS |
+| obdeect chain CPU ≤ sim_telarray CPU (one thread per program) | 0.96 × sim_telarray | PASS |
 | Same physics: photoelectron bias of the obdeect chain within its limit | -0.09% ± 0.14% | PASS |
 
 All runs completed with their repetitions (9 checks).
 
 <!-- notes:performance-air-shower-proton -->
-**Same picture as for gammas: 1.26× the CPU.** sim_telarray takes 7.87 s, of which about 0.80 s is optics. The obdeect chain takes 9.89 s:
+**Same picture as for gammas: 0.96× the CPU, 1.00× the wall time.** sim_telarray takes 7.93 s, of which 1.09 s is optics. The obdeect chain takes 7.64 s:
 
 | Program | CPU s |
 |---|---|
-| sim_telarray camera | 4.98 |
-| propagation | 3.02 |
-| from-corsika | 1.06 |
-| trace-stream | 0.75 |
+| sim_telarray camera | 4.77 |
+| propagation | 1.15 |
+| from-corsika | 0.96 |
+| trace-stream | 0.67 |
+| to-simtel | 0.06 |
 
-Reading and the atmosphere (4.1 s) are 57 % of sim_telarray's CPU, more than for gammas (49 %). Proton showers have more photons per shower at the telescope; reading and propagation grow with the photon number, the camera less.
+Reading and the atmosphere are 30 % of sim_telarray's CPU (check), more than for gammas (20 %): the camera is cheaper for protons, reading and propagation are not. The case reads the 45-shower proton file, not a 100-shower one.
 <!-- /notes -->
 
 Data: `performance.air-shower-proton` · [metrics.json](performance.air-shower-proton/metrics.json) · [details.json](performance.air-shower-proton/details.json)
@@ -776,28 +777,28 @@ Other figures:
 
 ### Which program limits the obdeect pipe? — PASS
 
-The obdeect pipe with QE pre-selection (20 gamma showers, LSTN-01) is built up one program at a time: from-corsika alone, then from-corsika → propagation, and so on, the last program writing its output nowhere. The wall time a program adds is what it costs inside the pipe; the program that adds most limits the whole chain (the bottleneck). CPU s is the program's own CPU time in the full pipe.
+The obdeect pipe with QE pre-selection (100 gamma showers, LSTN-01) is built up one program at a time: from-corsika alone, then from-corsika → propagation, and so on, the last program writing its output nowhere. The wall time a program adds is what it costs inside the pipe; the program that adds most limits the whole chain (the bottleneck). CPU s is the program's own CPU time in the full pipe.
 
 | Quantity | Value |
 |---|---|
 | Bottleneck | sim_telarray |
-| Full pipe, wall s | 3.00 |
-| Spread of the full pipe over repetitions | 1.0% |
+| Full pipe, wall s | 15.23 |
+| Spread of the full pipe over repetitions | 0.8% |
 
 | Program | Wall s it adds | Share of the pipe wall | Its CPU s |
 |---|---|---|---|
-| stream: from-corsika (read the CORSIKA photons) | 0.34 | 11% | 0.35 |
-| propagation: run (atmosphere) | 1.18 | 39% | 1.11 |
-| ray-tracing: trace-stream (telescope optics) | 0.14 | 5% | 0.27 |
-| stream: to-simtel (hand the photons to sim_telarray) | 0.02 | 1% | 0.03 |
-| sim_telarray, camera only | 1.31 | 44% | 2.26 |
+| stream: from-corsika (read the CORSIKA photons) | 0.99 | 6% | 1.08 |
+| propagation: run (atmosphere) | 1.69 | 11% | 1.50 |
+| ray-tracing: trace-stream (telescope optics) | 0.88 | 6% | 0.82 |
+| stream: to-simtel (hand the photons to sim_telarray) | 0.15 | 1% | 0.07 |
+| sim_telarray, camera only | 11.52 | 76% | 10.50 |
 
 All runs completed with their repetitions (5 checks).
 
 <!-- notes:performance-bottleneck -->
-**The sim_telarray camera limits the pipe** (1.31 s of the 3.0 s wall time), followed by propagation (1.18 s). trace-stream adds only 0.14 s.
+**On one core this table shows cost shares, not a bottleneck**: the five programs take turns on the core, so the wall time a program adds is about its CPU time. The sim_telarray camera takes 11.5 of the 15.2 s (76 %), propagation 1.7 s, from-corsika 1.0 s, trace-stream 0.9 s.
 
-So a faster propagation shortens the wall time only until the camera limits it. The CPU time, which is what a batch farm pays, gains in full.
+On several cores the programs of the pipe run at the same time, and the slowest one sets the wall time: the sim_telarray camera (10.5 s CPU) against 3.5 s for all other programs together. So faster propagation or reading would not shorten the wall time of a multi-core pipe, but it saves CPU time in full, which is what a batch farm pays. This statement is derived from the single-core numbers; a multi-core run was not made for this report.
 <!-- /notes -->
 
 Data: `performance.bottleneck` · [metrics.json](performance.bottleneck/metrics.json) · [details.json](performance.bottleneck/details.json)
@@ -810,42 +811,42 @@ Data: `performance.bottleneck` · [metrics.json](performance.bottleneck/metrics.
 
 ### Each program on its own — PASS
 
-Each obdeect program run alone on the 20 gamma showers (input from a file, output to a file), repeated, with sim_telarray (optics and camera) on the same showers for scale. trace-stream here traces the photons without QE pre-selection, about ten times more than in the production pipe. CPU ns per photon: per photon at the telescope (before the atmosphere).
+Each obdeect program run alone on the 100 gamma showers (input from a file, output to a file), repeated, with sim_telarray (optics and camera) on the same showers for scale. trace-stream here traces the photons without QE pre-selection, about ten times more than in the production pipe. CPU ns per photon: per photon at the telescope (before the atmosphere).
 
 | Quantity | Value |
 |---|---|
 | Timing unreliable | 1 |
-| Load average before the run | 1.27 |
+| Load average before the run | 1.66 |
 
 | Program | Wall s | CPU s | Photons/s | CPU ns per photon | Spread over repetitions |
 |---|---|---|---|---|---|
-| stream: from-corsika (read the CORSIKA photons) | 0.42 | 0.34 | 1.29e+08 | 6 | 14% |
-| propagation: run (atmosphere) | 1.19 | 0.97 | 4.54e+07 | 18 | 110% |
-| propagation: run with QE pre-selection | 1.11 | 1.05 | 4.88e+07 | 19 | 12% |
-| ray-tracing: compile (build the optical model) | 0.26 | 0.54 | – | – | 12% |
-| ray-tracing: trace-stream (telescope optics) | 2.13 | 2.02 | 1.78e+07 | 53 | 7% |
-| stream: to-simtel (hand the photons to sim_telarray) | 0.29 | 0.18 | 1.88e+08 | 3 | 59% |
-| sim_telarray, optics and camera (production) | 3.61 | 3.42 | 1.5e+07 | 63 | 4% |
+| stream: from-corsika (read the CORSIKA photons) | 1.68 | 1.12 | 1.19e+08 | 6 | 32% |
+| propagation: run (atmosphere) | 1.32 | 1.21 | 1.51e+08 | 6 | 30% |
+| propagation: run with QE pre-selection | 1.45 | 1.38 | 1.38e+08 | 7 | 6% |
+| ray-tracing: compile (build the optical model) | 0.18 | 0.10 | – | – | 9% |
+| ray-tracing: trace-stream (telescope optics) | 6.78 | 6.50 | 6.64e+06 | 144 | 6% |
+| stream: to-simtel (hand the photons to sim_telarray) | 1.05 | 0.71 | 1.9e+08 | 4 | 30% |
+| sim_telarray, optics and camera (production) | 15.52 | 14.64 | 1.28e+07 | 73 | 2% |
 
 | Check | Measured | Result |
 |---|---|---|
-| Photon count unchanged from CORSIKA file to obdeect stream | 1.8e-11 | PASS |
-| Photon count unchanged through from-corsika → to-simtel | 1.8e-11 | PASS |
+| Photon count unchanged from CORSIKA file to obdeect stream | 1.2e-10 | PASS |
+| Photon count unchanged through from-corsika → to-simtel | 1.2e-10 | PASS |
 
 All runs completed with their repetitions (16 checks).
 
 <!-- notes:performance-stages -->
-CPU time per photon at the telescope, each program alone:
+CPU time of each program on its own (100 gamma showers, one core):
 
-| Program | ns per photon |
+| Program | CPU s |
 |---|---|
-| from-corsika | 6 |
-| propagation | 18 (19 with QE pre-selection) |
-| trace-stream | 53 |
-| to-simtel | 3 |
-| sim_telarray, optics and camera | 63 |
+| from-corsika | 1.12 |
+| propagation | 1.21 (1.38 with QE pre-selection) |
+| trace-stream (all photons, no pre-selection) | 6.50 |
+| to-simtel | 0.71 |
+| sim_telarray, optics and camera | 14.64 |
 
-trace-stream is the most expensive obdeect program per photon here, because this case feeds it photons that were not preselected. In the production pipe it sees only the preselected ones. The propagation repetitions differed by up to 110 % (busy machine); its median agrees with the pipe cases.
+The ns per photon are not comparable between rows: each program is divided by the photons it receives (trace-stream gets only the photons at LSTN-01, from-corsika and sim_telarray the whole file). trace-stream is the most expensive obdeect program here because this case feeds it photons that were not preselected; in the production pipe it sees only the preselected ones (0.83 s). The short programs (from-corsika, to-simtel, propagation) differ by up to 32 % between repetitions on this machine; the pipe cases, which run them for longer, agree to 1–2 %.
 <!-- /notes -->
 
 Data: `performance.stages` · [metrics.json](performance.stages/metrics.json) · [details.json](performance.stages/details.json)
@@ -862,28 +863,28 @@ Each obdeect program timed on 0, 10 and 20 gamma showers. A straight line throug
 
 | Quantity | Value |
 |---|---|
-| Cores | 6 |
+| Cores | 1 |
 
 | Program | Fixed wall s | Wall s per shower | Fixed CPU s | CPU s per shower | Fixed share for 10 showers |
 |---|---|---|---|---|---|
-| stream: from-corsika (read the CORSIKA photons) | 0.01 | 0.014 | 0.01 | 0.014 | 7% |
-| propagation: run (atmosphere) | 0.02 | 0.057 | 0.04 | 0.046 | 4% |
-| ray-tracing: compile (build the optical model) | 0.26 | 0.000 | 0.53 | 0.000 | 100% |
-| ray-tracing: trace-stream (telescope optics) | 0.01 | 0.100 | 0.02 | 0.094 | 1% |
-| stream: to-simtel (hand the photons to sim_telarray) | 0.01 | 0.009 | 0.01 | 0.009 | 6% |
+| stream: from-corsika (read the CORSIKA photons) | 0.02 | 0.009 | 0.02 | 0.009 | 15% |
+| propagation: run (atmosphere) | 0.01 | 0.014 | 0.01 | 0.013 | 9% |
+| ray-tracing: compile (build the optical model) | 0.19 | 0.000 | 0.10 | 0.000 | 100% |
+| ray-tracing: trace-stream (telescope optics) | 0.06 | 0.067 | 0.06 | 0.063 | 8% |
+| stream: to-simtel (hand the photons to sim_telarray) | 0.03 | 0.005 | 0.01 | 0.005 | 33% |
 
 | trace-stream threads | Wall s | CPU s | Speedup | Efficiency |
 |---|---|---|---|---|
-| 1 | 1.00 | 0.96 | 1.00 | 100% |
-| 2 | 0.59 | 0.96 | 1.71 | 85% |
-| 4 | 0.42 | 1.00 | 2.37 | 59% |
+| 1 | 0.84 | 0.80 | 1.00 | 100% |
 
 All runs completed with their repetitions (6 checks).
 
 <!-- notes:performance-scaling -->
-**Fixed cost per run.** Only one program has a noticeable fixed cost: building the optical model (`ray-tracing: compile`), 0.26 s wall and 0.53 s CPU on every run. It is still Python. Everything else starts within a few milliseconds. With hundreds of showers per production run, the fixed cost does not matter. The compiled model could also be built once and reused.
+**Fixed cost per run.** Only one program has a noticeable fixed cost: building the optical model (`ray-tracing: compile`), 0.19 s wall and 0.10 s CPU on every run. It is still Python. Everything else starts within a few milliseconds. With hundreds of showers per production run, the fixed cost does not matter. The compiled model could also be built once and reused.
 
-**Threads.** trace-stream runs 1.7× faster on 2 threads and 2.4× on 4 (60 % efficiency). In the pipe it no longer limits the chain, so threads matter mainly when one telescope is traced alone.
+**Per shower** (CPU): from-corsika 0.009 s, propagation 0.013 s, trace-stream 0.063 s, to-simtel 0.005 s.
+
+**Threads.** Not measured: the run was pinned to one core, so only 1 thread was timed (speedup 1.00 by definition). The earlier laptop run (6 cores available) gave 1.7× on 2 threads and 2.4× on 4 (60 % efficiency). The thread scaling needs a multi-core run.
 <!-- /notes -->
 
 Data: `performance.scaling` · [metrics.json](performance.scaling/metrics.json) · [details.json](performance.scaling/details.json)
@@ -896,66 +897,53 @@ Data: `performance.scaling` · [metrics.json](performance.scaling/metrics.json) 
 
 ### Array of six telescopes (4 LST, 2 MST) — PASS
 
-20 gamma showers on LSTN-01 to -04, MSTN-03 and MSTN-15. sim_telarray: one run that simulates all six telescopes (atmosphere, optics, cameras), single-threaded. obdeect chain: telescopes with the same QE share one from-corsika → propagation (QE pre-selection); a `tee` copies that photon stream to one trace-stream → to-simtel → sim_telarray (camera only) branch per telescope. The branches are separate processes that run at the same time, so the CPU ratio is the fair comparison; the wall time profits from the parallel branches. Not compared: the array trigger (each telescope has its own sim_telarray run).
+100 gamma showers on LSTN-01 to -04, MSTN-03 and MSTN-15. sim_telarray: one run that simulates all six telescopes (atmosphere, optics, cameras), single-threaded. obdeect chain: telescopes with the same QE share one from-corsika → propagation (QE pre-selection); a `tee` copies that photon stream to one trace-stream → to-simtel → sim_telarray (camera only) branch per telescope. The branches are separate processes that run at the same time, so the CPU ratio is the fair comparison; the wall time profits from the parallel branches. Not compared: the array trigger (each telescope has its own sim_telarray run).
 
 | Quantity | Value |
 |---|---|
-| sim_telarray, all six telescopes: wall s, CPU s | 40.6, 39.3 |
-| obdeect chain with tee: wall s, CPU s | 8.7, 18.4 |
-| **obdeect chain / sim_telarray, CPU** | **0.47** |
-| **obdeect chain / sim_telarray, wall** | **0.21** |
-| obdeect chain / sim_telarray, CPU, fastest repetitions | 0.47 |
-| Shared propagation (tee) / one full pipe per telescope, CPU | 0.73 |
+| sim_telarray, all six telescopes: wall s, CPU s | 189.0, 181.8 |
+| obdeect chain with tee: wall s, CPU s | 88.2, 77.8 |
+| **obdeect chain / sim_telarray, CPU** | **0.43** |
+| **obdeect chain / sim_telarray, wall** | **0.47** |
+| obdeect chain / sim_telarray, CPU, fastest repetitions | 0.43 |
+| Shared propagation (tee) / one full pipe per telescope, CPU | 0.98 |
 | Timing unreliable | 1 |
 
 | Telescope | Photoelectron bias obdeect vs sim_telarray | ± (1 σ) | Images compared | sim_telarray camera CPU s | trace-stream CPU s |
 |---|---|---|---|---|---|
-| LSTN-01 | +0.68% | 0.47% | 95 | 2.16 | 0.13 |
-| LSTN-02 | +0.48% | 0.42% | 99 | 2.32 | 0.20 |
-| LSTN-03 | +1.14% | 0.59% | 98 | 2.31 | 0.21 |
-| LSTN-04 | +0.21% | 0.39% | 97 | 2.30 | 0.18 |
-| MSTN-03 | -0.05% | 0.65% | 64 | 2.53 | 0.10 |
-| MSTN-15 | -0.31% | 0.60% | 90 | 2.78 | 0.09 |
+| LSTN-01 | -0.05% | 0.21% | 484 | 10.20 | 0.53 |
+| LSTN-02 | +0.37% | 0.25% | 486 | 10.66 | 0.56 |
+| LSTN-03 | +0.11% | 0.24% | 469 | 10.53 | 0.55 |
+| LSTN-04 | +0.66% | 0.24% | 478 | 10.59 | 0.53 |
+| MSTN-03 | -0.16% | 0.37% | 276 | 11.29 | 0.23 |
+| MSTN-15 | -0.93% | 0.32% | 433 | 12.95 | 0.28 |
 
 | Check | Measured | Result |
 |---|---|---|
-| obdeect chain wall ≤ sim_telarray wall | 0.21 × sim_telarray | PASS |
-| obdeect chain CPU ≤ sim_telarray CPU | 0.47 × sim_telarray | PASS |
+| obdeect chain wall ≤ sim_telarray wall | 0.47 × sim_telarray | PASS |
+| obdeect chain CPU ≤ sim_telarray CPU | 0.43 × sim_telarray | PASS |
 | Same physics: photoelectron bias within its limit in all six telescopes | 0 | PASS |
 | Photon counts consistent through the chain in all six telescopes | 0 | PASS |
 
 All runs completed with their repetitions (9 checks).
 
 <!-- notes:performance-air-shower-array -->
-**obdeect needs less than half the CPU of sim_telarray here** (18.4 s against 39.3 s). Where the obdeect time goes:
+**The chain needs 0.43× the CPU of sim_telarray (77.8 s against 181.8 s), but that is not an obdeect gain.** Where the obdeect time goes (CPU s): six camera stages 66 (10.2–13.0 each), from-corsika and propagation, shared by all telescopes, about 8, trace-stream 3, tee 0.4.
 
-| Part | CPU s |
-|---|---|
-| six camera stages | about 14 (2.2–2.5 each) |
-| propagation, shared by all telescopes | 1.5 |
-| from-corsika, shared by all telescopes | 1.3 |
-| trace-stream, per telescope | 0.1 |
-
-**Why 0.47 here, but 1.23 for one LST.** Per telescope, in CPU seconds:
+**Per telescope**, in CPU seconds:
 
 | | One LST | Six telescopes |
 |---|---|---|
-| sim_telarray | 3.4 | 6.5 (39.3 / 6) |
-| obdeect: camera (same sim_telarray code) | 2.3 | 2.3 |
-| obdeect: reading + atmosphere | 1.55 | 0.47 (2.8 / 6, shared) |
-| obdeect: trace-stream, to-simtel | 0.30 | about 0.1 |
-| obdeect total | 4.15 | 3.1 (18.4 / 6) |
+| sim_telarray | 14.3 | 30.3 (181.8 / 6) |
+| obdeect chain | 14.1 | 13.0 (77.8 / 6) |
 
-Two things change, and the second is larger:
+The obdeect cost per telescope is the same as for one LST. Sharing the reading and the atmosphere between telescopes saves little now: the shared chain needs 0.98× the CPU of one full pipe per telescope (earlier: 0.73×, when propagation was still expensive). What differs is sim_telarray: **2.1× more CPU per telescope** in the six-telescope run than in the one-LST run. If its cameras cost what the obdeect-side cameras cost (66 s in total), its optics and atmosphere would take about 115 s, 19 s per telescope against 1.4 s for one LST. **This is not understood.** It is not the number of photons per telescope: the array input puts fewer photons on each telescope (mean 1.0e5 per telescope and event) than the single-LST input (1.8e5). Open candidates: per-telescope overhead of a sim_telarray run with six telescopes (trigger, array configuration, the MST models), or the larger core scatter (250 m against 100 m). A sim_telarray run for one telescope of this array on this input would separate the causes. Until then, do not quote 0.43 as the expected gain for an array.
 
-1. **Sharing.** Reading and atmosphere (the part that makes obdeect slower for one LST) are paid once for all six telescopes instead of once per telescope. This is measured: shared tee 0.73 × six separate pipes. It brings 1.23 down to about 0.9.
-2. **sim_telarray gets more expensive per telescope** (3.4 → 6.5 s), while the obdeect camera cost stays at 2.3 s. This is **not yet understood**. It is not more photons per telescope: the array input puts fewer photons on each telescope (mean 1.0e5 per telescope and event, 0.6–1.4e5) than the single-LST input (1.8e5), although its 20 showers have more total energy (8579 against 6180 GeV). Candidates: per-telescope overhead of a six-telescope sim_telarray run, or the array configuration. A sim_telarray run per telescope on this input would separate the causes.
+**The showers of the two cases differ.** Single-LST input: seeds 1017…, core scatter 100 m, three telescopes of 12 m radius. Array input: seeds 1617…, scatter 250 m, six telescopes. Within a case, sim_telarray and the obdeect chain read the same file (100 telescope events), so the showers are identical there by construction. Times of different cases are not strictly like for like.
 
-**The showers of the two cases are different, not the same showers.** Single-LST input: seeds 17/29/43/61, core scatter 100 m, 3 telescopes of 12 m radius. Array input: seeds 617/629/643/661, scatter 250 m, six telescopes. Within one case, sim_telarray and the obdeect chain read the same file with all its showers (20 CORSIKA showers, each used at 5 core positions: 100 telescope events), so the showers are identical there by construction; the input file is not hashed in the report. Times of different cases are therefore not strictly like for like.
+**Physics.** The photoelectron bias is within its limit for all six telescopes (−0.9 % to +0.7 %).
 
-So the advantage for six telescopes rests on the sharing (understood) and on a sim_telarray cost increase that is not explained; do not quote 0.47 as the expected gain for an array until it is.
-
-**Physics.** The photoelectron bias is within its limit for all six telescopes (−0.3 % to +1.1 %).
+**Harness bug found on the way.** In the first runs the tee candidate failed (`--telescopes given twice`: the harness added the selection once for the single telescope and once for the group); fixed in `with_telescopes`, with a test.
 <!-- /notes -->
 
 Data: `performance.air-shower-array` · [metrics.json](performance.air-shower-array/metrics.json) · [details.json](performance.air-shower-array/details.json)
@@ -983,22 +971,22 @@ Other figures:
 
 ### How fast photons pass between programs — FAIL
 
-The photon stream of the 20 gamma showers (about 350 MB) read with `cat` and written to disk by `tee` (a plain copy: the ceiling of this machine), and converted by `stream: to-simtel` (the last obdeect step before sim_telarray). Throughput in GB/s (10^9 bytes per second); the budget is 1 GB/s.
+The photon stream of the 100 gamma showers (about 1.3 GB) read with `cat` and written to disk by `tee` (a plain copy: the ceiling of this machine), and converted by `stream: to-simtel` (the last obdeect step before sim_telarray). Throughput in GB/s (10^9 bytes per second); the budget is 1 GB/s.
 
 | Quantity | Value |
 |---|---|
-| Plain copy (cat → tee), GB/s | 0.90 |
-| cat → stream: to-simtel, GB/s | 0.61 |
+| Plain copy (cat → tee), GB/s | 0.68 |
+| cat → stream: to-simtel, GB/s | 0.87 |
 
 | Check | Measured | Result |
 |---|---|---|
-| Plain copy ≥ 1 GB/s | 0.90 GB/s | FAIL |
-| stream: to-simtel ≥ 1 GB/s | 0.61 GB/s | FAIL |
+| Plain copy ≥ 1 GB/s | 0.68 GB/s | FAIL |
+| stream: to-simtel ≥ 1 GB/s | 0.87 GB/s | FAIL |
 
 All runs completed with their repetitions (2 checks).
 
 <!-- notes:performance-stream-pipe -->
-Even a plain copy reaches only 0.90 GB/s in this VM (the podman VM's file system), so the 1 GB/s budget cannot be met on this machine. to-simtel reaches 0.61 GB/s, two thirds of the copy. Its CPU time, 0.37 s for 350 MB (about 1 GB/s), shows that the conversion itself would keep up; the rest is waiting for the disk.
+A plain copy reaches only 0.68 GB/s in this VM (the podman VM's file system), so the 1 GB/s budget cannot be met on this machine. to-simtel reaches 0.87 GB/s. Its CPU time, 1.0 s for 1.3 GB (about 1.3 GB/s), shows that the conversion itself would keep up; the rest is waiting for the pipe or the disk. This case needs a Linux node with a faster disk.
 <!-- /notes -->
 
 Data: `performance.stream-pipe` · [metrics.json](performance.stream-pipe/metrics.json) · [details.json](performance.stream-pipe/details.json)
@@ -1011,17 +999,17 @@ Data: `performance.stream-pipe` · [metrics.json](performance.stream-pipe/metric
 
 | Quantity | Value |
 |---|---|
-| sim_telarray side: LightEmission wall s, sim_telarray wall s | 0.053, 0.164 |
-| obdeect side: wall s | 0.180 |
+| sim_telarray side: LightEmission wall s, sim_telarray wall s | 0.054, 0.148 |
+| obdeect side: wall s | 0.167 |
 | **obdeect / sim_telarray side, wall** | **0.83** |
-| obdeect / sim_telarray side, wall, fastest repetitions | 0.81 |
+| obdeect / sim_telarray side, wall, fastest repetitions | 0.80 |
 
 | obdeect program | Wall s |
 |---|---|
 | sources: light source | 0.005 |
 | propagation: run (atmosphere) | 0.003 |
 | stream: to-simtel (hand the photons to sim_telarray) | 0.003 |
-| sim_telarray, camera only | 0.169 |
+| sim_telarray, camera only | 0.156 |
 
 | Check | Measured | Result |
 |---|---|---|
@@ -1030,11 +1018,11 @@ Data: `performance.stream-pipe` · [metrics.json](performance.stream-pipe/metric
 All runs completed with their repetitions (2 checks).
 
 <!-- notes:performance-flasher-dish -->
-Only about 56 000 photons reach the camera. Both sides are therefore dominated by start-up and by the sim_telarray camera, which takes 0.16–0.17 s on each side.
-- LightEmission (`ff-1m`) itself takes 0.05 s, mostly start-up: 0.04 s even for a single photon.
+Only about 56 000 photons reach the camera. Both sides are therefore dominated by start-up and by the sim_telarray camera, which takes 0.15 s on each side.
+- LightEmission (`ff-1m`) itself takes 0.05 s, mostly start-up.
 - The obdeect flasher takes 0.005 s.
 
-Changed for this run: LightEmission now writes an uncompressed file. Before, gzip added 0.03 s to its side.
+LightEmission writes an uncompressed file here (gzip added 0.03 s to its side before).
 
 To compare the light sources themselves, the case needs far more photons per event.
 <!-- /notes -->
@@ -1053,26 +1041,26 @@ Data: `performance.flasher-dish` · [metrics.json](performance.flasher-dish/metr
 
 | Quantity | Value |
 |---|---|
-| sim_telarray side: LightEmission wall s, sim_telarray wall s | 0.043, 0.134 |
-| obdeect side: wall s | 0.137 |
-| **obdeect / sim_telarray side, wall** | **0.78** |
-| obdeect / sim_telarray side, wall, fastest repetitions | 0.78 |
+| sim_telarray side: LightEmission wall s, sim_telarray wall s | 0.045, 0.122 |
+| obdeect side: wall s | 0.126 |
+| **obdeect / sim_telarray side, wall** | **0.74** |
+| obdeect / sim_telarray side, wall, fastest repetitions | 0.75 |
 
 | obdeect program | Wall s |
 |---|---|
-| sources: light source | 0.001 |
+| sources: light source | 0.002 |
 | propagation: run (atmosphere) | 0.001 |
-| stream: to-simtel (hand the photons to sim_telarray) | 0.002 |
-| sim_telarray, camera only | 0.133 |
+| stream: to-simtel (hand the photons to sim_telarray) | 0.001 |
+| sim_telarray, camera only | 0.121 |
 
 | Check | Measured | Result |
 |---|---|---|
-| obdeect wall ≤ LightEmission + sim_telarray wall | 0.78 × sim_telarray | PASS |
+| obdeect wall ≤ LightEmission + sim_telarray wall | 0.74 × sim_telarray | PASS |
 
 All runs completed with their repetitions (2 checks).
 
 <!-- notes:performance-point-source -->
-Same as the flasher. The sim_telarray camera takes 0.13 s on both sides. LightEmission (`xyzls`) takes 0.043 s, the obdeect point source 0.001 s.
+Same as the flasher. The sim_telarray camera takes 0.12 s on both sides. LightEmission (`xyzls`) takes 0.045 s, the obdeect point source 0.002 s.
 <!-- /notes -->
 
 Data: `performance.point-source` · [metrics.json](performance.point-source/metrics.json) · [details.json](performance.point-source/details.json)

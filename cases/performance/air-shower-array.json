@@ -7,8 +7,8 @@
     "python3"
   ],
   "inputs": [
-    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.iact",
-    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.corsika.log"
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north-100showers.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north-100showers.corsika.log"
   ],
   "timeout": 14400,
   "commands": [

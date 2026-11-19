@@ -50,11 +50,11 @@
       "card": "corsika/gamma-20deg-100-3000GeV-array-north.card"
     },
     "gamma-20deg-100-3000GeV-100showers.iact": {
-      "sha256": null,
+      "sha256": "2e4f7b6d856495eceffe66bd68746267271309456bf04be9cf57378226a02a77",
       "card": "corsika/gamma-20deg-100-3000GeV-100showers.card"
     },
     "gamma-20deg-100-3000GeV-array-north-100showers.iact": {
-      "sha256": null,
+      "sha256": "6f50151a1fcfa6f71e0901166d0e34d5152fa213104c5aefaa29c15b86cdb785",
       "card": "corsika/gamma-20deg-100-3000GeV-array-north-100showers.card"
     }
   }

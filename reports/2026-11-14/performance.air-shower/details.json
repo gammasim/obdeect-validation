@@ -1,18 +1,18 @@
 {
   "case": "air-shower",
   "host": {
-    "nproc": 6,
+    "nproc": 1,
     "cpu_model": "0x000",
     "machine": "aarch64",
     "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
-    "obdeect_version": "obdeect-stream 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-propagation 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-sources 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-ray-tracing 0.9.3.dev2+g31749a2a6.d20261117\nphoton-stream format 1.0",
+    "obdeect_version": "obdeect-stream 0.9.3.dev7+g34d812c61\nobdeect-propagation 0.9.3.dev7+g34d812c61\nobdeect-sources 0.9.3.dev7+g34d812c61\nobdeect-ray-tracing 0.9.3.dev7+g34d812c61\nphoton-stream format 1.0",
     "host": "Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs"
   },
   "settings": {
     "reps": 3,
     "timing": "wall and CPU: wait4 rusage per child; peak RSS: sampled /proc VmHWM on Linux",
-    "showers": 20,
-    "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
+    "showers": 100,
+    "input": "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact",
     "config": "/results/performance.air-shower/cfg/model/7.0.0/CTAO.cfg",
     "reference_atmosphere": null,
     "candidate_atmosphere": "obdeect propagation (reference atmosphere below 1000 nm, 250-700 nm); sim_telarray unit table",
@@ -33,9 +33,9 @@
     "reference": {
       "sim_telarray": [
         {
-          "wall_s": 4.148448262945749,
-          "cpu_s": 3.908568,
-          "peak_rss_mb": 83.1953125,
+          "wall_s": 15.49825830804184,
+          "cpu_s": 14.647146,
+          "peak_rss_mb": 92.23828125,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -49,9 +49,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/reference/reference.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/reference/reference.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/reference/reference.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/reference/reference.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -80,14 +80,14 @@
               "min_photons=0",
               "-C",
               "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         },
         {
-          "wall_s": 3.4795365990139544,
-          "cpu_s": 3.314364,
-          "peak_rss_mb": 83.15625,
+          "wall_s": 14.94357930996921,
+          "cpu_s": 14.127725000000002,
+          "peak_rss_mb": 92.2265625,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -101,9 +101,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/reference/reference.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/reference/reference.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/reference/reference.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/reference/reference.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -132,14 +132,14 @@
               "min_photons=0",
               "-C",
               "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         },
         {
-          "wall_s": 3.536333399009891,
-          "cpu_s": 3.362071,
-          "peak_rss_mb": 83.0546875,
+          "wall_s": 15.09446684003342,
+          "cpu_s": 14.27786,
+          "peak_rss_mb": 92.37109375,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -153,9 +153,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/reference/reference.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/reference/reference.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/reference/reference.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/reference/reference.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -184,7 +184,7 @@
               "min_photons=0",
               "-C",
               "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         }
@@ -193,49 +193,49 @@
     "candidate_threads1": {
       "from_corsika": [
         {
-          "wall_s": 0.7116035239305347,
-          "cpu_s": 0.623078,
-          "peak_rss_mb": 76.828125,
+          "wall_s": 1.5823584160534665,
+          "cpu_s": 1.2244199999999998,
+          "peak_rss_mb": 101.90625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         },
         {
-          "wall_s": 0.4879409420536831,
-          "cpu_s": 0.398783,
-          "peak_rss_mb": 76.875,
+          "wall_s": 1.6867581580299884,
+          "cpu_s": 1.262668,
+          "peak_rss_mb": 102.078125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         },
         {
-          "wall_s": 0.44560158206149936,
-          "cpu_s": 0.35604199999999997,
-          "peak_rss_mb": 77.00390625,
+          "wall_s": 1.7746143590193242,
+          "cpu_s": 1.3830010000000001,
+          "peak_rss_mb": 102.078125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         }
       ],
       "propagation": [
         {
-          "wall_s": 1.0637946450151503,
-          "cpu_s": 1.03121,
-          "peak_rss_mb": 13.03515625,
+          "wall_s": 1.4090340959373862,
+          "cpu_s": 1.33845,
+          "peak_rss_mb": 14.01953125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+              "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
@@ -247,22 +247,24 @@
               "--wavelength-range",
               "250",
               "700",
+              "--telescopes",
+              "1",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threads1/showers.gst",
+              "/tmp/perf-chain-fcieqwq2/threads1/showers.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/propagated.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 1.1460920380195603,
-          "cpu_s": 1.064852,
-          "peak_rss_mb": 12.84375,
+          "wall_s": 1.5245885039912537,
+          "cpu_s": 1.3934259999999998,
+          "peak_rss_mb": 14.12109375,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+              "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
@@ -274,22 +276,24 @@
               "--wavelength-range",
               "250",
               "700",
+              "--telescopes",
+              "1",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threads1/showers.gst",
+              "/tmp/perf-chain-fcieqwq2/threads1/showers.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/propagated.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 1.03870422008913,
-          "cpu_s": 0.9243849999999999,
-          "peak_rss_mb": 12.8359375,
+          "wall_s": 1.9550838029244915,
+          "cpu_s": 1.362151,
+          "peak_rss_mb": 14.06640625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+              "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
@@ -301,19 +305,21 @@
               "--wavelength-range",
               "250",
               "700",
+              "--telescopes",
+              "1",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threads1/showers.gst",
+              "/tmp/perf-chain-fcieqwq2/threads1/showers.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/propagated.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/propagated.gst"
             ]
           ]
         }
       ],
       "compile_model": [
         {
-          "wall_s": 0.29651527700480074,
-          "cpu_s": 0.550381,
-          "peak_rss_mb": 39.328125,
+          "wall_s": 0.2050029420061037,
+          "cpu_s": 0.116612,
+          "peak_rss_mb": 39.18359375,
           "argv": [
             [
               "obdeect",
@@ -328,14 +334,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/threads1/lst.model"
+              "/tmp/perf-chain-fcieqwq2/threads1/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.2901062020100653,
-          "cpu_s": 0.544636,
-          "peak_rss_mb": 39.41015625,
+          "wall_s": 0.187022069003433,
+          "cpu_s": 0.103977,
+          "peak_rss_mb": 39.09765625,
           "argv": [
             [
               "obdeect",
@@ -350,13 +356,13 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/threads1/lst.model"
+              "/tmp/perf-chain-fcieqwq2/threads1/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.2862595410551876,
-          "cpu_s": 0.540219,
+          "wall_s": 0.18623915209900588,
+          "cpu_s": 0.10727400000000001,
           "peak_rss_mb": 39.43359375,
           "argv": [
             [
@@ -372,21 +378,21 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/threads1/lst.model"
+              "/tmp/perf-chain-fcieqwq2/threads1/lst.model"
             ]
           ]
         }
       ],
       "trace_stream": [
         {
-          "wall_s": 2.0124862750526518,
-          "cpu_s": 1.9527320000000001,
-          "peak_rss_mb": 31.3125,
+          "wall_s": 7.144841097993776,
+          "cpu_s": 6.825916,
+          "peak_rss_mb": 32.671875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-chain-c265u7oc/threads1/lst.model",
+              "/tmp/perf-chain-fcieqwq2/threads1/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -400,21 +406,21 @@
               "--telescope-transmission",
               "full",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threads1/propagated.gst",
+              "/tmp/perf-chain-fcieqwq2/threads1/propagated.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 2.221050417982042,
-          "cpu_s": 2.0832170000000003,
-          "peak_rss_mb": 31.22265625,
+          "wall_s": 7.075362310977653,
+          "cpu_s": 6.762858,
+          "peak_rss_mb": 32.5703125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-chain-c265u7oc/threads1/lst.model",
+              "/tmp/perf-chain-fcieqwq2/threads1/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -428,21 +434,21 @@
               "--telescope-transmission",
               "full",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threads1/propagated.gst",
+              "/tmp/perf-chain-fcieqwq2/threads1/propagated.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 2.239959851023741,
-          "cpu_s": 1.891149,
-          "peak_rss_mb": 31.0390625,
+          "wall_s": 7.275441712001339,
+          "cpu_s": 6.794166,
+          "peak_rss_mb": 32.578125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-chain-c265u7oc/threads1/lst.model",
+              "/tmp/perf-chain-fcieqwq2/threads1/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -456,65 +462,65 @@
               "--telescope-transmission",
               "full",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threads1/propagated.gst",
+              "/tmp/perf-chain-fcieqwq2/threads1/propagated.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/traced.gst"
             ]
           ]
         }
       ],
       "to_simtel": [
         {
-          "wall_s": 0.2616465319879353,
-          "cpu_s": 0.25315,
-          "peak_rss_mb": 63.19921875,
+          "wall_s": 0.9269503010436893,
+          "cpu_s": 0.860569,
+          "peak_rss_mb": 78.33203125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-chain-c265u7oc/threads1/camera-map.txt",
+              "/tmp/perf-chain-fcieqwq2/threads1/camera-map.txt",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/candidate.iact",
-              "/tmp/perf-chain-c265u7oc/threads1/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/candidate.iact",
+              "/tmp/perf-chain-fcieqwq2/threads1/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.42843960400205106,
-          "cpu_s": 0.270763,
-          "peak_rss_mb": 63.1875,
+          "wall_s": 0.9600895900512114,
+          "cpu_s": 0.8926839999999999,
+          "peak_rss_mb": 78.22265625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-chain-c265u7oc/threads1/camera-map.txt",
+              "/tmp/perf-chain-fcieqwq2/threads1/camera-map.txt",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/candidate.iact",
-              "/tmp/perf-chain-c265u7oc/threads1/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/candidate.iact",
+              "/tmp/perf-chain-fcieqwq2/threads1/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.21598188299685717,
-          "cpu_s": 0.13005699999999998,
-          "peak_rss_mb": 63.1875,
+          "wall_s": 0.8552328490186483,
+          "cpu_s": 0.7960430000000001,
+          "peak_rss_mb": 78.2890625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-chain-c265u7oc/threads1/camera-map.txt",
+              "/tmp/perf-chain-fcieqwq2/threads1/camera-map.txt",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threads1/candidate.iact",
-              "/tmp/perf-chain-c265u7oc/threads1/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threads1/candidate.iact",
+              "/tmp/perf-chain-fcieqwq2/threads1/traced.gst"
             ]
           ]
         }
       ],
       "sim_telarray": [
         {
-          "wall_s": 3.042758006020449,
-          "cpu_s": 2.9243419999999998,
-          "peak_rss_mb": 93.421875,
+          "wall_s": 13.580214168992825,
+          "cpu_s": 12.854012,
+          "peak_rss_mb": 102.48828125,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -528,9 +534,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/threads1/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/threads1/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/threads1/candidate.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/threads1/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -558,15 +564,15 @@
               "-C",
               "min_photons=0",
               "-C",
-              "atmospheric_transmission=/tmp/perf-chain-c265u7oc/unit-atmosphere.dat",
-              "/tmp/perf-chain-c265u7oc/threads1/candidate.iact"
+              "atmospheric_transmission=/tmp/perf-chain-fcieqwq2/unit-atmosphere.dat",
+              "/tmp/perf-chain-fcieqwq2/threads1/candidate.iact"
             ]
           ]
         },
         {
-          "wall_s": 2.9890594099415466,
-          "cpu_s": 2.8754459999999997,
-          "peak_rss_mb": 93.640625,
+          "wall_s": 13.336499147000723,
+          "cpu_s": 12.785293,
+          "peak_rss_mb": 102.54296875,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -580,9 +586,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/threads1/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/threads1/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/threads1/candidate.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/threads1/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -610,15 +616,15 @@
               "-C",
               "min_photons=0",
               "-C",
-              "atmospheric_transmission=/tmp/perf-chain-c265u7oc/unit-atmosphere.dat",
-              "/tmp/perf-chain-c265u7oc/threads1/candidate.iact"
+              "atmospheric_transmission=/tmp/perf-chain-fcieqwq2/unit-atmosphere.dat",
+              "/tmp/perf-chain-fcieqwq2/threads1/candidate.iact"
             ]
           ]
         },
         {
-          "wall_s": 2.908348181983456,
-          "cpu_s": 2.7994719999999997,
-          "peak_rss_mb": 93.69921875,
+          "wall_s": 13.387760518002324,
+          "cpu_s": 12.834028,
+          "peak_rss_mb": 102.64453125,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -632,9 +638,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/threads1/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/threads1/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/threads1/candidate.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/threads1/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -662,8 +668,8 @@
               "-C",
               "min_photons=0",
               "-C",
-              "atmospheric_transmission=/tmp/perf-chain-c265u7oc/unit-atmosphere.dat",
-              "/tmp/perf-chain-c265u7oc/threads1/candidate.iact"
+              "atmospheric_transmission=/tmp/perf-chain-fcieqwq2/unit-atmosphere.dat",
+              "/tmp/perf-chain-fcieqwq2/threads1/candidate.iact"
             ]
           ]
         }
@@ -672,49 +678,49 @@
     "candidate_threadsdefault": {
       "from_corsika": [
         {
-          "wall_s": 0.5588310159510002,
-          "cpu_s": 0.499945,
-          "peak_rss_mb": 76.90234375,
+          "wall_s": 2.2349066140595824,
+          "cpu_s": 1.786932,
+          "peak_rss_mb": 102.0625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         },
         {
-          "wall_s": 0.5147344069555402,
-          "cpu_s": 0.43906999999999996,
-          "peak_rss_mb": 76.828125,
+          "wall_s": 2.6613462469540536,
+          "cpu_s": 1.765005,
+          "peak_rss_mb": 101.9609375,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         },
         {
-          "wall_s": 0.47679787408560514,
-          "cpu_s": 0.398597,
-          "peak_rss_mb": 77.00390625,
+          "wall_s": 2.760075114085339,
+          "cpu_s": 1.450971,
+          "peak_rss_mb": 102.078125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ]
           ]
         }
       ],
       "propagation": [
         {
-          "wall_s": 1.1116012909915298,
-          "cpu_s": 1.0772009999999999,
-          "peak_rss_mb": 12.8359375,
+          "wall_s": 1.5192186289932579,
+          "cpu_s": 1.427704,
+          "peak_rss_mb": 14.19140625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+              "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
@@ -726,22 +732,24 @@
               "--wavelength-range",
               "250",
               "700",
+              "--telescopes",
+              "1",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/showers.gst",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/showers.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/propagated.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 1.2170199030078948,
-          "cpu_s": 1.009607,
-          "peak_rss_mb": 12.83984375,
+          "wall_s": 1.6015934979077429,
+          "cpu_s": 1.442442,
+          "peak_rss_mb": 14.12890625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+              "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
@@ -753,22 +761,24 @@
               "--wavelength-range",
               "250",
               "700",
+              "--telescopes",
+              "1",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/showers.gst",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/showers.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/propagated.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 1.6723819710314274,
-          "cpu_s": 1.015831,
-          "peak_rss_mb": 12.78125,
+          "wall_s": 1.5894171650288627,
+          "cpu_s": 1.42901,
+          "peak_rss_mb": 13.86328125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+              "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
@@ -780,19 +790,21 @@
               "--wavelength-range",
               "250",
               "700",
+              "--telescopes",
+              "1",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/showers.gst",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/showers.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/propagated.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/propagated.gst"
             ]
           ]
         }
       ],
       "compile_model": [
         {
-          "wall_s": 0.2600085760932416,
-          "cpu_s": 0.543937,
-          "peak_rss_mb": 39.359375,
+          "wall_s": 0.20544448297005147,
+          "cpu_s": 0.125553,
+          "peak_rss_mb": 39.484375,
           "argv": [
             [
               "obdeect",
@@ -807,14 +819,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/lst.model"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.26908835500944406,
-          "cpu_s": 0.52671,
-          "peak_rss_mb": 38.9609375,
+          "wall_s": 0.2147573990514502,
+          "cpu_s": 0.129199,
+          "peak_rss_mb": 39.3515625,
           "argv": [
             [
               "obdeect",
@@ -829,14 +841,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/lst.model"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.2784474679501727,
-          "cpu_s": 0.537033,
-          "peak_rss_mb": 39.40234375,
+          "wall_s": 0.2160164410015568,
+          "cpu_s": 0.13332,
+          "peak_rss_mb": 39.11328125,
           "argv": [
             [
               "obdeect",
@@ -851,21 +863,21 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/lst.model"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/lst.model"
             ]
           ]
         }
       ],
       "trace_stream": [
         {
-          "wall_s": 1.2738563689636067,
-          "cpu_s": 2.346518,
-          "peak_rss_mb": 33.01953125,
+          "wall_s": 6.899314533919096,
+          "cpu_s": 6.602936,
+          "peak_rss_mb": 38.8125,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/lst.model",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -879,21 +891,21 @@
               "--telescope-transmission",
               "full",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/propagated.gst",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/propagated.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.6968197100795805,
-          "cpu_s": 2.022496,
-          "peak_rss_mb": 34.04296875,
+          "wall_s": 7.121690350002609,
+          "cpu_s": 6.615927,
+          "peak_rss_mb": 39.55859375,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/lst.model",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -907,21 +919,21 @@
               "--telescope-transmission",
               "full",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/propagated.gst",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/propagated.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.7528151369187981,
-          "cpu_s": 2.1007190000000002,
-          "peak_rss_mb": 34.4765625,
+          "wall_s": 7.132577765965834,
+          "cpu_s": 6.818982999999999,
+          "peak_rss_mb": 38.859375,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/lst.model",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -935,65 +947,65 @@
               "--telescope-transmission",
               "full",
               "-i",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/propagated.gst",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/propagated.gst",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/traced.gst"
             ]
           ]
         }
       ],
       "to_simtel": [
         {
-          "wall_s": 0.4655579299433157,
-          "cpu_s": 0.44956899999999994,
-          "peak_rss_mb": 63.23046875,
+          "wall_s": 0.766288980958052,
+          "cpu_s": 0.695164,
+          "peak_rss_mb": 78.25,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/camera-map.txt",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/camera-map.txt",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/candidate.iact",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.iact",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.4101620870642364,
-          "cpu_s": 0.236223,
-          "peak_rss_mb": 63.20703125,
+          "wall_s": 0.8149807259906083,
+          "cpu_s": 0.693329,
+          "peak_rss_mb": 78.19921875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/camera-map.txt",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/camera-map.txt",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/candidate.iact",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.iact",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/traced.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.30563834903296083,
-          "cpu_s": 0.295325,
-          "peak_rss_mb": 63.1875,
+          "wall_s": 0.9863155459752306,
+          "cpu_s": 0.7105889999999999,
+          "peak_rss_mb": 78.140625,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/camera-map.txt",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/camera-map.txt",
               "-o",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/candidate.iact",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/traced.gst"
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.iact",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/traced.gst"
             ]
           ]
         }
       ],
       "sim_telarray": [
         {
-          "wall_s": 3.155411065905355,
-          "cpu_s": 3.0313849999999998,
-          "peak_rss_mb": 93.52734375,
+          "wall_s": 13.749126281007193,
+          "cpu_s": 12.840096,
+          "peak_rss_mb": 102.43359375,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -1007,9 +1019,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/threadsdefault/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/threadsdefault/candidate.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -1037,15 +1049,15 @@
               "-C",
               "min_photons=0",
               "-C",
-              "atmospheric_transmission=/tmp/perf-chain-c265u7oc/unit-atmosphere.dat",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/candidate.iact"
+              "atmospheric_transmission=/tmp/perf-chain-fcieqwq2/unit-atmosphere.dat",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.iact"
             ]
           ]
         },
         {
-          "wall_s": 2.9608202379895374,
-          "cpu_s": 2.851913,
-          "peak_rss_mb": 93.66796875,
+          "wall_s": 14.188603995018639,
+          "cpu_s": 13.544389,
+          "peak_rss_mb": 102.828125,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -1059,9 +1071,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/threadsdefault/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/threadsdefault/candidate.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -1089,15 +1101,15 @@
               "-C",
               "min_photons=0",
               "-C",
-              "atmospheric_transmission=/tmp/perf-chain-c265u7oc/unit-atmosphere.dat",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/candidate.iact"
+              "atmospheric_transmission=/tmp/perf-chain-fcieqwq2/unit-atmosphere.dat",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.iact"
             ]
           ]
         },
         {
-          "wall_s": 3.0899497780483216,
-          "cpu_s": 2.966786,
-          "peak_rss_mb": 93.2578125,
+          "wall_s": 13.237070695962757,
+          "cpu_s": 12.686798000000001,
+          "peak_rss_mb": 102.61328125,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -1111,9 +1123,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-c265u7oc/threadsdefault/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-c265u7oc/threadsdefault/candidate.simtel",
+              "output_file=/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -1141,8 +1153,8 @@
               "-C",
               "min_photons=0",
               "-C",
-              "atmospheric_transmission=/tmp/perf-chain-c265u7oc/unit-atmosphere.dat",
-              "/tmp/perf-chain-c265u7oc/threadsdefault/candidate.iact"
+              "atmospheric_transmission=/tmp/perf-chain-fcieqwq2/unit-atmosphere.dat",
+              "/tmp/perf-chain-fcieqwq2/threadsdefault/candidate.iact"
             ]
           ]
         }
@@ -1151,9 +1163,9 @@
     "candidate_envelope": {
       "compile_model": [
         {
-          "wall_s": 0.30206368607468903,
-          "cpu_s": 0.553912,
-          "peak_rss_mb": 39.453125,
+          "wall_s": 0.19848627597093582,
+          "cpu_s": 0.12031399999999999,
+          "peak_rss_mb": 39.30859375,
           "argv": [
             [
               "obdeect",
@@ -1168,14 +1180,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/envelope/lst.model"
+              "/tmp/perf-chain-fcieqwq2/envelope/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.25728382903616875,
-          "cpu_s": 0.527783,
-          "peak_rss_mb": 39.28515625,
+          "wall_s": 0.24597798089962453,
+          "cpu_s": 0.151798,
+          "peak_rss_mb": 39.1328125,
           "argv": [
             [
               "obdeect",
@@ -1190,14 +1202,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/envelope/lst.model"
+              "/tmp/perf-chain-fcieqwq2/envelope/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.2597961169667542,
-          "cpu_s": 0.53408,
-          "peak_rss_mb": 39.44921875,
+          "wall_s": 0.18752169399522245,
+          "cpu_s": 0.11107299999999999,
+          "peak_rss_mb": 39.37890625,
           "argv": [
             [
               "obdeect",
@@ -1212,34 +1224,36 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/envelope/lst.model"
+              "/tmp/perf-chain-fcieqwq2/envelope/lst.model"
             ]
           ]
         }
       ],
       "pipeline": [
         {
-          "wall_s": 3.1603368929354474,
-          "cpu_s": 4.418805,
-          "peak_rss_mb": 76.828125,
+          "wall_s": 15.70053337502759,
+          "cpu_s": 14.33113,
+          "peak_rss_mb": 101.9375,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
@@ -1248,7 +1262,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -1269,7 +1283,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
@@ -1287,9 +1301,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -1308,7 +1322,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -1328,11 +1342,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.119068030966446,
-              "cpu_s": 0.541792,
-              "peak_rss_mb": 76.828125,
+              "wall_s": 15.626563173020259,
+              "cpu_s": 1.3086179999999998,
+              "peak_rss_mb": 101.9375,
               "returncode": 0
             },
             {
@@ -1340,23 +1354,25 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.124387274030596,
-              "cpu_s": 1.165501,
-              "peak_rss_mb": 12.44921875,
+              "wall_s": 15.626360006048344,
+              "cpu_s": 1.5023980000000001,
+              "peak_rss_mb": 13.69921875,
               "returncode": 0
             },
             {
@@ -1364,7 +1380,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -1382,9 +1398,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.1245716069824994,
-              "cpu_s": 0.308025,
-              "peak_rss_mb": 10.30859375,
+              "wall_s": 15.647986921016127,
+              "cpu_s": 0.89249,
+              "peak_rss_mb": 12.04296875,
               "returncode": 0
             },
             {
@@ -1392,15 +1408,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.1260928970295936,
-              "cpu_s": 0.036395,
-              "peak_rss_mb": 12.94921875,
+              "wall_s": 15.671970003051683,
+              "cpu_s": 0.07103899999999999,
+              "peak_rss_mb": 14.92578125,
               "returncode": 0
             },
             {
@@ -1417,9 +1433,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -1438,7 +1454,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -1451,35 +1467,37 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.1603368929354474,
-              "cpu_s": 2.367092,
-              "peak_rss_mb": 49.60546875,
+              "wall_s": 15.70053337502759,
+              "cpu_s": 10.556585,
+              "peak_rss_mb": 50.6328125,
               "returncode": 0
             }
           ]
         },
         {
-          "wall_s": 3.0609209820395336,
-          "cpu_s": 4.193041999999999,
-          "peak_rss_mb": 76.9609375,
+          "wall_s": 16.13701625703834,
+          "cpu_s": 14.72922,
+          "peak_rss_mb": 101.9375,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
@@ -1488,7 +1506,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -1509,7 +1527,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
@@ -1527,9 +1545,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -1548,7 +1566,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -1568,11 +1586,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.0193709939485416,
-              "cpu_s": 0.415604,
-              "peak_rss_mb": 76.9609375,
+              "wall_s": 16.06087613804266,
+              "cpu_s": 1.6084749999999999,
+              "peak_rss_mb": 101.9375,
               "returncode": 0
             },
             {
@@ -1580,23 +1598,25 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0245647790143266,
-              "cpu_s": 1.133173,
-              "peak_rss_mb": 12.5390625,
+              "wall_s": 16.059342387947254,
+              "cpu_s": 1.529604,
+              "peak_rss_mb": 13.64453125,
               "returncode": 0
             },
             {
@@ -1604,7 +1624,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -1622,9 +1642,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.024757112027146,
-              "cpu_s": 0.30029700000000004,
-              "peak_rss_mb": 10.8515625,
+              "wall_s": 16.08396984403953,
+              "cpu_s": 0.88913,
+              "peak_rss_mb": 11.84765625,
               "returncode": 0
             },
             {
@@ -1632,15 +1652,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0261697359383106,
-              "cpu_s": 0.032311999999999994,
-              "peak_rss_mb": 12.9140625,
+              "wall_s": 16.107199384015985,
+              "cpu_s": 0.076109,
+              "peak_rss_mb": 14.9296875,
               "returncode": 0
             },
             {
@@ -1657,9 +1677,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -1678,7 +1698,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -1691,35 +1711,37 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.0609209820395336,
-              "cpu_s": 2.3116559999999997,
-              "peak_rss_mb": 48.65625,
+              "wall_s": 16.13701625703834,
+              "cpu_s": 10.625902,
+              "peak_rss_mb": 50.30078125,
               "returncode": 0
             }
           ]
         },
         {
-          "wall_s": 3.0951863951049745,
-          "cpu_s": 4.302409,
-          "peak_rss_mb": 76.8828125,
+          "wall_s": 15.661641587037593,
+          "cpu_s": 14.320070999999999,
+          "peak_rss_mb": 101.9375,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
@@ -1728,7 +1750,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -1749,7 +1771,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
@@ -1767,9 +1789,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -1788,7 +1810,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -1808,11 +1830,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.052755451062694,
-              "cpu_s": 0.497523,
-              "peak_rss_mb": 76.8828125,
+              "wall_s": 15.585828718030825,
+              "cpu_s": 1.2017,
+              "peak_rss_mb": 101.9375,
               "returncode": 0
             },
             {
@@ -1820,23 +1842,25 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0583010270493105,
-              "cpu_s": 1.148834,
-              "peak_rss_mb": 12.5390625,
+              "wall_s": 15.58601450896822,
+              "cpu_s": 1.516452,
+              "peak_rss_mb": 13.671875,
               "returncode": 0
             },
             {
@@ -1844,7 +1868,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -1862,9 +1886,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0582569440593943,
-              "cpu_s": 0.308635,
-              "peak_rss_mb": 11.0078125,
+              "wall_s": 15.608020341023803,
+              "cpu_s": 0.895656,
+              "peak_rss_mb": 12.05078125,
               "returncode": 0
             },
             {
@@ -1872,15 +1896,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0598334830719978,
-              "cpu_s": 0.035228999999999996,
-              "peak_rss_mb": 12.80078125,
+              "wall_s": 15.629898673039861,
+              "cpu_s": 0.07409199999999999,
+              "peak_rss_mb": 14.80859375,
               "returncode": 0
             },
             {
@@ -1897,9 +1921,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -1918,7 +1942,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -1931,9 +1955,9 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.0951863951049745,
-              "cpu_s": 2.3121880000000004,
-              "peak_rss_mb": 49.5703125,
+              "wall_s": 15.661641587037593,
+              "cpu_s": 10.632171,
+              "peak_rss_mb": 50.30078125,
               "returncode": 0
             }
           ]
@@ -1943,8 +1967,30 @@
     "candidate_envelope_threads1": {
       "compile_model": [
         {
-          "wall_s": 0.23832201992627233,
-          "cpu_s": 0.516514,
+          "wall_s": 0.20286335900891572,
+          "cpu_s": 0.123833,
+          "peak_rss_mb": 39.32421875,
+          "argv": [
+            [
+              "obdeect",
+              "ray-tracing",
+              "compile",
+              "--simulation-models",
+              "/models/simulation-models",
+              "--model",
+              "LSTN-01",
+              "--version",
+              "7.0.0",
+              "--seed",
+              "20261113",
+              "--output",
+              "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model"
+            ]
+          ]
+        },
+        {
+          "wall_s": 0.1972049429314211,
+          "cpu_s": 0.119562,
           "peak_rss_mb": 39.63671875,
           "argv": [
             [
@@ -1960,14 +2006,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model"
+              "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.2719988509779796,
-          "cpu_s": 0.524222,
-          "peak_rss_mb": 39.41015625,
+          "wall_s": 0.20085410901810974,
+          "cpu_s": 0.12120899999999998,
+          "peak_rss_mb": 39.65625,
           "argv": [
             [
               "obdeect",
@@ -1982,56 +2028,36 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model"
-            ]
-          ]
-        },
-        {
-          "wall_s": 0.2670952749904245,
-          "cpu_s": 0.52584,
-          "peak_rss_mb": 39.17578125,
-          "argv": [
-            [
-              "obdeect",
-              "ray-tracing",
-              "compile",
-              "--simulation-models",
-              "/models/simulation-models",
-              "--model",
-              "LSTN-01",
-              "--version",
-              "7.0.0",
-              "--seed",
-              "20261113",
-              "--output",
-              "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model"
+              "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model"
             ]
           ]
         }
       ],
       "pipeline": [
         {
-          "wall_s": 3.048790246946737,
-          "cpu_s": 4.152958,
-          "peak_rss_mb": 77.0078125,
+          "wall_s": 15.372931943042204,
+          "cpu_s": 14.084258,
+          "peak_rss_mb": 101.86328125,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
@@ -2040,7 +2066,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2061,7 +2087,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
@@ -2079,9 +2105,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -2100,7 +2126,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -2120,11 +2146,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.0059307200135663,
-              "cpu_s": 0.42350099999999996,
-              "peak_rss_mb": 77.0078125,
+              "wall_s": 15.300810324028134,
+              "cpu_s": 1.1709299999999998,
+              "peak_rss_mb": 101.86328125,
               "returncode": 0
             },
             {
@@ -2132,23 +2158,25 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0111579640069976,
-              "cpu_s": 1.1342949999999998,
-              "peak_rss_mb": 12.55078125,
+              "wall_s": 15.298455449054018,
+              "cpu_s": 1.4944659999999999,
+              "peak_rss_mb": 13.671875,
               "returncode": 0
             },
             {
@@ -2156,7 +2184,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2174,9 +2202,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0111192549811676,
-              "cpu_s": 0.275674,
-              "peak_rss_mb": 9.9765625,
+              "wall_s": 15.320809780037962,
+              "cpu_s": 0.8216159999999999,
+              "peak_rss_mb": 10.6328125,
               "returncode": 0
             },
             {
@@ -2184,15 +2212,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0127983780112118,
-              "cpu_s": 0.028103999999999997,
-              "peak_rss_mb": 13.078125,
+              "wall_s": 15.343590529053472,
+              "cpu_s": 0.071083,
+              "peak_rss_mb": 14.85546875,
               "returncode": 0
             },
             {
@@ -2209,9 +2237,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -2230,7 +2258,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -2243,35 +2271,37 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.048790246946737,
-              "cpu_s": 2.2913840000000003,
-              "peak_rss_mb": 49.6171875,
+              "wall_s": 15.372931943042204,
+              "cpu_s": 10.526163,
+              "peak_rss_mb": 50.328125,
               "returncode": 0
             }
           ]
         },
         {
-          "wall_s": 3.0255831540562212,
-          "cpu_s": 4.093693,
-          "peak_rss_mb": 77.0078125,
+          "wall_s": 15.775174494017847,
+          "cpu_s": 14.437465999999999,
+          "peak_rss_mb": 101.89453125,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
@@ -2280,7 +2310,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2301,7 +2331,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
@@ -2319,9 +2349,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -2340,7 +2370,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -2360,11 +2390,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 2.9840719170169905,
-              "cpu_s": 0.37335799999999997,
-              "peak_rss_mb": 77.0078125,
+              "wall_s": 15.701590667013079,
+              "cpu_s": 1.3695929999999998,
+              "peak_rss_mb": 101.89453125,
               "returncode": 0
             },
             {
@@ -2372,23 +2402,25 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
                 "-"
               ],
-              "wall_s": 2.9894608260365203,
-              "cpu_s": 1.128292,
-              "peak_rss_mb": 12.61328125,
+              "wall_s": 15.701473207911476,
+              "cpu_s": 1.5120779999999998,
+              "peak_rss_mb": 13.61328125,
               "returncode": 0
             },
             {
@@ -2396,7 +2428,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2414,9 +2446,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 2.9894779101014137,
-              "cpu_s": 0.273535,
-              "peak_rss_mb": 10.11328125,
+              "wall_s": 15.723073747940361,
+              "cpu_s": 0.836504,
+              "peak_rss_mb": 10.77734375,
               "returncode": 0
             },
             {
@@ -2424,15 +2456,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
                 "-"
               ],
-              "wall_s": 2.9908512830734253,
-              "cpu_s": 0.027427999999999998,
-              "peak_rss_mb": 13.0,
+              "wall_s": 15.745829454972409,
+              "cpu_s": 0.072461,
+              "peak_rss_mb": 14.83203125,
               "returncode": 0
             },
             {
@@ -2449,9 +2481,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -2470,7 +2502,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -2483,35 +2515,37 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.0255831540562212,
-              "cpu_s": 2.29108,
-              "peak_rss_mb": 49.58203125,
+              "wall_s": 15.775174494017847,
+              "cpu_s": 10.64683,
+              "peak_rss_mb": 50.23828125,
               "returncode": 0
             }
           ]
         },
         {
-          "wall_s": 3.0682269720127806,
-          "cpu_s": 4.166543,
-          "peak_rss_mb": 76.7734375,
+          "wall_s": 15.350794069003314,
+          "cpu_s": 14.077515,
+          "peak_rss_mb": 101.93359375,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
@@ -2520,7 +2554,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2541,7 +2575,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
@@ -2559,9 +2593,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -2580,7 +2614,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -2600,11 +2634,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.024572737980634,
-              "cpu_s": 0.41823699999999997,
-              "peak_rss_mb": 76.7734375,
+              "wall_s": 15.278206115937792,
+              "cpu_s": 1.0830419999999998,
+              "peak_rss_mb": 101.93359375,
               "returncode": 0
             },
             {
@@ -2612,23 +2646,25 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--envelope",
-                "qe=/tmp/perf-chain-c265u7oc/envelope/qe-envelope.dat",
+                "qe=/tmp/perf-chain-fcieqwq2/envelope/qe-envelope.dat",
                 "-i",
                 "-",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.0303537300787866,
-              "cpu_s": 1.131084,
-              "peak_rss_mb": 12.5234375,
+              "wall_s": 15.27739365794696,
+              "cpu_s": 1.5068489999999999,
+              "peak_rss_mb": 13.6484375,
               "returncode": 0
             },
             {
@@ -2636,7 +2672,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/lst.model",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2654,9 +2690,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.030406397068873,
-              "cpu_s": 0.273584,
-              "peak_rss_mb": 10.05078125,
+              "wall_s": 15.29938828095328,
+              "cpu_s": 0.827494,
+              "peak_rss_mb": 10.6875,
               "returncode": 0
             },
             {
@@ -2664,15 +2700,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/envelope_threads1/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/envelope_threads1/camera-map.txt",
                 "--scaled-factor",
                 "qe",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.031756437034346,
-              "cpu_s": 0.028744,
-              "peak_rss_mb": 12.69140625,
+              "wall_s": 15.322226237971336,
+              "cpu_s": 0.06863699999999999,
+              "peak_rss_mb": 15.0,
               "returncode": 0
             },
             {
@@ -2689,9 +2725,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/envelope_threads1/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/envelope_threads1/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -2710,7 +2746,7 @@
                 "telescope_phi=180",
                 "-C",
                 "Bypass_Optics=3",
-                "-I/tmp/perf-chain-c265u7oc/envelope/qe-table",
+                "-I/tmp/perf-chain-fcieqwq2/envelope/qe-table",
                 "-I/results/performance.air-shower/cfg/model/7.0.0",
                 "-DTELESCOPE=1",
                 "-C",
@@ -2723,9 +2759,9 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.0682269720127806,
-              "cpu_s": 2.3148940000000002,
-              "peak_rss_mb": 49.45703125,
+              "wall_s": 15.350794069003314,
+              "cpu_s": 10.591493,
+              "peak_rss_mb": 49.890625,
               "returncode": 0
             }
           ]
@@ -2735,9 +2771,9 @@
     "candidate_unthinned_threads1": {
       "compile_model": [
         {
-          "wall_s": 0.2567725799744949,
-          "cpu_s": 0.517738,
-          "peak_rss_mb": 39.015625,
+          "wall_s": 0.18155306903645396,
+          "cpu_s": 0.10575999999999999,
+          "peak_rss_mb": 39.25,
           "argv": [
             [
               "obdeect",
@@ -2752,14 +2788,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/unthinned/lst.model"
+              "/tmp/perf-chain-fcieqwq2/unthinned/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.2444036789238453,
-          "cpu_s": 0.517307,
-          "peak_rss_mb": 39.34375,
+          "wall_s": 0.20468552596867085,
+          "cpu_s": 0.111869,
+          "peak_rss_mb": 38.99609375,
           "argv": [
             [
               "obdeect",
@@ -2774,14 +2810,14 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/unthinned/lst.model"
+              "/tmp/perf-chain-fcieqwq2/unthinned/lst.model"
             ]
           ]
         },
         {
-          "wall_s": 0.24087810097262263,
-          "cpu_s": 0.516166,
-          "peak_rss_mb": 39.19921875,
+          "wall_s": 0.18177061097230762,
+          "cpu_s": 0.106301,
+          "peak_rss_mb": 39.421875,
           "argv": [
             [
               "obdeect",
@@ -2796,32 +2832,34 @@
               "--seed",
               "20261113",
               "--output",
-              "/tmp/perf-chain-c265u7oc/unthinned/lst.model"
+              "/tmp/perf-chain-fcieqwq2/unthinned/lst.model"
             ]
           ]
         }
       ],
       "pipeline": [
         {
-          "wall_s": 3.35033685201779,
-          "cpu_s": 4.455779,
-          "peak_rss_mb": 76.83984375,
+          "wall_s": 16.737364874919876,
+          "cpu_s": 15.373643,
+          "peak_rss_mb": 101.98046875,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--mode",
                 "weighted",
                 "-i",
@@ -2832,7 +2870,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/unthinned/lst.model",
+                "/tmp/perf-chain-fcieqwq2/unthinned/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2853,7 +2891,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/unthinned/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/unthinned/camera-map.txt",
                 "-o",
                 "-"
               ],
@@ -2869,9 +2907,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -2909,11 +2947,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.3016785819781944,
-              "cpu_s": 0.410438,
-              "peak_rss_mb": 76.83984375,
+              "wall_s": 16.65807100699749,
+              "cpu_s": 1.095939,
+              "peak_rss_mb": 101.98046875,
               "returncode": 0
             },
             {
@@ -2921,13 +2959,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--mode",
                 "weighted",
                 "-i",
@@ -2935,9 +2975,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.3058859939919785,
-              "cpu_s": 0.9209909999999999,
-              "peak_rss_mb": 12.515625,
+              "wall_s": 16.657862464897335,
+              "cpu_s": 1.219552,
+              "peak_rss_mb": 13.33984375,
               "returncode": 0
             },
             {
@@ -2945,7 +2985,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/unthinned/lst.model",
+                "/tmp/perf-chain-fcieqwq2/unthinned/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -2963,9 +3003,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.306051117950119,
-              "cpu_s": 0.716699,
-              "peak_rss_mb": 18.07421875,
+              "wall_s": 16.68335308798123,
+              "cpu_s": 2.198309,
+              "peak_rss_mb": 19.046875,
               "returncode": 0
             },
             {
@@ -2973,13 +3013,13 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/unthinned/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/unthinned/camera-map.txt",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.31368548294995,
-              "cpu_s": 0.070369,
-              "peak_rss_mb": 31.7265625,
+              "wall_s": 16.708194835926406,
+              "cpu_s": 0.164045,
+              "peak_rss_mb": 36.11328125,
               "returncode": 0
             },
             {
@@ -2996,9 +3036,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -3029,33 +3069,35 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.35033685201779,
-              "cpu_s": 2.337282,
-              "peak_rss_mb": 59.48828125,
+              "wall_s": 16.737364874919876,
+              "cpu_s": 10.695798,
+              "peak_rss_mb": 62.14453125,
               "returncode": 0
             }
           ]
         },
         {
-          "wall_s": 3.358173382934183,
-          "cpu_s": 4.434353,
-          "peak_rss_mb": 76.83984375,
+          "wall_s": 16.98253948101774,
+          "cpu_s": 15.571788999999999,
+          "peak_rss_mb": 102.078125,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--mode",
                 "weighted",
                 "-i",
@@ -3066,7 +3108,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/unthinned/lst.model",
+                "/tmp/perf-chain-fcieqwq2/unthinned/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -3087,7 +3129,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/unthinned/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/unthinned/camera-map.txt",
                 "-o",
                 "-"
               ],
@@ -3103,9 +3145,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -3143,11 +3185,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.309847487951629,
-              "cpu_s": 0.398529,
-              "peak_rss_mb": 76.83984375,
+              "wall_s": 16.90184877894353,
+              "cpu_s": 1.176216,
+              "peak_rss_mb": 102.078125,
               "returncode": 0
             },
             {
@@ -3155,13 +3197,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--mode",
                 "weighted",
                 "-i",
@@ -3169,9 +3213,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.314449899015017,
-              "cpu_s": 0.9210419999999999,
-              "peak_rss_mb": 12.515625,
+              "wall_s": 16.89950640499592,
+              "cpu_s": 1.238912,
+              "peak_rss_mb": 13.39453125,
               "returncode": 0
             },
             {
@@ -3179,7 +3223,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/unthinned/lst.model",
+                "/tmp/perf-chain-fcieqwq2/unthinned/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -3197,9 +3241,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.3145712319528684,
-              "cpu_s": 0.717997,
-              "peak_rss_mb": 18.00390625,
+              "wall_s": 16.926054651965387,
+              "cpu_s": 2.219769,
+              "peak_rss_mb": 18.98828125,
               "returncode": 0
             },
             {
@@ -3207,13 +3251,13 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/unthinned/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/unthinned/camera-map.txt",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.3207089320058003,
-              "cpu_s": 0.065083,
-              "peak_rss_mb": 31.44921875,
+              "wall_s": 16.949530816986226,
+              "cpu_s": 0.175479,
+              "peak_rss_mb": 36.10546875,
               "returncode": 0
             },
             {
@@ -3230,9 +3274,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -3263,33 +3307,35 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.358173382934183,
-              "cpu_s": 2.331702,
-              "peak_rss_mb": 59.48828125,
+              "wall_s": 16.98253948101774,
+              "cpu_s": 10.761413,
+              "peak_rss_mb": 62.28515625,
               "returncode": 0
             }
           ]
         },
         {
-          "wall_s": 3.3526183490175754,
-          "cpu_s": 4.443838,
-          "peak_rss_mb": 76.87890625,
+          "wall_s": 16.85377286595758,
+          "cpu_s": 15.469009000000002,
+          "peak_rss_mb": 101.91796875,
           "argv": [
             [
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--mode",
                 "weighted",
                 "-i",
@@ -3300,7 +3346,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/unthinned/lst.model",
+                "/tmp/perf-chain-fcieqwq2/unthinned/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -3321,7 +3367,7 @@
               [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/unthinned/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/unthinned/camera-map.txt",
                 "-o",
                 "-"
               ],
@@ -3337,9 +3383,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -3377,11 +3423,11 @@
               "name": "from_corsika",
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-                "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+                "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
               ],
-              "wall_s": 3.305144537007436,
-              "cpu_s": 0.380776,
-              "peak_rss_mb": 76.87890625,
+              "wall_s": 16.772490539005958,
+              "cpu_s": 1.105084,
+              "peak_rss_mb": 101.91796875,
               "returncode": 0
             },
             {
@@ -3389,13 +3435,15 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
                 "--transmission",
-                "/tmp/perf-chain-c265u7oc/atmosphere-below-1000nm.dat",
+                "/tmp/perf-chain-fcieqwq2/atmosphere-below-1000nm.dat",
                 "--site-altitude",
                 "2156",
                 "--pathlen",
                 "28",
                 "--seed",
                 "123",
+                "--telescopes",
+                "1",
                 "--mode",
                 "weighted",
                 "-i",
@@ -3403,9 +3451,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.3095614480553195,
-              "cpu_s": 0.923167,
-              "peak_rss_mb": 12.4140625,
+              "wall_s": 16.77315849799197,
+              "cpu_s": 1.2436289999999999,
+              "peak_rss_mb": 13.38671875,
               "returncode": 0
             },
             {
@@ -3413,7 +3461,7 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
                 "--model",
-                "/tmp/perf-chain-c265u7oc/unthinned/lst.model",
+                "/tmp/perf-chain-fcieqwq2/unthinned/lst.model",
                 "--seed",
                 "20261113",
                 "--threads",
@@ -3431,9 +3479,9 @@
                 "-o",
                 "-"
               ],
-              "wall_s": 3.3098572390154004,
-              "cpu_s": 0.71776,
-              "peak_rss_mb": 17.83984375,
+              "wall_s": 16.800428328919224,
+              "cpu_s": 2.233885,
+              "peak_rss_mb": 18.86328125,
               "returncode": 0
             },
             {
@@ -3441,13 +3489,13 @@
               "argv": [
                 "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
                 "--camera-map",
-                "/tmp/perf-chain-c265u7oc/unthinned/camera-map.txt",
+                "/tmp/perf-chain-fcieqwq2/unthinned/camera-map.txt",
                 "-o",
                 "-"
               ],
-              "wall_s": 3.31440415000543,
-              "cpu_s": 0.067395,
-              "peak_rss_mb": 31.6953125,
+              "wall_s": 16.824366785003804,
+              "cpu_s": 0.17199699999999998,
+              "peak_rss_mb": 36.11328125,
               "returncode": 0
             },
             {
@@ -3464,9 +3512,9 @@
                 "-W",
                 "random_state=none",
                 "-C",
-                "histogram_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.hdata",
+                "histogram_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.hdata",
                 "-C",
-                "output_file=/tmp/perf-chain-c265u7oc/unthinned/candidate.simtel",
+                "output_file=/tmp/perf-chain-fcieqwq2/unthinned/candidate.simtel",
                 "-C",
                 "random_seed=20261113",
                 "-C",
@@ -3497,9 +3545,9 @@
                 "atmospheric_transmission=/results/performance.air-shower/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
                 "-"
               ],
-              "wall_s": 3.3526183490175754,
-              "cpu_s": 2.35474,
-              "peak_rss_mb": 59.375,
+              "wall_s": 16.85377286595758,
+              "cpu_s": 10.714414000000001,
+              "peak_rss_mb": 62.26953125,
               "returncode": 0
             }
           ]
@@ -3510,140 +3558,140 @@
   "pipelines": {
     "reference": [
       {
-        "wall_s": 4.148448262945749,
-        "cpu_s": 3.908568,
-        "peak_rss_mb": 83.1953125
+        "wall_s": 15.49825830804184,
+        "cpu_s": 14.647146,
+        "peak_rss_mb": 92.23828125
       },
       {
-        "wall_s": 3.4795365990139544,
-        "cpu_s": 3.314364,
-        "peak_rss_mb": 83.15625
+        "wall_s": 14.94357930996921,
+        "cpu_s": 14.127725000000002,
+        "peak_rss_mb": 92.2265625
       },
       {
-        "wall_s": 3.536333399009891,
-        "cpu_s": 3.362071,
-        "peak_rss_mb": 83.0546875
+        "wall_s": 15.09446684003342,
+        "cpu_s": 14.27786,
+        "peak_rss_mb": 92.37109375
       }
     ],
     "candidate_threads1": [
       {
-        "wall_s": 7.388804259011522,
-        "cpu_s": 7.334893,
-        "peak_rss_mb": 93.421875
+        "wall_s": 24.848401022027247,
+        "cpu_s": 23.219979000000002,
+        "peak_rss_mb": 102.48828125
       },
       {
-        "wall_s": 7.562688614008948,
-        "cpu_s": 7.237697,
-        "peak_rss_mb": 93.640625
+        "wall_s": 24.77031977905426,
+        "cpu_s": 23.200906,
+        "peak_rss_mb": 102.54296875
       },
       {
-        "wall_s": 7.134855259209871,
-        "cpu_s": 6.641323999999999,
-        "peak_rss_mb": 93.69921875
+        "wall_s": 25.434372393065132,
+        "cpu_s": 23.276663,
+        "peak_rss_mb": 102.64453125
       }
     ],
     "candidate_threadsdefault": [
       {
-        "wall_s": 6.825266247848049,
-        "cpu_s": 7.948555,
-        "peak_rss_mb": 93.52734375
+        "wall_s": 25.374299521907233,
+        "cpu_s": 23.478385,
+        "peak_rss_mb": 102.43359375
       },
       {
-        "wall_s": 6.068644700106233,
-        "cpu_s": 7.086019,
-        "peak_rss_mb": 93.66796875
+        "wall_s": 26.602972214925103,
+        "cpu_s": 24.190291000000002,
+        "peak_rss_mb": 102.828125
       },
       {
-        "wall_s": 6.576030577067286,
-        "cpu_s": 7.314291,
-        "peak_rss_mb": 93.2578125
+        "wall_s": 25.92147272801958,
+        "cpu_s": 23.229671,
+        "peak_rss_mb": 102.61328125
       }
     ],
     "candidate_envelope": [
       {
-        "wall_s": 3.4624005790101364,
-        "cpu_s": 4.972716999999999,
-        "peak_rss_mb": 76.828125
+        "wall_s": 15.899019650998525,
+        "cpu_s": 14.451444,
+        "peak_rss_mb": 101.9375
       },
       {
-        "wall_s": 3.3182048110757023,
-        "cpu_s": 4.720825,
-        "peak_rss_mb": 76.9609375
+        "wall_s": 16.382994237937964,
+        "cpu_s": 14.881018,
+        "peak_rss_mb": 101.9375
       },
       {
-        "wall_s": 3.3549825120717287,
-        "cpu_s": 4.836489,
-        "peak_rss_mb": 76.8828125
+        "wall_s": 15.849163281032816,
+        "cpu_s": 14.431143999999998,
+        "peak_rss_mb": 101.9375
       }
     ],
     "candidate_envelope_threads1": [
       {
-        "wall_s": 3.2871122668730095,
-        "cpu_s": 4.669472,
-        "peak_rss_mb": 77.0078125
+        "wall_s": 15.57579530205112,
+        "cpu_s": 14.208091,
+        "peak_rss_mb": 101.86328125
       },
       {
-        "wall_s": 3.297582005034201,
-        "cpu_s": 4.617915,
-        "peak_rss_mb": 77.0078125
+        "wall_s": 15.972379436949268,
+        "cpu_s": 14.557027999999999,
+        "peak_rss_mb": 101.89453125
       },
       {
-        "wall_s": 3.335322247003205,
-        "cpu_s": 4.6923829999999995,
-        "peak_rss_mb": 76.7734375
+        "wall_s": 15.551648178021424,
+        "cpu_s": 14.198724,
+        "peak_rss_mb": 101.93359375
       }
     ],
     "candidate_unthinned_threads1": [
       {
-        "wall_s": 3.607109431992285,
-        "cpu_s": 4.973516999999999,
-        "peak_rss_mb": 76.83984375
+        "wall_s": 16.91891794395633,
+        "cpu_s": 15.479403,
+        "peak_rss_mb": 101.98046875
       },
       {
-        "wall_s": 3.602577061858028,
-        "cpu_s": 4.9516599999999995,
-        "peak_rss_mb": 76.83984375
+        "wall_s": 17.18722500698641,
+        "cpu_s": 15.683658,
+        "peak_rss_mb": 102.078125
       },
       {
-        "wall_s": 3.593496449990198,
-        "cpu_s": 4.9600040000000005,
-        "peak_rss_mb": 76.87890625
+        "wall_s": 17.035543476929888,
+        "cpu_s": 15.575310000000002,
+        "peak_rss_mb": 101.91796875
       }
     ]
   },
   "counts": {
     "candidate_threads1": {
-      "into_simtel_weight": 7242808.0,
-      "into_trace_photons": 3723604,
-      "out_of_trace_photons": 7242808
+      "into_simtel_weight": 24961460.0,
+      "into_trace_photons": 13529244,
+      "out_of_trace_photons": 24961460
     },
     "candidate_threadsdefault": {
-      "into_simtel_weight": 7242808.0,
-      "into_trace_photons": 3723604,
-      "out_of_trace_photons": 7242808
+      "into_simtel_weight": 24961460.0,
+      "into_trace_photons": 13529244,
+      "out_of_trace_photons": 24961460
     },
     "reference": {
-      "into_simtel_weight": 18605134.335775957
+      "into_simtel_weight": 67708779.5446427
     },
     "candidate_envelope": {
-      "into_trace_photons": 1370276,
-      "out_of_trace_photons": 777500,
-      "into_simtel_photons": 777500
+      "into_trace_photons": 4696846,
+      "out_of_trace_photons": 2662129,
+      "into_simtel_photons": 2662129
     },
     "candidate_envelope_threads1": {
-      "into_trace_photons": 1370276,
-      "out_of_trace_photons": 777500,
-      "into_simtel_photons": 777500
+      "into_trace_photons": 4696846,
+      "out_of_trace_photons": 2662129,
+      "into_simtel_photons": 2662129
     },
     "candidate_unthinned_threads1": {
-      "into_trace_photons": 1849435,
-      "out_of_trace_photons": 2362125,
-      "into_simtel_photons": 2362125
+      "into_trace_photons": 5831902,
+      "out_of_trace_photons": 8079317,
+      "into_simtel_photons": 8079317
     },
     "physics_envelope": {
-      "into_trace_photons": 1370276,
-      "out_of_trace_photons": 777500,
-      "into_simtel_photons": 777500
+      "into_trace_photons": 4696846,
+      "out_of_trace_photons": 2662129,
+      "into_simtel_photons": 2662129
     }
   },
   "failures": {},
@@ -3655,7 +3703,7 @@
           "se": 0.0,
           "mcnemar_p": 1.0,
           "flag": 0,
-          "both": 100,
+          "both": 500,
           "reference_only": 0,
           "candidate_only": 0
         }
@@ -3668,7 +3716,7 @@
           "se": 0.0,
           "mcnemar_p": 1.0,
           "flag": 0,
-          "both": 100,
+          "both": 500,
           "reference_only": 0,
           "candidate_only": 0
         }
@@ -3681,7 +3729,7 @@
           "se": 0.0,
           "mcnemar_p": 1.0,
           "flag": 0,
-          "both": 100,
+          "both": 500,
           "reference_only": 0,
           "candidate_only": 0
         }
@@ -3693,10 +3741,7 @@
     "spread_limit": 0.05,
     "load_limit": 1.0,
     "reasons": [
-      "reference wall spread 0.189 > 0.05",
-      "candidate_threads1 wall spread 0.058 > 0.05",
-      "candidate_threadsdefault wall spread 0.115 > 0.05",
-      "host_loadavg_before 1.18 > 1.0"
+      "host_loadavg_before 1.36 > 1.0"
     ]
   }
 }

@@ -205,6 +205,8 @@ def chain_commands(work, iact, inputs):
                 "--wavelength-range",
                 250,
                 700,
+                "--telescopes",
+                ",".join(map(str, co.TELESCOPES)),
                 "-i",
                 native,
                 "-o",

@@ -389,6 +389,8 @@ def shower_candidate(work, source, inputs, threads):
                     "--wavelength-range",
                     250,
                     700,
+                    "--telescopes",
+                    ",".join(map(str, co.TELESCOPES)),
                     "-i",
                     native,
                     "-o",
@@ -690,8 +692,9 @@ def envelope_pipeline(
 ):
     """One pipe: from-corsika | propagation | trace-stream | to-simtel | sim_telarray.
 
-    envelope None gives the unthinned chain (weighted propagation, no scaled table). Only the
-    telescope is traced (trace-stream); propagation covers all telescopes. sim_argv reads standard input ("-") and is the last stage.
+    envelope None gives the unthinned chain (weighted propagation, no scaled table). Propagation
+    and trace-stream keep only the telescope; the photons of the others are not processed.
+    sim_argv reads standard input ("-") and is the last stage.
     """
     thinned = envelope is not None
     propagation = [
@@ -706,7 +709,9 @@ def envelope_pipeline(
         28,
         "--seed",
         123,
-    ]  # no --telescopes: the image's obdeect has none; thinning and wavelengths are keyed by telescope
+        "--telescopes",
+        str(telescope),
+    ]
     if thinned:
         propagation += ["--envelope", f"{ENVELOPE_FACTOR}={envelope}"]
     else:

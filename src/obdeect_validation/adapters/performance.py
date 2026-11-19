@@ -35,7 +35,7 @@ from eventio.iact import IACTFile
 from obdeect_validation.adapters import common
 
 REPS = 3
-INPUT = common.SHOWERS
+INPUT = common.VALIDATION / "inputs/gamma-20deg-100-3000GeV-100showers.iact"
 RUSAGE = []
 SPREAD_LIMIT = (
     0.05  # (max - min) / median of a stage's wall time above this: timing unreliable
@@ -532,6 +532,8 @@ def main():
                     "--wavelength-range",
                     250,
                     700,
+                    "--telescopes",
+                    ",".join(map(str, co.TELESCOPES)),
                     "-i",
                     stream,
                     "-o",
@@ -563,6 +565,8 @@ def main():
                     123,
                     "--envelope",
                     f"{chain.ENVELOPE_FACTOR}={envelope['envelope']}",
+                    "--telescopes",
+                    ",".join(map(str, co.TELESCOPES)),
                     "-i",
                     stream,
                     "-o",

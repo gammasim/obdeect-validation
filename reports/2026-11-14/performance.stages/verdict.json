@@ -115,14 +115,14 @@
       "status": "PASS"
     },
     {
-      "actual": 1.8466951262929926e-11,
+      "actual": 1.1546007454229786e-10,
       "atol": 1e-06,
       "expected": 0,
       "metric": "iact_input_vs_stream_weight_relative_delta",
       "status": "PASS"
     },
     {
-      "actual": 1.8466951263270954e-11,
+      "actual": 1.1546007452896684e-10,
       "atol": 1e-06,
       "expected": 0,
       "metric": "from_corsika_to_simtel_weight_relative_delta",

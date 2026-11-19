@@ -1,11 +1,11 @@
 {
   "case": "point-source",
   "host": {
-    "nproc": 6,
+    "nproc": 1,
     "cpu_model": "0x000",
     "machine": "aarch64",
     "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
-    "obdeect_version": "obdeect-stream 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-propagation 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-sources 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-ray-tracing 0.9.3.dev2+g31749a2a6.d20261117\nphoton-stream format 1.0",
+    "obdeect_version": "obdeect-stream 0.9.3.dev7+g34d812c61\nobdeect-propagation 0.9.3.dev7+g34d812c61\nobdeect-sources 0.9.3.dev7+g34d812c61\nobdeect-ray-tracing 0.9.3.dev7+g34d812c61\nphoton-stream format 1.0",
     "host": "Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs"
   },
   "settings": {
@@ -22,9 +22,9 @@
     "reference": {
       "light_emission": [
         {
-          "wall_s": 0.04555456503294408,
-          "cpu_s": 0.041163000000000005,
-          "peak_rss_mb": 11.58984375,
+          "wall_s": 0.04518645501229912,
+          "cpu_s": 0.041315,
+          "peak_rss_mb": 11.53515625,
           "argv": [
             [
               "xyzls",
@@ -38,14 +38,14 @@
               "-a",
               "isotropic",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/reference/reference.dat"
+              "/tmp/perf-chain-aw9jfcsz/reference/reference.dat"
             ]
           ]
         },
         {
-          "wall_s": 0.0430470269639045,
-          "cpu_s": 0.040434,
-          "peak_rss_mb": 11.40625,
+          "wall_s": 0.0429597879992798,
+          "cpu_s": 0.040491,
+          "peak_rss_mb": 11.6328125,
           "argv": [
             [
               "xyzls",
@@ -59,14 +59,14 @@
               "-a",
               "isotropic",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/reference/reference.dat"
+              "/tmp/perf-chain-aw9jfcsz/reference/reference.dat"
             ]
           ]
         },
         {
-          "wall_s": 0.042241069953888655,
-          "cpu_s": 0.039774,
-          "peak_rss_mb": 11.55859375,
+          "wall_s": 0.046877746004611254,
+          "cpu_s": 0.044385999999999995,
+          "peak_rss_mb": 11.6015625,
           "argv": [
             [
               "xyzls",
@@ -80,16 +80,16 @@
               "-a",
               "isotropic",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/reference/reference.dat"
+              "/tmp/perf-chain-aw9jfcsz/reference/reference.dat"
             ]
           ]
         }
       ],
       "sim_telarray": [
         {
-          "wall_s": 0.13730686192866415,
-          "cpu_s": 0.09516,
-          "peak_rss_mb": 37.24609375,
+          "wall_s": 0.13613686396274716,
+          "cpu_s": 0.107251,
+          "peak_rss_mb": 37.06640625,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -103,9 +103,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-5zx8lc4j/reference/reference.hdata",
+              "histogram_file=/tmp/perf-chain-aw9jfcsz/reference/reference.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-5zx8lc4j/reference/reference.simtel",
+              "output_file=/tmp/perf-chain-aw9jfcsz/reference/reference.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -130,14 +130,14 @@
               "telescope_phi=0",
               "-C",
               "Bypass_Optics=0",
-              "/tmp/perf-chain-5zx8lc4j/reference/reference.dat"
+              "/tmp/perf-chain-aw9jfcsz/reference/reference.dat"
             ]
           ]
         },
         {
-          "wall_s": 0.12788795703090727,
-          "cpu_s": 0.09482299999999999,
-          "peak_rss_mb": 37.359375,
+          "wall_s": 0.12132507294882089,
+          "cpu_s": 0.09431500000000001,
+          "peak_rss_mb": 37.2890625,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -151,9 +151,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-5zx8lc4j/reference/reference.hdata",
+              "histogram_file=/tmp/perf-chain-aw9jfcsz/reference/reference.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-5zx8lc4j/reference/reference.simtel",
+              "output_file=/tmp/perf-chain-aw9jfcsz/reference/reference.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -178,14 +178,14 @@
               "telescope_phi=0",
               "-C",
               "Bypass_Optics=0",
-              "/tmp/perf-chain-5zx8lc4j/reference/reference.dat"
+              "/tmp/perf-chain-aw9jfcsz/reference/reference.dat"
             ]
           ]
         },
         {
-          "wall_s": 0.1339903239859268,
-          "cpu_s": 0.09321,
-          "peak_rss_mb": 37.33984375,
+          "wall_s": 0.12191886501386762,
+          "cpu_s": 0.09493199999999999,
+          "peak_rss_mb": 37.0390625,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -199,9 +199,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-5zx8lc4j/reference/reference.hdata",
+              "histogram_file=/tmp/perf-chain-aw9jfcsz/reference/reference.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-5zx8lc4j/reference/reference.simtel",
+              "output_file=/tmp/perf-chain-aw9jfcsz/reference/reference.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -226,7 +226,7 @@
               "telescope_phi=0",
               "-C",
               "Bypass_Optics=0",
-              "/tmp/perf-chain-5zx8lc4j/reference/reference.dat"
+              "/tmp/perf-chain-aw9jfcsz/reference/reference.dat"
             ]
           ]
         }
@@ -235,9 +235,9 @@
     "candidate_threads1": {
       "sources": [
         {
-          "wall_s": 0.001380539033561945,
-          "cpu_s": 0.001077,
-          "peak_rss_mb": 0.70703125,
+          "wall_s": 0.0017735830042511225,
+          "cpu_s": 0.0011359999999999999,
+          "peak_rss_mb": 2.62109375,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/sources/bin/obdeect-sources-point-source",
@@ -252,14 +252,14 @@
               "--seed",
               "17",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/native.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/native.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.0014620820293202996,
-          "cpu_s": 0.001126,
-          "peak_rss_mb": 0.46484375,
+          "wall_s": 0.0019708750769495964,
+          "cpu_s": 0.0016099999999999999,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/sources/bin/obdeect-sources-point-source",
@@ -274,14 +274,14 @@
               "--seed",
               "17",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/native.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/native.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.001361330971121788,
-          "cpu_s": 0.001104,
-          "peak_rss_mb": 0.33984375,
+          "wall_s": 0.0013371249660849571,
+          "cpu_s": 0.000959,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/sources/bin/obdeect-sources-point-source",
@@ -296,16 +296,16 @@
               "--seed",
               "17",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/native.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/native.gst"
             ]
           ]
         }
       ],
       "propagation": [
         {
-          "wall_s": 0.0012803740100935102,
-          "cpu_s": 0.001,
-          "peak_rss_mb": 0.84375,
+          "wall_s": 0.0012416669633239508,
+          "cpu_s": 0.001004,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
@@ -318,16 +318,16 @@
               "300",
               "800",
               "-i",
-              "/tmp/perf-chain-5zx8lc4j/candidate/native.gst",
+              "/tmp/perf-chain-aw9jfcsz/candidate/native.gst",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/propagated.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.0012338319793343544,
-          "cpu_s": 0.001008,
-          "peak_rss_mb": 0.52734375,
+          "wall_s": 0.0012214579619467258,
+          "cpu_s": 0.0009609999999999999,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
@@ -340,16 +340,16 @@
               "300",
               "800",
               "-i",
-              "/tmp/perf-chain-5zx8lc4j/candidate/native.gst",
+              "/tmp/perf-chain-aw9jfcsz/candidate/native.gst",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/propagated.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.0011002910323441029,
-          "cpu_s": 0.000935,
-          "peak_rss_mb": 0.73828125,
+          "wall_s": 0.0012565000215545297,
+          "cpu_s": 0.0009889999999999999,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
@@ -362,59 +362,59 @@
               "300",
               "800",
               "-i",
-              "/tmp/perf-chain-5zx8lc4j/candidate/native.gst",
+              "/tmp/perf-chain-aw9jfcsz/candidate/native.gst",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/propagated.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/propagated.gst"
             ]
           ]
         }
       ],
       "to_simtel": [
         {
-          "wall_s": 0.0015220389468595386,
-          "cpu_s": 0.0013,
-          "peak_rss_mb": 0.76171875,
+          "wall_s": 0.0014530830085277557,
+          "cpu_s": 0.001207,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/candidate.iact",
-              "/tmp/perf-chain-5zx8lc4j/candidate/propagated.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/candidate.iact",
+              "/tmp/perf-chain-aw9jfcsz/candidate/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.0015145809156820178,
-          "cpu_s": 0.001308,
-          "peak_rss_mb": 0.46875,
+          "wall_s": 0.0014962080167606473,
+          "cpu_s": 0.001215,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/candidate.iact",
-              "/tmp/perf-chain-5zx8lc4j/candidate/propagated.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/candidate.iact",
+              "/tmp/perf-chain-aw9jfcsz/candidate/propagated.gst"
             ]
           ]
         },
         {
-          "wall_s": 0.0016808720538392663,
-          "cpu_s": 0.00137,
-          "peak_rss_mb": 0.41796875,
+          "wall_s": 0.001523209037259221,
+          "cpu_s": 0.0012339999999999999,
+          "peak_rss_mb": 38.796875,
           "argv": [
             [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "-o",
-              "/tmp/perf-chain-5zx8lc4j/candidate/candidate.iact",
-              "/tmp/perf-chain-5zx8lc4j/candidate/propagated.gst"
+              "/tmp/perf-chain-aw9jfcsz/candidate/candidate.iact",
+              "/tmp/perf-chain-aw9jfcsz/candidate/propagated.gst"
             ]
           ]
         }
       ],
       "sim_telarray": [
         {
-          "wall_s": 0.13260874198749661,
-          "cpu_s": 0.09525499999999999,
-          "peak_rss_mb": 36.96875,
+          "wall_s": 0.12173119897488505,
+          "cpu_s": 0.094248,
+          "peak_rss_mb": 37.14453125,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -428,9 +428,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-5zx8lc4j/candidate/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-aw9jfcsz/candidate/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-5zx8lc4j/candidate/candidate.simtel",
+              "output_file=/tmp/perf-chain-aw9jfcsz/candidate/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -455,14 +455,14 @@
               "telescope_phi=0",
               "-C",
               "Bypass_Optics=0",
-              "/tmp/perf-chain-5zx8lc4j/candidate/candidate.iact"
+              "/tmp/perf-chain-aw9jfcsz/candidate/candidate.iact"
             ]
           ]
         },
         {
-          "wall_s": 0.1329629090614617,
-          "cpu_s": 0.093415,
-          "peak_rss_mb": 37.19140625,
+          "wall_s": 0.1185942409792915,
+          "cpu_s": 0.09367999999999999,
+          "peak_rss_mb": 37.046875,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -476,9 +476,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-5zx8lc4j/candidate/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-aw9jfcsz/candidate/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-5zx8lc4j/candidate/candidate.simtel",
+              "output_file=/tmp/perf-chain-aw9jfcsz/candidate/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -503,14 +503,14 @@
               "telescope_phi=0",
               "-C",
               "Bypass_Optics=0",
-              "/tmp/perf-chain-5zx8lc4j/candidate/candidate.iact"
+              "/tmp/perf-chain-aw9jfcsz/candidate/candidate.iact"
             ]
           ]
         },
         {
-          "wall_s": 0.13002812094055116,
-          "cpu_s": 0.09116899999999999,
-          "peak_rss_mb": 37.03125,
+          "wall_s": 0.12147394905332476,
+          "cpu_s": 0.093998,
+          "peak_rss_mb": 37.0703125,
           "argv": [
             [
               "/workdir/simulation_software/sim_telarray/bin/sim_telarray",
@@ -524,9 +524,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-chain-5zx8lc4j/candidate/candidate.hdata",
+              "histogram_file=/tmp/perf-chain-aw9jfcsz/candidate/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-chain-5zx8lc4j/candidate/candidate.simtel",
+              "output_file=/tmp/perf-chain-aw9jfcsz/candidate/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -551,7 +551,7 @@
               "telescope_phi=0",
               "-C",
               "Bypass_Optics=0",
-              "/tmp/perf-chain-5zx8lc4j/candidate/candidate.iact"
+              "/tmp/perf-chain-aw9jfcsz/candidate/candidate.iact"
             ]
           ]
         }
@@ -561,36 +561,36 @@
   "pipelines": {
     "reference": [
       {
-        "wall_s": 0.18286142696160823,
-        "cpu_s": 0.136323,
-        "peak_rss_mb": 37.24609375
+        "wall_s": 0.18132331897504628,
+        "cpu_s": 0.148566,
+        "peak_rss_mb": 37.06640625
       },
       {
-        "wall_s": 0.17093498399481177,
-        "cpu_s": 0.135257,
-        "peak_rss_mb": 37.359375
+        "wall_s": 0.16428486094810069,
+        "cpu_s": 0.134806,
+        "peak_rss_mb": 37.2890625
       },
       {
-        "wall_s": 0.17623139393981546,
-        "cpu_s": 0.132984,
-        "peak_rss_mb": 37.33984375
+        "wall_s": 0.16879661101847887,
+        "cpu_s": 0.139318,
+        "peak_rss_mb": 37.0390625
       }
     ],
     "candidate_threads1": [
       {
-        "wall_s": 0.1367916939780116,
-        "cpu_s": 0.098632,
-        "peak_rss_mb": 36.96875
+        "wall_s": 0.12619953195098788,
+        "cpu_s": 0.097595,
+        "peak_rss_mb": 38.796875
       },
       {
-        "wall_s": 0.13717340398579836,
-        "cpu_s": 0.096857,
-        "peak_rss_mb": 37.19140625
+        "wall_s": 0.12328278203494847,
+        "cpu_s": 0.09746599999999998,
+        "peak_rss_mb": 38.796875
       },
       {
-        "wall_s": 0.13417061499785632,
-        "cpu_s": 0.09457799999999998,
-        "peak_rss_mb": 37.03125
+        "wall_s": 0.12559078307822347,
+        "cpu_s": 0.09718,
+        "peak_rss_mb": 38.796875
       }
     ]
   },
@@ -601,8 +601,8 @@
     "spread_limit": 0.05,
     "load_limit": 1.0,
     "reasons": [
-      "reference wall spread 0.068 > 0.05",
-      "host_loadavg_before 1.63 > 1.0"
+      "reference wall spread 0.101 > 0.05",
+      "host_loadavg_before 1.98 > 1.0"
     ]
   }
 }

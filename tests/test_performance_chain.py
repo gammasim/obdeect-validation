@@ -358,7 +358,7 @@ def test_envelope_pipeline_thins_with_the_qe_bound_on_one_telescope() -> None:
     ]
     stage = dict(stages)
     assert option(stage["propagation"], "--envelope") == "qe=envelope.dat"
-    assert "--telescopes" not in stage["propagation"]
+    assert option(stage["propagation"], "--telescopes") == "1"
     assert (
         "--mode" not in stage["propagation"]
         and "--wavelength-range" not in stage["propagation"]

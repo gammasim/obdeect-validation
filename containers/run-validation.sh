@@ -45,12 +45,15 @@ host_description() {
 
 mkdir -p "$output"
 output=$(cd "$output" && pwd)
-podman build --rm \
-  --ignorefile obdeect-validation/containers/context.ignore \
-  --build-arg "SIMTOOLS_PROD_IMAGE=$SIMTOOLS_PROD_IMAGE" \
-  --file obdeect-validation/containers/Dockerfile.simtools-prod \
-  --tag "$image" .
-if [[ "${MODE3:-0}" == 1 ]]; then
+# SKIP_BUILD=1 reuses the images built by an earlier call (several cases one after another).
+if [[ "${SKIP_BUILD:-0}" != 1 ]]; then
+  podman build --rm \
+    --ignorefile obdeect-validation/containers/context.ignore \
+    --build-arg "SIMTOOLS_PROD_IMAGE=$SIMTOOLS_PROD_IMAGE" \
+    --file obdeect-validation/containers/Dockerfile.simtools-prod \
+    --tag "$image" .
+fi
+if [[ "${MODE3:-0}" == 1 && "${SKIP_BUILD:-0}" != 1 ]]; then
   # sim_telarray source is the git tree at SIMTEL_REF (default: the mode-3 commit), exported with git archive.
   simtel_ref=${SIMTEL_REF:-b8f2494}
   simtel_commit=$(git -C sim_telarray rev-parse --verify "$simtel_ref^{commit}")
@@ -70,6 +73,11 @@ if [[ "${MODE3:-0}" == 1 ]]; then
     --build-context "hessio=$hessio_src" \
     --file obdeect-validation/containers/Dockerfile.mode3 \
     --tag obdeect-validation:mode3 .
+fi
+if [[ "${BUILD_ONLY:-0}" == 1 ]]; then
+  exit 0
+fi
+if [[ "${MODE3:-0}" == 1 ]]; then
   run_image=obdeect-validation:mode3
   extra_env=(--env SIMTEL_CANDIDATE_BINARY=/opt/mode3/sim_telarray)
 fi
@@ -83,10 +91,18 @@ models=${VALIDATION_MODELS_DIR:-simulation-models-dev}
 mounts=(--volume "$PWD/obdeect-validation:/validation:ro"
         --volume "$PWD/sim_telarray:/reference:ro"
         --volume "$(cd "$models" && pwd):/models:ro")
+# CPUS=0 pins the container to one core (podman --cpuset-cpus; 0,1 for two); unset: all cores.
+# CASE=cases/performance/air-shower.json runs that one case instead of the suite.
+if [[ -n "${CASE:-}" ]]; then
+  select=(--case "/validation/$CASE")
+else
+  select=(--suite "/validation/suites/$suite.json")
+fi
 podman run --rm "${mounts[@]}" ${extra_env[@]+"${extra_env[@]}"} \
+  ${CPUS:+--cpuset-cpus "$CPUS"} \
   --volume "$output:/results:Z" \
   "$run_image" \
   obdeect-validate run \
-    --suite "/validation/suites/$suite.json" \
+    "${select[@]}" \
     --environment "/validation/environments/$environment.json" \
     --output /results --non-interactive

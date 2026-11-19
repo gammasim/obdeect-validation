@@ -191,6 +191,21 @@ def test_tee_groups_telescopes_by_qe_envelope():
     assert pa.group_name([1, 2, 3, 4]) == "tee_tel1_4"
 
 
+def test_with_telescopes_replaces_an_existing_selection():
+    argv = ["obdeect", "propagation", "run", "--telescopes", "1", "-i", "-", "-o", "-"]
+    assert pa.with_telescopes(argv, [1, 2]) == [
+        "obdeect",
+        "propagation",
+        "run",
+        "--telescopes",
+        "1,2",
+        "-i",
+        "-",
+        "-o",
+        "-",
+    ]
+
+
 def test_with_telescopes_selects_before_the_input_option():
     argv = [
         "obdeect",

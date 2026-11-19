@@ -13,22 +13,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ]
         ],
-        "wall_s": 0.3542163680540398,
-        "cpu_s": 0.257032,
-        "peak_rss_mb": 76.828125,
+        "wall_s": 1.4256511210696772,
+        "cpu_s": 1.0601049999999999,
+        "peak_rss_mb": 101.90625,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 0.3542163680540398,
-            "cpu_s": 0.257032,
-            "peak_rss_mb": 76.828125,
+            "wall_s": 1.4256511210696772,
+            "cpu_s": 1.0601049999999999,
+            "peak_rss_mb": 101.90625,
             "returncode": 0
           }
         ]
@@ -37,22 +37,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ]
         ],
-        "wall_s": 0.33701055799610913,
-        "cpu_s": 0.250966,
-        "peak_rss_mb": 76.953125,
+        "wall_s": 0.9857207030290738,
+        "cpu_s": 0.749346,
+        "peak_rss_mb": 101.9453125,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 0.33701055799610913,
-            "cpu_s": 0.250966,
-            "peak_rss_mb": 76.953125,
+            "wall_s": 0.9857207030290738,
+            "cpu_s": 0.749346,
+            "peak_rss_mb": 101.9453125,
             "returncode": 0
           }
         ]
@@ -61,22 +61,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ]
         ],
-        "wall_s": 0.3351386010181159,
-        "cpu_s": 0.249002,
-        "peak_rss_mb": 76.828125,
+        "wall_s": 0.9681226629763842,
+        "cpu_s": 0.738405,
+        "peak_rss_mb": 101.9140625,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 0.3351386010181159,
-            "cpu_s": 0.249002,
-            "peak_rss_mb": 76.828125,
+            "wall_s": 0.9681226629763842,
+            "cpu_s": 0.738405,
+            "peak_rss_mb": 101.9140625,
             "returncode": 0
           }
         ]
@@ -87,39 +87,41 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
             "-"
           ]
         ],
-        "wall_s": 1.5184627569979057,
-        "cpu_s": 1.37861,
-        "peak_rss_mb": 77.00390625,
+        "wall_s": 2.736129794968292,
+        "cpu_s": 2.3883479999999997,
+        "peak_rss_mb": 102.046875,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.513802554924041,
-            "cpu_s": 0.336365,
-            "peak_rss_mb": 77.00390625,
+            "wall_s": 2.736129794968292,
+            "cpu_s": 0.9763789999999999,
+            "peak_rss_mb": 102.046875,
             "returncode": 0
           },
           {
@@ -127,23 +129,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.5184627569979057,
-            "cpu_s": 1.0422449999999999,
-            "peak_rss_mb": 12.53515625,
+            "wall_s": 2.7360250029014423,
+            "cpu_s": 1.411969,
+            "peak_rss_mb": 13.484375,
             "returncode": 0
           }
         ]
@@ -152,39 +156,41 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
             "-"
           ]
         ],
-        "wall_s": 1.5166778420098126,
-        "cpu_s": 1.3675769999999998,
-        "peak_rss_mb": 76.94140625,
+        "wall_s": 2.6793135500047356,
+        "cpu_s": 2.344432,
+        "peak_rss_mb": 101.97265625,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.5120581820374355,
-            "cpu_s": 0.32320099999999996,
-            "peak_rss_mb": 76.94140625,
+            "wall_s": 2.6793135500047356,
+            "cpu_s": 0.923233,
+            "peak_rss_mb": 101.97265625,
             "returncode": 0
           },
           {
@@ -192,23 +198,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.5166778420098126,
-            "cpu_s": 1.044376,
-            "peak_rss_mb": 12.48046875,
+            "wall_s": 2.678522799978964,
+            "cpu_s": 1.4211989999999999,
+            "peak_rss_mb": 13.6328125,
             "returncode": 0
           }
         ]
@@ -217,39 +225,41 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
             "-"
           ]
         ],
-        "wall_s": 1.5366527329897508,
-        "cpu_s": 1.385848,
-        "peak_rss_mb": 76.875,
+        "wall_s": 2.6307976790703833,
+        "cpu_s": 2.3036149999999997,
+        "peak_rss_mb": 101.90625,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.532373446971178,
-            "cpu_s": 0.327027,
-            "peak_rss_mb": 76.875,
+            "wall_s": 2.6307976790703833,
+            "cpu_s": 0.9093229999999999,
+            "peak_rss_mb": 101.90625,
             "returncode": 0
           },
           {
@@ -257,23 +267,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.5366527329897508,
-            "cpu_s": 1.058821,
-            "peak_rss_mb": 12.5234375,
+            "wall_s": 2.630063637974672,
+            "cpu_s": 1.3942919999999999,
+            "peak_rss_mb": 13.66796875,
             "returncode": 0
           }
         ]
@@ -284,20 +296,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -306,7 +320,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -325,19 +339,19 @@
             "-"
           ]
         ],
-        "wall_s": 1.681042834999971,
-        "cpu_s": 1.706201,
-        "peak_rss_mb": 76.953125,
+        "wall_s": 3.584509259904735,
+        "cpu_s": 3.18444,
+        "peak_rss_mb": 101.95703125,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.675884591997601,
-            "cpu_s": 0.35088899999999995,
-            "peak_rss_mb": 76.953125,
+            "wall_s": 3.5835210930090398,
+            "cpu_s": 0.9667789999999999,
+            "peak_rss_mb": 101.95703125,
             "returncode": 0
           },
           {
@@ -345,23 +359,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.681042834999971,
-            "cpu_s": 1.084878,
-            "peak_rss_mb": 12.51953125,
+            "wall_s": 3.5834407180082053,
+            "cpu_s": 1.4394099999999999,
+            "peak_rss_mb": 13.484375,
             "returncode": 0
           },
           {
@@ -369,7 +385,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -387,9 +403,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 1.6808929180260748,
-            "cpu_s": 0.270434,
-            "peak_rss_mb": 9.765625,
+            "wall_s": 3.584509259904735,
+            "cpu_s": 0.778251,
+            "peak_rss_mb": 10.7109375,
             "returncode": 0
           }
         ]
@@ -398,20 +414,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -420,7 +438,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -439,19 +457,19 @@
             "-"
           ]
         ],
-        "wall_s": 1.6620818589581177,
-        "cpu_s": 1.662708,
-        "peak_rss_mb": 76.90234375,
+        "wall_s": 3.562439970090054,
+        "cpu_s": 3.1682749999999995,
+        "peak_rss_mb": 101.95703125,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.6567420749925077,
-            "cpu_s": 0.327847,
-            "peak_rss_mb": 76.90234375,
+            "wall_s": 3.5623254280071706,
+            "cpu_s": 0.9506429999999999,
+            "peak_rss_mb": 101.95703125,
             "returncode": 0
           },
           {
@@ -459,23 +477,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.6620818589581177,
-            "cpu_s": 1.067531,
-            "peak_rss_mb": 12.46484375,
+            "wall_s": 3.5604282200802118,
+            "cpu_s": 1.441779,
+            "peak_rss_mb": 13.484375,
             "returncode": 0
           },
           {
@@ -483,7 +503,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -501,9 +521,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 1.6620551509549841,
-            "cpu_s": 0.26733,
-            "peak_rss_mb": 9.89453125,
+            "wall_s": 3.562439970090054,
+            "cpu_s": 0.7758529999999999,
+            "peak_rss_mb": 10.84765625,
             "returncode": 0
           }
         ]
@@ -512,20 +532,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -534,7 +556,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -553,19 +575,19 @@
             "-"
           ]
         ],
-        "wall_s": 1.65888278093189,
-        "cpu_s": 1.6641979999999998,
-        "peak_rss_mb": 76.90234375,
+        "wall_s": 3.5205123900668696,
+        "cpu_s": 3.1353459999999997,
+        "peak_rss_mb": 101.859375,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.6540739960037172,
-            "cpu_s": 0.328424,
-            "peak_rss_mb": 76.90234375,
+            "wall_s": 3.5203954740427434,
+            "cpu_s": 0.941313,
+            "peak_rss_mb": 101.859375,
             "returncode": 0
           },
           {
@@ -573,23 +595,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.65888278093189,
-            "cpu_s": 1.069432,
-            "peak_rss_mb": 12.5234375,
+            "wall_s": 3.5190624319948256,
+            "cpu_s": 1.424046,
+            "peak_rss_mb": 13.63671875,
             "returncode": 0
           },
           {
@@ -597,7 +621,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -615,9 +639,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 1.6588340729940683,
-            "cpu_s": 0.26634199999999997,
-            "peak_rss_mb": 9.7265625,
+            "wall_s": 3.5205123900668696,
+            "cpu_s": 0.769987,
+            "peak_rss_mb": 10.77734375,
             "returncode": 0
           }
         ]
@@ -628,20 +652,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -650,7 +676,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -671,26 +697,26 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
             "--camera-map",
-            "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+            "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
             "--scaled-factor",
             "qe",
             "-o",
             "-"
           ]
         ],
-        "wall_s": 1.6851156629854813,
-        "cpu_s": 1.725963,
-        "peak_rss_mb": 76.953125,
+        "wall_s": 3.7080595400184393,
+        "cpu_s": 3.2826969999999998,
+        "peak_rss_mb": 101.90625,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.6797986699966714,
-            "cpu_s": 0.348861,
-            "peak_rss_mb": 76.953125,
+            "wall_s": 3.707040415960364,
+            "cpu_s": 0.974185,
+            "peak_rss_mb": 101.90625,
             "returncode": 0
           },
           {
@@ -698,23 +724,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.6848473299760371,
-            "cpu_s": 1.079896,
-            "peak_rss_mb": 12.48046875,
+            "wall_s": 3.7065181660000235,
+            "cpu_s": 1.448591,
+            "peak_rss_mb": 13.64453125,
             "returncode": 0
           },
           {
@@ -722,7 +750,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -740,9 +768,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 1.6847635799786076,
-            "cpu_s": 0.277045,
-            "peak_rss_mb": 9.6328125,
+            "wall_s": 3.7080595400184393,
+            "cpu_s": 0.8085959999999999,
+            "peak_rss_mb": 10.8046875,
             "returncode": 0
           },
           {
@@ -750,15 +778,15 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+              "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
               "--scaled-factor",
               "qe",
               "-o",
               "-"
             ],
-            "wall_s": 1.6851156629854813,
-            "cpu_s": 0.020161,
-            "peak_rss_mb": 13.08203125,
+            "wall_s": 3.707930331933312,
+            "cpu_s": 0.051324999999999996,
+            "peak_rss_mb": 14.85546875,
             "returncode": 0
           }
         ]
@@ -767,20 +795,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -789,7 +819,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -810,26 +840,26 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
             "--camera-map",
-            "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+            "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
             "--scaled-factor",
             "qe",
             "-o",
             "-"
           ]
         ],
-        "wall_s": 1.7014718499267474,
-        "cpu_s": 1.732324,
-        "peak_rss_mb": 76.83984375,
+        "wall_s": 3.733336413046345,
+        "cpu_s": 3.295766,
+        "peak_rss_mb": 101.9609375,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.6960444819414988,
-            "cpu_s": 0.338875,
-            "peak_rss_mb": 76.83984375,
+            "wall_s": 3.732185538043268,
+            "cpu_s": 0.978021,
+            "peak_rss_mb": 101.9609375,
             "returncode": 0
           },
           {
@@ -837,23 +867,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.70116772595793,
-            "cpu_s": 1.098889,
-            "peak_rss_mb": 12.71875,
+            "wall_s": 3.7321063299896196,
+            "cpu_s": 1.4512720000000001,
+            "peak_rss_mb": 13.609375,
             "returncode": 0
           },
           {
@@ -861,7 +893,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -879,9 +911,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 1.7011361418990418,
-            "cpu_s": 0.27419899999999997,
-            "peak_rss_mb": 9.8046875,
+            "wall_s": 3.7332644959678873,
+            "cpu_s": 0.815851,
+            "peak_rss_mb": 10.8515625,
             "returncode": 0
           },
           {
@@ -889,15 +921,15 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+              "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
               "--scaled-factor",
               "qe",
               "-o",
               "-"
             ],
-            "wall_s": 1.7014718499267474,
-            "cpu_s": 0.020361,
-            "peak_rss_mb": 12.9140625,
+            "wall_s": 3.733336413046345,
+            "cpu_s": 0.050622,
+            "peak_rss_mb": 14.80859375,
             "returncode": 0
           }
         ]
@@ -906,20 +938,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -928,7 +962,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -949,26 +983,26 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
             "--camera-map",
-            "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+            "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
             "--scaled-factor",
             "qe",
             "-o",
             "-"
           ]
         ],
-        "wall_s": 1.6732198039535433,
-        "cpu_s": 1.6988549999999998,
-        "peak_rss_mb": 76.90234375,
+        "wall_s": 3.6583237119484693,
+        "cpu_s": 3.245608,
+        "peak_rss_mb": 101.90625,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 1.6675867279991508,
-            "cpu_s": 0.332595,
-            "peak_rss_mb": 76.90234375,
+            "wall_s": 3.6571270040003583,
+            "cpu_s": 0.9498829999999999,
+            "peak_rss_mb": 101.90625,
             "returncode": 0
           },
           {
@@ -976,23 +1010,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 1.6727943459991366,
-            "cpu_s": 1.0754549999999998,
-            "peak_rss_mb": 12.5234375,
+            "wall_s": 3.6571727950358763,
+            "cpu_s": 1.436848,
+            "peak_rss_mb": 13.6015625,
             "returncode": 0
           },
           {
@@ -1000,7 +1036,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -1018,9 +1054,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 1.6728321379050612,
-            "cpu_s": 0.271146,
-            "peak_rss_mb": 9.8984375,
+            "wall_s": 3.6583237119484693,
+            "cpu_s": 0.809161,
+            "peak_rss_mb": 10.8515625,
             "returncode": 0
           },
           {
@@ -1028,15 +1064,15 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+              "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
               "--scaled-factor",
               "qe",
               "-o",
               "-"
             ],
-            "wall_s": 1.6732198039535433,
-            "cpu_s": 0.019659,
-            "peak_rss_mb": 12.82421875,
+            "wall_s": 3.6582315450068563,
+            "cpu_s": 0.049715999999999996,
+            "peak_rss_mb": 14.9765625,
             "returncode": 0
           }
         ]
@@ -1047,20 +1083,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -1069,7 +1107,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -1090,7 +1128,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
             "--camera-map",
-            "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+            "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
             "--scaled-factor",
             "qe",
             "-o",
@@ -1108,9 +1146,9 @@
             "-W",
             "random_state=none",
             "-C",
-            "histogram_file=/tmp/perf-bottleneck-jo92jifm/candidate.hdata",
+            "histogram_file=/tmp/perf-bottleneck-c0io8cxj/candidate.hdata",
             "-C",
-            "output_file=/tmp/perf-bottleneck-jo92jifm/candidate.simtel",
+            "output_file=/tmp/perf-bottleneck-c0io8cxj/candidate.simtel",
             "-C",
             "random_seed=20261113",
             "-C",
@@ -1129,7 +1167,7 @@
             "telescope_phi=180",
             "-C",
             "Bypass_Optics=3",
-            "-I/tmp/perf-bottleneck-jo92jifm/envelope/qe-table",
+            "-I/tmp/perf-bottleneck-c0io8cxj/envelope/qe-table",
             "-I/results/performance.bottleneck/cfg/model/7.0.0",
             "-DTELESCOPE=1",
             "-C",
@@ -1143,19 +1181,19 @@
             "-"
           ]
         ],
-        "wall_s": 2.996610690956004,
-        "cpu_s": 4.052751,
-        "peak_rss_mb": 76.97265625,
+        "wall_s": 15.244542166008614,
+        "cpu_s": 13.989035999999999,
+        "peak_rss_mb": 101.76953125,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 2.9572177019435912,
-            "cpu_s": 0.352666,
-            "peak_rss_mb": 76.97265625,
+            "wall_s": 15.172817922080867,
+            "cpu_s": 1.105528,
+            "peak_rss_mb": 101.76953125,
             "returncode": 0
           },
           {
@@ -1163,23 +1201,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 2.9609524469124153,
-            "cpu_s": 1.114602,
-            "peak_rss_mb": 12.484375,
+            "wall_s": 15.172700672061183,
+            "cpu_s": 1.499659,
+            "peak_rss_mb": 13.5859375,
             "returncode": 0
           },
           {
@@ -1187,7 +1227,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -1205,9 +1245,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 2.960890654940158,
-            "cpu_s": 0.272673,
-            "peak_rss_mb": 10.08984375,
+            "wall_s": 15.194118754006922,
+            "cpu_s": 0.8197929999999999,
+            "peak_rss_mb": 10.78515625,
             "returncode": 0
           },
           {
@@ -1215,15 +1255,15 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+              "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
               "--scaled-factor",
               "qe",
               "-o",
               "-"
             ],
-            "wall_s": 2.962433320004493,
-            "cpu_s": 0.027412,
-            "peak_rss_mb": 12.8828125,
+            "wall_s": 15.216686960076913,
+            "cpu_s": 0.066609,
+            "peak_rss_mb": 14.90625,
             "returncode": 0
           },
           {
@@ -1240,9 +1280,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-bottleneck-jo92jifm/candidate.hdata",
+              "histogram_file=/tmp/perf-bottleneck-c0io8cxj/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-bottleneck-jo92jifm/candidate.simtel",
+              "output_file=/tmp/perf-bottleneck-c0io8cxj/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -1261,7 +1301,7 @@
               "telescope_phi=180",
               "-C",
               "Bypass_Optics=3",
-              "-I/tmp/perf-bottleneck-jo92jifm/envelope/qe-table",
+              "-I/tmp/perf-bottleneck-c0io8cxj/envelope/qe-table",
               "-I/results/performance.bottleneck/cfg/model/7.0.0",
               "-DTELESCOPE=1",
               "-C",
@@ -1274,9 +1314,9 @@
               "atmospheric_transmission=/results/performance.bottleneck/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
               "-"
             ],
-            "wall_s": 2.996610690956004,
-            "cpu_s": 2.285398,
-            "peak_rss_mb": 49.62890625,
+            "wall_s": 15.244542166008614,
+            "cpu_s": 10.497447,
+            "peak_rss_mb": 50.4609375,
             "returncode": 0
           }
         ]
@@ -1285,20 +1325,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -1307,7 +1349,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -1328,7 +1370,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
             "--camera-map",
-            "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+            "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
             "--scaled-factor",
             "qe",
             "-o",
@@ -1346,9 +1388,9 @@
             "-W",
             "random_state=none",
             "-C",
-            "histogram_file=/tmp/perf-bottleneck-jo92jifm/candidate.hdata",
+            "histogram_file=/tmp/perf-bottleneck-c0io8cxj/candidate.hdata",
             "-C",
-            "output_file=/tmp/perf-bottleneck-jo92jifm/candidate.simtel",
+            "output_file=/tmp/perf-bottleneck-c0io8cxj/candidate.simtel",
             "-C",
             "random_seed=20261113",
             "-C",
@@ -1367,7 +1409,7 @@
             "telescope_phi=180",
             "-C",
             "Bypass_Optics=3",
-            "-I/tmp/perf-bottleneck-jo92jifm/envelope/qe-table",
+            "-I/tmp/perf-bottleneck-c0io8cxj/envelope/qe-table",
             "-I/results/performance.bottleneck/cfg/model/7.0.0",
             "-DTELESCOPE=1",
             "-C",
@@ -1381,19 +1423,19 @@
             "-"
           ]
         ],
-        "wall_s": 2.9667722730664536,
-        "cpu_s": 4.026503,
-        "peak_rss_mb": 77.0078125,
+        "wall_s": 15.124707508948632,
+        "cpu_s": 13.885527,
+        "peak_rss_mb": 101.859375,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 2.9272087831050158,
-            "cpu_s": 0.348977,
-            "peak_rss_mb": 77.0078125,
+            "wall_s": 15.053323015919887,
+            "cpu_s": 1.0355509999999999,
+            "peak_rss_mb": 101.859375,
             "returncode": 0
           },
           {
@@ -1401,23 +1443,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 2.93243402603548,
-            "cpu_s": 1.110889,
-            "peak_rss_mb": 12.484375,
+            "wall_s": 15.053047556895763,
+            "cpu_s": 1.4859850000000001,
+            "peak_rss_mb": 13.6015625,
             "returncode": 0
           },
           {
@@ -1425,7 +1469,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -1443,9 +1487,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 2.932402693084441,
-            "cpu_s": 0.284754,
-            "peak_rss_mb": 9.9921875,
+            "wall_s": 15.074701013974845,
+            "cpu_s": 0.8167699999999999,
+            "peak_rss_mb": 10.90234375,
             "returncode": 0
           },
           {
@@ -1453,15 +1497,15 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+              "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
               "--scaled-factor",
               "qe",
               "-o",
               "-"
             ],
-            "wall_s": 2.9340847320854664,
-            "cpu_s": 0.034821,
-            "peak_rss_mb": 13.2109375,
+            "wall_s": 15.097333927988075,
+            "cpu_s": 0.06458799999999999,
+            "peak_rss_mb": 14.9140625,
             "returncode": 0
           },
           {
@@ -1478,9 +1522,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-bottleneck-jo92jifm/candidate.hdata",
+              "histogram_file=/tmp/perf-bottleneck-c0io8cxj/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-bottleneck-jo92jifm/candidate.simtel",
+              "output_file=/tmp/perf-bottleneck-c0io8cxj/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -1499,7 +1543,7 @@
               "telescope_phi=180",
               "-C",
               "Bypass_Optics=3",
-              "-I/tmp/perf-bottleneck-jo92jifm/envelope/qe-table",
+              "-I/tmp/perf-bottleneck-c0io8cxj/envelope/qe-table",
               "-I/results/performance.bottleneck/cfg/model/7.0.0",
               "-DTELESCOPE=1",
               "-C",
@@ -1512,9 +1556,9 @@
               "atmospheric_transmission=/results/performance.bottleneck/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
               "-"
             ],
-            "wall_s": 2.9667722730664536,
-            "cpu_s": 2.2470619999999997,
-            "peak_rss_mb": 48.390625,
+            "wall_s": 15.124707508948632,
+            "cpu_s": 10.482633,
+            "peak_rss_mb": 49.05859375,
             "returncode": 0
           }
         ]
@@ -1523,20 +1567,22 @@
         "argv": [
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-            "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+            "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
           ],
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
             "--transmission",
-            "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+            "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
             "--site-altitude",
             "2156",
             "--pathlen",
             "28",
             "--seed",
             "123",
+            "--telescopes",
+            "1",
             "--envelope",
-            "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+            "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
             "-i",
             "-",
             "-o",
@@ -1545,7 +1591,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
             "--model",
-            "/tmp/perf-bottleneck-jo92jifm/lst.model",
+            "/tmp/perf-bottleneck-c0io8cxj/lst.model",
             "--seed",
             "20261113",
             "--threads",
@@ -1566,7 +1612,7 @@
           [
             "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
             "--camera-map",
-            "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+            "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
             "--scaled-factor",
             "qe",
             "-o",
@@ -1584,9 +1630,9 @@
             "-W",
             "random_state=none",
             "-C",
-            "histogram_file=/tmp/perf-bottleneck-jo92jifm/candidate.hdata",
+            "histogram_file=/tmp/perf-bottleneck-c0io8cxj/candidate.hdata",
             "-C",
-            "output_file=/tmp/perf-bottleneck-jo92jifm/candidate.simtel",
+            "output_file=/tmp/perf-bottleneck-c0io8cxj/candidate.simtel",
             "-C",
             "random_seed=20261113",
             "-C",
@@ -1605,7 +1651,7 @@
             "telescope_phi=180",
             "-C",
             "Bypass_Optics=3",
-            "-I/tmp/perf-bottleneck-jo92jifm/envelope/qe-table",
+            "-I/tmp/perf-bottleneck-c0io8cxj/envelope/qe-table",
             "-I/results/performance.bottleneck/cfg/model/7.0.0",
             "-DTELESCOPE=1",
             "-C",
@@ -1619,19 +1665,19 @@
             "-"
           ]
         ],
-        "wall_s": 2.9966573159908876,
-        "cpu_s": 4.022806,
-        "peak_rss_mb": 77.01171875,
+        "wall_s": 15.225731167010963,
+        "cpu_s": 13.969954999999999,
+        "peak_rss_mb": 101.953125,
         "children": [
           {
             "name": "from_corsika",
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-from-corsika",
-              "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+              "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact"
             ],
-            "wall_s": 2.9575666589662433,
-            "cpu_s": 0.348655,
-            "peak_rss_mb": 77.01171875,
+            "wall_s": 15.150714506977238,
+            "cpu_s": 1.0810629999999999,
+            "peak_rss_mb": 101.953125,
             "returncode": 0
           },
           {
@@ -1639,23 +1685,25 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/propagation/bin/obdeect-propagation-run",
               "--transmission",
-              "/tmp/perf-bottleneck-jo92jifm/atmosphere-below-1000nm.dat",
+              "/tmp/perf-bottleneck-c0io8cxj/atmosphere-below-1000nm.dat",
               "--site-altitude",
               "2156",
               "--pathlen",
               "28",
               "--seed",
               "123",
+              "--telescopes",
+              "1",
               "--envelope",
-              "qe=/tmp/perf-bottleneck-jo92jifm/envelope/qe-envelope.dat",
+              "qe=/tmp/perf-bottleneck-c0io8cxj/envelope/qe-envelope.dat",
               "-i",
               "-",
               "-o",
               "-"
             ],
-            "wall_s": 2.9618612369522452,
-            "cpu_s": 1.116486,
-            "peak_rss_mb": 12.61328125,
+            "wall_s": 15.15079317393247,
+            "cpu_s": 1.497039,
+            "peak_rss_mb": 13.65234375,
             "returncode": 0
           },
           {
@@ -1663,7 +1711,7 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/ray_tracing/bin/obdeect-ray-tracing-trace-stream",
               "--model",
-              "/tmp/perf-bottleneck-jo92jifm/lst.model",
+              "/tmp/perf-bottleneck-c0io8cxj/lst.model",
               "--seed",
               "20261113",
               "--threads",
@@ -1681,9 +1729,9 @@
               "-o",
               "-"
             ],
-            "wall_s": 2.9619931540219113,
-            "cpu_s": 0.27280899999999997,
-            "peak_rss_mb": 9.79296875,
+            "wall_s": 15.175168004934676,
+            "cpu_s": 0.8239949999999999,
+            "peak_rss_mb": 10.7109375,
             "returncode": 0
           },
           {
@@ -1691,15 +1739,15 @@
             "argv": [
               "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
               "--camera-map",
-              "/tmp/perf-bottleneck-jo92jifm/camera-map.txt",
+              "/tmp/perf-bottleneck-c0io8cxj/camera-map.txt",
               "--scaled-factor",
               "qe",
               "-o",
               "-"
             ],
-            "wall_s": 2.9634055680362508,
-            "cpu_s": 0.026666,
-            "peak_rss_mb": 13.07421875,
+            "wall_s": 15.197830293909647,
+            "cpu_s": 0.066325,
+            "peak_rss_mb": 14.86328125,
             "returncode": 0
           },
           {
@@ -1716,9 +1764,9 @@
               "-W",
               "random_state=none",
               "-C",
-              "histogram_file=/tmp/perf-bottleneck-jo92jifm/candidate.hdata",
+              "histogram_file=/tmp/perf-bottleneck-c0io8cxj/candidate.hdata",
               "-C",
-              "output_file=/tmp/perf-bottleneck-jo92jifm/candidate.simtel",
+              "output_file=/tmp/perf-bottleneck-c0io8cxj/candidate.simtel",
               "-C",
               "random_seed=20261113",
               "-C",
@@ -1737,7 +1785,7 @@
               "telescope_phi=180",
               "-C",
               "Bypass_Optics=3",
-              "-I/tmp/perf-bottleneck-jo92jifm/envelope/qe-table",
+              "-I/tmp/perf-bottleneck-c0io8cxj/envelope/qe-table",
               "-I/results/performance.bottleneck/cfg/model/7.0.0",
               "-DTELESCOPE=1",
               "-C",
@@ -1750,9 +1798,9 @@
               "atmospheric_transmission=/results/performance.bottleneck/cfg/model/7.0.0/atmospheric_transmission-2.0.0-OBS-North.dat",
               "-"
             ],
-            "wall_s": 2.9966573159908876,
-            "cpu_s": 2.25819,
-            "peak_rss_mb": 49.3515625,
+            "wall_s": 15.225731167010963,
+            "cpu_s": 10.501532999999998,
+            "peak_rss_mb": 50.03125,
             "returncode": 0
           }
         ]
@@ -1774,12 +1822,12 @@
         "--seed",
         "20261113",
         "--output",
-        "/tmp/perf-bottleneck-jo92jifm/lst.model"
+        "/tmp/perf-bottleneck-c0io8cxj/lst.model"
       ]
     ],
-    "wall_s": 0.19593790895305574,
-    "cpu_s": 0.528475,
-    "peak_rss_mb": 39.28125,
+    "wall_s": 0.18106777500361204,
+    "cpu_s": 0.100324,
+    "peak_rss_mb": 39.1328125,
     "children": [
       {
         "name": "compile_model",
@@ -1796,33 +1844,33 @@
           "--seed",
           "20261113",
           "--output",
-          "/tmp/perf-bottleneck-jo92jifm/lst.model"
+          "/tmp/perf-bottleneck-c0io8cxj/lst.model"
         ],
-        "wall_s": 0.19593790895305574,
-        "cpu_s": 0.528475,
-        "peak_rss_mb": 39.28125,
+        "wall_s": 0.18106777500361204,
+        "cpu_s": 0.100324,
+        "peak_rss_mb": 39.1328125,
         "returncode": 0
       }
     ]
   },
   "failures": {},
   "host_info": {
-    "nproc": 6,
+    "nproc": 1,
     "cpu_model": "0x000",
     "machine": "aarch64",
     "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
-    "obdeect_version": "obdeect-stream 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-propagation 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-sources 0.9.3.dev2+g31749a2a6.d20261117\nobdeect-ray-tracing 0.9.3.dev2+g31749a2a6.d20261117\nphoton-stream format 1.0",
+    "obdeect_version": "obdeect-stream 0.9.3.dev7+g34d812c61\nobdeect-propagation 0.9.3.dev7+g34d812c61\nobdeect-sources 0.9.3.dev7+g34d812c61\nobdeect-ray-tracing 0.9.3.dev7+g34d812c61\nphoton-stream format 1.0",
     "host": "Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs"
   },
   "settings": {
     "reps": 3,
     "threads": 1,
-    "input": "/validation/inputs/gamma-20deg-100-3000GeV.iact",
-    "events": 20,
+    "input": "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact",
+    "events": 100,
     "config": "/results/performance.bottleneck/cfg/model/7.0.0/CTAO.cfg",
     "candidate_atmosphere": "obdeect propagation (reference atmosphere below 1000 nm); sim_telarray unit table",
     "headroom": 0.7256894049346879,
-    "work_dir": "/tmp/perf-bottleneck-jo92jifm",
+    "work_dir": "/tmp/perf-bottleneck-c0io8cxj",
     "timing": "pipe wall from start to last exit; CPU per member (wait4 rusage)"
   }
 }

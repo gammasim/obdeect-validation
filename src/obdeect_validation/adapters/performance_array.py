@@ -76,7 +76,7 @@ from obdeect_validation.adapters import (
     performance_chain as pc,
 )
 
-INPUT = common.VALIDATION / "inputs/gamma-20deg-100-3000GeV-array-north.iact"
+INPUT = common.VALIDATION / "inputs/gamma-20deg-100-3000GeV-array-north-100showers.iact"
 # (CORSIKA telescope number = sim_telarray TELESCOPE index, element name), as in the simtools config.
 ARRAY = (
     (1, "LSTN-01"),
@@ -268,7 +268,14 @@ def group_name(telescopes):
 
 
 def with_telescopes(argv, telescopes):
-    """Propagation argv with the telescope selection (--telescopes) before its input option."""
+    """Propagation argv with the telescope selection (--telescopes) before its input option.
+
+    A selection already in argv (performance_chain.envelope_pipeline keeps one telescope) is replaced.
+    """
+    argv = list(argv)
+    if "--telescopes" in argv:
+        index = argv.index("--telescopes")
+        del argv[index : index + 2]
     index = argv.index("-i")
     return [
         *argv[:index],
@@ -408,11 +415,21 @@ def run_fan_out(pipe, branches, logs):
         "children": children,
     }
     performance.RUSAGE.append(record)
-    for child in children:
-        if child["returncode"]:
-            raise RuntimeError(
-                f"{child['name']} exited {child['returncode']}; see {logs[child['name']]}"
+    failed = [child for child in children if child["returncode"]]
+    if failed:
+        # The temporary work directory is removed afterwards: keep the evidence in the error.
+        tails = "".join(
+            f"\n--- {child['name']} exited {child['returncode']} ({logs[child['name']]}):\n"
+            + "".join(
+                Path(logs[child["name"]])
+                .read_text(errors="replace")
+                .splitlines(keepends=True)[-15:]
             )
+            for child in failed
+        )
+        raise RuntimeError(
+            f"{failed[0]['name']} exited {failed[0]['returncode']}{tails}"
+        )
     return record
 
 
