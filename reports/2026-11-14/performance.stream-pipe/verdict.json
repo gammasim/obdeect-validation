@@ -1,0 +1,37 @@
+{
+  "name": "Stream pipe throughput, budget >= 1 GB/s: cat | tee and cat | obdeect stream to-simtel on the CORSIKA native stream",
+  "status": "FAIL",
+  "metrics": [
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "cat_tee_pipe_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "to_simtel_pipe_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 0,
+      "metric": "cat_tee_pipe_throughput_budget_exceeded",
+      "status": "FAIL"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 0,
+      "metric": "to_simtel_pipe_throughput_budget_exceeded",
+      "status": "FAIL"
+    }
+  ],
+  "missing": [],
+  "missing_inputs": [],
+  "missing_modules": []
+}

@@ -1,0 +1,66 @@
+{
+  "id": "performance.bottleneck",
+  "name": "Bottleneck of the envelope pipe (LSTN-01 7.0.0, 20 deg gamma): prefix pipes from-corsika to sim_telarray, marginal wall per member (report only)",
+  "requires": [
+    "obdeect",
+    "simtools-generate-array-config",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "measure-bottleneck",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_bottleneck",
+        "--config",
+        "cfg/model/7.0.0/CTAO.cfg"
+      ],
+      "timeout": 7200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "prefix1_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "prefix2_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "prefix3_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "prefix4_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "prefix5_completed",
+      "expected": 1,
+      "atol": 0
+    }
+  ]
+}

@@ -1,0 +1,290 @@
+{
+  "host": {
+    "nproc": 1,
+    "cpu_model": "0x000",
+    "machine": "aarch64",
+    "platform": "Linux-7.1.3-200.fc44.aarch64-aarch64-with-glibc2.34",
+    "obdeect_version": "obdeect-stream 0.9.3.dev7+g34d812c61\nobdeect-propagation 0.9.3.dev7+g34d812c61\nobdeect-sources 0.9.3.dev7+g34d812c61\nobdeect-ray-tracing 0.9.3.dev7+g34d812c61\nphoton-stream format 1.0",
+    "host": "Apple M3 Pro (6 performance + 6 efficiency cores), podman VM 6 CPUs"
+  },
+  "pipes": {
+    "cat_tee": {
+      "stages": [
+        "cat",
+        "tee"
+      ],
+      "records": [
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/perf-pipe-xiufpk1b/showers.gst"
+            ],
+            [
+              "tee",
+              "/tmp/perf-pipe-xiufpk1b/tee-copy.gst"
+            ]
+          ],
+          "wall_s": 1.8747836638940498,
+          "cpu_s": 1.7002899999999999,
+          "peak_rss_mb": 2.3515625,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/perf-pipe-xiufpk1b/showers.gst"
+              ],
+              "wall_s": 1.8747836638940498,
+              "cpu_s": 0.609663,
+              "peak_rss_mb": 2.3515625,
+              "returncode": 0
+            },
+            {
+              "name": "tee",
+              "argv": [
+                "tee",
+                "/tmp/perf-pipe-xiufpk1b/tee-copy.gst"
+              ],
+              "wall_s": 1.8747437469428405,
+              "cpu_s": 1.090627,
+              "peak_rss_mb": 2.28515625,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/perf-pipe-xiufpk1b/showers.gst"
+            ],
+            [
+              "tee",
+              "/tmp/perf-pipe-xiufpk1b/tee-copy.gst"
+            ]
+          ],
+          "wall_s": 1.876763581065461,
+          "cpu_s": 1.721612,
+          "peak_rss_mb": 2.3515625,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/perf-pipe-xiufpk1b/showers.gst"
+              ],
+              "wall_s": 1.876763581065461,
+              "cpu_s": 0.49954699999999996,
+              "peak_rss_mb": 2.3515625,
+              "returncode": 0
+            },
+            {
+              "name": "tee",
+              "argv": [
+                "tee",
+                "/tmp/perf-pipe-xiufpk1b/tee-copy.gst"
+              ],
+              "wall_s": 1.8767178719863296,
+              "cpu_s": 1.222065,
+              "peak_rss_mb": 2.17578125,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/perf-pipe-xiufpk1b/showers.gst"
+            ],
+            [
+              "tee",
+              "/tmp/perf-pipe-xiufpk1b/tee-copy.gst"
+            ]
+          ],
+          "wall_s": 2.5108729399507865,
+          "cpu_s": 1.394545,
+          "peak_rss_mb": 2.37109375,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/perf-pipe-xiufpk1b/showers.gst"
+              ],
+              "wall_s": 2.5108729399507865,
+              "cpu_s": 0.428888,
+              "peak_rss_mb": 2.23046875,
+              "returncode": 0
+            },
+            {
+              "name": "tee",
+              "argv": [
+                "tee",
+                "/tmp/perf-pipe-xiufpk1b/tee-copy.gst"
+              ],
+              "wall_s": 2.5107709399890155,
+              "cpu_s": 0.965657,
+              "peak_rss_mb": 2.37109375,
+              "returncode": 0
+            }
+          ]
+        }
+      ],
+      "gb_per_s_per_rep": [
+        0.6838326238330463,
+        0.6831112053400842,
+        0.5105946269129524
+      ]
+    },
+    "to_simtel": {
+      "stages": [
+        "cat",
+        "to_simtel"
+      ],
+      "records": [
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/perf-pipe-xiufpk1b/showers.gst"
+            ],
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/perf-pipe-xiufpk1b/roundtrip.iact"
+            ]
+          ],
+          "wall_s": 1.4716039079939947,
+          "cpu_s": 1.3344909999999999,
+          "peak_rss_mb": 59.81640625,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/perf-pipe-xiufpk1b/showers.gst"
+              ],
+              "wall_s": 1.4690964090405032,
+              "cpu_s": 0.204862,
+              "peak_rss_mb": 2.36328125,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "-o",
+                "/tmp/perf-pipe-xiufpk1b/roundtrip.iact"
+              ],
+              "wall_s": 1.4716039079939947,
+              "cpu_s": 1.129629,
+              "peak_rss_mb": 59.81640625,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/perf-pipe-xiufpk1b/showers.gst"
+            ],
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/perf-pipe-xiufpk1b/roundtrip.iact"
+            ]
+          ],
+          "wall_s": 1.5492416101042181,
+          "cpu_s": 1.023752,
+          "peak_rss_mb": 59.60546875,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/perf-pipe-xiufpk1b/showers.gst"
+              ],
+              "wall_s": 1.5482393180718645,
+              "cpu_s": 0.194709,
+              "peak_rss_mb": 2.23828125,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "-o",
+                "/tmp/perf-pipe-xiufpk1b/roundtrip.iact"
+              ],
+              "wall_s": 1.5492416101042181,
+              "cpu_s": 0.829043,
+              "peak_rss_mb": 59.60546875,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/perf-pipe-xiufpk1b/showers.gst"
+            ],
+            [
+              "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/perf-pipe-xiufpk1b/roundtrip.iact"
+            ]
+          ],
+          "wall_s": 0.8272989249089733,
+          "cpu_s": 0.7718749999999999,
+          "peak_rss_mb": 59.6640625,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/perf-pipe-xiufpk1b/showers.gst"
+              ],
+              "wall_s": 0.8255148419411853,
+              "cpu_s": 0.187903,
+              "peak_rss_mb": 2.2890625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/workdir/env/lib64/python3.14/site-packages/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "-o",
+                "/tmp/perf-pipe-xiufpk1b/roundtrip.iact"
+              ],
+              "wall_s": 0.8272989249089733,
+              "cpu_s": 0.5839719999999999,
+              "peak_rss_mb": 59.6640625,
+              "returncode": 0
+            }
+          ]
+        }
+      ],
+      "gb_per_s_per_rep": [
+        0.8711843078397368,
+        0.8275263352329898,
+        1.5496674701240076
+      ]
+    }
+  },
+  "failures": {},
+  "settings": {
+    "reps": 3,
+    "input": "/validation/inputs/gamma-20deg-100-3000GeV-100showers.iact",
+    "events": 100,
+    "work_dir": "/tmp/perf-pipe-xiufpk1b",
+    "native_stream_bytes": 1282038232,
+    "limit_gb_per_s": 1.0,
+    "gigabyte": "decimal, 1e9 bytes",
+    "timing": "pipe wall from start to last exit; CPU and RSS per member (wait4, sampled VmHWM)"
+  },
+  "budget_reasons": {}
+}

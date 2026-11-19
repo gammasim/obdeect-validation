@@ -1,0 +1,100 @@
+{
+  "name": "Air shower, North array (LSTN-01..04, MSTN-03, MSTN-15; 7.0.0): CORSIKA IACT -> sim_telarray with all six telescopes versus an obdeect tee candidate (one QE-envelope propagation per telescope group, FIFO fan-out to one sim_telarray camera stage per telescope, Bypass_Optics=3); chain time without compiles; per-telescope photoelectron bias; timing budgets",
+  "status": "PASS",
+  "metrics": [
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "reference_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "candidate_tee_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "physics_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "array_chain_wall_budget_exceeded",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "array_chain_cpu_budget_exceeded",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "equal_statistics_budget_exceeded",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "photon_gate_budget_exceeded",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "tel1_camera_only_missing",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "tel2_camera_only_missing",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "tel3_camera_only_missing",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "tel4_camera_only_missing",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "tel5_camera_only_missing",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "tel6_camera_only_missing",
+      "status": "PASS"
+    }
+  ],
+  "missing": [],
+  "missing_inputs": [],
+  "missing_modules": []
+}

@@ -1,0 +1,51 @@
+{
+  "name": "Air shower, one LST (LSTN-01 7.0.0, 20 deg gamma): fixed vs per-shower cost of each chain stage (0, N, 2N showers) and trace-stream thread scaling (report only)",
+  "status": "PASS",
+  "metrics": [
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "from_corsika_scaling_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "propagation_scaling_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "compile_model_scaling_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "trace_stream_scaling_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "to_simtel_scaling_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "thread_scaling_completed",
+      "status": "PASS"
+    }
+  ],
+  "missing": [],
+  "missing_inputs": [],
+  "missing_modules": []
+}

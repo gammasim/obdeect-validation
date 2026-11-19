@@ -1,0 +1,121 @@
+{
+  "name": "Air shower, one LST (LSTN-01 7.0.0, 20 deg gamma): CORSIKA IACT -> sim_telarray full optics versus obdeect envelope chain (threads=1 and default) and unthinned chain; timing budgets",
+  "status": "FAIL",
+  "metrics": [
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "reference_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "candidate_threads1_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "candidate_threadsdefault_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "candidate_envelope_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "candidate_envelope_threads1_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "candidate_unthinned_threads1_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "physics_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 0,
+      "metric": "from_corsika_propagation_cpu_budget_exceeded",
+      "status": "FAIL"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 0,
+      "metric": "envelope_from_corsika_propagation_cpu_budget_exceeded",
+      "status": "FAIL"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 0,
+      "metric": "candidate_envelope_wall_budget_exceeded",
+      "status": "FAIL"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 0,
+      "metric": "candidate_envelope_cpu_budget_exceeded",
+      "status": "FAIL"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 0,
+      "metric": "candidate_envelope_threads1_wall_budget_exceeded",
+      "status": "FAIL"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "candidate_envelope_threads1_cpu_budget_exceeded",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "equal_statistics_budget_exceeded",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "candidate_envelope_camera_only_missing",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "candidate_envelope_threads1_camera_only_missing",
+      "status": "PASS"
+    }
+  ],
+  "missing": [],
+  "missing_inputs": [],
+  "missing_modules": []
+}

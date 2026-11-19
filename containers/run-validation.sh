@@ -23,14 +23,37 @@ if [[ ! "$environment" =~ ^[a-z0-9-]+$ || ! -f "obdeect-validation/environments/
   exit 2
 fi
 
+# One-line description of the host CPU (the container cannot see it): model, cores, podman VM CPUs.
+host_description() {
+  local text model cores perf eff vm
+  if [[ "$(uname)" == Darwin ]]; then
+    text=$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo "unknown CPU")
+    if perf=$(sysctl -n hw.perflevel0.physicalcpu 2>/dev/null) && eff=$(sysctl -n hw.perflevel1.physicalcpu 2>/dev/null); then
+      text="$text ($perf performance + $eff efficiency cores)"
+    fi
+    vm=$(podman machine inspect --format '{{.Resources.CPUs}}' 2>/dev/null || true)
+    if [[ -n "$vm" ]]; then
+      text="$text, podman VM $vm CPUs"
+    fi
+  else
+    model=$(lscpu 2>/dev/null | sed -n 's/^Model name:[[:space:]]*//p' | head -n 1 || true)
+    cores=$(nproc 2>/dev/null || echo "?")
+    text="${model:-unknown CPU}, $cores cores"
+  fi
+  printf '%s\n' "$text"
+}
+
 mkdir -p "$output"
 output=$(cd "$output" && pwd)
-podman build --rm \
-  --ignorefile obdeect-validation/containers/context.ignore \
-  --build-arg "SIMTOOLS_PROD_IMAGE=$SIMTOOLS_PROD_IMAGE" \
-  --file obdeect-validation/containers/Dockerfile.simtools-prod \
-  --tag "$image" .
-if [[ "${MODE3:-0}" == 1 ]]; then
+# SKIP_BUILD=1 reuses the images built by an earlier call (several cases one after another).
+if [[ "${SKIP_BUILD:-0}" != 1 ]]; then
+  podman build --rm \
+    --ignorefile obdeect-validation/containers/context.ignore \
+    --build-arg "SIMTOOLS_PROD_IMAGE=$SIMTOOLS_PROD_IMAGE" \
+    --file obdeect-validation/containers/Dockerfile.simtools-prod \
+    --tag "$image" .
+fi
+if [[ "${MODE3:-0}" == 1 && "${SKIP_BUILD:-0}" != 1 ]]; then
   # sim_telarray source is the git tree at SIMTEL_REF (default: the mode-3 commit), exported with git archive.
   simtel_ref=${SIMTEL_REF:-b8f2494}
   simtel_commit=$(git -C sim_telarray rev-parse --verify "$simtel_ref^{commit}")
@@ -50,21 +73,36 @@ if [[ "${MODE3:-0}" == 1 ]]; then
     --build-context "hessio=$hessio_src" \
     --file obdeect-validation/containers/Dockerfile.mode3 \
     --tag obdeect-validation:mode3 .
+fi
+if [[ "${BUILD_ONLY:-0}" == 1 ]]; then
+  exit 0
+fi
+if [[ "${MODE3:-0}" == 1 ]]; then
   run_image=obdeect-validation:mode3
   extra_env=(--env SIMTEL_CANDIDATE_BINARY=/opt/mode3/sim_telarray)
 fi
 image_id=$(podman image inspect --format '{{.Id}}' "$run_image")
-python3 -c 'import json,sys; json.dump({"base_image":sys.argv[1],"derived_image_id":sys.argv[2],"image":sys.argv[3],"sim_telarray_commit":sys.argv[4],"hessio_rev":sys.argv[5]},open(sys.argv[6],"w"),indent=2); open(sys.argv[6],"a").write(chr(10))' \
-  "$SIMTOOLS_PROD_IMAGE" "$image_id" "$run_image" "${simtel_commit:-}" "${hessio_rev:-}" "$output/container.json"
+host=$(host_description)
+extra_env+=(--env "OBDEECT_VALIDATION_HOST=$host")
+python3 -c 'import json,sys; json.dump({"base_image":sys.argv[1],"derived_image_id":sys.argv[2],"image":sys.argv[3],"sim_telarray_commit":sys.argv[4],"hessio_rev":sys.argv[5],"host":sys.argv[6]},open(sys.argv[7],"w"),indent=2); open(sys.argv[7],"a").write(chr(10))' \
+  "$SIMTOOLS_PROD_IMAGE" "$image_id" "$run_image" "${simtel_commit:-}" "${hessio_rev:-}" "$host" "$output/container.json"
 # Same layout as the development container: checkouts read-only, results writable.
 models=${VALIDATION_MODELS_DIR:-simulation-models-dev}
 mounts=(--volume "$PWD/obdeect-validation:/validation:ro"
         --volume "$PWD/sim_telarray:/reference:ro"
         --volume "$(cd "$models" && pwd):/models:ro")
+# CPUS=0 pins the container to one core (podman --cpuset-cpus; 0,1 for two); unset: all cores.
+# CASE=cases/performance/air-shower.json runs that one case instead of the suite.
+if [[ -n "${CASE:-}" ]]; then
+  select=(--case "/validation/$CASE")
+else
+  select=(--suite "/validation/suites/$suite.json")
+fi
 podman run --rm "${mounts[@]}" ${extra_env[@]+"${extra_env[@]}"} \
+  ${CPUS:+--cpuset-cpus "$CPUS"} \
   --volume "$output:/results:Z" \
   "$run_image" \
   obdeect-validate run \
-    --suite "/validation/suites/$suite.json" \
+    "${select[@]}" \
     --environment "/validation/environments/$environment.json" \
     --output /results --non-interactive

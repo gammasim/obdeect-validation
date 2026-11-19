@@ -1,5 +1,8 @@
 """Pure helpers of the multi-telescope air-shower timing (no sim_telarray, no obdeect run)."""
 
+import os
+from pathlib import Path
+
 import pytest
 
 from obdeect_validation.adapters import performance_array as pa
@@ -45,6 +48,15 @@ def test_budgets_pass_when_chain_within_reference_and_all_bias_within_limits():
     assert out["equal_statistics_budget_exceeded"] == 0
     assert out["array_chain_wall_ratio"] == pytest.approx(0.9)
     assert reasons == {}
+
+
+def test_budget_reports_ratio_of_minima_without_changing_the_budget():
+    metrics, chain = _metrics(9.0, 8.0, [0] * 6)
+    metrics.update({"candidate_tee_wall_s_min": 4.0, "reference_wall_s_min": 8.0})
+    out, _ = pa.array_budgets(metrics, chain)
+    assert out["array_chain_wall_ratio_min"] == pytest.approx(0.5)
+    assert out["array_chain_wall_budget_exceeded"] == 0
+    assert "array_chain_cpu_ratio_min" not in out
 
 
 def test_budget_exceeded_when_chain_slower_or_one_telescope_biased():
@@ -163,3 +175,109 @@ def test_measured_flags_fewer_than_twenty_matched_samples():
     )
     enough = {"matched_event_telescope_samples": 20, "photoelectron_relative_bias": 0.0}
     assert pa.measured(enough, "tel5", details) is enough
+
+
+def test_tee_groups_telescopes_by_qe_envelope():
+    elements = {
+        element: {
+            "qe": Path("qe-mst.dat" if element.startswith("MST") else "qe-lst.dat"),
+            "headroom": 0.7,
+        }
+        for _, element in pa.ARRAY
+    }
+    assert pa.tee_groups(elements) == [[1, 2, 3, 4], [5, 6]]
+    elements["LSTN-02"]["headroom"] = 0.6  # another envelope: its own propagation
+    assert pa.tee_groups(elements) == [[1, 3, 4], [2], [5, 6]]
+    assert pa.group_name([1, 2, 3, 4]) == "tee_tel1_4"
+
+
+def test_with_telescopes_replaces_an_existing_selection():
+    argv = ["obdeect", "propagation", "run", "--telescopes", "1", "-i", "-", "-o", "-"]
+    assert pa.with_telescopes(argv, [1, 2]) == [
+        "obdeect",
+        "propagation",
+        "run",
+        "--telescopes",
+        "1,2",
+        "-i",
+        "-",
+        "-o",
+        "-",
+    ]
+
+
+def test_with_telescopes_selects_before_the_input_option():
+    argv = [
+        "obdeect",
+        "propagation",
+        "run",
+        "--envelope",
+        "qe=q.dat",
+        "-i",
+        "-",
+        "-o",
+        "-",
+    ]
+    assert pa.with_telescopes(argv, [5, 6]) == [
+        "obdeect",
+        "propagation",
+        "run",
+        "--envelope",
+        "qe=q.dat",
+        "--telescopes",
+        "5,6",
+        "-i",
+        "-",
+        "-o",
+        "-",
+    ]
+
+
+def test_tee_member_cpu_sums_each_member_over_the_groups():
+    def record(*children):
+        return {"children": [{"name": n, "cpu_s": c} for n, c in children]}
+
+    stages = {
+        "compile_tel1": [{"wall_s": 1.0, "cpu_s": 1.0}] * 2,
+        "tee_tel1_4": [
+            record(("from_corsika", 1.0), ("tel1_trace_stream", 2.0)),
+            record(("from_corsika", 3.0), ("tel1_trace_stream", 2.0)),
+        ],
+        "tee_tel5_6": [record(("from_corsika", 0.5)), record(("from_corsika", 0.5))],
+    }
+    # repetition sums: from_corsika 1.5 and 3.5 (median 2.5); trace stream 2.0
+    assert pa.tee_member_cpu(stages) == {"from_corsika": 2.5, "tel1_trace_stream": 2.0}
+    shares = pa.tee_shares(4.5, pa.tee_member_cpu(stages))
+    assert shares["candidate_tee_tel1_trace_stream_cpu_share"] == pytest.approx(
+        2.0 / 4.5
+    )
+
+
+def test_run_fan_out_feeds_every_branch_from_one_tee(tmp_path):
+    source = tmp_path / "in.txt"
+    source.write_text("photons\n")
+    fifos = [tmp_path / "a.fifo", tmp_path / "b.fifo"]
+    for fifo in fifos:
+        os.mkfifo(fifo)
+    pipe = [
+        ("from_corsika", ["cat", source]),
+        ("propagation", ["cat"]),
+        ("tee", ["tee", *fifos]),
+    ]
+    branches = [
+        ([("tel1_trace_stream", ["cat", fifos[0]])], tmp_path / "a.out"),
+        ([("tel2_trace_stream", ["cat", fifos[1]])], tmp_path / "b.out"),
+    ]
+    names = [
+        "from_corsika",
+        "propagation",
+        "tee",
+        "tel1_trace_stream",
+        "tel2_trace_stream",
+    ]
+    logs = {name: tmp_path / f"{name}.log" for name in names}
+    record = pa.run_fan_out(pipe, branches, logs)
+    assert (tmp_path / "a.out").read_text() == "photons\n"
+    assert (tmp_path / "b.out").read_text() == "photons\n"
+    assert [child["name"] for child in record["children"]] == names
+    assert all(child["returncode"] == 0 for child in record["children"])
