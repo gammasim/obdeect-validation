@@ -1,0 +1,23 @@
+{
+  "id": "optics.lst-window-reference",
+  "name": "Window off, 6.55 cm focus reference",
+  "requires": [
+    "simtools-validate-optics"
+  ],
+  "inputs": [
+    "/validation/fixtures/optics-inputs/optics-lst-window-reference.json"
+  ],
+  "commands": [
+    {
+      "name": "obdeect-window-study",
+      "timeout": 7200,
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.optics_window_study",
+        "--config",
+        "/validation/fixtures/optics-inputs/optics-lst-window-reference.json"
+      ]
+    }
+  ]
+}
