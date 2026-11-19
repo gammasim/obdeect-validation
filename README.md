@@ -11,7 +11,7 @@ From the workspace root (checkouts `obdeect`, `simtools`, `sim_telarray`,
 bash obdeect-validation/containers/run-validation.sh full obdeect-validation/results/full
 ```
 
-Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `chain`, `curvature`, `endtoend`, `full`,
+Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `optics-window`, `chain`, `curvature`, `endtoend`, `full`,
 `performance` (report only). The launcher builds obdeect and simtools from the
 checkouts on a digest-pinned simtools-prod image and mounts this repository
 (`/validation`), sim_telarray (`/reference`) and the models (`/models`) read-only.
@@ -33,6 +33,20 @@ cases (`cases/sources/flasher-dish.json`, `flasher-secondary.json`, `led-referen
 `cases/stream/corsika-roundtrip.json`). The obdeect chain test runs without the container
 once obdeect is installed (`python -m pytest tests/test_obdeect_chain.py`; it skips otherwise).
 Summary of an IACT file: `python -m obdeect_validation.adapters.summarize_iact FILE.iact.gz`.
+
+The LST camera-window study is `suites/optics-window.json`. Run it with:
+
+```sh
+obdeect-validate run --suite suites/optics-window.json \
+  --output results/window-study --environment environments/workspace.json --non-interactive
+```
+
+It runs obdeect only:
+window off at 6.55 cm, window on at 6.55 cm, then window on from 6.95 to 6.15 cm
+in 0.05 cm steps. The scan reports its best on-axis D80 and compares its 1-4 deg
+D80 values to the window-off case. The window parameters come from the models
+(LSTN-design); a temporary copy of the production table adds them, so the checkout
+is not changed.
 
 Case files are JSON. Each has an id, executable requirements, commands (argument
 arrays, without shell expansion), and metrics with metric/expected/atol.
