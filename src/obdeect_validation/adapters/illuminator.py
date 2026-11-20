@@ -453,6 +453,38 @@ def _camera_stage(root, propagated, reference_iact, geo, label):
     return {**camera, **pixel}, counts
 
 
+def native_argv(geo, events, photons):
+    """obdeect sources run point-source with the arguments of source_argv (SI units, m)."""
+    x, y, z = (v / 100.0 for v in geo["source_cm"])
+    return [
+        "sources",
+        "run",
+        "point-source",
+        "--observation-level",
+        f"{OBS_LEVEL_M:.1f}",
+        "--seed",
+        str(SEED),
+        "--atmosphere-id",
+        "1",
+        "--events",
+        str(events),
+        "--photons",
+        str(photons),
+        "--position",
+        f"{x:.8f},{y:.8f},{z:.8f}",
+        "--direction",
+        ",".join(f"{v:.8f}" for v in geo["pointing"]),
+        "--telescope-radius",
+        f"{TELESCOPE_RADIUS_CM / 100.0:.4f}",
+        "--bunch-size",
+        "1",
+        "--spectrum",
+        f"fixed:wavelength_nm={WAVELENGTH_NM}",
+        "--angular",
+        ANGULAR,
+    ]
+
+
 def run_configuration(root, instrument, label, scale):
     """Emission and camera comparison of one illuminator distance; returns (metrics, details)."""
     root.mkdir(parents=True, exist_ok=True)
@@ -461,11 +493,7 @@ def run_configuration(root, instrument, label, scale):
     common.command(
         [
             "obdeect",
-            "sources",
-            "point-source",
-            *source_argv(geo, EVENTS, PHOTONS_PER_EVENT),
-            "--seed",
-            str(SEED),
+            *native_argv(geo, EVENTS, PHOTONS_PER_EVENT),
             "-o",
             native_gst,
         ],
