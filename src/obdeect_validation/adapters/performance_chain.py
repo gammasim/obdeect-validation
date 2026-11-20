@@ -97,12 +97,11 @@ LOAD_LIMIT = 1.0
 SHARE_EXCLUDED = ("compile_model",)
 # obdeect wrapper subcommands that run as native programs in candidate pipelines. The wrapper adds
 # ~0.1 s per call (light-start-up measurements); the native program takes the same arguments and
-# gives byte-identical output (checked for flasher, point-source, propagation, to-simtel, from-corsika
-# with the same seeds). trace-stream and the model compile have no native program here: they stay
-# on the wrapper.
+# gives byte-identical output (checked for propagation, to-simtel, from-corsika with the same seeds).
+# trace-stream and the model compile have no native program here: they stay on the wrapper.
+# obdeect sources run has no native program (the sources tools were replaced by run descriptions),
+# so the sources stage uses the wrapper.
 NATIVE_PROGRAMS = {
-    ("sources", "flasher"): ("obdeect.sources", "obdeect-sources-flasher"),
-    ("sources", "point-source"): ("obdeect.sources", "obdeect-sources-point-source"),
     ("propagation", "run"): ("obdeect.propagation", "obdeect-propagation-run"),
     ("stream", "to-simtel"): ("obdeect.stream", "obdeect-stream-to-simtel"),
     ("stream", "from-corsika"): ("obdeect.stream", "obdeect-stream-from-corsika"),
@@ -154,13 +153,32 @@ SOURCES = {
         "candidate": lambda n, p: [
             "obdeect",
             "sources",
+            "run",
             "flasher",
             "--type",
             "dish",
+            "--observation-level",
+            "2150",
+            "--seed",
+            "1",
+            "--atmosphere-id",
+            "1",
+            "--position",
+            "0,0,16",
+            "--camera-radius",
+            "1.2",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--angular",
+            "isotropic",
             "--events",
             n,
             "--photons",
             p,
+            "--set",
+            "run.frame=sky",
+            "--set",
+            "events[0].emissions[0].to_plane_z0=false",
         ],
         "reference": lambda n, p: ["ff-1m", "--events", n, "--photons", p],
         "bypass": 1,  # as in source_camera stage 2
@@ -171,17 +189,26 @@ SOURCES = {
         "candidate": lambda n, p: [
             "obdeect",
             "sources",
+            "run",
             "point-source",
-            "-N",
-            n,
-            "-n",
-            p,
-            "-z",
-            "100000",
-            "-a",
-            "isotropic",
+            "--observation-level",
+            "2150",
             "--seed",
             "17",
+            "--atmosphere-id",
+            "1",
+            "--events",
+            n,
+            "--photons",
+            p,
+            "--position",
+            "0,0,1000",
+            "--telescope-radius",
+            "15",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--angular",
+            "isotropic",
         ],
         "reference": lambda n, p: [
             "xyzls",
