@@ -50,6 +50,19 @@ def test_rayleigh_table_is_exponential_in_altitude():
     assert beta == pytest.approx(sl.TAU_0 * math.exp(-0.25) / 8000.0)
 
 
+def test_depolarized_rayleigh_phase_is_normalized_and_uses_rho():
+    rho = sl.DEPOLARIZATION
+    gamma = rho / (2.0 - rho)
+    mu = np.linspace(-1.0, 1.0, 20001)
+    phase = (
+        3.0 / (8.0 * math.pi * (2.0 + gamma)) * ((1.0 + gamma) + (1.0 - gamma) * mu**2)
+    )
+    integral = 2.0 * math.pi * np.trapezoid(phase, mu)
+    assert integral == pytest.approx(1.0, abs=1e-8)
+    assert phase[-1] / phase[0] == pytest.approx(1.0)
+    assert phase[0] != pytest.approx(3.0 / (8.0 * math.pi))
+
+
 def test_zero_extinction_table_moves_bottom_to_observation_level(tmp_path, monkeypatch):
     fixture = tmp_path / "fixture.dat"
     fixture.write_text(

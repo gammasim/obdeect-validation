@@ -15,6 +15,9 @@
     {"metric": "max_time_error_ns_normalised", "expected": 0, "atol": 1},
     {"metric": "max_direction_scale_error", "expected": 0, "atol": 1e-6},
     {"metric": "straight_delay_max_error_ns_normalised", "expected": 0, "atol": 1},
+    {"metric": "reference_wavelength_group_delay_max_error_normalised", "expected": 0, "atol": 1},
+    {"metric": "dispersion_time_max_error_normalised", "expected": 0, "atol": 1},
+    {"metric": "dispersion_position_max_error_normalised", "expected": 0, "atol": 1},
     {"metric": "plane_limit_max_difference", "expected": 0, "atol": 1},
     {"metric": "reference_convergence_relative_change", "expected": 0, "atol": 1e-8}
   ]

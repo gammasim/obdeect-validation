@@ -275,6 +275,8 @@ def main():
             args.seed,
             "--mode",
             "weighted",
+            "--wavelength-interpolation",
+            "floor",
             "--wavelength-range",
             band[0],
             band[1],
@@ -292,6 +294,37 @@ def main():
     )
 
     summary = propagation_summary((root / "propagate.log").read_text(errors="replace"))
+    linear = root / "propagated-linear.pst"
+    common.command(
+        [
+            "obdeect",
+            "propagation",
+            "run",
+            "--transmission",
+            cut_path,
+            "--site-altitude",
+            args.site_altitude,
+            "--pathlen",
+            args.pathlen,
+            "--seed",
+            args.seed,
+            "--mode",
+            "weighted",
+            "--wavelength-interpolation",
+            "linear",
+            "--wavelength-range",
+            band[0],
+            band[1],
+            "-i",
+            native,
+            "-o",
+            linear,
+        ],
+        root / "propagate-linear.log",
+    )
+    linear_summary = propagation_summary(
+        (root / "propagate-linear.log").read_text(errors="replace")
+    )
     input_weight, sample = read_bunches(source, SAMPLE_FRACTION, args.seed)
     depth = table_reference(cut_path)[1]
     draws = np.random.default_rng(args.seed).random(len(sample)).tolist()
@@ -342,6 +375,11 @@ def main():
             "weight_ratio_observed": observed,
             "weight_ratio_expected": expected,
             "transmission_mean_difference": observed - expected,
+            "linear_weight_ratio": linear_summary["weight_out"] / input_weight,
+            "linear_minus_floor_weight_ratio": (
+                linear_summary["weight_out"] - summary["weight_out"]
+            )
+            / input_weight,
             "transmission_mean_limit_exceeded": limit_exceeded(
                 observed - expected, max(0.01, 5 * expected_se)
             ),
@@ -356,6 +394,12 @@ def main():
         "input_photon_weight": input_weight,
         "propagation": summary,
         "expected_transmission_standard_error": expected_se,
+        "camera_comparison_wavelength_interpolation": "floor (sim_telarray convention)",
+        "linear_mode_weight_ratio": linear_summary["weight_out"] / input_weight,
+        "linear_minus_floor_weight_ratio": (
+            linear_summary["weight_out"] - summary["weight_out"]
+        )
+        / input_weight,
         "sample_bunches": len(sample),
         "limits": LIMITS,
         "direct_photon_statistics": stats_direct,
