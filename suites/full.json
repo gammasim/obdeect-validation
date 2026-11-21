@@ -47,6 +47,8 @@
     "../cases/sources/laser-beam-scattered.json",
     "../cases/performance/air-shower-array.json",
     "../cases/performance/air-shower-proton.json",
-    "../cases/performance/stream-pipe.json"
+    "../cases/performance/stream-pipe.json",
+    "../cases/propagation/corsika-to-sky-scattering.json",
+    "../cases/propagation/simtools-synthetic-atmosphere.json"
   ]
 }
