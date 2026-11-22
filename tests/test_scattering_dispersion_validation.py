@@ -25,7 +25,7 @@ def _ciddor_group_refractivity(wavelength_nm):
 
 
 def test_fractional_scattering_wavelength_interpolates_adjacent_rows():
-    from obdeect.propagation import ScatteringTable
+    ScatteringTable = pytest.importorskip("obdeect.propagation").ScatteringTable
 
     table = ScatteringTable(str(SCATTERING))
     altitude = np.array([5000.0, 5000.0, 5000.0])

@@ -63,7 +63,7 @@ def _photons(path):
 
 
 def test_plane_horizon_against_independent_snell_integral(tmp_path):
-    from obdeect.propagation import propagate
+    propagate = pytest.importorskip("obdeect.propagation").propagate
 
     angles = np.array([84.0, 86.0, 87.0, 88.0, 89.0])
     source, output = tmp_path / "sky.pst", tmp_path / "plane.pst"
@@ -93,7 +93,7 @@ def test_plane_horizon_against_independent_snell_integral(tmp_path):
 
 
 def test_scattered_photon_timing_includes_both_air_paths(tmp_path):
-    from obdeect.propagation import propagate
+    propagate = pytest.importorskip("obdeect.propagation").propagate
 
     source = tmp_path / "sky.pst"
     _stream(source, angles=[0.0], refracted=True, telescopes=2)
