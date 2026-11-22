@@ -1,0 +1,75 @@
+{
+  "id": "stream.direction-roundtrip",
+  "name": "Full-sphere photon directions (format 1.1): .pst round trip bit-exact in each frame, to-simtel rejects upward and horizontal cz",
+  "requires": [
+    "obdeect"
+  ],
+  "commands": [
+    {
+      "name": "round-trip-and-rejection",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.stream_directions"
+      ],
+      "timeout": 900
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "photon_count",
+      "expected": 4000,
+      "atol": 0
+    },
+    {
+      "metric": "bit_mismatch_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "max_abs_difference",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "format_major",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "format_minor",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "cz_upward_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cz_downward_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "cz_horizontal_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "rejected_cases",
+      "expected": 2,
+      "atol": 0
+    },
+    {
+      "metric": "camera_any_sign_accepted",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "accepted_downward",
+      "expected": 3,
+      "atol": 0
+    }
+  ]
+}

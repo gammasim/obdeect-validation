@@ -3,6 +3,7 @@
   "cases": [
     "../cases/optics/optics-lst.json",
     "../cases/optics/optics-mst.json",
-    "../cases/optics/optics-sst.json"
+    "../cases/optics/optics-sst.json",
+    "../cases/optics/upward-absorption.json"
   ]
 }

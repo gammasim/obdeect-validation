@@ -153,6 +153,47 @@
       ],
       "differences": "The photons are not bit-identical: the stream stores positions in m as float32, so x, y and emission height come back with a relative error up to {max_codec_normalized_error:.2f} × 1e-6 (the codec bound); directions, times, wavelengths and bunch sizes are exact. A change this small can still move a photon across a mirror or camera edge in sim_telarray and shift its random-number sequence for the rest of the event, so a few pixels differ (image χ²/ndf {mean_image_reduced_chi2:.2f}, below 1: the runs share most fluctuations). The mean bias ({photoelectron_relative_bias:+.2%} ± {photoelectron_relative_bias_se:.2%}) is zero within errors and no trigger changes. The mechanism is the expected one, not isolated."
     },
+    "stream.direction-roundtrip": {
+      "title": "Full-sphere photon directions: stream round trip and to-simtel rejection",
+      "headline": "photons {photon_count:.0f}, bit mismatches {bit_mismatch_count}, up / down / horizontal count deltas {cz_upward_count_delta} / {cz_downward_count_delta} / {cz_horizontal_count_delta}, to-simtel refused upward+horizontal in {rejected_cases} of 2 frames, camera accepts any sign {camera_any_sign_accepted} of 1, downward converted {accepted_downward} of 3",
+      "description": "A grid of 1000 unit vectors over the full sphere (Fibonacci grid with exact vertical and horizontal directions) is written as a format 1.1 `.pst` stream in each frame (sky, ground, telescope, camera), read back, and compared column by column at the bit level. In the ground and telescope frames, which sim_telarray reads with the sign of cz, a stream with one upward and one horizontal photon must be refused by `obdeect stream to-simtel` with the message that sim_telarray does not store the sign of cz. In the camera frame, where only cx and cy are used, a stream with upward, downward and horizontal photons must convert. In every frame a downward-only stream of the same layout must convert. Needs obdeect only.",
+      "rows": [
+        {
+          "label": "Photons written / read back",
+          "text": "{photon_count:.0f}"
+        },
+        {
+          "label": "Bit mismatches (all columns, all frames)",
+          "text": "{bit_mismatch_count}"
+        },
+        {
+          "label": "Upward / downward / horizontal count deltas",
+          "text": "{cz_upward_count_delta} / {cz_downward_count_delta} / {cz_horizontal_count_delta}"
+        },
+        {
+          "label": "Stream format (major.minor)",
+          "text": "{format_major}.{format_minor}"
+        },
+        {
+          "label": "to-simtel refused upward+horizontal (ground, telescope)",
+          "text": "{rejected_cases} of 2"
+        },
+        {
+          "label": "Camera frame accepts any sign (1 = yes)",
+          "text": "{camera_any_sign_accepted}"
+        },
+        {
+          "label": "Downward-only streams converted",
+          "text": "{accepted_downward} of 3"
+        }
+      ],
+      "figures": [
+        {
+          "file": "sky-map.png",
+          "caption": "cz against azimuth of the directions read back from the sky-frame stream, one marker per photon; blue-green for downward, pink for upward, orange for horizontal (exact cz = 0)."
+        }
+      ]
+    },
     "propagation.extinction-analytic": {
       "title": "Extinction vs analytic Beer–Lambert",
       "headline": "largest transmission error {max_transmission_absolute_error:.1e}",
@@ -386,6 +427,55 @@
         }
       ]
     },
+    "sources.isotropic-to-plane": {
+      "title": "Isotropic light to the plane, upward plane wave and upward laser beam (analytic)",
+      "headline": "kept fraction pull {kept_fraction_pull_max_abs:.2f} σ, radial χ²/ndf {radial_chi2_ndf:.2f}, arrival time {max_time_error_ulp:.1f} ulp, plane wave direction {plane_wave_direction_error_deg:.1e}°, rejected {rejected_cases} of 2 plane waves and {laser_rejected_cases} of 3 laser cases",
+      "description": "Isotropic point source at height H = 100 m above the plane z = 0 and at −H below it, 2e5 photons each, moved to the plane with `to_plane_z0`. Photons that move away from the plane are dropped and counted (`not_on_plane`). Kept fraction 1/2 (binomial), kept + not_on_plane = N exactly, radial density on the plane H/(r² + H²)^(3/2) in equal-probability radial bins, and arrival times sqrt(r² + H²)/c to float32 rounding. Then an upward plane wave (source below the disc): direction, start plane and target disc; a horizontal `towards_source` and a start plane on the wrong side must be rejected. Last, the upward laser beam preset: direction, start height on the beam, cone bound, tilt limit from the zenith; horizontal beams, tilts above the limit and start heights below the laser must be rejected. All references are analytic and written in the adapter.",
+      "rows": [
+        {
+          "label": "Kept fraction, source above / below (pull)",
+          "text": "{kept_fraction_pull_max_abs:.2f} σ (max of both)"
+        },
+        {
+          "label": "Photon balance error (kept + not on plane − N)",
+          "text": "{photon_balance_error}"
+        },
+        {
+          "label": "Radial χ²/ndf (19 dof, larger of the two heights)",
+          "text": "{radial_chi2_ndf:.2f}"
+        },
+        {
+          "label": "Largest arrival time error (float32 ulp)",
+          "text": "{max_time_error_ulp:.2f}"
+        },
+        {
+          "label": "Plane wave: direction error [deg]; start plane error [m]",
+          "text": "{plane_wave_direction_error_deg:.1e}; {plane_wave_start_error_m:.1e}"
+        },
+        {
+          "label": "Plane wave rejected (horizontal, wrong-side start)",
+          "text": "{rejected_cases} of 2"
+        },
+        {
+          "label": "Laser: direction error [deg]; start error [m]",
+          "text": "{laser_direction_error_deg:.1e}; {laser_start_error_m:.1e}"
+        },
+        {
+          "label": "Laser rejected (horizontal, tilt above limit, start below laser)",
+          "text": "{laser_rejected_cases} of 3"
+        }
+      ],
+      "figures": [
+        {
+          "file": "isotropic-radial.png",
+          "caption": "Radial density of isotropic light on the plane for a source at +H and −H (obdeect markers, both heights) against the analytic density (black dashed); bottom: pulls per radial bin, with ±2 σ band."
+        },
+        {
+          "file": "plane-wave-targets.png",
+          "caption": "Target points of the upward plane wave on the disc (obdeect), with the disc boundary (analytic)."
+        }
+      ]
+    },
     "sources.muon-track": {
       "title": "Muon track vs fake-muon and analytic",
       "headline": "yield {yield_ratio_native_reference:.4f} ± {yield_ratio_se:.4f}, time vs analytic {time_native_vs_analytic_mean_difference_ns:+.1e} ns, camera p.e. {camera_pe_ratio:.3f} ± {camera_pe_ratio_se:.3f}",
@@ -441,6 +531,51 @@
         }
       ],
       "differences": "The nsbls curves differ because nsbls is wrong, not obdeect. Projected entry point (top right): an isotropic flux is flat in ρ²; obdeect is flat (KS {projected_area_uniform_native_vs_analytic_ks:.4f}, critical {projected_area_uniform_native_vs_analytic_ks_critical:.4f}), nsbls piles up at the centre (KS {projected_area_uniform_reference_vs_analytic_ks:.2f}) because it draws the radius as 1 − sqrt(u) instead of sqrt(u) and rotates the entry point with the wrong azimuth (`IactLightEmission.cc` ~l.1395). Time (bottom left): the wrong entry points give nsbls a spread of {time_reference_sd_ns:.1f} ns; obdeect has the configured pulse ({time_native_sd_ns:.2f} ns). Camera (bottom right): nsbls puts more light on the dish centre, so its camera sees more; obdeect / nsbls = {camera_pe_ratio:.2f}, recorded only. With the nsbls sampler in obdeect (2026-11-13 report) the camera ratio was 0.998 ± 0.009."
+    },
+    "optics.upward-absorption": {
+      "title": "Light from below on the optics: blocked fraction against the projected primary",
+      "headline": "mirror-back pull max {mirror_back_pull_max_abs:.2f} σ over {mirror_back_cases} beams (LST, MST, SST), fixture {fixture_mirror_back_pull_max_abs:.2f} σ, detected {detected_count}, status sum error {status_sum_error}, downward mismatches {downward_mismatch_count}, determinism mismatches {determinism_mismatch_count}",
+      "description": "A uniform parallel beam from below (upward photons), along the telescope axis and at 20° and 45°, on a start disc larger than the primary, for the optical models LSTN-01, MSTN-01 and SSTS-01 (simulation models 7.0.0, compiled by obdeect) and for the segmented fixture of the obdeect tests. A photon that meets the back of a primary facet or segment is blocked there. The reference is the area of the primary projected along the beam onto the start plane, computed in the adapter from the mirror geometry of the optical model (facet caps and asphere segments; overlapping facet shadows counted once). Binomial pulls per model and inclination. Also: no photon is detected, the status counts add up to the input, every blocked photon names a primary or obscurer surface, the downward rows of a mixed beam are bit-identical to a downward-only trace, and the mixed beam gives identical results per photon for one thread, four threads, a thread pool, chunks of several sizes and a permuted row order.",
+      "rows": [
+        {
+          "label": "Mirror-back pull, real models (max |pull|, 9 beams)",
+          "text": "{mirror_back_pull_max_abs:.2f} σ (limit 4)"
+        },
+        {
+          "label": "Mirror-back pull, segmented fixture (max |pull|, 3 beams)",
+          "text": "{fixture_mirror_back_pull_max_abs:.2f} σ (limit 4)"
+        },
+        {
+          "label": "Detected photons from below",
+          "text": "{detected_count}"
+        },
+        {
+          "label": "Status sum error (counts minus input)",
+          "text": "{status_sum_error}"
+        },
+        {
+          "label": "Blocked photons on an unknown surface",
+          "text": "{blocked_unknown_surface_count}"
+        },
+        {
+          "label": "Downward rows differing from downward-only trace",
+          "text": "{downward_mismatch_count}"
+        },
+        {
+          "label": "Determinism mismatches (threads, pool, chunks, order)",
+          "text": "{determinism_mismatch_count}"
+        }
+      ],
+      "figures": [
+        {
+          "file": "upward-start-map.png",
+          "caption": "Start positions of the upward beam on the start plane for LST at 45°, coloured by the first hit: mirror back (primary), obscurer, direct focal surface. The dashed circle is the rim of the primary projected to the start plane (approximate)."
+        },
+        {
+          "file": "upward-blocked-fraction.png",
+          "caption": "Top: fraction of the beam blocked by the back of the primary per inclination (obdeect, binomial errors) with the projected-primary reference (dashed). Bottom: binomial pulls per model and inclination, band ±4 σ."
+        }
+      ]
     },
     "optics.*": {
       "title": "Optics {suffix}",
@@ -1564,6 +1699,146 @@
         }
       ]
     },
+    "propagation.upward-geometry": {
+    "title": "Upward photons: straight line in plane mode",
+    "headline": "position {max_position_error_ulp:.1f} ulp, time {max_time_error_ulp:.1f} ulp, direction {max_direction_error:.1e}, round trip at {round_trip_max_error_over_budget:.2f} of its float32 budget",
+    "description": "Photons emitted below the telescope plane (0 to 500 m) with directions from vertical to 89.5 deg, all azimuths. Reference: the straight line from the emission point with the stored float32 direction, t = t0 + path / c. Errors in float32 spacing of the output (0.5 ulp is the rounding of a stored value). The G to sky conversion (to_sky) returns the emission positions and times within its float32 error budget.",
+    "rows": [
+      {
+        "label": "Photons (samples)",
+        "text": "{sample_count}"
+      },
+      {
+        "label": "Max position / time error [ulp]",
+        "text": "{max_position_error_ulp:.2f} / {max_time_error_ulp:.2f}"
+      },
+      {
+        "label": "Max direction error",
+        "text": "{max_direction_error:.1e}"
+      },
+      {
+        "label": "Round trip (in units of its budget)",
+        "text": "{round_trip_max_error_over_budget:.3f}"
+      }
+    ],
+    "figures": [
+      {
+        "file": "upward-geometry.png",
+        "caption": "Position error in float32 ulp against zenith angle (obdeect, black dashed: the rounding of a stored value)."
+      }
+    ]
+  },
+    "propagation.upward-refraction": {
+    "title": "Upward and reversed photons: Snell bending",
+    "headline": "shift {max_shift_error_m:.1e} m, time {max_time_error_ns_moderate:.1e} ns up to 80 deg, reversed shift {reversed_max_shift_error_m:.1e} m, turnover reported {turns_over_reported}",
+    "description": "Upward photons bent by Snell's law (n sin theta = const) with an atmospheric profile, against scipy quadrature of the same profile (ln(n-1) spline, documented interpolation). Gates: time 1e-6 ns (1.4e-5 ns at 85 and 88 deg, the documented accuracy near the horizon); shift within max(1e-6 m, one float32 ulp of the stored output position) per sample, since the output is stored as float32 (at 240 m one ulp is 1.5e-5 m). A photon that turns over must be dropped as turns_over. Reversed: downward photons from above the plane with the same Snell constant and the reversed direction.",
+    "rows": [
+      {
+        "label": "Upward: shift / direction / time (≤80 deg) error",
+        "text": "{max_shift_error_m:.2e} m / {max_direction_error:.1e} / {max_time_error_ns_moderate:.1e} ns"
+      },
+      {
+        "label": "Upward: time error at 85, 88 deg [ns]",
+        "text": "{max_time_error_ns_grazing:.1e}"
+      },
+      {
+        "label": "Turnover reported as turns_over (1 = yes)",
+        "text": "{turns_over_reported}"
+      },
+      {
+        "label": "Reversed: shift / direction / time error",
+        "text": "{reversed_max_shift_error_m:.2e} m / {reversed_max_direction_error:.1e} / {reversed_max_time_error_ns:.1e} ns"
+      }
+    ],
+    "figures": [
+      {
+        "file": "upward-refraction.png",
+        "caption": "Travel-time error of the upward photons against zenith angle (log scale), with the 1e-6 ns gate."
+      }
+    ]
+  },
+    "propagation.upward-extinction": {
+    "title": "Upward photons: transmission",
+    "headline": "plane {plane_max_abs_error:.1e}, spherical {spherical_max_abs_error:.1e}, flat limit {flat_limit_max_abs_error:.1e}; downward rows bit-identical: {plane_downward_bitwise_mismatch} / {spherical_downward_bitwise_mismatch} mismatches",
+    "description": "Transmission of upward photons: plane-parallel exp(-|tau(h_t) - tau(h_e)| / |cz|) with tau from the extinction table (log10-linear in height, linear in wavelength); spherical exp(-slant depth) with the slant integral of |dtau/dh| / cos(theta); R to infinity must give the plane-parallel value. Downward photons in the same run must be bit-identical to a downward-only run.",
+    "rows": [
+      {
+        "label": "Samples",
+        "text": "{sample_count}"
+      },
+      {
+        "label": "Max |obdeect - reference|: plane / spherical / flat limit",
+        "text": "{plane_max_abs_error:.1e} / {spherical_max_abs_error:.1e} / {flat_limit_max_abs_error:.1e}"
+      },
+      {
+        "label": "Downward mismatches (plane / spherical)",
+        "text": "{plane_downward_bitwise_mismatch} / {spherical_downward_bitwise_mismatch}"
+      }
+    ],
+    "figures": [
+      {
+        "file": "upward-extinction.png",
+        "caption": "Transmission of upward photons: obdeect against the independent reference, plane-parallel (left) and spherical (right)."
+      }
+    ]
+  },
+    "propagation.upward-lidar": {
+    "title": "Upward laser light: single scattering into an off-axis telescope",
+    "headline": "total yield pulls {up_100m_total_yield_pull:+.1f} / {up_1km_total_yield_pull:+.1f} / {down_100m_total_yield_pull:+.1f} (100 m, 1 km, downward control); time chi2/ndf {up_100m_time_chi2_ndf:.2f} / {up_1km_time_chi2_ndf:.2f} / {down_100m_time_chi2_ndf:.2f}; plane counts off by {up_100m_plane_up_count_error} / {up_1km_plane_up_count_error}",
+    "description": "A laser at 1 m above the observation level (obdeect scatters primaries only above it) fires upwards at 20 deg from the zenith, w = 1 at 355 nm, with the molecular and aerosol table of the scattering cases. Single scattering (obdeect, one primary per call) into a telescope sphere of radius 12.5 m centred 30 m above the observation level, at 100 m and 1 km horizontal distance; scattering points below the centre send light upwards. A vertical downward beam from 48 km above the observation level into the 100 m telescope is the downward control. The reference is the numerical lidar equation written in the adapter with numpy and the documented phase functions (Rayleigh with the table depolarization, Henyey-Greenstein), the transmission table of the telescope path, the aim-point disc average of the documented estimator, and the arrival time (s + D) / c at the sphere centre (no air profile). Gates: total yield pull within 4 standard errors; per-bin chi2/ndf within 3 sigma of one and per-bin pulls within 4; scattered photons sent through the sky to G with extinction off: photons reaching the plane with cz > 0 from below it and cz < 0 from above it, and the photons moving away, exact; empty reference bins receive no photons.",
+    "rows": [
+      {
+        "label": "Primaries per configuration",
+        "text": "{sample_count}"
+      },
+      {
+        "label": "Total yield pull: 100 m up / 1 km up / 100 m down",
+        "text": "{up_100m_total_yield_pull:+.2f} / {up_1km_total_yield_pull:+.2f} / {down_100m_total_yield_pull:+.2f}"
+      },
+      {
+        "label": "Time chi2/ndf: 100 m up / 1 km up / 100 m down",
+        "text": "{up_100m_time_chi2_ndf:.2f} / {up_1km_time_chi2_ndf:.2f} / {down_100m_time_chi2_ndf:.2f}"
+      },
+      {
+        "label": "Largest time-bin pull: 100 m up / 1 km up / 100 m down",
+        "text": "{up_100m_time_max_abs_pull:.2f} / {up_1km_time_max_abs_pull:.2f} / {down_100m_time_max_abs_pull:.2f}"
+      },
+      {
+        "label": "Plane count errors (up / down / moving away), 100 m up",
+        "text": "{up_100m_plane_up_count_error} / {up_100m_plane_down_count_error} / {up_100m_moving_away_error}"
+      },
+      {
+        "label": "Empty bins with photons; reference quadrature change",
+        "text": "{empty_bin_content} / {reference_quadrature_relative:.1e}"
+      }
+    ],
+    "figures": [
+      {
+        "file": "upward-lidar.png",
+        "caption": "Top: scattered photons per primary per microsecond against arrival time at the sphere centre, obdeect (markers with errors) and the reference (black dashed). Bottom: per-bin pulls, with the dashed zero line and the 4 sigma limits (dotted)."
+      }
+    ]
+  },
+    "propagation.direction-losses": {
+    "title": "Loss accounting of mixed directions",
+    "headline": "{sample_count} photons in eight categories: reason counts off by {reason_count_error}, balance error {balance_error}",
+    "description": "A population of downward and upward photons above and below the plane, horizontal photons, photons below ground and an upward photon that turns over (profile). The expected reason of each category is written in the adapter; the counts per reason, the outputs of the reaching photons and the balance photons in = out + dropped are checked exactly.",
+    "rows": [
+      {
+        "label": "Photons",
+        "text": "{sample_count}"
+      },
+      {
+        "label": "Count errors per reason / output / reaching up / down",
+        "text": "{reason_count_error} / {photons_out_error} / {reaching_upward_count_error} / {reaching_downward_count_error}"
+      },
+      {
+        "label": "Balance / dropped-sum error",
+        "text": "{balance_error} / {dropped_sum_error}"
+      }
+    ],
+    "figures": []
+  },
     "propagation.curvature-chapman": {
       "title": "Curved extinction vs Chapman integral",
       "headline": "transmission vs Chapman ≤ {max_transmission_relative_error_vs_chapman:.1e}, flat limit {flat_limit_max_relative_error:.1e}",
@@ -1811,6 +2086,26 @@
       "title": "Night-sky camera p.e. vs analytic expectation",
       "description": "Night-sky background through sim_telarray's camera, against the analytic expectation (rate x area x solid angle x efficiencies). No nsbls comparison."
     },
+    "determinism.mixed-directions": {
+    "title": "Determinism with mixed directions",
+    "headline": "{mismatch_count} mismatched photons of {sample_count} ({survivor_count_error} survivor-count errors); seed-change control detects {control_seed_change_detected}",
+    "description": "Photons of all direction classes through the atmosphere stage (refraction, extinction, wavelengths drawn per photon index) with CLI threads 1 and 4, the Python API with threads 4 and 500-row chunks, one chunk per photon, and a shuffled input in which each photon keeps its original index. Compared photon by photon; the reaching photons are identified by their input classification.",
+    "rows": [
+      {
+        "label": "Photons / reaching",
+        "text": "{sample_count} / {survivor_count}"
+      },
+      {
+        "label": "Mismatched photons",
+        "text": "{mismatch_count}"
+      },
+      {
+        "label": "Seed-change control (1 = detected)",
+        "text": "{control_seed_change_detected}"
+      }
+    ],
+    "figures": []
+  },
     "determinism.photons": {
       "title": "Determinism of trace-stream and propagation",
       "description": "Photon-by-photon equality across thread counts (1, 4, all), input chunk sizes (1024, 65536) and file, pipe or in-process use; a changed seed must be detected."

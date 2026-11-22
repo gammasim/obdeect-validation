@@ -1,0 +1,22 @@
+{
+  "id": "propagation.direction-losses",
+  "name": "Mixed-direction population (reaching, moving away, horizontal, below ground, turned over): exact counts per loss category, photons in = photons out + dropped",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "direction-losses",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.direction_losses"],
+      "timeout": 600
+    }
+  ],
+  "metrics": [
+    {"metric": "sample_count", "expected": 200, "atol": 0},
+    {"metric": "reason_count_error", "expected": 0, "atol": 0},
+    {"metric": "photons_out_error", "expected": 0, "atol": 0},
+    {"metric": "balance_error", "expected": 0, "atol": 0},
+    {"metric": "dropped_sum_error", "expected": 0, "atol": 0},
+    {"metric": "reaching_upward_count_error", "expected": 0, "atol": 0},
+    {"metric": "reaching_downward_count_error", "expected": 0, "atol": 0},
+    {"metric": "not_bendable_or_misses_level", "expected": 0, "atol": 0}
+  ]
+}
