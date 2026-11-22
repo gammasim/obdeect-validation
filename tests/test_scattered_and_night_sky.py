@@ -1,12 +1,15 @@
 """Pure helpers of the scattered-light and night-sky camera adapters (analytic expectations)."""
 
 import math
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from obdeect_validation.adapters import night_sky_camera as nsc
 from obdeect_validation.adapters import scattered_light as sl
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_table_value_interpolates_one_column(tmp_path):
@@ -50,17 +53,54 @@ def test_rayleigh_table_is_exponential_in_altitude():
     assert beta == pytest.approx(sl.TAU_0 * math.exp(-0.25) / 8000.0)
 
 
-def test_depolarized_rayleigh_phase_is_normalized_and_uses_rho():
+def test_depolarized_rayleigh_phase_is_used_by_scattering(tmp_path):
+    propagation = pytest.importorskip("obdeect.propagation")
     rho = sl.DEPOLARIZATION
     gamma = rho / (2.0 - rho)
-    mu = np.linspace(-1.0, 1.0, 20001)
-    phase = (
+    rows = []
+    for wavelength in (354, 355, 356):
+        for height in (1, 60):
+            tau_mol = 0.1 * math.exp(-height / 8.0)
+            rows.append(f"{wavelength} {height} {tau_mol:.12g} 0 1 0")
+    tables = []
+    for name, depolarization in (("unpolarized", 0.0), ("depolarized", rho)):
+        path = tmp_path / f"{name}.dat"
+        path.write_text(
+            "\n".join([*rows, f"depolarization {depolarization}"]) + "\n",
+            encoding="utf-8",
+        )
+        tables.append(propagation.ScatteringTable(str(path)))
+    transmission = propagation.TransmissionTable(
+        str(ROOT / "fixtures/atm_trans_2000_1_10_0_0_2000.dat"), 2000.0
+    )
+    primaries = {
+        "x": np.zeros(16, dtype=np.float32),
+        "y": np.zeros(16, dtype=np.float32),
+        "z": np.full(16, 10000.0, dtype=np.float32),
+        "cx": np.zeros(16, dtype=np.float32),
+        "cy": np.zeros(16, dtype=np.float32),
+        "t": np.zeros(16, dtype=np.float32),
+        "w": np.ones(16, dtype=np.float32),
+        "wavelength": np.full(16, 355.0, dtype=np.float32),
+    }
+    telescope = (1, 3000.0, 0.0, 0.0, 12.5)
+    outputs = [
+        propagation.scatter(primaries, table, transmission, [telescope], 7, 1, 0, 16)[1]
+        for table in tables
+    ]
+    plain, depolarized = outputs
+    assert len(plain["w"]) > 0
+    for key in plain:
+        if key != "w":
+            np.testing.assert_array_equal(plain[key], depolarized[key])
+    mu = plain["cz"].astype(np.float64)
+    phase_rho = (
         3.0 / (8.0 * math.pi * (2.0 + gamma)) * ((1.0 + gamma) + (1.0 - gamma) * mu**2)
     )
-    integral = 2.0 * math.pi * np.trapezoid(phase, mu)
-    assert integral == pytest.approx(1.0, abs=1e-8)
-    assert phase[-1] / phase[0] == pytest.approx(1.0)
-    assert phase[0] != pytest.approx(3.0 / (8.0 * math.pi))
+    phase_zero = 3.0 / (16.0 * math.pi) * (1.0 + mu**2)
+    np.testing.assert_allclose(
+        depolarized["w"] / plain["w"], phase_rho / phase_zero, rtol=2e-6
+    )
 
 
 def test_zero_extinction_table_moves_bottom_to_observation_level(tmp_path, monkeypatch):

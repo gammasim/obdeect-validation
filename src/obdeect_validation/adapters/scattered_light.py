@@ -17,11 +17,12 @@ photon is unchanged") and writes the scattered photons as additional rows. Only 
 compared here: the Python scatter() API returns them alone, and the CLI weighted output minus the
 output without scattering gives the same weight sum (cross-checked in the run).
 
-Medium: Rayleigh only, tau_aer = 0, single-scattering albedo 1, 355 nm, vertical optical depth
-tau(h) = 0.00865 (lambda/um)^-4.05 exp(-h/8 km) (the Rayleigh form of the obdeect scattering
-documentation, not a fitted model), tabulated at 300 log-spaced altitudes so that the table
-interpolation is negligible. The transmission table is zero (T = 1, no extinction), which obdeect
-requires with scattering.
+Medium: synthetic molecular plus aerosol scattering at 355 nm. Molecular vertical optical depth
+is 0.00865 (lambda/um)^-4.05 exp(-h/8 km); aerosol depth is 0.20 (lambda/550 nm)^-1.3
+exp(-h/1.5 km), with single-scattering albedo 0.9 and asymmetry 0.65. The molecular phase uses
+depolarization rho = 0.03; aerosol uses a tabulated Henyey-Greenstein phase. Both profiles are
+tabulated at 300 log-spaced altitudes. The transmission table is zero (T = 1, no extinction),
+which obdeect requires with scattering.
 
 Analytic expectation (per unit path length s along the beam, direction d):
 
