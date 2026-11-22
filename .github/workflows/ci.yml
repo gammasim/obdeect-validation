@@ -19,6 +19,7 @@ jobs:
           path: obdeect
           fetch-depth: 0  # setuptools-scm needs history
       - run: python -m pip install ./obdeect/src/stream
+      - run: python -m pip install --no-deps ./obdeect/src/propagation
       - run: python -m pip install -e '.[dev,references]'
       - run: python -m pytest
   lint:
