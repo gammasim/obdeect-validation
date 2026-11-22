@@ -117,10 +117,14 @@ def profile_path() -> Path:
     candidate = reference / "cfg/common/atmprof1.dat"
     if candidate.is_file():
         return candidate
-    return (
-        WORKSPACE
-        / "obdeect/src/propagation/cpp/tests/data/atmprof_ecmwf_north_winter_fixed.dat"
+    relative = Path(
+        "obdeect/src/propagation/cpp/tests/data/atmprof_ecmwf_north_winter_fixed.dat"
     )
+    for checkout in (WORKSPACE, Path(__file__).resolve().parents[3]):
+        candidate = checkout / relative
+        if candidate.is_file():
+            return candidate
+    return WORKSPACE / relative
 
 
 def load_table(path) -> tuple[np.ndarray, np.ndarray]:
