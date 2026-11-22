@@ -372,6 +372,11 @@ def main() -> None:
         "max_abs_difference": comparison["max_abs_difference"],
         "format_major": int(header.get("format_major", -1)),
         "format_minor": int(header.get("format_minor", -1)),
+        # Format 1.1 introduced cz of either sign; later minor versions keep it.
+        "format_supports_directions": int(
+            (int(header.get("format_major", -1)), int(header.get("format_minor", -1)))
+            >= (1, 1)
+        ),
         "cz_upward_count_delta": abs(
             readback_counts["upward"] - expected_total["upward"]
         ),

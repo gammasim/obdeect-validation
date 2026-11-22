@@ -8,6 +8,13 @@ import shutil
 import numpy as np
 import pytest
 
+from obdeect_validation.adapters import common
+
+needs_upward = pytest.mark.skipif(
+    not common.obdeect_supports_upward(),
+    reason="needs obdeect with photons in all directions (stream format 1.1)",
+)
+
 pytest.importorskip("obdeect.stream")
 stream_directions = pytest.importorskip("obdeect_validation.adapters.stream_directions")
 
@@ -31,12 +38,13 @@ def test_grid_has_exact_vertical_and_horizontal_directions():
     assert sum(counts.values()) == stream_directions.GRID_SIZE
 
 
+@needs_upward
 def test_round_trip_is_bit_exact(tmp_path):
     grid = stream_directions.directions()
     stream = tmp_path / "directions.pst"
     written = stream_directions.write_round_trip(stream, grid)
     header, chunks = stream_directions.read_back(stream)
-    assert header["format_minor"] == 1
+    assert (header["format_major"], header["format_minor"]) >= (1, 1)
     result = stream_directions.compare(written, chunks)
     assert result["photon_count"] == 4 * stream_directions.GRID_SIZE
     assert result["bit_mismatch_count"] == 0
@@ -62,6 +70,7 @@ def test_sign_counts_split_upward_downward_horizontal():
     assert counts == {"upward": 2, "downward": 1, "horizontal": 2}
 
 
+@needs_upward
 @pytest.mark.skipif(shutil.which("obdeect") is None, reason="obdeect CLI not installed")
 def test_to_simtel_rejects_upward_and_horizontal_outside_camera(tmp_path):
     rejected, accepted, camera_mixed = stream_directions.rejection_checks(tmp_path)

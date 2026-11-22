@@ -6,11 +6,18 @@ without obdeect.
 """
 
 import math
+
 import numpy as np
 import pytest
 from scipy.integrate import quad
 
+from obdeect_validation.adapters import common
 from obdeect_validation.adapters import upward_lidar as ul
+
+needs_upward = pytest.mark.skipif(
+    not common.obdeect_supports_upward(),
+    reason="needs obdeect with photons in all directions (stream format 1.1)",
+)
 
 
 @pytest.fixture(scope="module")
@@ -133,6 +140,7 @@ def test_chi2_counts_only_bins_with_reference_and_error():
     assert pulls.size == 1
 
 
+@needs_upward
 def test_obdeect_adapter_run_is_consistent(tmp_path, monkeypatch):
     pytest.importorskip("obdeect.propagation")
     monkeypatch.chdir(tmp_path)

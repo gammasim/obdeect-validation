@@ -13,9 +13,21 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7
         with:
           python-version: "3.14"
+      # Companion pull requests use the obdeect branch of the same name, if there is one.
+      - name: Select obdeect branch
+        id: obdeect-ref
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          if git ls-remote --exit-code --heads https://github.com/gammasim/obdeect.git "$BRANCH" >/dev/null; then
+            echo "ref=$BRANCH" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
         with:
           repository: gammasim/obdeect
+          ref: ${{ steps.obdeect-ref.outputs.ref }}
           path: obdeect
           fetch-depth: 0  # setuptools-scm needs history
       - run: python -m pip install ./obdeect/src/stream

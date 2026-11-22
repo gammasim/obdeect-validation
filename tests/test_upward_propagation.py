@@ -10,10 +10,16 @@ import math
 import numpy as np
 import pytest
 
+from obdeect_validation.adapters import common
 from obdeect_validation.adapters import direction_losses as dl
 from obdeect_validation.adapters import upward_common as uc
 from obdeect_validation.adapters import upward_extinction as uext
 from obdeect_validation.adapters import upward_geometry as ug
+
+needs_upward = pytest.mark.skipif(
+    not common.obdeect_supports_upward(),
+    reason="needs obdeect with photons in all directions (stream format 1.1)",
+)
 
 
 @pytest.fixture(scope="module")
@@ -133,6 +139,7 @@ def test_direction_population_has_the_expected_categories():
     assert reasons.count("below_ground") == 2 * dl.N
 
 
+@needs_upward
 def test_obdeect_geometry_adapter_runs(tmp_path):
     pytest.importorskip("obdeect.propagation")
     metrics, _ = ug.analyse(tmp_path)
