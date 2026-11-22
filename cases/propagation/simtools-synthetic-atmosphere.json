@@ -1,0 +1,21 @@
+{
+  "id": "propagation.simtools-synthetic-atmosphere",
+  "name": "Synthetic simtools ECSV atmosphere tables and telescope path depth",
+  "requires": ["obdeect", "simtools-derive-atmosphere-optical-tables"],
+  "commands": [
+    {
+      "name": "ecsv-transmission-and-optics-path",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.synthetic_atmosphere_tables"]
+    }
+  ],
+  "metrics": [
+    {"metric": "wavelength_count", "expected": 2, "atol": 0},
+    {"metric": "height_count", "expected": 3, "atol": 0},
+    {"metric": "zenith_count", "expected": 3, "atol": 0},
+    {"metric": "transmission_max_absolute_error", "expected": 0, "atol": 2e-6},
+    {"metric": "telescope_path_depth_max_absolute_error", "expected": 0, "atol": 2e-6},
+    {"metric": "optical_model_count", "expected": 2, "atol": 0},
+    {"metric": "optical_model_path_max_absolute_error_m", "expected": 0, "atol": 1e-9},
+    {"metric": "path_extinction_max_absolute_error", "expected": 0, "atol": 2e-6}
+  ]
+}

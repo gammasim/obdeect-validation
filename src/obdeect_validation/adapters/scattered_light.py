@@ -17,17 +17,19 @@ photon is unchanged") and writes the scattered photons as additional rows. Only 
 compared here: the Python scatter() API returns them alone, and the CLI weighted output minus the
 output without scattering gives the same weight sum (cross-checked in the run).
 
-Medium: Rayleigh only, tau_aer = 0, single-scattering albedo 1, 355 nm, vertical optical depth
-tau(h) = 0.00865 (lambda/um)^-4.05 exp(-h/8 km) (the Rayleigh form of the obdeect scattering
-documentation, not a fitted model), tabulated at 300 log-spaced altitudes so that the table
-interpolation is negligible. The transmission table is zero (T = 1, no extinction), which obdeect
-requires with scattering.
+Medium: synthetic molecular plus aerosol scattering at 355 nm. Molecular vertical optical depth
+is 0.00865 (lambda/um)^-4.05 exp(-h/8 km); aerosol depth is 0.20 (lambda/550 nm)^-1.3
+exp(-h/1.5 km), with single-scattering albedo 0.9 and asymmetry 0.65. The molecular phase uses
+depolarization rho = 0.03; aerosol uses a tabulated Henyey-Greenstein phase. Both profiles are
+tabulated at 300 log-spaced altitudes. The transmission table is zero (T = 1, no extinction),
+which obdeect requires with scattering.
 
 Analytic expectation (per unit path length s along the beam, direction d):
 
     g(s) = W_up(s) beta(h) p_R(theta) Omega(D)     for h > 0 and D > R, else 0
-    beta(h) = -dtau/dh = tau(h) / 8000 m           (sum over the Rayleigh vertical depth)
-    p_R(theta) = 3/(16 pi) (1 + cos^2 theta),      theta between d and the direction to the telescope
+beta_mol = tau_mol(h) / 8000 m, beta_aer = tau_aer(h) / 1500 m
+    p_R(theta) = 3/[8 pi (2 + gamma)] [(1 + gamma) + (1 - gamma) cos^2 theta],
+        gamma = rho/(2-rho), rho = 0.03, theta between d and the direction to the telescope
     Omega(D) = 2 pi (1 - sqrt(1 - (R/D)^2))        solid angle of the telescope sphere from distance D
     W_up(s) = sum over primaries upstream of s of w_k exp(-(tau(h_s) - tau(h_k))/|cz|)
     (the primary survives to s with the slant Rayleigh depth between its height h_k and h_s, as in
@@ -65,6 +67,11 @@ TELESCOPE_CENTRE_M = np.zeros(
     3
 )  # telescope at the origin of the sky frame (laser-beam convention)
 SCATTERING_POINTS = 32
+DEPOLARIZATION = 0.03
+AEROSOL_TAU_0 = 0.20
+AEROSOL_SCALE_HEIGHT_M = 1500.0
+AEROSOL_SSA = 0.9
+AEROSOL_G = 0.65
 STEP_M = 0.5
 YIELD_FLOOR = 0.01
 ANGLE_FLOOR = 0.01
@@ -87,12 +94,35 @@ UNIT_TRANSMISSION = common.VALIDATION / "fixtures" / "unit-transmission.dat"
 
 
 def write_scattering_table(path):
-    """Rayleigh-only scattering table (see module docstring); altitudes log-spaced 0.1-60 km."""
+    """Synthetic molecular and aerosol table with tabulated HG phase and depolarization."""
+    wavelengths = (354, 355, 356)
     altitudes = np.geomspace(0.1, 60.0, 300)
     rows = ["# wavelength_nm altitude_km tau_mol tau_aer ssa g"]
-    for h in altitudes:
-        tau = TAU_0 * math.exp(-h / 8.0)
-        rows.append(f"{LAMBDA_NM} {h:.8f} {tau:.10e} 0.0 1.0 0.65")
+    for wavelength in wavelengths:
+        wavelength_tau = (wavelength / 1000.0) ** -4.05
+        wavelength_aer = (wavelength / 550.0) ** -1.3
+        for h in altitudes:
+            tau_mol = 0.00865 * wavelength_tau * math.exp(-h / 8.0)
+            tau_aer = (
+                AEROSOL_TAU_0
+                * wavelength_aer
+                * math.exp(-h * 1000.0 / AEROSOL_SCALE_HEIGHT_M)
+            )
+            rows.append(
+                f"{wavelength} {h:.8f} {tau_mol:.10e} {tau_aer:.10e} "
+                f"{AEROSOL_SSA} {AEROSOL_G}"
+            )
+    angles = np.arange(0.0, 181.0, 1.0)
+    rows.append("angles_deg " + " ".join(f"{angle:g}" for angle in angles))
+    mu = np.cos(np.deg2rad(angles))
+    phase = (1.0 - AEROSOL_G**2) / (
+        4.0 * math.pi * (1.0 + AEROSOL_G**2 - 2.0 * AEROSOL_G * mu) ** 1.5
+    )
+    phase_text = " ".join(f"{value:.12e}" for value in phase)
+    for wavelength in wavelengths:
+        for h in altitudes:
+            rows.append(f"phase {wavelength} {h:.8f} {phase_text}")
+    rows.append(f"depolarization {DEPOLARIZATION}")
     Path(path).write_text("\n".join(rows) + "\n", encoding="utf-8")
     return Path(path)
 
@@ -125,24 +155,41 @@ def analytic_expectation(primary_s, primary_w, direction, origin_point):
     dist = np.linalg.norm(points - TELESCOPE_CENTRE_M, axis=1)
     allowed = (z > 0.0) & (dist > TELESCOPE_RADIUS_M)
     cos_theta = (direction[None, :] * (TELESCOPE_CENTRE_M - points)).sum(axis=1) / dist
-    phase = 3.0 / (16.0 * math.pi) * (1.0 + cos_theta**2)
+    gamma = DEPOLARIZATION / (2.0 - DEPOLARIZATION)
+    phase = (
+        3.0
+        / (8.0 * math.pi * (2.0 + gamma))
+        * ((1.0 + gamma) + (1.0 - gamma) * cos_theta**2)
+    )
     omega = (
         2.0
         * math.pi
         * (1.0 - np.sqrt(np.clip(1.0 - (TELESCOPE_RADIUS_M / dist) ** 2, 0, None)))
     )
     altitude_km = (SITE_ALTITUDE_M + z) / 1000.0
-    beta = TAU_0 * np.exp(-altitude_km / 8.0) / SCALE_HEIGHT_M
+    tau_mol = TAU_0 * np.exp(-altitude_km / 8.0)
+    tau_aer = (
+        AEROSOL_TAU_0
+        * (LAMBDA_NM / 550.0) ** -1.3
+        * np.exp(-(SITE_ALTITUDE_M + z) / AEROSOL_SCALE_HEIGHT_M)
+    )
+    beta_mol = tau_mol / SCALE_HEIGHT_M
+    beta_aer = tau_aer / AEROSOL_SCALE_HEIGHT_M
     # Primary survival to the scattering point: exp(-(tau(h_k) - tau(h_s)) / |cz|), the slant
     # Rayleigh depth between the primary's own height h_k and the point (obdeect applies the same
     # factor through exp(-step j), with the table's extinction). Only primaries upstream of s count.
     cz = abs(direction[2])
-    tau_grid = TAU_0 * np.exp(-((SITE_ALTITUDE_M + z) / 1000.0) / 8.0)
+    tau_grid = tau_mol + tau_aer
     order = np.argsort(primary_s)
     s_sorted = np.asarray(primary_s)[order]
     w_sorted = np.asarray(primary_w, dtype=float)[order]
     h_sorted = origin_point[2] + s_sorted * direction[2]
     tau_prim = TAU_0 * np.exp(-((SITE_ALTITUDE_M + h_sorted) / 1000.0) / 8.0)
+    tau_prim += (
+        AEROSOL_TAU_0
+        * (LAMBDA_NM / 550.0) ** -1.3
+        * np.exp(-(SITE_ALTITUDE_M + h_sorted) / AEROSOL_SCALE_HEIGHT_M)
+    )
     # tau decreases with altitude: the depth from the primary (higher) down to the point (lower) is
     # tau(h_s) - tau(h_k) >= 0, so the survival factor is exp(-tau_s/cz) exp(+tau_k/cz).
     weighted_surv = np.cumsum(w_sorted * np.exp(tau_prim / cz))
@@ -150,7 +197,14 @@ def analytic_expectation(primary_s, primary_w, direction, origin_point):
     has = idx > 0
     weight_up = np.zeros(grid.size)
     weight_up[has] = weighted_surv[idx[has] - 1] * np.exp(-tau_grid[has] / cz)
-    g = np.where(allowed, weight_up * beta * phase * omega, 0.0)
+    phase_aer = (1.0 - AEROSOL_G**2) / (
+        4.0 * math.pi * (1.0 + AEROSOL_G**2 - 2.0 * AEROSOL_G * cos_theta) ** 1.5
+    )
+    g = np.where(
+        allowed,
+        weight_up * (beta_mol * phase + AEROSOL_SSA * beta_aer * phase_aer) * omega,
+        0.0,
+    )
     total = float(np.sum(g) * STEP_M)
     if total <= 0:
         raise ValueError("analytic expectation is zero")
@@ -336,7 +390,13 @@ API_SEEDS = (1, 2, 3, 4)
 
 
 def main():
-    from obdeect.propagation import ScatteringTable, TransmissionTable, scatter
+    from obdeect.propagation import (
+        AtmosphereProfile,
+        ScatteringTable,
+        TransmissionTable,
+        air_delay_ns,
+        scatter,
+    )
 
     work = Path.cwd().resolve()
     primary, base, with_scatter, table, transmission, ls_out, _ = run(work)
@@ -354,6 +414,38 @@ def main():
 
     # Python API (the function of the unit tests): scattered photons only, one run per seed.
     scat_table = ScatteringTable(str(table))
+    wavelengths = np.asarray([354.0, 354.5, 355.0, 355.5, 356.0])
+    state = scat_table.profile(wavelengths, np.full(wavelengths.size, 5000.0))
+    fractional_interpolation_error = max(
+        abs(
+            float(values[index])
+            - 0.5 * (float(values[index - 1]) + float(values[index + 1]))
+        )
+        / max(abs(float(values[index])), 1e-12)
+        for values in state
+        for index in (1, 3)
+    )
+    from obdeect_validation.adapters.refraction_curved_reference import (
+        NuProfile,
+        profile_path,
+    )
+
+    air_profile_path = profile_path()
+    air_profile = AtmosphereProfile(str(air_profile_path))
+    independent_profile = NuProfile(air_profile_path)
+    delay_samples = []
+    for low_m, high_m, cosine in (
+        (SITE_ALTITUDE_M + 500.0, SITE_ALTITUDE_M + 5000.0, 1.0),
+        (SITE_ALTITUDE_M + 500.0, SITE_ALTITUDE_M + 5000.0, 0.5),
+    ):
+        heights = np.linspace(low_m, high_m, 20001)
+        nu = independent_profile(heights)
+        expected_delay = float(np.trapezoid(nu, heights) / (0.299792458 * cosine))
+        candidate_delay = float(
+            air_delay_ns(air_profile, low_m, high_m, math.acos(cosine))
+        )
+        delay_samples.append(abs(candidate_delay - expected_delay))
+    air_delay_reference_error_ns = max(delay_samples)
     site = TransmissionTable(
         str(transmission), site_altitude_m=float(SWEEP["altitude"])
     )
@@ -393,6 +485,8 @@ def main():
         "scattered_weight_analytic": expected["yield"],
         "scattered_yield_ratio": ratio,
         "scattered_yield_limit_exceeded": int(abs(ratio - 1.0) > ratio_limit),
+        "fractional_wavelength_interpolation_relative_error": fractional_interpolation_error,
+        "air_delay_reference_error_ns": air_delay_reference_error_ns,
         "cos_theta_mean_mc": cos_mean,
         "cos_theta_mean_analytic": expected["mean_cos_theta"],
         "cos_theta_mean_delta": cos_mean - expected["mean_cos_theta"],
@@ -418,8 +512,10 @@ def main():
     details = {
         "case": "laser beam scattered light: obdeect single scattering (python scatter, CLI cross-check) versus analytic integral; ls-beam recorded",
         "geometry": SWEEP,
-        "medium": f"Rayleigh only, {LAMBDA_NM} nm, tau_0 = {TAU_0:.6f} at the ground, scale height 8 km, "
-        "tau_aer = 0, ssa = 1, transmission table zero (T = 1)",
+        "medium": f"Molecular plus aerosol scattering at {LAMBDA_NM} nm; Rayleigh tau_0 = {TAU_0:.6f}, aerosol tau_0 = {AEROSOL_TAU_0:.3f} at 550 nm, aerosol SSA = {AEROSOL_SSA}, g = {AEROSOL_G}, tabulated HG phase, depolarization = {DEPOLARIZATION}; transmission table zero (T = 1)",
+        "fractional_wavelengths_checked_nm": wavelengths.tolist(),
+        "air_profile": str(air_profile_path),
+        "air_delay_independent_reference": "dense trapezoid of the independent log-spline n-1 profile, divided by c cos(zenith)",
         "scattering_points_per_primary": SCATTERING_POINTS,
         "api_seeds": list(API_SEEDS),
         "api_yields": yields.tolist(),
