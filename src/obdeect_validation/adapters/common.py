@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -36,6 +37,15 @@ def obdeect_supports_upward() -> bool:
     except ImportError:
         return False
     return (format_major, format_minor) >= (1, 1)
+
+
+def obdeect_has(module: str) -> bool:
+    """True if the installed obdeect provides module (for example obdeect.ray_tracing)."""
+    try:
+        importlib.import_module(module)
+    except ImportError:
+        return False
+    return True
 
 
 def obdeect_supports_sphere() -> bool:

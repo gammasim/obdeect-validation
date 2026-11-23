@@ -29,7 +29,6 @@ import math
 from pathlib import Path
 
 import numpy as np
-from obdeect.ray_tracing.errors import ModelError
 
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import optics_directions as od
@@ -423,6 +422,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
         root / "small-sphere.pst", parallel_beam(200, FIXTURE_DISK_M, SEED + 2), 0.5
     )
     from obdeect.propagation import propagate
+    from obdeect.ray_tracing.errors import ModelError
 
     small = root / "small-sphere-sphere.pst"
     propagate(

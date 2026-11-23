@@ -9,8 +9,8 @@ from obdeect_validation.adapters import common
 from obdeect_validation.adapters import sphere_sources as ss
 
 needs_sphere = pytest.mark.skipif(
-    not common.obdeect_supports_sphere(),
-    reason="needs obdeect with the sphere representation (stream format 1.2)",
+    not (common.obdeect_supports_sphere() and common.obdeect_has("obdeect.sources")),
+    reason="needs obdeect with the sphere representation (stream format 1.2) and sources",
 )
 
 
