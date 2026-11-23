@@ -10,6 +10,8 @@ import math
 import numpy as np
 import pytest
 
+from obdeect_validation.adapters import sources_directions
+
 try:
     import obdeect.sources  # noqa: F401
 except ImportError:
@@ -19,8 +21,6 @@ else:
 needs_obdeect = pytest.mark.skipif(
     not HAVE_OBDEECT, reason="obdeect.sources is not installed"
 )
-from obdeect_validation.adapters import sources_directions
-
 D = sources_directions
 
 
