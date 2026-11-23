@@ -43,7 +43,11 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from obdeect.ray_tracing import STATUS_NAMES, OpticalModel, ThreadPool
+
+try:  # the traced runs need obdeect; the reference helpers do not
+    from obdeect.ray_tracing import STATUS_NAMES, OpticalModel, ThreadPool
+except ImportError:  # pragma: no cover - exercised by the reference-only environment
+    STATUS_NAMES = OpticalModel = ThreadPool = None
 
 from obdeect_validation.adapters import common, plotting
 
@@ -64,8 +68,6 @@ FACET_POINTS_LOG2 = (
 )
 SEGMENT_GRID = 400  # cells across the box of a segment
 PULL_LIMIT = 4.0
-BLOCKED = STATUS_NAMES.index("blocked")
-DETECTED = STATUS_NAMES.index("detected")
 SQRT3_2 = math.sqrt(3.0) / 2.0
 STATUS_COLOURS = {
     "mirror back (primary)": plotting.NATIVE,
@@ -487,6 +489,10 @@ def differing_rows(a: dict, b: dict) -> np.ndarray:
     return differs
 
 
+def status_code(name: str) -> int:
+    return STATUS_NAMES.index(name)
+
+
 def status_counts(status: np.ndarray) -> dict[str, int]:
     return {
         name: int(np.count_nonzero(status == i)) for i, name in enumerate(STATUS_NAMES)
@@ -521,13 +527,13 @@ def beam_part(
     )
     out = trace(model, photons)
     counts = status_counts(out["status"])
-    primary = (out["status"] == BLOCKED) & np.isin(
+    primary = (out["status"] == status_code("blocked")) & np.isin(
         out["terminal_surface"], sorted(geometry.primary["ids"])
     )
-    obscurer = (out["status"] == BLOCKED) & np.isin(
+    obscurer = (out["status"] == status_code("blocked")) & np.isin(
         out["terminal_surface"], sorted(geometry.obscurer_ids)
     )
-    unknown = (out["status"] == BLOCKED) & ~primary & ~obscurer
+    unknown = (out["status"] == status_code("blocked")) & ~primary & ~obscurer
     record = {
         "inclination_deg": inclination,
         "disk_radius_m": radius,
@@ -746,7 +752,7 @@ def plot_start_map(path: Path, arrays: dict) -> None:
         arrays["status"],
         arrays["primary"],
     )
-    obscurer = (status == BLOCKED) & ~primary
+    obscurer = (status == status_code("blocked")) & ~primary
     masks = {
         "mirror back (primary)": primary,
         "obscurer": obscurer,

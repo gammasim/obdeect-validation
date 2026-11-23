@@ -31,8 +31,6 @@ import math
 from pathlib import Path
 
 import numpy as np
-from obdeect.sources import run
-from obdeect.stream import Reader
 from scipy import stats
 
 from obdeect_validation.adapters import common, plotting
@@ -127,6 +125,8 @@ def beam_direction(zenith_deg: float, azimuth_deg: float) -> np.ndarray:
 
 def read_photons(path) -> dict:
     """Photon columns (float32, as stored) of a stream, plus the run_end not_on_plane count."""
+    from obdeect.stream import Reader
+
     columns = {name: [] for name in TIME_KEYS}
     run_end = None
     for record in Reader(str(path)):
@@ -202,6 +202,8 @@ def time_test(data: dict, height: float) -> tuple[float, float]:
 
 def isotropic_part(root: Path, photons: int = PHOTONS, seed: int = SEED) -> dict:
     """Both heights: kept fraction, photon balance, radial density and arrival times."""
+    from obdeect.sources import run
+
     cases = {}
     for label, height in (("above", HEIGHT_M), ("below", -HEIGHT_M)):
         path = root / f"isotropic-{label}.pst"
@@ -285,6 +287,8 @@ def plane_wave_run(
 
 def plane_wave_part(root: Path, seed: int = SEED, photons: int = PLANE_PHOTONS) -> dict:
     """Upward plane wave: direction, start plane, and hits of the target disc."""
+    from obdeect.sources import run
+
     path = root / "plane-wave-upward.pst"
     summary = run.write(
         plane_wave_run(PLANE_START_M, PLANE_TOWARDS, seed, photons), path
@@ -321,6 +325,8 @@ def plane_wave_part(root: Path, seed: int = SEED, photons: int = PLANE_PHOTONS) 
 
 def rejection(run_description, expected_text: str) -> dict:
     """Run the description; a ValueError must name expected_text. Other outcomes are not a pass."""
+    from obdeect.sources import run
+
     try:
         run.write(run_description, "/dev/null")
     except ValueError as exc:

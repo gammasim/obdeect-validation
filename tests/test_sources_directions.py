@@ -10,10 +10,17 @@ import math
 import numpy as np
 import pytest
 
-pytest.importorskip("obdeect.sources")
-sources_directions = pytest.importorskip(
-    "obdeect_validation.adapters.sources_directions"
+try:
+    import obdeect.sources  # noqa: F401
+except ImportError:
+    HAVE_OBDEECT = False
+else:
+    HAVE_OBDEECT = True
+needs_obdeect = pytest.mark.skipif(
+    not HAVE_OBDEECT, reason="obdeect.sources is not installed"
 )
+from obdeect_validation.adapters import sources_directions
+
 D = sources_directions
 
 
@@ -82,6 +89,7 @@ def test_beam_direction_is_unit_and_follows_zenith():
     assert D.beam_direction(0.0, 0.0)[2] == pytest.approx(1.0)
 
 
+@needs_obdeect
 def test_isotropic_part_keeps_half_and_balances_photons(tmp_path):
     cases = D.isotropic_part(tmp_path, photons=20_000)
     for case in cases.values():
@@ -93,12 +101,14 @@ def test_isotropic_part_keeps_half_and_balances_photons(tmp_path):
         assert case["kept_rows"] + case["summary"]["not_on_plane"] == 20_000
 
 
+@needs_obdeect
 def test_plane_wave_rejections_name_the_problem():
     result = D.plane_wave_rejections()
     assert result["horizontal_towards_source"]["message_found"]
     assert result["start_plane_wrong_side"]["message_found"]
 
 
+@needs_obdeect
 def test_laser_upward_beam_matches_the_reference(tmp_path):
     result = D.laser_part(tmp_path)
     assert result["direction_error_deg"] < 1e-4
