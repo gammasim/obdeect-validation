@@ -13,9 +13,16 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-OpticalModel = pytest.importorskip("obdeect.ray_tracing").OpticalModel
-oa = pytest.importorskip("obdeect_validation.adapters.optics_directions")
-common = pytest.importorskip("obdeect_validation.adapters.common")
+from obdeect_validation.adapters import common
+from obdeect_validation.adapters import optics_directions as oa
+
+try:
+    from obdeect.ray_tracing import OpticalModel
+except ImportError:
+    OpticalModel = None
+needs_obdeect = pytest.mark.skipif(
+    OpticalModel is None, reason="obdeect.ray_tracing is not installed"
+)
 FIXTURE = Path(__file__).resolve().parents[1] / oa.FIXTURE
 
 
@@ -224,6 +231,7 @@ def test_obscurer_below_the_primary_is_rejected():
         oa.Geometry.of(document)
 
 
+@needs_obdeect
 def test_fixture_blocked_fraction_matches_the_reference():
     model = OpticalModel.load(FIXTURE)
     geometry = oa.Geometry.of(model.document)
@@ -235,6 +243,7 @@ def test_fixture_blocked_fraction_matches_the_reference():
         assert abs(record["mirror_back_pull"]) < oa.PULL_LIMIT
 
 
+@needs_obdeect
 def test_fixture_downward_rows_are_identical_to_downward_only_trace():
     model = OpticalModel.load(FIXTURE)
     geometry = oa.Geometry.of(model.document)
@@ -243,6 +252,7 @@ def test_fixture_downward_rows_are_identical_to_downward_only_trace():
     assert record["status_sum_error"] == 0
 
 
+@needs_obdeect
 def test_fixture_determinism_across_threads_pools_chunks_and_order():
     model = OpticalModel.load(FIXTURE)
     geometry = oa.Geometry.of(model.document)
@@ -275,6 +285,7 @@ def test_summary_flags_detected_and_unknown_surfaces():
     assert metrics["mirror_back_cases"] == 1
 
 
+@needs_obdeect
 @pytest.mark.skipif(
     not (common.models_root() / "productions" / oa.MODEL_VERSION).is_dir(),
     reason="simulation models not available (set VALIDATION_MODELS)",
@@ -294,6 +305,7 @@ def test_lst_blocked_fraction_matches_the_reference():
     assert abs(record["mirror_back_pull"]) < oa.PULL_LIMIT
 
 
+@needs_obdeect
 def test_copy_of_document_is_not_changed_by_the_geometry_reference():
     model = OpticalModel.load(FIXTURE)
     before = copy.deepcopy(model.document)
