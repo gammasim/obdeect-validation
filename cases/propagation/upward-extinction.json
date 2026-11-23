@@ -1,0 +1,21 @@
+{
+  "id": "propagation.upward-extinction",
+  "name": "Upward photons: plane-parallel and spherical transmission against independent table references (log10-linear tau, slant integral), flat limit, downward rows bit-identical",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "upward-extinction",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.upward_extinction"],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {"metric": "sample_count", "expected": 300, "atol": 0},
+    {"metric": "plane_max_abs_error", "expected": 0, "atol": 1e-6},
+    {"metric": "spherical_max_abs_error", "expected": 0, "atol": 1e-6},
+    {"metric": "flat_limit_max_abs_error", "expected": 0, "atol": 1e-6},
+    {"metric": "plane_downward_bitwise_mismatch", "expected": 0, "atol": 0},
+    {"metric": "spherical_downward_bitwise_mismatch", "expected": 0, "atol": 0},
+    {"metric": "dropped_upward", "expected": 0, "atol": 0}
+  ]
+}

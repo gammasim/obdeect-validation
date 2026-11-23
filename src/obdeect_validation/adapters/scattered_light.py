@@ -6,11 +6,10 @@ Usage (inside the container, in an empty case directory):
 
 Geometry: a laser above the telescope fires a beam downwards through the 15 deg field of view
 (laser at (-1000, 0, 3000) m, zenith 108.5 deg, azimuth 0, telescope zenith 30 deg, radius 12.5 m).
-Downward only: obdeect scattering assumes primaries travel towards the observation level
-(scattering.hpp:555 sets cz = -sqrt(1 - cx^2 - cy^2) for every primary, and a cz column that disagrees
-raises; scattering.hpp:365 returns for primaries at or below the observation level; the scattering
-documentation, scattering.md:85, says points below the telescope and photons travel downwards only).
-The upward beam of the laser-beam case (zenith 60 deg) therefore gives no scattered photons at all.
+This case uses a downward beam. Since obdeect PR 80, upward primaries (cz > 0) are scattered too,
+and scattering points below a telescope sphere centre send light upward (scattering.md, "Upward
+primaries"); the upward laser is validated by propagation.upward-lidar. Primaries at or below the
+observation level are not scattered.
 
 Output: the propagation CLI passes the primary photons through unchanged (scattering.md, "The primary
 photon is unchanged") and writes the scattered photons as additional rows. Only the scattered rows are

@@ -1,0 +1,65 @@
+{
+  "id": "optics.upward-absorption",
+  "name": "Light from below on the optics (LST, MST, SST and the segmented fixture): blocked fraction by the primary back against the projected primary, downward control bit-identical, determinism across threads, pools, chunks and row order",
+  "requires": [
+    "obdeect"
+  ],
+  "commands": [
+    {
+      "name": "upward-absorption",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.optics_directions"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "detected_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "status_sum_error",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "mirror_back_cases",
+      "expected": 9,
+      "atol": 0
+    },
+    {
+      "metric": "mirror_back_pull_max_abs",
+      "expected": 0,
+      "atol": 4
+    },
+    {
+      "metric": "fixture_mirror_back_cases",
+      "expected": 3,
+      "atol": 0
+    },
+    {
+      "metric": "fixture_mirror_back_pull_max_abs",
+      "expected": 0,
+      "atol": 4
+    },
+    {
+      "metric": "blocked_unknown_surface_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "downward_mismatch_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "determinism_mismatch_count",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

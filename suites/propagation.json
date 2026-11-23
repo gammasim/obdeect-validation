@@ -9,6 +9,11 @@
     "../cases/propagation/refraction-curved-ray.json",
     "../cases/propagation/curvature-input-guards.json",
     "../cases/propagation/corsika-to-sky-scattering.json",
-    "../cases/propagation/simtools-synthetic-atmosphere.json"
+    "../cases/propagation/simtools-synthetic-atmosphere.json",
+    "../cases/propagation/upward-geometry.json",
+    "../cases/propagation/upward-refraction.json",
+    "../cases/propagation/upward-extinction.json",
+    "../cases/propagation/upward-lidar.json",
+    "../cases/propagation/direction-losses.json"
   ]
 }

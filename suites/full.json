@@ -3,6 +3,7 @@
   "cases": [
     "../cases/stream/led-eventio.json",
     "../cases/stream/corsika-roundtrip.json",
+    "../cases/stream/direction-roundtrip.json",
     "../cases/propagation/extinction-analytic.json",
     "../cases/propagation/extinction-simtel-table.json",
     "../cases/propagation/atmosphere-corsika.json",
@@ -14,9 +15,11 @@
     "../cases/sources/laser-beam.json",
     "../cases/sources/night-sky.json",
     "../cases/sources/muon-track.json",
+    "../cases/sources/isotropic-to-plane.json",
     "../cases/optics/optics-lst.json",
     "../cases/optics/optics-mst.json",
     "../cases/optics/optics-sst.json",
+    "../cases/optics/upward-absorption.json",
     "../cases/chain/stream-roundtrip-threshold.json",
     "../cases/chain/atmosphere-substitution.json",
     "../cases/chain/optics-bypass1.json",
@@ -49,6 +52,11 @@
     "../cases/performance/air-shower-proton.json",
     "../cases/performance/stream-pipe.json",
     "../cases/propagation/corsika-to-sky-scattering.json",
-    "../cases/propagation/simtools-synthetic-atmosphere.json"
+    "../cases/propagation/simtools-synthetic-atmosphere.json",
+    "../cases/propagation/upward-geometry.json",
+    "../cases/propagation/upward-refraction.json",
+    "../cases/propagation/upward-extinction.json",
+    "../cases/propagation/upward-lidar.json",
+    "../cases/propagation/direction-losses.json"
   ]
 }

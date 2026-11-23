@@ -26,6 +26,18 @@ ZERO_DEPTH_BOTTOM_M = 2140.0
 _H2_HEADER = re.compile(r"H2=\s*[0-9.]+")
 
 
+def obdeect_supports_upward() -> bool:
+    """True if the installed obdeect takes photons in all directions (stream format 1.1 or later).
+
+    Unit tests of the upward-photon cases skip on an older obdeect (obdeect PR 80).
+    """
+    try:
+        from obdeect.stream import format_major, format_minor
+    except ImportError:
+        return False
+    return (format_major, format_minor) >= (1, 1)
+
+
 def zero_depth_table(text: str, bottom_m: float = ZERO_DEPTH_BOTTOM_M) -> str:
     """Sim_telarray transmission table with zero optical depth and its bottom (H2) at bottom_m.
 
