@@ -581,7 +581,12 @@ def run_all(root: Path) -> tuple[dict, dict]:
     # (b) refraction (profile): 3D ray integrator reference; hybrid rule and integrator rows
     summary_b, rows_b_raw, _ = run_obdeect(root, "refraction", cols, profile=uc.PROFILE)
     rows_b = match_by_index(rows_b_raw, n)
-    ref_b = reference_refraction(cols, profile, TELESCOPE_M, s_max=6000.0)
+    # Longest path needed: from the farthest origin to the sphere, with margin for bending.
+    origins = np.stack([cols["x"], cols["y"], cols["z"]], axis=1).astype(np.float64)
+    s_max = (
+        1.2 * float(np.max(np.linalg.norm(origins - TELESCOPE_M, axis=1))) + RADIUS_M
+    )
+    ref_b = reference_refraction(cols, profile, TELESCOPE_M, s_max=s_max)
     kept_b = ref_b["reason"] == "ok"
     present_b = rows_b["present"]
     reason_mismatch = int(np.count_nonzero(kept_b != present_b))

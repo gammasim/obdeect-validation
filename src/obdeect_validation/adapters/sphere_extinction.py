@@ -88,6 +88,8 @@ def flat_chord_depth(wl, h_start, h_end, length) -> float:
     """Flat: h linear in s; the integral of k along the chord (equals the plane formula for any u)."""
     if length <= 0.0:
         return 0.0
+    if h_end == h_start:  # horizontal chord: constant altitude, no breakpoints
+        return k_of(wl, h_start) * length
     slope = (h_end - h_start) / length
     points = []
     for h_b in table().breakpoints(min(h_start, h_end), max(h_start, h_end)):
