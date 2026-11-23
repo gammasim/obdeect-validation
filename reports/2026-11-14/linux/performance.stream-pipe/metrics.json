@@ -1,0 +1,20 @@
+{
+  "cat_tee_pipe_completed": 1,
+  "cat_tee_pipe_reps": 3,
+  "cat_tee_pipe_wall_s": 5.843022204004228,
+  "cat_tee_pipe_cpu_s": 1.77487,
+  "cat_tee_pipe_peak_rss_mb": 2.66796875,
+  "cat_tee_pipe_bytes_in": 1544577472,
+  "cat_tee_pipe_gb_per_s": 0.26434564478319106,
+  "to_simtel_pipe_completed": 1,
+  "to_simtel_pipe_reps": 3,
+  "to_simtel_pipe_wall_s": 5.535353675950319,
+  "to_simtel_pipe_cpu_s": 2.148165,
+  "to_simtel_pipe_peak_rss_mb": 60.57421875,
+  "to_simtel_pipe_bytes_in": 1544577472,
+  "to_simtel_pipe_gb_per_s": 0.2790386238029902,
+  "cat_tee_pipe_gb_per_s_limit": 1.0,
+  "cat_tee_pipe_throughput_budget_exceeded": 1,
+  "to_simtel_pipe_gb_per_s_limit": 1.0,
+  "to_simtel_pipe_throughput_budget_exceeded": 1
+}

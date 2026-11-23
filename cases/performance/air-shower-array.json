@@ -1,14 +1,14 @@
 {
   "id": "performance.air-shower-array",
-  "name": "Air shower, North array (LSTN-01..04, MSTN-03, MSTN-15; 7.0.0): CORSIKA IACT -> sim_telarray with all six telescopes versus per-telescope obdeect envelope pipes (sim_telarray Bypass_Optics=3); chain time without compiles; per-telescope photoelectron bias; timing budgets",
+  "name": "Air shower, North array (LSTN-01..04, MSTN-03, MSTN-15; 7.0.0): CORSIKA IACT -> sim_telarray with all six telescopes versus an obdeect tee candidate (one QE-envelope propagation per telescope group, FIFO fan-out to one sim_telarray camera stage per telescope, Bypass_Optics=3); chain time without compiles; per-telescope photoelectron bias; timing budgets",
   "requires": [
     "obdeect",
     "simtools-generate-array-config",
     "python3"
   ],
   "inputs": [
-    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.iact",
-    "/validation/inputs/gamma-20deg-100-3000GeV-array-north.corsika.log"
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north-100showers.iact",
+    "/validation/inputs/gamma-20deg-100-3000GeV-array-north-100showers.corsika.log"
   ],
   "timeout": 14400,
   "commands": [
@@ -54,7 +54,7 @@
       "atol": 0
     },
     {
-      "metric": "candidate_envelope_completed",
+      "metric": "candidate_tee_completed",
       "expected": 1,
       "atol": 0
     },

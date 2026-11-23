@@ -6,13 +6,16 @@ LightEmission -> sim_telarray (sources). The candidate is the obdeect chain endi
 sim_telarray camera stage (Bypass_Optics=1 for the air shower, as in cases/chain/optics-bypass1.json).
 Every child process is timed with performance.run_timed. A pipeline total is the sum of its stage
 wall and CPU times and the maximum of its stage peak RSS (stages run one after another).
+The repetitions alternate between pipelines (rep 1 of each, then rep 2 of each), so a change in host
+state affects all pipelines alike (run_interleaved).
 
 The air-shower case also times an optimised candidate (candidate_envelope, obdeect default threads;
 candidate_envelope_threads1 for the single-core comparison): from-corsika, propagation (QE bound,
 thinned), trace-stream and to-simtel run as one pipe; sim_telarray then reads a QE / bound table, so
 the product is the model QE. A physics check compares its camera output with sim_telarray on the
 same input (unit atmosphere on both sides); its photoelectron bias is the equal-statistics condition
-of the wall and CPU budgets (performance_budget).
+of the wall and CPU budgets (performance_budget). candidate_unthinned_threads1 is the same pipe
+without thinning (report only: thinning and piping gains).
 
 Only ray-tracing trace-stream is multithreaded. The air-shower candidate therefore runs with
 threads=1 and with the obdeect default (0 = every core); the source pipelines are single-threaded
@@ -85,17 +88,27 @@ ENVELOPE_VARIANTS = (
     ("candidate_envelope_threads1", 1),
 )
 PHOTON_KEYS = ("wall_s", "cpu_s", "peak_rss_mb")
+UNTHINNED_LABEL = "candidate_unthinned_threads1"
+# Timing reliability (report only, see timing_reliability): relative wall spread of a pipeline total
+# over the repetitions, and the host 1-minute load average before the run.
+SPREAD_LIMIT = 0.05
+LOAD_LIMIT = 1.0
+# The model compile runs once per repetition: left out of CPU shares and of the piping gain.
+SHARE_EXCLUDED = ("compile_model",)
 # obdeect wrapper subcommands that run as native programs in candidate pipelines. The wrapper adds
 # ~0.1 s per call (light-start-up measurements); the native program takes the same arguments and
-# gives byte-identical output (checked for flasher, point-source, propagation, to-simtel, from-corsika
-# with the same seeds). trace-stream and the model compile have no native program here: they stay
-# on the wrapper.
+# gives byte-identical output (checked for propagation, to-simtel, from-corsika with the same seeds).
+# trace-stream and the model compile have no native program here: they stay on the wrapper.
+# obdeect sources run has no native program (the sources tools were replaced by run descriptions),
+# so the sources stage uses the wrapper.
 NATIVE_PROGRAMS = {
-    ("sources", "flasher"): ("obdeect.sources", "obdeect-sources-flasher"),
-    ("sources", "point-source"): ("obdeect.sources", "obdeect-sources-point-source"),
     ("propagation", "run"): ("obdeect.propagation", "obdeect-propagation-run"),
     ("stream", "to-simtel"): ("obdeect.stream", "obdeect-stream-to-simtel"),
     ("stream", "from-corsika"): ("obdeect.stream", "obdeect-stream-from-corsika"),
+    ("ray-tracing", "trace-stream"): (
+        "obdeect.ray_tracing",
+        "obdeect-ray-tracing-trace-stream",
+    ),
 }
 
 
@@ -140,13 +153,32 @@ SOURCES = {
         "candidate": lambda n, p: [
             "obdeect",
             "sources",
+            "run",
             "flasher",
             "--type",
             "dish",
+            "--observation-level",
+            "2150",
+            "--seed",
+            "1",
+            "--atmosphere-id",
+            "1",
+            "--position",
+            "0,0,16",
+            "--camera-radius",
+            "1.2",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--angular",
+            "isotropic",
             "--events",
             n,
             "--photons",
             p,
+            "--set",
+            "run.frame=sky",
+            "--set",
+            "events[0].emissions[0].to_plane_z0=false",
         ],
         "reference": lambda n, p: ["ff-1m", "--events", n, "--photons", p],
         "bypass": 1,  # as in source_camera stage 2
@@ -157,17 +189,26 @@ SOURCES = {
         "candidate": lambda n, p: [
             "obdeect",
             "sources",
+            "run",
             "point-source",
-            "-N",
-            n,
-            "-n",
-            p,
-            "-z",
-            "100000",
-            "-a",
-            "isotropic",
+            "--observation-level",
+            "2150",
             "--seed",
             "17",
+            "--atmosphere-id",
+            "1",
+            "--events",
+            n,
+            "--photons",
+            p,
+            "--position",
+            "0,0,1000",
+            "--telescope-radius",
+            "15",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--angular",
+            "isotropic",
         ],
         "reference": lambda n, p: [
             "xyzls",
@@ -260,11 +301,22 @@ def _median(records, key):
 
 
 def _aggregate(prefix, records):
-    return {
+    """Medians over repetitions, the range of wall and CPU, and the relative wall spread."""
+    wall = [record["wall_s"] for record in records]
+    cpu = [record["cpu_s"] for record in records]
+    out = {
         f"{prefix}_wall_s": _median(records, "wall_s"),
         f"{prefix}_cpu_s": _median(records, "cpu_s"),
         f"{prefix}_peak_rss_mb": _median(records, "peak_rss_mb"),
+        f"{prefix}_wall_s_min": min(wall),
+        f"{prefix}_wall_s_max": max(wall),
+        f"{prefix}_cpu_s_min": min(cpu),
+        f"{prefix}_cpu_s_max": max(cpu),
     }
+    spread = ratio(max(wall) - min(wall), out[f"{prefix}_wall_s"])
+    if spread is not None:
+        out[f"{prefix}_wall_s_spread"] = spread
+    return out
 
 
 def pipeline_metrics(prefix, per_stage, totals):
@@ -287,6 +339,20 @@ def ratio_metrics(label, candidate, reference):
         value = ratio(candidate[key], reference[key])
         if value is not None:
             out[f"ratio_{name}_{label}"] = value
+    return out
+
+
+def ratio_min_metrics(label, metrics):
+    """Candidate / reference of the minimum wall and CPU over the repetitions (pipeline totals)."""
+    out = {}
+    for key, name in (("wall_s", "wall"), ("cpu_s", "cpu")):
+        candidate = metrics.get(f"{label}_{key}_min")
+        reference = metrics.get(f"reference_{key}_min")
+        if candidate is None or reference is None:
+            continue
+        value = ratio(candidate, reference)
+        if value is not None:
+            out[f"ratio_{name}_{label.removeprefix('candidate_')}_min"] = value
     return out
 
 
@@ -350,6 +416,8 @@ def shower_candidate(work, source, inputs, threads):
                     "--wavelength-range",
                     250,
                     700,
+                    "--telescopes",
+                    ",".join(map(str, co.TELESCOPES)),
                     "-i",
                     native,
                     "-o",
@@ -479,8 +547,10 @@ def source_candidate(work, spec):
 
 
 def source_reference(work, spec):
-    """LightEmission -> sim_telarray with the same photon counts and camera options."""
-    reference = work / "reference.dat.gz"
+    """LightEmission -> sim_telarray with the same photon counts and camera options.
+
+    The photon file is uncompressed, as the obdeect side's stream: gzip would add its own time."""
+    reference = work / "reference.dat"
     argv = source_camera._reference_argv(
         spec["reference"](spec["events"], spec["photons"]), work
     )
@@ -498,25 +568,52 @@ def source_reference(work, spec):
     ]
 
 
+def run_interleaved(runs, reps, metrics, details):
+    """Measure several pipelines with their repetitions alternating: rep 1 of each, then rep 2 of each.
+
+    runs: [(label, steps)]. A label that raises is recorded as failed and skipped in the later
+    repetitions; the others still run. Returns {label: completed}.
+    """
+    per_stage = {label: {name: [] for name, _ in steps} for label, steps in runs}
+    totals = {label: [] for label, _ in runs}
+    failed = {}
+    for _ in range(reps):
+        for label, steps in runs:
+            if label in failed:
+                continue
+            try:
+                rep_stages, rep_totals = measure(steps, 1)
+            except (RuntimeError, OSError, ValueError) as error:  # reported, not hidden
+                failed[label] = (error, traceback.format_exc())
+                continue
+            for name, records in rep_stages.items():
+                per_stage[label][name].extend(records)
+            totals[label].extend(rep_totals)
+    ok = {}
+    for label, _ in runs:
+        if label in failed:
+            error, trace = failed[label]
+            metrics[f"{label}_completed"] = 0
+            details["failures"][label] = {
+                "error": str(error)[:400],
+                "traceback": trace[-800:],
+            }
+            ok[label] = False
+            continue
+        metrics.update(pipeline_metrics(label, per_stage[label], totals[label]))
+        details["stages"][label] = per_stage[label]
+        details["pipelines"][label] = totals[label]
+        ok[label] = True
+    return ok
+
+
 def _run(label, steps, reps, metrics, details):
-    """Measure one pipeline; a failure is recorded and the other pipelines still run."""
-    try:
-        per_stage, totals = measure(steps, reps)
-    except (RuntimeError, OSError, ValueError) as error:  # reported, not hidden
-        metrics[f"{label}_completed"] = 0
-        details["failures"][label] = {
-            "error": str(error)[:400],
-            "traceback": traceback.format_exc()[-800:],
-        }
-        return False
-    metrics.update(pipeline_metrics(label, per_stage, totals))
-    details["stages"][label] = per_stage
-    details["pipelines"][label] = totals
-    return True
+    """Measure one pipeline (run_interleaved with one label); a failure is recorded."""
+    return run_interleaved([(label, steps)], reps, metrics, details)[label]
 
 
 def _ratios(metrics, reference_ok, candidates):
-    """Candidate / reference ratios of the pipeline totals (only when both completed)."""
+    """Candidate / reference ratios of the pipeline totals, medians and minima (only when both completed)."""
     if not reference_ok:
         return
     ref = {key: metrics[f"reference_{key}"] for key in PHOTON_KEYS}
@@ -525,6 +622,7 @@ def _ratios(metrics, reference_ok, candidates):
             continue
         cand = {key: metrics[f"{label}_{key}"] for key in PHOTON_KEYS}
         metrics.update(ratio_metrics(label.removeprefix("candidate_"), cand, ref))
+        metrics.update(ratio_min_metrics(label, metrics))
 
 
 def sim_telarray_qe(path, grid=WAVELENGTH_GRID):
@@ -621,8 +719,9 @@ def envelope_pipeline(
 ):
     """One pipe: from-corsika | propagation | trace-stream | to-simtel | sim_telarray.
 
-    envelope None gives the unthinned chain (weighted propagation, no scaled table). Only the
-    telescope is traced (trace-stream); propagation covers all telescopes. sim_argv reads standard input ("-") and is the last stage.
+    envelope None gives the unthinned chain (weighted propagation, no scaled table). Propagation
+    and trace-stream keep only the telescope; the photons of the others are not processed.
+    sim_argv reads standard input ("-") and is the last stage.
     """
     thinned = envelope is not None
     propagation = [
@@ -637,7 +736,9 @@ def envelope_pipeline(
         28,
         "--seed",
         123,
-    ]  # no --telescopes: the image's obdeect has none; thinning and wavelengths are keyed by telescope
+        "--telescopes",
+        str(telescope),
+    ]
     if thinned:
         propagation += ["--envelope", f"{ENVELOPE_FACTOR}={envelope}"]
     else:
@@ -809,13 +910,14 @@ def envelope_candidate(work, source, inputs, files, threads=0):
 
     Steps: compile of the optical model, then one pipe from-corsika | propagation | trace-stream |
     to-simtel | sim_telarray (Bypass_Optics=3). sim_telarray's statistics go to candidate.stdout.
+    files None gives the unthinned pipe (weighted propagation, no scaled table).
     """
     model = work / "lst.model"
     sim_argv, _ = simtel_candidate(work, inputs, files)
     stages = envelope_pipeline(
         source,
         inputs["atmosphere"],
-        files["envelope"],
+        files["envelope"] if files else None,
         model,
         co.camera_map(work, inputs["rotation"]),
         sim_argv,
@@ -890,16 +992,154 @@ def variant_counts(work, camera):
 
 
 def child_metrics(prefix, summaries):
-    """Median wall and CPU of each pipeline member over the repetitions: '<prefix>_<member>_wall_s'."""
+    """Median exit time and CPU of each pipeline member over the repetitions.
+
+    The exit time runs from the start of the pipe to the member's exit ('<prefix>_<member>_exit_s'),
+    not the member's own run time.
+    """
     members = {}
     for summary in summaries:
         for child in summary.get("children", []):
             members.setdefault(child["name"], []).append(child)
     metrics = {}
     for name, records in members.items():
-        metrics[f"{prefix}_{name}_wall_s"] = _median(records, "wall_s")
+        metrics[f"{prefix}_{name}_exit_s"] = _median(records, "wall_s")
         metrics[f"{prefix}_{name}_cpu_s"] = _median(records, "cpu_s")
     return metrics
+
+
+def loadavg():
+    """1-minute load average of the host, or None where it is not available."""
+    try:
+        return os.getloadavg()[0]
+    except (OSError, AttributeError):
+        return None
+
+
+def timing_reliability(metrics, labels):
+    """(1, reasons) when a pipeline total is too noisy to compare, else (0, reasons).
+
+    Noisy: the relative wall spread over the repetitions above SPREAD_LIMIT, or a host load
+    above LOAD_LIMIT before the run. Report only; no budget depends on it.
+    """
+    reasons = []
+    for label in labels:
+        spread = metrics.get(f"{label}_wall_s_spread")
+        if spread is not None and spread > SPREAD_LIMIT:
+            reasons.append(f"{label} wall spread {spread:.3f} > {SPREAD_LIMIT}")
+    before = metrics.get("host_loadavg_before")
+    if before is not None and before > LOAD_LIMIT:
+        reasons.append(f"host_loadavg_before {before:.2f} > {LOAD_LIMIT}")
+    details = {
+        "spread_limit": SPREAD_LIMIT,
+        "load_limit": LOAD_LIMIT,
+        "reasons": reasons,
+    }
+    return int(bool(reasons)), details
+
+
+def _shares(label, cpu, denominator):
+    """'<label>_<stage>_cpu_share' = stage CPU / denominator; nothing when the denominator is not positive."""
+    out = {}
+    for name, value in cpu.items():
+        share = ratio(value, denominator)
+        if share is not None:
+            out[f"{label}_{name}_cpu_share"] = share
+    return out
+
+
+def normalised_metrics(metrics, details):
+    """Cost per shower and per telescope photon of each completed pipeline, and CPU shares of stages.
+
+    Per shower: wall and CPU over settings.showers. Per photon: CPU in ns over telescope_photons.
+    Shares: candidate_threads1 stages over its CPU without compile_model; envelope pipe members over
+    the pipe stage (their CPU sums to it).
+    """
+    out = {}
+    showers = details["settings"].get("showers")
+    photons = metrics.get("telescope_photons")
+    for label in details["pipelines"]:
+        wall, cpu = metrics[f"{label}_wall_s"], metrics[f"{label}_cpu_s"]
+        out[f"{label}_s_per_shower"] = ratio(wall, showers)
+        out[f"{label}_cpu_s_per_shower"] = ratio(cpu, showers)
+        out[f"{label}_cpu_ns_per_photon"] = ratio(cpu * 1e9, photons)
+    out = {key: value for key, value in out.items() if value is not None}
+    if "candidate_threads1" in details["stages"]:
+        names = [
+            name
+            for name in details["stages"]["candidate_threads1"]
+            if name not in SHARE_EXCLUDED
+        ]
+        cpu = {name: metrics[f"candidate_threads1_{name}_cpu_s"] for name in names}
+        out.update(_shares("candidate_threads1", cpu, sum(cpu.values())))
+    for label in ("candidate_envelope", "candidate_envelope_threads1"):
+        if label not in details["stages"]:
+            continue
+        members = {
+            child["name"]
+            for summary in details["stages"][label]["pipeline"]
+            for child in summary.get("children", [])
+        }
+        cpu = {name: metrics[f"{label}_{name}_cpu_s"] for name in sorted(members)}
+        out.update(_shares(label, cpu, metrics[f"{label}_pipeline_cpu_s"]))
+    return out
+
+
+def reference_optics_metrics(metrics, details):
+    """Optics cost of the reference, by difference of two sim_telarray runs (report only).
+
+    The reference runs sim_telarray with full optics; candidate_threads1 runs the same events
+    camera only (Bypass_Optics=1). Assumption: the camera work is the same in both runs, so the
+    difference is the optics. Missing inputs give no metric.
+    """
+    out = {}
+    for key in ("cpu_s", "wall_s"):
+        reference = metrics.get(f"reference_sim_telarray_{key}")
+        camera = metrics.get(f"candidate_threads1_sim_telarray_{key}")
+        if reference is not None and camera is not None:
+            out[f"reference_optics_{key}"] = reference - camera
+    if "reference_optics_cpu_s" in out:
+        out["reference_camera_cpu_s"] = metrics["candidate_threads1_sim_telarray_cpu_s"]
+    trace = metrics.get("candidate_threads1_trace_stream_cpu_s")
+    optics = out.get("reference_optics_cpu_s")
+    if trace is None or optics is None:
+        details["reference_optics"] = {
+            "trace_stream_ratio": "omitted: inputs not measured"
+        }
+    elif ratio(trace, optics) is None:
+        details["reference_optics"] = {
+            "trace_stream_ratio": "omitted: reference_optics_cpu_s <= 0"
+        }
+    else:
+        out["trace_stream_vs_reference_optics_cpu_ratio"] = ratio(trace, optics)
+    return out
+
+
+def _without_compile(metrics, label, key):
+    """Pipeline wall or CPU of a label without its compile_model stage, or None if not measured."""
+    total = metrics.get(f"{label}_{key}")
+    compile_time = metrics.get(f"{label}_compile_model_{key}")
+    if total is None or compile_time is None:
+        return None
+    return total - compile_time
+
+
+def gain_metrics(metrics):
+    """Thinning gain: unthinned / thinned envelope pipe (threads=1).
+
+    Piping gain: separate stages (candidate_threads1) / unthinned pipe. Both run weighted
+    propagation, so the separate stages are compared with the pipe. All without compile_model.
+    """
+    out = {}
+    for name in ("cpu", "wall"):
+        piped = _without_compile(metrics, UNTHINNED_LABEL, f"{name}_s")
+        thinned = _without_compile(metrics, "candidate_envelope_threads1", f"{name}_s")
+        if piped is not None and thinned is not None:
+            out[f"thinning_gain_{name}"] = ratio(piped, thinned)
+        separate = _without_compile(metrics, "candidate_threads1", f"{name}_s")
+        if separate is not None and piped is not None:
+            out[f"piping_gain_{name}"] = ratio(separate, piped)
+    return {key: value for key, value in out.items() if value is not None}
 
 
 def physics_check(
@@ -1034,44 +1274,60 @@ def run_air_shower(root, work_root, source, config, reps, metrics, details):
     )
     reference_dir = work_root / "reference"
     reference_dir.mkdir(parents=True, exist_ok=True)
-    reference_ok = _run(
-        "reference",
-        shower_reference(
-            reference_dir, source, config, config_dir, inputs["reference_atmosphere"]
-        ),
-        reps,
-        metrics,
-        details,
+    # Steps are built before any run (building runs nothing); repetitions alternate between labels.
+    runs = [
+        (
+            "reference",
+            shower_reference(
+                reference_dir,
+                source,
+                config,
+                config_dir,
+                inputs["reference_atmosphere"],
+            ),
+        )
+    ]
+    for name, threads in THREAD_VARIANTS:
+        work = work_root / name
+        work.mkdir(parents=True, exist_ok=True)
+        runs.append(
+            (f"candidate_{name}", shower_candidate(work, source, inputs, threads))
+        )
+    files = envelope_files(work_root / "envelope", inputs["qe"], headroom)
+    for env_label, threads in ENVELOPE_VARIANTS:
+        env_work = work_root / env_label.removeprefix("candidate_")
+        env_work.mkdir(parents=True, exist_ok=True)
+        runs.append(
+            (
+                env_label,
+                envelope_candidate(env_work, source, inputs, files, threads=threads),
+            )
+        )
+    unthinned_work = work_root / "unthinned"
+    unthinned_work.mkdir(parents=True, exist_ok=True)
+    runs.append(
+        (
+            UNTHINNED_LABEL,
+            envelope_candidate(unthinned_work, source, inputs, None, threads=1),
+        )
     )
+    ok = run_interleaved(runs, reps, metrics, details)
+    reference_ok = ok["reference"]
     candidates = []
     for name, threads in THREAD_VARIANTS:
         label = f"candidate_{name}"
         work = work_root / name
-        work.mkdir(parents=True, exist_ok=True)
-        if _run(
-            label,
-            shower_candidate(work, source, inputs, threads),
-            reps,
-            metrics,
-            details,
-        ):
+        if ok[label]:
             details["counts"][label] = variant_counts(work, work / "candidate.iact")
         details["threads"][label] = threads
         candidates.append(label)
     details["counts"]["reference"] = {
         "into_simtel_weight": iact_telescope_weight(source)
     }
-    files = envelope_files(work_root / "envelope", inputs["qe"], headroom)
+    metrics["telescope_photons"] = details["counts"]["reference"]["into_simtel_weight"]
     for env_label, threads in ENVELOPE_VARIANTS:
         env_work = work_root / env_label.removeprefix("candidate_")
-        env_work.mkdir(parents=True, exist_ok=True)
-        if _run(
-            env_label,
-            envelope_candidate(env_work, source, inputs, files, threads=threads),
-            reps,
-            metrics,
-            details,
-        ):
+        if ok[env_label]:
             metrics.update(
                 child_metrics(env_label, details["stages"][env_label]["pipeline"])
             )
@@ -1082,6 +1338,15 @@ def run_air_shower(root, work_root, source, config, reps, metrics, details):
         metrics["candidate_envelope_headroom"] = headroom
         details["threads"][env_label] = threads
         candidates.append(env_label)
+    if ok[UNTHINNED_LABEL]:
+        metrics.update(
+            child_metrics(
+                UNTHINNED_LABEL, details["stages"][UNTHINNED_LABEL]["pipeline"]
+            )
+        )
+        details["counts"][UNTHINNED_LABEL] = pipeline_counts(unthinned_work)
+    details["threads"][UNTHINNED_LABEL] = 1
+    candidates.append(UNTHINNED_LABEL)
     try:
         physics_check(
             root,
@@ -1098,6 +1363,9 @@ def run_air_shower(root, work_root, source, config, reps, metrics, details):
         metrics["physics_completed"] = 0
         details["failures"]["physics"] = str(error)[:400]
     _ratios(metrics, reference_ok, candidates)
+    metrics.update(normalised_metrics(metrics, details))
+    metrics.update(reference_optics_metrics(metrics, details))
+    metrics.update(gain_metrics(metrics))
     budgets, reasons = performance_budget.shower_budgets(metrics)
     metrics.update(budgets)
     details["budget_reasons"] = reasons
@@ -1116,16 +1384,16 @@ def run_source(root, work_root, name, reps, metrics, details):
             "bypass_optics": spec["bypass"],
         }
     )
-    reference_ok = _run(
-        "reference", source_reference(reference_dir, spec), reps, metrics, details
-    )
-    _run(
-        "candidate_threads1",
-        source_candidate(candidate_dir, spec),
+    ok = run_interleaved(
+        [
+            ("reference", source_reference(reference_dir, spec)),
+            ("candidate_threads1", source_candidate(candidate_dir, spec)),
+        ],
         reps,
         metrics,
         details,
     )
+    reference_ok = ok["reference"]
     details["threads"]["candidate_threads1"] = (
         "1 (all stages single-threaded; default is the same)"
     )
@@ -1193,9 +1461,15 @@ def main():
         args.input.resolve(), args.events, work_root / "showers-input.iact"
     )
     metrics = {}
+    load_before = loadavg()
+    if load_before is not None:
+        metrics["host_loadavg_before"] = load_before
+    host = performance.host_info()
+    if host["nproc"]:
+        metrics["host_nproc"] = host["nproc"]
     details = {
         "case": args.case,
-        "host": performance.host_info(),
+        "host": host,
         "settings": {
             "reps": args.reps,
             "timing": "wall and CPU: wait4 rusage per child; peak RSS: sampled /proc VmHWM on Linux",
@@ -1213,6 +1487,12 @@ def main():
         )
     else:
         run_source(root, work_root, args.case, args.reps, metrics, details)
+    load_after = loadavg()
+    if load_after is not None:
+        metrics["host_loadavg_after"] = load_after
+    metrics["timing_unreliable"], details["timing_reliability"] = timing_reliability(
+        metrics, list(details["pipelines"])
+    )
     walls = {
         label: {name: _median(records, "wall_s") for name, records in per_stage.items()}
         for label, per_stage in details["stages"].items()

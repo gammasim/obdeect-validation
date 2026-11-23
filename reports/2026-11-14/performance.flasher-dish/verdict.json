@@ -1,0 +1,30 @@
+{
+  "name": "Flasher-dish, wall time budget: LightEmission -> sim_telarray versus obdeect sources -> propagation -> stream -> sim_telarray, matched photon counts (candidate wall <= reference wall)",
+  "status": "PASS",
+  "metrics": [
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "reference_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 1,
+      "atol": 0,
+      "expected": 1,
+      "metric": "candidate_threads1_completed",
+      "status": "PASS"
+    },
+    {
+      "actual": 0,
+      "atol": 0,
+      "expected": 0,
+      "metric": "candidate_threads1_wall_budget_exceeded",
+      "status": "PASS"
+    }
+  ],
+  "missing": [],
+  "missing_inputs": [],
+  "missing_modules": []
+}

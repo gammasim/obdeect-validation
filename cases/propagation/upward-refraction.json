@@ -1,0 +1,75 @@
+{
+  "id": "propagation.upward-refraction",
+  "name": "Upward and reversed downward photons bent by Snell's law against a scipy quad integral (shift within max(1e-6 m, float32 ulp of the output), time 1e-6 ns; 1.4e-5 ns near the horizon); turning over reported as turns_over",
+  "requires": [
+    "obdeect"
+  ],
+  "commands": [
+    {
+      "name": "upward-refraction",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.upward_refraction"
+      ],
+      "timeout": 900
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "sample_count",
+      "expected": 18,
+      "atol": 0
+    },
+    {
+      "metric": "max_shift_gate_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "max_direction_error",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "max_time_error_ns_moderate",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "max_time_error_ns_grazing",
+      "expected": 0,
+      "atol": 1.4e-05
+    },
+    {
+      "metric": "turns_over_reported",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "turns_over_other_drops",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "reversed_max_shift_gate_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "reversed_max_direction_error",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "reversed_max_time_error_ns",
+      "expected": 0,
+      "atol": 1.4e-05
+    },
+    {
+      "metric": "reversed_dropped",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

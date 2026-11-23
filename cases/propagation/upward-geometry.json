@@ -1,0 +1,20 @@
+{
+  "id": "propagation.upward-geometry",
+  "name": "Upward photons in plane mode: straight-line crossing point and time from below the plane (float32 ulp), direction kept, G to sky round trip",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "upward-geometry",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.upward_geometry"],
+      "timeout": 600
+    }
+  ],
+  "metrics": [
+    {"metric": "sample_count", "expected": 140, "atol": 0},
+    {"metric": "dropped", "expected": 0, "atol": 0},
+    {"metric": "max_position_error_ulp", "expected": 0, "atol": 1},
+    {"metric": "max_time_error_ulp", "expected": 0, "atol": 1},
+    {"metric": "max_direction_error", "expected": 0, "atol": 0},
+    {"metric": "round_trip_max_error_over_budget", "expected": 0, "atol": 1}
+  ]
+}

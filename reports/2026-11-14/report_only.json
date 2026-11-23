@@ -1,0 +1,13 @@
+{
+  "cases": [
+    "performance.air-shower",
+    "performance.air-shower-array",
+    "performance.air-shower-proton",
+    "performance.bottleneck",
+    "performance.flasher-dish",
+    "performance.point-source",
+    "performance.scaling",
+    "performance.stages",
+    "performance.stream-pipe"
+  ]
+}

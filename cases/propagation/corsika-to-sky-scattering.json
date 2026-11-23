@@ -1,0 +1,24 @@
+{
+  "id": "propagation.corsika-to-sky-scattering",
+  "name": "Real CORSIKA shower through to-sky and single scattering",
+  "requires": ["obdeect"],
+  "inputs": ["/validation/inputs/gamma-20deg-100-3000GeV.iact"],
+  "commands": [
+    {
+      "name": "convert-and-scatter-corsika-shower",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.corsika_scattering",
+               "--input", "/validation/inputs/gamma-20deg-100-3000GeV.iact"],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {"metric": "to_sky_dropped", "expected": 0, "atol": 0},
+    {"metric": "base_dropped", "expected": 0, "atol": 0},
+    {"metric": "scattering_dropped", "expected": 0, "atol": 0},
+    {"metric": "scattered_weight_positive_diagnostic", "expected": 1, "atol": 0},
+    {"metric": "selected_output_telescope_count", "expected": 2, "atol": 0},
+    {"metric": "selected_output_has_primary_telescope", "expected": 0, "atol": 0},
+    {"metric": "selection_chunk_thread_row_delta", "expected": 0, "atol": 0},
+    {"metric": "selection_chunk_thread_max_weight_difference", "expected": 0, "atol": 0.000001}
+  ]
+}

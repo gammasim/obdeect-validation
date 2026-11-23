@@ -39,9 +39,27 @@ SITE_ALTITUDE_M = 2000.0
 SEED = 1
 HEIGHTS_KM = (3.0, 8.0, 20.0, 60.0)
 ZENITHS_DEG = (0.0, 20.0, 40.0, 60.0, 75.0, 80.0, 85.0)
+DISPERSION_REFERENCE_NM = 500.0
 PRODUCTION_INTERVALS = 2**16
 COARSE_INTERVALS = 2**15
 WORKSPACE = Path(__file__).resolve().parents[4]
+
+
+def ciddor_refractivity_e8(wavelength_nm: float) -> float:
+    """Ciddor (1996) standard dry-air refractivity, in units of 1e-8."""
+    s2 = (1000.0 / wavelength_nm) ** 2
+    return 5792105.0 / (238.0185 - s2) + 167917.0 / (57.362 - s2)
+
+
+def ciddor_group_factor(wavelength_nm: float) -> float:
+    """Group refractivity relative to the profile's reference-wavelength phase refractivity."""
+    s2 = (1000.0 / wavelength_nm) ** 2
+    phase = ciddor_refractivity_e8(wavelength_nm)
+    group = phase + 2.0 * s2 * (
+        5792105.0 / (238.0185 - s2) ** 2 + 167917.0 / (57.362 - s2) ** 2
+    )
+    return group / phase
+
 
 # Limits fixed before looking at results. Each entry: (rule, justification).
 LIMITS = {
@@ -99,10 +117,14 @@ def profile_path() -> Path:
     candidate = reference / "cfg/common/atmprof1.dat"
     if candidate.is_file():
         return candidate
-    return (
-        WORKSPACE
-        / "obdeect/src/propagation/cpp/tests/data/atmprof_ecmwf_north_winter_fixed.dat"
+    relative = Path(
+        "obdeect/src/propagation/cpp/tests/data/atmprof_ecmwf_north_winter_fixed.dat"
     )
+    for checkout in (WORKSPACE, Path(__file__).resolve().parents[3]):
+        candidate = checkout / relative
+        if candidate.is_file():
+            return candidate
+    return WORKSPACE / relative
 
 
 def load_table(path) -> tuple[np.ndarray, np.ndarray]:
@@ -362,7 +384,9 @@ def _plot(samples, path) -> None:
     plotting.save(fig, path)
 
 
-def write_stream(path, geometry, run_extra: dict) -> None:
+def write_stream(
+    path, geometry, run_extra: dict, wavelength_nm=DISPERSION_REFERENCE_NM
+) -> None:
     """One event per sample: one photon of telescope 1 in the sky frame, no cz column."""
     run = {
         "run_number": 1,
@@ -372,8 +396,8 @@ def write_stream(path, geometry, run_extra: dict) -> None:
         "telescope_z_m": [0.0],
         "refraction_applied": 0,
         "curvature_applied": 0,
-        "wavelength_min_nm": 300.0,
-        "wavelength_max_nm": 600.0,
+        "wavelength_min_nm": wavelength_nm,
+        "wavelength_max_nm": wavelength_nm,
         **run_extra,
     }
     from obdeect.stream import Writer
@@ -395,6 +419,7 @@ def write_stream(path, geometry, run_extra: dict) -> None:
                 "cy": np.array([sample["cy"]], dtype=np.float32),
                 "t": np.zeros(1, dtype=np.float32),
                 "w": np.ones(1, dtype=np.float32),
+                "wavelength": np.array([wavelength_nm], dtype=np.float32),
             },
         )
         writer.write("telescope_end", {"telescope_id": 1, "photons": 1.0})
@@ -422,7 +447,7 @@ def read_outputs(path) -> list[dict]:
 
 
 def run_obdeect(
-    input_path, output_path, curvature: str, earth_radius_m, profile
+    input_path, output_path, curvature: str, earth_radius_m, profile, dispersion=False
 ) -> list[dict]:
     from obdeect.propagation import propagate
 
@@ -436,6 +461,7 @@ def run_obdeect(
         mode="weighted",
         curvature=curvature,
         earth_radius_m=earth_radius_m,
+        dispersion_reference_nm=DISPERSION_REFERENCE_NM if dispersion else None,
     )
     return read_outputs(output_path)
 
@@ -482,6 +508,26 @@ def main() -> None:
         EARTH_RADIUS_M,
         profile,
     )
+    out_dispersion = run_obdeect(
+        "earth-spherical.pst",
+        "earth-dispersion-out.pst",
+        "spherical",
+        EARTH_RADIUS_M,
+        profile,
+        dispersion=True,
+    )
+    dispersed_outputs = {DISPERSION_REFERENCE_NM: out_dispersion}
+    for wavelength_nm in (300.0, 700.0):
+        input_path = f"earth-dispersion-{int(wavelength_nm)}.pst"
+        write_stream(input_path, stored_earth, {}, wavelength_nm=wavelength_nm)
+        dispersed_outputs[wavelength_nm] = run_obdeect(
+            input_path,
+            f"earth-dispersion-{int(wavelength_nm)}-out.pst",
+            "spherical",
+            EARTH_RADIUS_M,
+            profile,
+            dispersion=True,
+        )
     out_flat = run_obdeect(
         "flat-spherical.pst",
         "flat-spherical-out.pst",
@@ -493,17 +539,58 @@ def main() -> None:
 
     rows, plane_rows = [], []
     scale_errors, time_norm, straight_norm, plane_norm = [], [], [], []
+    group_delay_norm = []
+    dispersion_time_norm = []
+    dispersion_position_norm = []
     x_norm, shift_abs = [], []
     for index, (label, stored) in enumerate(zip(samples, stored_earth)):
         ref = reference_sample(nu_earth, EARTH_RADIUS_M, SITE_ALTITUDE_M, stored)
         out = out_earth[index]
         out_s = out_straight[index]
+        out_d = out_dispersion[index]
         dx = out["x"] - ref["x_ref_m"]
         tol_x = position_limit(ref["theta_s_deg"], ref["shift_m"])
         dt = out["t"] - ref["t_ref_ns"]
         tol_t = time_limit(out["t"], ref["excess_ns"])
         dt_s = out_s["t"] - ref["t_straight_ref_ns"]
         tol_s = time_limit(out_s["t"], ref["straight_ns"])
+        group_delay_expected = (
+            ciddor_group_factor(DISPERSION_REFERENCE_NM) - 1.0
+        ) * ref["straight_ns"]
+        group_delay_error = (out_d["t"] - out["t"]) - group_delay_expected
+        group_delay_norm.append(
+            abs(group_delay_error)
+            / (time_limit(out_d["t"], ref["straight_ns"]) + tol_t + tol_s)
+        )
+        for wavelength_nm, outputs in dispersed_outputs.items():
+            if wavelength_nm == DISPERSION_REFERENCE_NM:
+                continue
+            factor = ciddor_refractivity_e8(wavelength_nm) / ciddor_refractivity_e8(
+                DISPERSION_REFERENCE_NM
+            )
+            group_factor = ciddor_group_factor(wavelength_nm) * factor
+
+            def scaled_profile(height, k=factor):
+                return k * nu_earth(height)
+
+            scaled_ref = reference_sample(
+                scaled_profile, EARTH_RADIUS_M, SITE_ALTITUDE_M, stored
+            )
+            time_expected = (
+                scaled_ref["t_ref_ns"] + (group_factor - factor) * ref["straight_ns"]
+            )
+            time_error = outputs[index]["t"] - time_expected
+            time_tolerance = max(
+                time_limit(outputs[index]["t"], scaled_ref["excess_ns"]),
+                1e-3 * abs(scaled_ref["excess_ns"]),
+            )
+            dispersion_time_norm.append(abs(time_error) / time_tolerance)
+            position_error = outputs[index]["x"] - scaled_ref["x_ref_m"]
+            position_tolerance = max(
+                position_limit(scaled_ref["theta_s_deg"], scaled_ref["shift_m"]),
+                1e-3 * abs(scaled_ref["shift_m"]),
+            )
+            dispersion_position_norm.append(abs(position_error) / position_tolerance)
         x_norm.append(abs(dx) / tol_x)
         shift_abs.append(abs(dx))
         time_norm.append(abs(dt) / tol_t)
@@ -534,6 +621,11 @@ def main() -> None:
                 "t_straight_out_ns": out_s["t"],
                 "t_straight_ref_ns": ref["t_straight_ref_ns"],
                 "straight_dt_ns": dt_s,
+                "dispersion_reference_nm": DISPERSION_REFERENCE_NM,
+                "group_delay_expected_ns": group_delay_expected,
+                "group_delay_observed_ns": out_d["t"] - out["t"],
+                "group_delay_error_ns": group_delay_error,
+                "dispersion_wavelengths_checked_nm": [300.0, 500.0, 700.0],
                 "x_straight_out_m": out_s["x"],
                 "x_straight_ref_m": ref["x_straight_m"],
                 "cx_in": stored["cx"],
@@ -589,6 +681,9 @@ def main() -> None:
         "max_time_error_ns_normalised": max(time_norm),
         "max_direction_scale_error": max(scale_errors),
         "straight_delay_max_error_ns_normalised": max(straight_norm),
+        "reference_wavelength_group_delay_max_error_normalised": max(group_delay_norm),
+        "dispersion_time_max_error_normalised": max(dispersion_time_norm),
+        "dispersion_position_max_error_normalised": max(dispersion_position_norm),
         "plane_limit_max_difference": max(plane_norm),
         "reference_convergence_relative_change": convergence_change,
     }

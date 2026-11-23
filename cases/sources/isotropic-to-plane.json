@@ -1,0 +1,131 @@
+{
+  "id": "sources.isotropic-to-plane",
+  "name": "Isotropic light to the plane z = 0 (to_plane_z0), upward plane wave, upward and horizontal laser beams (horizontal: start distance accepted, start height rejected): kept fraction, radial density, times, directions, rejections",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "isotropic-plane-and-upward-beams",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.sources_directions"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "kept_fraction_pull_max_abs",
+      "expected": 0,
+      "atol": 4
+    },
+    {
+      "metric": "photon_balance_error",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "on_plane_z_max_abs_m",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "radial_chi2_ndf",
+      "expected": 1,
+      "atol": 0.5
+    },
+    {
+      "metric": "max_time_error_ulp",
+      "expected": 0,
+      "atol": 2
+    },
+    {
+      "metric": "plane_wave_direction_error_deg",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "plane_wave_start_error_m",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "plane_wave_target_outside_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "plane_wave_target_r2_pull",
+      "expected": 0,
+      "atol": 4
+    },
+    {
+      "metric": "plane_wave_rows_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "rejected_cases",
+      "expected": 2,
+      "atol": 0
+    },
+    {
+      "metric": "laser_direction_error_deg",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "laser_start_error_m",
+      "expected": 0,
+      "atol": 0.01
+    },
+    {
+      "metric": "laser_start_height_error_m",
+      "expected": 0,
+      "atol": 0.01
+    },
+    {
+      "metric": "laser_time_error_ulp",
+      "expected": 0,
+      "atol": 2
+    },
+    {
+      "metric": "laser_cone_excess_deg",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "laser_tilt_limit_ok",
+      "expected": 2,
+      "atol": 0
+    },
+    {
+      "metric": "laser_rejected_cases",
+      "expected": 3,
+      "atol": 0
+    },
+    {
+      "metric": "laser_horizontal_accepted",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "laser_horizontal_start_error_m",
+      "expected": 0,
+      "atol": 0.01
+    },
+    {
+      "metric": "laser_horizontal_cz_max_abs",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "laser_horizontal_time_error_ulp",
+      "expected": 0,
+      "atol": 2
+    }
+  ]
+}

@@ -1,21 +1,42 @@
 {
   "id": "performance.stages",
-  "name": "Per-stage throughput on the fixed CORSIKA IACT input (report only, no performance gates)",
-  "requires": ["obdeect", "python3"],
+  "name": "Per-stage throughput on the fixed CORSIKA IACT input, air-shower setup (LSTN-01 7.0.0; report only, no performance gates)",
+  "requires": ["obdeect", "simtools-generate-array-config", "python3"],
   "commands": [
-    {"name": "measure-stages", "argv": ["{python}", "-m", "obdeect_validation.adapters.performance"], "timeout": 7200}
+    {
+      "name": "generate-sim_telarray-config",
+      "argv": [
+        "simtools-generate-array-config",
+        "--site",
+        "North",
+        "--array_element_list",
+        "LSTN-01",
+        "--model_version",
+        "7.0.0",
+        "--simulation_models_path",
+        "/models",
+        "--output_path",
+        "cfg"
+      ],
+      "timeout": 900
+    },
+    {"name": "measure-stages", "argv": ["{python}", "-m", "obdeect_validation.adapters.performance", "--config", "cfg/model/7.0.0/CTAO.cfg"], "timeout": 7200}
   ],
   "metrics": [
     {"metric": "stages_failed", "expected": 0, "atol": 0},
-    {"metric": "stages_completed", "expected": 5, "atol": 0},
+    {"metric": "stages_completed", "expected": 6, "atol": 0},
     {"metric": "from_corsika_completed", "expected": 1, "atol": 0},
     {"metric": "to_simtel_completed", "expected": 1, "atol": 0},
     {"metric": "propagation_completed", "expected": 1, "atol": 0},
+    {"metric": "propagation_envelope_completed", "expected": 1, "atol": 0},
+    {"metric": "compile_model_completed", "expected": 1, "atol": 0},
     {"metric": "trace_stream_completed", "expected": 1, "atol": 0},
     {"metric": "simtel_direct_completed", "expected": 1, "atol": 0},
     {"metric": "from_corsika_reps", "expected": 3, "atol": 0},
     {"metric": "to_simtel_reps", "expected": 3, "atol": 0},
     {"metric": "propagation_reps", "expected": 3, "atol": 0},
+    {"metric": "propagation_envelope_reps", "expected": 3, "atol": 0},
+    {"metric": "compile_model_reps", "expected": 3, "atol": 0},
     {"metric": "trace_stream_reps", "expected": 3, "atol": 0},
     {"metric": "simtel_direct_reps", "expected": 3, "atol": 0},
     {"metric": "iact_input_vs_stream_weight_relative_delta", "expected": 0, "atol": 1e-6},

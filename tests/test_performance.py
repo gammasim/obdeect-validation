@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -105,3 +106,138 @@ def test_check_atmosphere_log_reads_the_file(tmp_path: Path) -> None:
     log = tmp_path / "reference.log"
     log.write_text(f"Read atmospheric transmission data from file {OBS}\n")
     assert common.check_atmosphere_log(log, OBS) == [OBS]
+
+
+def fake_runner(walls, cpu=1.0):
+    """run_once that appends one child record per call, with the given wall times."""
+    walls = iter(walls)
+
+    def run_once():
+        performance.RUSAGE.append(
+            {
+                "argv": ["fake"],
+                "wall_s": next(walls),
+                "cpu_s": cpu,
+                "peak_rss_mb": 10.0,
+                "loadavg_before": None,
+            }
+        )
+
+    return run_once
+
+
+def test_measure_reports_wall_spread_and_rate_only_with_photons(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setattr(performance, "RUSAGE", [])
+    stage_in = tmp_path / "in.gst"
+    stage_in.write_bytes(b"12")
+    stage_out = tmp_path / "out.gst"
+    stage_out.write_bytes(b"1234")
+    metrics, details = {}, {"failures": {}, "stages": {}}
+    assert performance.measure(
+        "stage",
+        fake_runner([2.0, 1.0, 4.0], cpu=3.0),
+        100.0,
+        stage_in,
+        stage_out,
+        metrics,
+        details,
+        3,
+    )
+    assert metrics["stage_wall_s_median"] == 2.0
+    assert metrics["stage_wall_s_min"] == 1.0
+    assert metrics["stage_wall_s_max"] == 4.0
+    assert metrics["stage_wall_s_spread"] == pytest.approx(1.5)  # (4 - 1) / 2
+    assert metrics["stage_cpu_s_median"] == 3.0
+    assert metrics["stage_photons_per_s"] == pytest.approx(50.0)
+    assert metrics["stage_bytes_in"] == 2 and metrics["stage_bytes_out"] == 4
+    assert details["stages"]["stage"]["records"][0]["wall_s"] == 2.0
+
+    no_photons = {}
+    assert performance.measure(
+        "compile",
+        fake_runner([1.0]),
+        None,
+        stage_in,
+        stage_out,
+        no_photons,
+        details,
+        1,
+    )
+    assert no_photons["compile_wall_s_spread"] == 0.0
+    assert "compile_photons_per_s" not in no_photons
+    assert "compile_photons_in" not in no_photons
+
+
+def test_measure_records_a_failed_stage(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(performance, "RUSAGE", [])
+
+    def fail():
+        raise RuntimeError("bad input")
+
+    metrics, details = {}, {"failures": {}, "stages": {}}
+    assert not performance.measure(
+        "stage", fail, 1.0, tmp_path, tmp_path, metrics, details, 2
+    )
+    assert details["failures"] == {"stage": "bad input"}
+    assert metrics == {"stage_completed": 0}
+
+
+def test_run_timed_records_load_average_before(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(performance, "loadavg", lambda: 0.25)
+    record = performance.run_timed(["true"], tmp_path / "log.txt")
+    assert record["loadavg_before"] == 0.25
+
+
+def test_loadavg_is_none_without_os_support(monkeypatch) -> None:
+    def unavailable():
+        raise OSError("no load average")
+
+    monkeypatch.setattr(performance.os, "getloadavg", unavailable)
+    assert performance.loadavg() is None
+
+
+def test_cpu_metrics_share_of_envelope_chain_and_ns_per_photon() -> None:
+    metrics = {
+        "from_corsika_cpu_s_median": 1.0,
+        "propagation_envelope_cpu_s_median": 2.0,
+        "trace_stream_cpu_s_median": 4.0,
+        "to_simtel_cpu_s_median": 1.0,
+        "propagation_cpu_s_median": 8.0,
+        "propagation_photons_in": 1e6,
+        "propagation_envelope_photons_in": 1e6,
+    }
+    out = performance.cpu_metrics(
+        metrics, ["from_corsika", "propagation_envelope", "propagation"]
+    )
+    assert out["from_corsika_cpu_share"] == pytest.approx(1 / 8)
+    assert out["propagation_envelope_cpu_share"] == pytest.approx(2 / 8)
+    assert out["propagation_cpu_share"] == pytest.approx(1.0)  # not in the chain: 8 / 8
+    assert out["propagation_ns_per_photon_cpu"] == pytest.approx(8000.0)
+    assert "from_corsika_ns_per_photon_cpu" not in out  # no photon count
+
+
+def test_timing_unreliable_flags_spread_or_busy_host() -> None:
+    stages = ["a", "b"]
+    calm = {
+        "a_wall_s_spread": 0.01,
+        "b_wall_s_spread": 0.02,
+        "host_loadavg_before": 0.3,
+    }
+    assert performance.timing_unreliable(calm, stages) == 0
+    assert performance.timing_unreliable({**calm, "b_wall_s_spread": 0.06}, stages) == 1
+    assert (
+        performance.timing_unreliable({**calm, "host_loadavg_before": 1.5}, stages) == 1
+    )
+    assert performance.timing_unreliable({"a_wall_s_spread": 0.01}, stages) == 0
+
+
+def test_stages_case_uses_the_air_shower_setup() -> None:
+    case = json.loads(
+        (Path(__file__).parents[1] / "cases/performance/stages.json").read_text()
+    )
+    measure = next(c for c in case["commands"] if c["name"] == "measure-stages")
+    assert measure["argv"][-2:] == ["--config", "cfg/model/7.0.0/CTAO.cfg"]
+    completed = next(m for m in case["metrics"] if m["metric"] == "stages_completed")
+    assert completed["expected"] == 6

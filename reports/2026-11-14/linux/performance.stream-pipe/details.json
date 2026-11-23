@@ -1,0 +1,290 @@
+{
+  "host": {
+    "nproc": 1,
+    "cpu_model": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+    "machine": "x86_64",
+    "platform": "Linux-5.14.0-687.66.1.el9_8.x86_64-x86_64-with-glibc2.34",
+    "obdeect_version": "obdeect-stream 0.9.3.dev7+g34d812c61\nobdeect-propagation 0.9.3.dev7+g34d812c61\nobdeect-sources 0.9.3.dev7+g34d812c61\nobdeect-ray-tracing 0.9.3.dev7+g34d812c61\nphoton-stream format 1.0",
+    "host": "Intel Xeon Gold 6130 @ 2.10 GHz (2 sockets, 64 threads), apptainer, case pinned to core 13, up to 4 cases at once"
+  },
+  "pipes": {
+    "cat_tee": {
+      "stages": [
+        "cat",
+        "tee"
+      ],
+      "records": [
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+            ],
+            [
+              "tee",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/tee-copy.gst"
+            ]
+          ],
+          "wall_s": 1.6797968068858609,
+          "cpu_s": 1.5731009999999999,
+          "peak_rss_mb": 2.546875,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+              ],
+              "wall_s": 1.6793735799146816,
+              "cpu_s": 0.340128,
+              "peak_rss_mb": 2.546875,
+              "returncode": 0
+            },
+            {
+              "name": "tee",
+              "argv": [
+                "tee",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/tee-copy.gst"
+              ],
+              "wall_s": 1.6797968068858609,
+              "cpu_s": 1.2329729999999999,
+              "peak_rss_mb": 2.53515625,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+            ],
+            [
+              "tee",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/tee-copy.gst"
+            ]
+          ],
+          "wall_s": 6.533927090000361,
+          "cpu_s": 1.833253,
+          "peak_rss_mb": 2.66796875,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+              ],
+              "wall_s": 1.8039665030082688,
+              "cpu_s": 0.340274,
+              "peak_rss_mb": 2.66796875,
+              "returncode": 0
+            },
+            {
+              "name": "tee",
+              "argv": [
+                "tee",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/tee-copy.gst"
+              ],
+              "wall_s": 6.533927090000361,
+              "cpu_s": 1.492979,
+              "peak_rss_mb": 2.65625,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+            ],
+            [
+              "tee",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/tee-copy.gst"
+            ]
+          ],
+          "wall_s": 5.843022204004228,
+          "cpu_s": 1.77487,
+          "peak_rss_mb": 2.70703125,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+              ],
+              "wall_s": 1.7486028030980378,
+              "cpu_s": 0.334093,
+              "peak_rss_mb": 2.70703125,
+              "returncode": 0
+            },
+            {
+              "name": "tee",
+              "argv": [
+                "tee",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/tee-copy.gst"
+              ],
+              "wall_s": 5.843022204004228,
+              "cpu_s": 1.440777,
+              "peak_rss_mb": 2.58984375,
+              "returncode": 0
+            }
+          ]
+        }
+      ],
+      "gb_per_s_per_rep": [
+        0.9195025646366474,
+        0.23639343548290415,
+        0.26434564478319106
+      ]
+    },
+    "to_simtel": {
+      "stages": [
+        "cat",
+        "to_simtel"
+      ],
+      "records": [
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+            ],
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/roundtrip.iact"
+            ]
+          ],
+          "wall_s": 2.0421816990710795,
+          "cpu_s": 1.9054599999999997,
+          "peak_rss_mb": 58.9609375,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+              ],
+              "wall_s": 2.040692894021049,
+              "cpu_s": 0.33352899999999996,
+              "peak_rss_mb": 2.69140625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "-o",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/roundtrip.iact"
+              ],
+              "wall_s": 2.0421816990710795,
+              "cpu_s": 1.5719309999999997,
+              "peak_rss_mb": 58.9609375,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+            ],
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/roundtrip.iact"
+            ]
+          ],
+          "wall_s": 5.535353675950319,
+          "cpu_s": 2.18083,
+          "peak_rss_mb": 60.57421875,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+              ],
+              "wall_s": 2.1736949059413746,
+              "cpu_s": 0.333322,
+              "peak_rss_mb": 2.59375,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "-o",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/roundtrip.iact"
+              ],
+              "wall_s": 5.535353675950319,
+              "cpu_s": 1.847508,
+              "peak_rss_mb": 60.57421875,
+              "returncode": 0
+            }
+          ]
+        },
+        {
+          "argv": [
+            [
+              "cat",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+            ],
+            [
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+              "-o",
+              "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/roundtrip.iact"
+            ]
+          ],
+          "wall_s": 5.7297696500318125,
+          "cpu_s": 2.148165,
+          "peak_rss_mb": 61.48828125,
+          "children": [
+            {
+              "name": "cat",
+              "argv": [
+                "cat",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/showers.gst"
+              ],
+              "wall_s": 2.1393042999552563,
+              "cpu_s": 0.330882,
+              "peak_rss_mb": 2.69140625,
+              "returncode": 0
+            },
+            {
+              "name": "to_simtel",
+              "argv": [
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/pylib/obdeect/stream/bin/obdeect-stream-to-simtel",
+                "-o",
+                "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe/roundtrip.iact"
+              ],
+              "wall_s": 5.7297696500318125,
+              "cpu_s": 1.817283,
+              "peak_rss_mb": 61.48828125,
+              "returncode": 0
+            }
+          ]
+        }
+      ],
+      "gb_per_s_per_rep": [
+        0.7563369472474348,
+        0.2790386238029902,
+        0.26957060516236014
+      ]
+    }
+  },
+  "failures": {},
+  "settings": {
+    "reps": 3,
+    "input": "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/inputs/gamma-20deg-100-3000GeV-100showers.iact",
+    "events": 100,
+    "work_dir": "/tmp/claude-17955/-cephfs-users-maierg-CTA-simpipe-202611-full-simulat-chain/0db475ea-1f3d-44f9-9103-9c68663fc58d/scratchpad/work/stream-pipe",
+    "native_stream_bytes": 1544577472,
+    "limit_gb_per_s": 1.0,
+    "gigabyte": "decimal, 1e9 bytes",
+    "timing": "pipe wall from start to last exit; CPU and RSS per member (wait4, sampled VmHWM)"
+  },
+  "budget_reasons": {}
+}

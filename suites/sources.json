@@ -13,8 +13,10 @@
     "../cases/sources/illuminator-ills-01.json",
     "../cases/sources/night-sky-camera.json",
     "../cases/sources/laser-beam-scattered.json",
+    "../cases/sources/isotropic-to-plane.json",
     "../cases/sources/simtools-flasher-chain.json",
     "../cases/sources/simtools-illuminator-chain.json",
-    "../cases/sources/simtools-illuminator-chain-north.json"
+    "../cases/sources/simtools-illuminator-chain-north.json",
+    "../cases/sources/ground-muon.json"
   ]
 }

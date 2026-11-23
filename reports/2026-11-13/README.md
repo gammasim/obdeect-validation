@@ -12,7 +12,9 @@ Four failures are source timing or impact-point conventions, one is the EventIO 
 for light-source streams. Every photon count, direction and camera p.e. comparison passes.
 <!-- /notes -->
 
-**Result: 5 FAIL, 14 PASS, 1 REPORT ONLY** (suite `full`, status ERROR). Each case below shows what is compared, its headline numbers and figures; all metrics are in the case's `metrics.json`, limits and settings in `details.json`.
+**Result: 5 FAIL, 14 PASS** (suite `full`, status ERROR). Each case below shows what is compared, its headline numbers and figures; all metrics are in the case's `metrics.json`, limits and settings in `details.json`.
+
+[6. Performance](#step-performance) is at the bottom: 1 REPORT ONLY.
 
 | Step | Case | Headline | Verdict |
 |---|---|---|---|
@@ -35,7 +37,6 @@ for light-source streams. Every photon count, direction and camera p.e. comparis
 | 5. Full chain | [Near-threshold showers (20–100 GeV), stream round trip](#chain-stream-roundtrip-threshold) | 291 telescope events, p.e. +0.00%, 0 trigger mismatches | PASS |
 | 5. Full chain | [obdeect atmosphere + sim_telarray optics and camera](#chain-atmosphere-substitution) | p.e. +0.12% ± 0.15%, image χ² 1.12 | PASS |
 | 5. Full chain | [obdeect atmosphere and optics + sim_telarray camera](#chain-optics-bypass1) | p.e. +0.06% ± 0.19%, image χ² 0.99, 0 trigger mismatches | PASS |
-| 6. Performance | [Stage throughput](#performance-stages) | – | REPORT ONLY |
 
 *This report predates the reading guide (reports from 2026-11-14 on). Its stage-1 time panels show each program's own time frame (obdeect at emission, the reference at arrival), not the compared arrival times; the case notes explain the failures of that run.*
 
@@ -478,28 +479,6 @@ obdeect atmosphere and optics replace sim_telarray's: CORSIKA → obdeect propag
 
 *Camera p.e. per telescope event, colour per telescope (type and position in the legend): obdeect chain against direct sim_telarray (left), relative difference (right).*
 
-## 6. Performance
-
-Wall and CPU time of the obdeect chain against sim_telarray on the same input and machine. Informational, no limits.
-
-<!-- notes:performance -->
-Separate report-only run (one thread, shared host): stream from-corsika 35 M photons/s,
-to-simtel 49 M/s, propagation 24 M/s, trace-stream 3.1 M/s; direct sim_telarray 4.6 M/s on
-the same showers.
-<!-- /notes -->
-
-<a id="performance-stages"></a>
-
-### Stage throughput — REPORT ONLY
-
-Throughput of each chain stage on one CORSIKA input.
-
-`performance.stages`: 0/0 gated checks pass. [metrics.json](performance.stages/metrics.json) · [details.json](performance.stages/details.json)
-
-![Photons per second for each stage.](performance.stages/photons-per-second.png)
-
-*Photons per second for each stage.*
-
 ## Scope and limits
 
 <!-- notes:end -->
@@ -514,3 +493,39 @@ night-sky and flasher-secondary comparisons (no triggers at the matched light le
 zenith angles other than 20° in the shower chain (CORSIKA data files not available
 in the container); per-mirror and incident-angle optics cases.
 <!-- /notes -->
+
+<a id="step-performance"></a>
+
+## 6. Performance
+
+Report only, apart from the timing budgets. Wall and CPU time of the obdeect chain against sim_telarray on the same input and machine, ordered from the whole chain to its parts: whole chain (gamma, proton), bottleneck inside the pipe, separate stages, fixed versus per-shower cost and threads, array, stream pipes, light sources, profiles. Timings with timing unreliable = 1 come from a loaded machine or noisy repetitions.
+
+<!-- notes:performance -->
+Separate report-only run (one thread, shared host): stream from-corsika 35 M photons/s,
+to-simtel 49 M/s, propagation 24 M/s, trace-stream 3.1 M/s; direct sim_telarray 4.6 M/s on
+the same showers.
+<!-- /notes -->
+
+| Case | Headline | Verdict |
+|---|---|---|
+| [Stage timing (wall and CPU)](#performance-stages) | trace-stream 12.1 s, sim_telarray direct 11.7 s (wall median) | REPORT ONLY |
+
+<a id="performance-stages"></a>
+
+### Stage timing (wall and CPU) — REPORT ONLY
+
+Each chain stage on one CORSIKA input, repeated; the table gives the medians, the wall-time spread over the repetitions and each stage's share of the CPU time.
+
+| Stage | Wall s (median) | CPU s (median) | Photons/s |
+|---|---|---|---|
+| from-corsika | 1.55 | 1.01 | 3.49e+07 |
+| propagation | 2.24 | 1.74 | 2.42e+07 |
+| trace-stream | 12.10 | 10.31 | 3.13e+06 |
+| to-simtel | 1.10 | 0.71 | 4.92e+07 |
+| sim_telarray (direct) | 11.68 | 10.90 | 4.64e+06 |
+
+`performance.stages`: 0/0 gated checks pass. [metrics.json](performance.stages/metrics.json) · [details.json](performance.stages/details.json)
+
+![Photons per second for each stage.](performance.stages/photons-per-second.png)
+
+*Photons per second for each stage.*

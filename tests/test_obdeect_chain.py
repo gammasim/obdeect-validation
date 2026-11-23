@@ -1,6 +1,6 @@
 """End-to-end chain: light source -> atmosphere -> optics -> sim_telarray input.
 
-    obdeect sources point-source | obdeect propagation run | obdeect ray-tracing trace-stream
+    obdeect sources run point-source | obdeect propagation run | obdeect ray-tracing trace-stream
         | obdeect stream to-simtel
 
 Moved from obdeect/validation/test_chain.py. Skipped unless the four obdeect components are
@@ -28,17 +28,25 @@ CAMERA_FRAME = 3
 
 SOURCE = [
     "sources",
+    "run",
     "point-source",
-    "-z",
-    "100000",
-    "-n",
+    "--position",
+    "0,0,1000",
+    "--photons",
     "5e10",
-    "-b",
+    "--bunch-size",
     "10",
-    "-r",
-    "300",
+    "--telescope-radius",
+    "3",
+    "--spectrum",
+    "fixed:wavelength_nm=400",
+    "--observation-level",
+    "2000",
+    "--atmosphere-id",
+    "1",
+    "--seed",
+    "3",
 ]
-SOURCE += ["-h", "2000", "--seed", "3"]
 ATMOSPHERE = [
     "propagation",
     "run",

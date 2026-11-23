@@ -26,8 +26,9 @@ Analytic expectations (independent of obdeect):
     s = (z - z_t) / cz_mag, the arrival is (x + cx s, y + cy s), the G position subtracts the
     telescope (x_t, y_t), and the time is t + s / c.
 
-(c) Photons with cz > 0 (upwards) never reach a telescope plane: each one is dropped once per
-    telescope, so the dropped count is n_up x n_telescopes.
+(c) Photons with cz > 0 (upwards) emitted above a telescope plane (all sky heights here) never
+    reach it (moving_away): each one is dropped once per telescope, so the dropped count is
+    n_up x n_telescopes.
 
 (d) The flat limit R -> 1e12 m reproduces the plane-parallel run (curvature none) to float32
     precision, because the residual of the spherical geometry is d^2/(2R) and the telescope

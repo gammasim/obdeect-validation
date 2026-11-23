@@ -69,6 +69,11 @@
       "atol": 0
     },
     {
+      "metric": "candidate_unthinned_threads1_completed",
+      "expected": 1,
+      "atol": 0
+    },
+    {
       "metric": "physics_completed",
       "expected": 1,
       "atol": 0

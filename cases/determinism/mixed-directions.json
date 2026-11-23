@@ -1,0 +1,20 @@
+{
+  "id": "determinism.mixed-directions",
+  "name": "Determinism of mixed-direction photons in the atmosphere stage: CLI threads 1/4, API threads 4 with chunks, one chunk per photon, shuffled order with original indices; photon by photon",
+  "requires": ["obdeect"],
+  "commands": [
+    {
+      "name": "mixed-directions",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.determinism_directions"],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {"metric": "sample_count", "expected": 4000, "atol": 0},
+    {"metric": "mismatch_count", "expected": 0, "atol": 0},
+    {"metric": "empty_comparison", "expected": 0, "atol": 0},
+    {"metric": "survivor_count_error", "expected": 0, "atol": 0},
+    {"metric": "summary_mismatch", "expected": 0, "atol": 0},
+    {"metric": "control_seed_change_detected", "expected": 1, "atol": 0}
+  ]
+}

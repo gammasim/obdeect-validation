@@ -1,0 +1,99 @@
+{
+  "id": "propagation.sphere-extinction",
+  "name": "Extinction of sphere rows: steep rows against the plane formula, near-horizontal and horizontal rows against the chord integral of the transmission table (flat and spherical), continuity at |u| = 0.1, plane and sphere rows of the same photons, emitted-inside rows",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "inputs": [
+    "fixtures/atm_trans_2000_1_10_0_0_2000.dat"
+  ],
+  "commands": [
+    {
+      "name": "sphere-extinction",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.sphere_extinction"
+      ],
+      "timeout": 900
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "a_steep_count",
+      "expected": 48,
+      "atol": 0
+    },
+    {
+      "metric": "a_steep_max_rel_error",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "b_chord_flat_count",
+      "expected": 80,
+      "atol": 0
+    },
+    {
+      "metric": "b_chord_flat_max_rel_error",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "b_chord_spherical_count",
+      "expected": 80,
+      "atol": 0
+    },
+    {
+      "metric": "b_chord_spherical_max_rel_error",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "c_formula_depth_difference",
+      "expected": 0,
+      "atol": 1e-09
+    },
+    {
+      "metric": "c_continuity_count",
+      "expected": 32,
+      "atol": 0
+    },
+    {
+      "metric": "c_continuity_max_rel_error",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "d_pairs",
+      "expected": 40,
+      "atol": 0
+    },
+    {
+      "metric": "d_plane_vs_sphere_max_rel",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "d_plane_vs_reference_max_rel",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "e_inside_count",
+      "expected": 5,
+      "atol": 0
+    },
+    {
+      "metric": "e_inside_max_rel_error",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "geometry_mismatch_count",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}
