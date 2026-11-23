@@ -1,0 +1,74 @@
+{
+  "id": "optics.sphere-vs-plane",
+  "name": "Ray tracing from the telescope sphere: the same downward photons as plane rows and as sphere entry rows, traced by trace-stream (segmented fixture, LSTN-01 when the simulation models are present), horizontal sphere rows on a tilted telescope, enclosure check; camera times of plane rows corrected by the documented plane-row time convention (n_g, input-plane move) and gated on the residual",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "inputs": [
+    "fixtures/optical-models/segmented.json"
+  ],
+  "commands": [
+    {
+      "name": "sphere-vs-plane",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.sphere_optics"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "fixture_detected_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "fixture_position_budget_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "fixture_time_residual_budget_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "lst_detected_set_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "lst_position_budget_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "lst_time_residual_budget_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "horizontal_rows_traced",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "enclosure_small_rejected",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "enclosure_message_names_element",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "enclosure_fixture_accepted",
+      "expected": 1,
+      "atol": 0
+    }
+  ]
+}

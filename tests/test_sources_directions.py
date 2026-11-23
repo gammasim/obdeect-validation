@@ -107,5 +107,10 @@ def test_laser_upward_beam_matches_the_reference(tmp_path):
     assert result["time_error_ulp"] < 2
     assert result["tilt_at_limit_accepted"]
     assert result["tilt_over_rejected"]
-    assert result["horizontal_rejected"]
+    assert result["horizontal_accepted"]
+    assert result["horizontal_rows"] > 0
+    assert result["horizontal_start_error_m"] < 1e-3
+    assert result["horizontal_cz_max_abs"] == 0.0
+    assert result["horizontal_time_error_ulp"] < 2
+    assert result["horizontal_start_height_rejected"]
     assert result["start_below_rejected"]

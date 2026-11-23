@@ -38,6 +38,18 @@ def obdeect_supports_upward() -> bool:
     return (format_major, format_minor) >= (1, 1)
 
 
+def obdeect_supports_sphere() -> bool:
+    """True if the installed obdeect has the sphere representation (stream format 1.2 or later).
+
+    Unit tests of the sphere cases skip on an older obdeect (obdeect plan, phases 5 and 6).
+    """
+    try:
+        from obdeect.stream import format_major, format_minor
+    except ImportError:
+        return False
+    return (format_major, format_minor) >= (1, 2)
+
+
 def zero_depth_table(text: str, bottom_m: float = ZERO_DEPTH_BOTTOM_M) -> str:
     """Sim_telarray transmission table with zero optical depth and its bottom (H2) at bottom_m.
 

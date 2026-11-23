@@ -430,7 +430,7 @@
     "sources.isotropic-to-plane": {
       "title": "Isotropic light to the plane, upward plane wave and upward laser beam (analytic)",
       "headline": "kept fraction pull {kept_fraction_pull_max_abs:.2f} σ, radial χ²/ndf {radial_chi2_ndf:.2f}, arrival time {max_time_error_ulp:.1f} ulp, plane wave direction {plane_wave_direction_error_deg:.1e}°, rejected {rejected_cases} of 2 plane waves and {laser_rejected_cases} of 3 laser cases",
-      "description": "Isotropic point source at height H = 100 m above the plane z = 0 and at −H below it, 2e5 photons each, moved to the plane with `to_plane_z0`. Photons that move away from the plane are dropped and counted (`not_on_plane`). Kept fraction 1/2 (binomial), kept + not_on_plane = N exactly, radial density on the plane H/(r² + H²)^(3/2) in equal-probability radial bins, and arrival times sqrt(r² + H²)/c to float32 rounding. Then an upward plane wave (source below the disc): direction, start plane and target disc; a horizontal `towards_source` and a start plane on the wrong side must be rejected. Last, the upward laser beam preset: direction, start height on the beam, cone bound, tilt limit from the zenith; horizontal beams, tilts above the limit and start heights below the laser must be rejected. All references are analytic and written in the adapter.",
+      "description": "Isotropic point source at height H = 100 m above the plane z = 0 and at −H below it, 2e5 photons each, moved to the plane with `to_plane_z0`. Photons that move away from the plane are dropped and counted (`not_on_plane`). Kept fraction 1/2 (binomial), kept + not_on_plane = N exactly, radial density on the plane H/(r² + H²)^(3/2) in equal-probability radial bins, and arrival times sqrt(r² + H²)/c to float32 rounding. Then an upward plane wave (source below the disc): direction, start plane and target disc; a horizontal `towards_source` and a start plane on the wrong side must be rejected. Last, the upward laser beam preset: direction, start height on the beam, cone bound, tilt limit from the zenith; a horizontal beam is accepted with a start distance (on the beam at the laser height, exact to float32) and rejected with a start height; tilts above the limit and start heights below the laser must be rejected. All references are analytic and written in the adapter.",
       "rows": [
         {
           "label": "Kept fraction, source above / below (pull)",
@@ -2121,6 +2121,123 @@
     "robustness.stream-damage": {
       "title": "Stream damage: truncated, corrupt and mismatched streams",
       "description": "Truncated, corrupt, version-mismatched and empty streams through the pipe chain must fail cleanly: no crash, no hang, no silent success; early consumer exit is included."
+    },
+    "stream.corsika-photons3d": {
+      "title": "CORSIKA 3D photon bunches (1217): sphere rows and to-simtel conversion",
+      "headline": "rows {row_count_obdeect} of {row_count_reference}, column ulp {max_column_ulp}, misses {misses_sphere_obdeect} (reference {misses_sphere_reference}), to-simtel refuses the full run {to_simtel_full_refused}, plane conversion of {to_simtel_subset_rows} rows: position {to_simtel_max_position_error_m:.1e} m, time {to_simtel_max_time_error_ns:.1e} ns",
+      "description": "The eleven bunches of the CORSIKA IACT fixture (block 1217, two telescopes, provenance in fixtures/sphere) are converted by `obdeect stream from-corsika`. The reference is written from the bytes: the EventIO items are walked here (the sync tag and the 12-byte item headers, containers without sync tags), the 1217 body is decoded here, and each bunch gives its emission point E = A - dist d and the sphere row by the documented rules (entry point, path, time ctime + (s - dist)/c, zem = observation level + telescope z + E_z). Rows are compared in float32 ulp, misses by count. `obdeect stream to-simtel` must refuse the full run (a photon emitted inside the sphere) and convert a subset of downward on-sphere rows, which must land on the plane z = 0 along their lines; the sim_telarray output is read with pyeventio (block 1205).",
+      "rows": [
+        {
+          "label": "Rows / reference rows",
+          "text": "{row_count_obdeect} / {row_count_reference}"
+        },
+        {
+          "label": "Largest column error [ulp]",
+          "text": "{max_column_ulp}"
+        },
+        {
+          "label": "Misses (obdeect / reference)",
+          "text": "{misses_sphere_obdeect} / {misses_sphere_reference}"
+        },
+        {
+          "label": "to-simtel: full run refused / subset rows",
+          "text": "{to_simtel_full_refused} / {to_simtel_subset_rows}"
+        },
+        {
+          "label": "Plane conversion: largest position / time error",
+          "text": "{to_simtel_max_position_error_m:.1e} m / {to_simtel_max_time_error_ns:.1e} ns"
+        }
+      ]
+    },
+    "propagation.sphere-extinction": {
+      "title": "Extinction of sphere rows: plane formula, chord integral (flat and spherical), continuity at |u| = 0.1, plane and sphere rows",
+      "headline": "steep rows {a_steep_max_rel_error:.1e}, near-horizontal and horizontal chords {b_chord_flat_max_rel_error:.1e} (flat) and {b_chord_spherical_max_rel_error:.1e} (spherical), continuity {c_continuity_max_rel_error:.1e} (formula difference {c_formula_depth_difference:.0e}), plane vs sphere {d_plane_vs_sphere_max_rel:.1e}",
+      "description": "Sky photons aimed at one telescope (centre 30 m above the observation level, radius 12.5 m; transmission table fixtures/atm_trans_2000_1_10_0_0_2000.dat, H2 = 2000 m, no profile). The run is weighted with store_p, so each row's p is its transmission. Reference, written in the adapter from the table class (log10-linear in height, linear in wavelength, derivative of the same interpolation) and scipy quad: for steep rows (|u| >= 0.1) p = exp(-|tau(h_E) - tau(h_Q)|/|u|) with h_E = zem and h_Q the altitude of the row point; for |u| < 0.1 the chord integral of k = |dtau/dh| from E = Q - L d to Q, flat (h linear) and spherical (Earth radius 6371315 m, centre (0, 0, -(R + H2)), h = |X - centre| - R). Continuity: the two reference forms agree at |u| = 0.1, and rows on both sides of 0.1 agree with their branch. Plane and sphere rows of the same photons, the sphere entry on the equator of the telescope: transmissions agree to 1e-6. Photons emitted inside the sphere have p = 1. Gate: 1e-6 relative (the documented quadrature agreement); the spherical chord is the open point (see the report)."
+    },
+    "propagation.sphere-geometry": {
+      "title": "Sphere representation of the atmosphere stage: geometry, refraction and determinism",
+      "headline": "no refraction: {no_refraction_rows} photons, kept and drop reasons equal, budget ratio {no_refraction_budget_ratio_max:.2f}; refraction: hybrid rule {refraction_hybrid_position_m:.1e} m, integrator {refraction_integrator_position_m:.1e} m, turning ray {turning_position_m:.1e} m; determinism mismatches {determinism_mismatch_count}",
+      "description": "Sky photons in all directions (downward, horizontal, upward from below, emitted inside the sphere, below the observation level, aimed past the sphere) against one telescope of radius 12.5 m at 20 m. Without refraction the references are the straight-line entry points, times and drop reasons, compared with a float32 budget (one spacing plus the direction budget 2 eps s, since the stored direction is unit to 6e-8). With the atmospheric profile the reference integrates the ray equation d(n d)/ds = grad n with scipy (DOP853, rtol 1e-12; the same profile interpolation as the documented one), with a two-phase search so that the sphere chord (about 14 m) is always resolved. Gates: hybrid rows and integrator rows 1e-4 m; times 1e-4 ns plus one float32 spacing; a turning ray (apex about 870 m, path 560 km, sphere centred on its descending crossing) 5e-3 m. Determinism: identical rows for chunk sizes 1 and 7, four threads, and a permuted input order.",
+      "rows": [
+        {
+          "label": "No refraction: kept mismatches / drop mismatches",
+          "text": "{no_refraction_kept_mismatch} / {no_refraction_below_ground_mismatch}+{no_refraction_misses_mismatch}"
+        },
+        {
+          "label": "No refraction: largest error / float32 budget",
+          "text": "{no_refraction_budget_ratio_max:.2f}"
+        },
+        {
+          "label": "Refraction: hybrid rule position [m] (gate 1e-4)",
+          "text": "{refraction_hybrid_position_m:.1e}"
+        },
+        {
+          "label": "Refraction: integrator position [m] (gate 1e-4)",
+          "text": "{refraction_integrator_position_m:.1e}"
+        },
+        {
+          "label": "Turning ray: position [m] (gate 5e-3)",
+          "text": "{turning_position_m:.1e}"
+        },
+        {
+          "label": "Determinism: bit mismatches",
+          "text": "{determinism_mismatch_count}"
+        }
+      ]
+    },
+    "sources.ground-muon": {
+      "title": "Ground-frame sources: muon-like line through the telescope sphere and an isotropic point",
+      "headline": "rows {rows}, misses {misses_sphere_run_end} (rows + misses = emitted: {rows_plus_misses_minus_emitted}), line inside pull {line_inside_pull:.2f}, point kept pull {point_kept_pull:.2f}, track distance {line_on_track_max_m:.1e} m, entry radius {entry_radius_max_error_m:.1e} m, time ratio {time_budget_ratio_max:.2f}",
+      "description": "A 120 m track at 3.6 m impact (1e5 photons, Cherenkov cone 1.2 degrees, beta = 1) and an isotropic point 57 m from the sphere centre (2e5 photons), frame ground, one telescope of radius 12.5 m. Every row is checked against the analytic geometry, with its emission point rebuilt from the row: inside rows are the emission points on the track (path 0); entry points lie on the sphere with path |r - P| and time (s_emit + path)/c; zem is the observation level plus the emission height. Counts: the inside rows of the track are Binomial(N, chord/L), the kept point photons Binomial(N, (1 - sqrt(1 - (R/D)^2))/2), both as pulls; misses_sphere equals the photons emitted minus the rows written.",
+      "rows": [
+        {
+          "label": "Rows written / misses (run_end)",
+          "text": "{rows} / {misses_sphere_run_end}"
+        },
+        {
+          "label": "Track inside rows: pull vs chord fraction",
+          "text": "{line_inside_pull:+.2f}"
+        },
+        {
+          "label": "Point rows: pull vs solid angle",
+          "text": "{point_kept_pull:+.2f}"
+        },
+        {
+          "label": "Largest distance of emission points from the track [m]",
+          "text": "{line_on_track_max_m:.1e}"
+        },
+        {
+          "label": "Largest entry-radius error [m]",
+          "text": "{entry_radius_max_error_m:.1e}"
+        }
+      ]
+    },
+    "optics.sphere-vs-plane": {
+      "title": "Ray tracing from the telescope sphere: plane rows and sphere entry rows of the same photons",
+      "headline": "segmented fixture: detected sets identical ({fixture_detected_plane} photons), position difference {fixture_max_position_difference_m:.1e} m, time {fixture_max_time_difference_ns:.1e} ns; LST: {lst_detected_set_mismatch} set mismatches, time budget ratio {lst_time_budget_ratio:.2f}; horizontal rows traced {horizontal_rows_traced}; enclosure rejects 0.5 m {enclosure_small_rejected}",
+      "description": "A parallel beam from a star at zenith 20 degrees (downward photons, the telescope pointed along the beam) is propagated in plane mode (G rows on the plane through the telescope centre) and in sphere mode (entry rows), and both go through trace-stream with the same optical model. The detected sets must be identical; camera positions and directions must agree within float32 rounding of the rows (budget four spacings, two roundings per path). Times: plane rows are moved to the ground input plane at vacuum speed and their traced path is multiplied by the group index n_g, while sphere rows start at their entry point; the expected difference is (1 - n_g) D / c per photon, D = (P - E) . d along the ray (P: plane row moved to the input plane, E: sphere entry). The residual after this convention is gated on float32 rounding; the raw difference is reported with its size (LST: up to 6.8e-3 ns, the convention explains 6.2e-3 ns, n_g = 1.000226). The segmented fixture is always compared; LSTN-01 when the simulation models are present (VALIDATION_MODELS or /models). Horizontal sphere rows of the tilted fixture telescope are traced without rejection, and the enclosure check rejects a 0.5 m sphere and accepts the fixture sphere of 9 m (camera front 8.52 m from the centre).",
+      "rows": [
+        {
+          "label": "Detected sets identical (mismatches)",
+          "text": "{fixture_detected_set_mismatch} (fixture), {lst_detected_set_mismatch} (LST)"
+        },
+        {
+          "label": "Largest position difference [m]: fixture / LST",
+          "text": "{fixture_max_position_difference_m:.1e} / {lst_max_position_difference_m:.1e}"
+        },
+        {
+          "label": "Largest time difference [ns]: fixture / LST",
+          "text": "{fixture_max_time_difference_ns:.1e} / {lst_max_time_difference_ns:.1e}"
+        },
+        {
+          "label": "Horizontal sphere rows traced",
+          "text": "{horizontal_rows_traced}"
+        },
+        {
+          "label": "Enclosure: 0.5 m rejected, fixture accepted",
+          "text": "{enclosure_small_rejected}, {enclosure_fixture_accepted}"
+        }
+      ]
     }
   },
   "since": "2026-11-14",

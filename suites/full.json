@@ -57,6 +57,11 @@
     "../cases/propagation/upward-refraction.json",
     "../cases/propagation/upward-extinction.json",
     "../cases/propagation/upward-lidar.json",
-    "../cases/propagation/direction-losses.json"
+    "../cases/propagation/direction-losses.json",
+    "../cases/stream/corsika-photons3d.json",
+    "../cases/propagation/sphere-geometry.json",
+    "../cases/sources/ground-muon.json",
+    "../cases/optics/sphere-vs-plane.json",
+    "../cases/propagation/sphere-extinction.json"
   ]
 }
