@@ -4,6 +4,7 @@
     "../cases/stream/led-eventio.json",
     "../cases/stream/corsika-roundtrip.json",
     "../cases/stream/inputs-headers.json",
-    "../cases/stream/direction-roundtrip.json"
+    "../cases/stream/direction-roundtrip.json",
+    "../cases/stream/corsika-photons3d.json"
   ]
 }

@@ -1,0 +1,99 @@
+{
+  "id": "propagation.sphere-geometry",
+  "name": "Sphere representation of the atmosphere stage: straight-line entry, path, time and drop reasons (float32 budget); refraction against a scipy ray integral (hybrid rule, integrator, turning ray); determinism over chunks, threads and order",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "inputs": [
+    "fixtures/atmprof_ecmwf_north_winter_fixed.dat"
+  ],
+  "commands": [
+    {
+      "name": "sphere-geometry",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.sphere_geometry"
+      ],
+      "timeout": 3600
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "no_refraction_rows",
+      "expected": 254,
+      "atol": 0
+    },
+    {
+      "metric": "no_refraction_kept_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "no_refraction_below_ground_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "no_refraction_misses_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "no_refraction_budget_ratio_max",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "no_refraction_inside_path_m",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "refraction_kept_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "refraction_hybrid_position_m",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "refraction_hybrid_time_gate_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "refraction_integrator_position_m",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "refraction_integrator_time_gate_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "turning_position_m",
+      "expected": 0,
+      "atol": 0.005
+    },
+    {
+      "metric": "turning_time_gate_ratio",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "turning_reached_sphere",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "determinism_mismatch_count",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

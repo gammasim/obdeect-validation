@@ -1,0 +1,104 @@
+{
+  "id": "stream.corsika-photons3d",
+  "name": "CORSIKA 3D photon bunches (1217) to sphere rows: from-corsika against an independent EventIO reader (row by row, float32 ulp), misses, to-simtel refusal of inside rows and plane conversion of downward sphere rows",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "inputs": [
+    "fixtures/sphere/photons3d.iact"
+  ],
+  "commands": [
+    {
+      "name": "corsika-photons3d",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.sphere_corsika"
+      ],
+      "timeout": 900
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "row_count_obdeect",
+      "expected": 9,
+      "atol": 0
+    },
+    {
+      "metric": "row_count_reference",
+      "expected": 9,
+      "atol": 0
+    },
+    {
+      "metric": "row_count_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "telescope_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "max_column_ulp",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "ground_representation_sphere",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "misses_sphere_obdeect",
+      "expected": 2,
+      "atol": 0
+    },
+    {
+      "metric": "misses_sphere_reference",
+      "expected": 2,
+      "atol": 0
+    },
+    {
+      "metric": "misses_sphere_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "inside_rows_reference",
+      "expected": 2,
+      "atol": 0
+    },
+    {
+      "metric": "to_simtel_full_refused",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "to_simtel_subset_rows",
+      "expected": 4,
+      "atol": 0
+    },
+    {
+      "metric": "to_simtel_subset_row_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "to_simtel_max_position_error_m",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "to_simtel_max_time_error_ns",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "to_simtel_max_zem_error_m",
+      "expected": 0,
+      "atol": 1e-06
+    }
+  ]
+}

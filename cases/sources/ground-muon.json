@@ -1,0 +1,96 @@
+{
+  "id": "sources.ground-muon",
+  "name": "Ground-frame sources with the telescope sphere: a muon-like line crossing the sphere (inside emission points, entry points with analytic path and time) and an isotropic point outside (kept fraction, binomial)",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "ground-muon",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.sphere_sources"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "rows_plus_misses_minus_emitted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "misses_sphere_summary_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "ground_representation_sphere",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "line_inside_pull",
+      "expected": 0,
+      "atol": 4
+    },
+    {
+      "metric": "point_kept_pull",
+      "expected": 0,
+      "atol": 4
+    },
+    {
+      "metric": "line_on_track_max_m",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "line_along_violations",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "inside_radius_violations",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "inside_path_nonzero",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "outside_path_zero",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "entry_radius_max_error_m",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "cone_excess_deg",
+      "expected": 0,
+      "atol": 0.0001
+    },
+    {
+      "metric": "time_budget_ratio_max",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "zem_budget_ratio_max",
+      "expected": 0,
+      "atol": 1
+    },
+    {
+      "metric": "point_position_max_error_m",
+      "expected": 0,
+      "atol": 0.0001
+    }
+  ]
+}

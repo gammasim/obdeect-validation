@@ -14,6 +14,8 @@
     "../cases/propagation/upward-refraction.json",
     "../cases/propagation/upward-extinction.json",
     "../cases/propagation/upward-lidar.json",
-    "../cases/propagation/direction-losses.json"
+    "../cases/propagation/direction-losses.json",
+    "../cases/propagation/sphere-geometry.json",
+    "../cases/propagation/sphere-extinction.json"
   ]
 }

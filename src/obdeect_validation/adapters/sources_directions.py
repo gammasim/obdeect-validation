@@ -14,8 +14,10 @@ Three parts. Every reference is analytic and written here (numpy, scipy), not ta
    side of the disc, each with the message of obdeect.
 3. Upward laser beam (``laser-beam`` preset): exact direction, start on the beam at the start
    height above the laser, arrival time offset path / c, cone bound for a divergent beam, tilt
-   limit measured from the zenith. Rejected: a horizontal beam, a tilt above the limit, and a
-   start height below the laser.
+   limit measured from the zenith. A horizontal beam (zenith 90) is accepted with a start distance
+   along the beam (``--start-distance``): it stays at the laser height and starts at that distance
+   from the laser; with a start height (``--start-height``) it is rejected. Rejected: a tilt above
+   the limit, a start height below the laser, and a horizontal beam with a start height.
 
 Radial geometry: a photon from (0, 0, H) reaches the plane at radius r with cos(theta) = H / d,
 d = sqrt(r^2 + H^2). The fraction of the emitted photons in the annulus r1..r2 is
@@ -54,6 +56,9 @@ LASER_OBSERVATION_M = 2150.0
 LASER_POSITION_M = (0.0, 0.0, 1000.0)  # sky frame: z above the observation level
 LASER_ZENITH_DEG = 20.0
 LASER_AZIMUTH_DEG = 30.0
+HORIZONTAL_START_DISTANCE_M = (
+    500.0  # start of the horizontal beam along the beam from the laser
+)
 LASER_START_M = 100000.0  # sky-frame height of the start on the upward beam
 LASER_ROWS = 1000
 LASER_CONE_FULL_DEG = 0.5
@@ -459,11 +464,52 @@ def laser_part(root: Path) -> dict:
             max_tilt=LASER_MAX_TILT_DEG,
         ),
     )
+    # horizontal beam: accepted with a start distance (exact start on the beam at the laser height),
+    # rejected with a start height (docs/sources/presets.md, "laser-beam", start rule)
+    horizontal_out = root / "laser-horizontal.pst"
     horizontal = run_laser(
         root,
         "laser-horizontal",
-        laser_argv(root / "laser-horizontal.pst", 90.0, LASER_AZIMUTH_DEG, 0.0),
+        laser_argv(
+            horizontal_out,
+            90.0,
+            LASER_AZIMUTH_DEG,
+            0.0,
+            start_distance=HORIZONTAL_START_DISTANCE_M,
+        ),
     )
+    horizontal_height = run_laser(
+        root,
+        "laser-horizontal-start-height",
+        laser_argv(
+            root / "laser-horizontal-start-height.pst",
+            90.0,
+            LASER_AZIMUTH_DEG,
+            0.0,
+            start_height=500.0,
+        ),
+    )
+    horizontal_data = read_photons(horizontal_out) if horizontal["ok"] else None
+    if horizontal_data is not None:
+        h_dir = beam_direction(90.0, LASER_AZIMUTH_DEG)
+        h_start = laser + HORIZONTAL_START_DISTANCE_M * h_dir
+        h_pos = np.stack(
+            [horizontal_data[k].astype(np.float64) for k in ("x", "y", "z")], axis=1
+        )
+        h_cz = horizontal_data["cz"].astype(np.float64)
+        h_time_ref = HORIZONTAL_START_DISTANCE_M / C_M_NS
+        h_start_error = float(np.abs(h_pos - h_start).max())
+        h_cz_max = float(np.abs(h_cz).max())
+        h_time_ulp = float(
+            (
+                np.abs(horizontal_data["t"].astype(np.float64) - h_time_ref)
+                / np.spacing(horizontal_data["t"]).astype(np.float64)
+            ).max()
+        )
+        h_rows = len(h_cz)
+    else:
+        h_start_error = h_cz_max = h_time_ulp = float("nan")
+        h_rows = 0
     below = run_laser(
         root,
         "laser-start-below",
@@ -495,13 +541,18 @@ def laser_part(root: Path) -> dict:
         "tilt_at_limit_accepted": tilt_ok["ok"],
         "tilt_over_rejected": (not tilt_over["ok"])
         and "exceeds --max-tilt" in tilt_over["message"],
-        "horizontal_rejected": (not horizontal["ok"])
-        and "horizontal" in horizontal["message"],
+        "horizontal_accepted": bool(horizontal["ok"]),
+        "horizontal_rows": h_rows,
+        "horizontal_start_error_m": h_start_error,
+        "horizontal_cz_max_abs": h_cz_max,
+        "horizontal_time_error_ulp": h_time_ulp,
+        "horizontal_start_height_rejected": (not horizontal_height["ok"])
+        and "horizontal" in horizontal_height["message"],
         "start_below_rejected": (not below["ok"])
         and "must lie on the beam" in below["message"],
         "messages": {
             "tilt_over": tilt_over["message"],
-            "horizontal": horizontal["message"],
+            "horizontal_start_height": horizontal_height["message"],
             "start_below": below["message"],
         },
     }
@@ -607,7 +658,11 @@ def run_all(
     )
     laser_rejected = sum(
         1
-        for key in ("horizontal_rejected", "start_below_rejected", "tilt_over_rejected")
+        for key in (
+            "horizontal_start_height_rejected",
+            "start_below_rejected",
+            "tilt_over_rejected",
+        )
         if laser[key]
     )
     below, above = isotropic["below"], isotropic["above"]
@@ -648,6 +703,10 @@ def run_all(
         "laser_tilt_limit_ok": int(laser["tilt_at_limit_accepted"])
         + int(laser["tilt_over_rejected"]),
         "laser_rejected_cases": laser_rejected,
+        "laser_horizontal_accepted": int(laser["horizontal_accepted"]),
+        "laser_horizontal_start_error_m": laser["horizontal_start_error_m"],
+        "laser_horizontal_cz_max_abs": laser["horizontal_cz_max_abs"],
+        "laser_horizontal_time_error_ulp": laser["horizontal_time_error_ulp"],
     }
     details = {
         "seed": SEED,
