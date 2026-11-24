@@ -140,6 +140,16 @@ def test_chi2_counts_only_bins_with_reference_and_error():
     assert pulls.size == 1
 
 
+def test_chi2_flag_flags_only_large_chi2_at_the_policy_level():
+    # ndf = 10: chi2 = ndf is p of about 0.44 (no flag); chi2 = 60 is p of about 4e-9 (flag).
+    assert ul.chi2_p_value(10.0, 10) == pytest.approx(0.4405, abs=1e-3)
+    assert ul.chi2_p_below_limit(10.0, 10) == 0
+    assert ul.chi2_p_below_limit(60.0, 10) == 1
+    # A small chi2 (overestimated errors) is not flagged.
+    assert ul.chi2_p_below_limit(0.5, 10) == 0
+    assert ul.CHI2_P_LIMIT == 1e-4
+
+
 @needs_upward
 def test_obdeect_adapter_run_is_consistent(tmp_path, monkeypatch):
     pytest.importorskip("obdeect.propagation")

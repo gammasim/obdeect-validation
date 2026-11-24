@@ -6,7 +6,7 @@
     {
       "name": "zenith-20-substitution",
       "argv": ["{python}", "-m", "obdeect_validation.adapters.atmosphere_chain",
-               "--showers", "/validation/inputs/gamma-20deg-100-3000GeV.iact"],
+               "--showers", "{validation}/inputs/gamma-20deg-100-3000GeV.iact"],
       "timeout": 3600
     }
   ],

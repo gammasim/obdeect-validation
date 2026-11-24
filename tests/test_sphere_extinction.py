@@ -81,6 +81,7 @@ def test_plane_and_sphere_rows_of_one_photon_agree(tmp_path):
         ground_representation="sphere",
         mode="weighted",
         store_p=True,
+        pathlen_m=0.0,
     )
     propagate(
         inp,
@@ -90,6 +91,7 @@ def test_plane_and_sphere_rows_of_one_photon_agree(tmp_path):
         seed=1,
         mode="weighted",
         store_p=True,
+        pathlen_m=0.0,
     )
     sphere = se.read_rows(tmp_path / "sph.pst")
     plane = se.read_rows(tmp_path / "pl.pst")

@@ -21,8 +21,6 @@ Limits: zero mismatched photons, zero survivor-count errors, identical summaries
 
 from __future__ import annotations
 
-import argparse
-import importlib.metadata
 import math
 from pathlib import Path
 
@@ -40,10 +38,7 @@ MIN_COMPARED = 1000
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 def population():
@@ -107,6 +102,8 @@ def cli(root: Path, stream: Path, out: Path, threads: int, seed: int) -> None:
         "run",
         "--transmission",
         uc.TRANSMISSION,
+        "--pathlen",
+        "0",
         "--site-altitude",
         uc.SITE_M,
         "--profile",
@@ -137,6 +134,7 @@ def api(stream: Path, out: Path, threads: int, seed: int) -> dict:
         profile=uc.PROFILE,
         mode="weighted",
         threads=threads,
+        pathlen_m=0.0,  # as the CLI run of the same case (--pathlen 0)
     )
 
 
@@ -263,11 +261,7 @@ def analyse(root: Path) -> tuple[dict, dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
-    metrics, details = analyse(root)
-    common.write_results(metrics, details, root)
+    common.results_main(analyse, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

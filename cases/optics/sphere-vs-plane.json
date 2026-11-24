@@ -6,7 +6,7 @@
     "python3"
   ],
   "inputs": [
-    "fixtures/optical-models/segmented.json"
+    "{validation}/fixtures/optical-models/segmented.json"
   ],
   "commands": [
     {

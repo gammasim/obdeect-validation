@@ -1,0 +1,34 @@
+{
+  "psf": {
+    "seeds": [11, 12, 13],
+    "simtools_config": {
+      "application": "simtools-validate-optics",
+      "configuration": {
+        "type": "cumulative_psf",
+        "data": "/validation/fixtures/psf/PSFcurve_data_v2.ecsv",
+        "site": "North",
+        "telescope": "LSTN-01",
+        "model_version": "7.0.0",
+        "simulation_models_path": "/models",
+        "zenith_angle": 20,
+        "source_distance": 10
+      }
+    }
+  },
+  "angles": {
+    "seeds": [11, 12, 13],
+    "simtools_config": {
+      "application": "simtools-derive-incident-angle",
+      "configuration": {
+        "site": "South",
+        "telescope": "SSTS-01",
+        "model_version": "7.0.0",
+        "simulation_models_path": "/models",
+        "zenith_angle": 20,
+        "source_distance": 10,
+        "off_axis_angles": [1.0],
+        "number_of_photons": 1000000
+      }
+    }
+  }
+}

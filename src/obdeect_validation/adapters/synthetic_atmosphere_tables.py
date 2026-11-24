@@ -110,10 +110,10 @@ def main() -> None:
         "camera_body_shape": record("camera_body_shape", 2),
         "camera_depth": record("camera_depth", 0.0, "cm"),
     }
-    mirror_list = """# x y diameter focal shape
-   0.0     0.0  100.0  0.0  0
- 125.0     0.0  100.0  0.0  0
--125.0     0.0  100.0  0.0  0
+    mirror_list = """# x y diameter focal shape z (z = 0: automatic height)
+   0.0     0.0  100.0  0.0  0  0.0
+ 125.0     0.0  100.0  0.0  0  0.0
+-125.0     0.0  100.0  0.0  0  0.0
 """
     dual_records = {
         "mirror_class": record("mirror_class", 2),
@@ -143,13 +143,17 @@ def main() -> None:
                 single_records,
                 {"mirror_list": mirror_list}.__getitem__,
                 configuration_seed=1,
+                propagation_group_index=1.0,
             ),
             8.0,
         ),
         (
             "dual",
             OpticalModel.from_records(
-                dual_records, {}.__getitem__, configuration_seed=1
+                dual_records,
+                {}.__getitem__,
+                configuration_seed=1,
+                propagation_group_index=1.0,
             ),
             3.5,
         ),

@@ -52,6 +52,8 @@ ATMOSPHERE = [
     "run",
     "--transmission",
     str(TRANSMISSION),
+    "--pathlen",
+    "0",
     "--site-altitude",
 ]
 ATMOSPHERE += ["2000", "--wavelength-range", "300", "600", "--seed", "5"]
@@ -60,14 +62,14 @@ OPTICS += ["--pointing-azimuth-deg", "0"]
 
 # Synthetic telescope (not a CTAO model): seven circular 1 m mirrors on a Davies-Cotton dish,
 # f = 8 m. Same inputs as the obdeect ray_tracing test telescope.
-MIRROR_LIST = """# x y diameter focal shape
-   0.0     0.0  100.0  0.0  0
- 125.0     0.0  100.0  0.0  0
--125.0     0.0  100.0  0.0  0
-  62.5   108.3  100.0  0.0  0
- -62.5   108.3  100.0  0.0  0
-  62.5  -108.3  100.0  0.0  0
- -62.5  -108.3  100.0  0.0  0
+MIRROR_LIST = """# x y diameter focal shape z (z = 0: automatic height)
+   0.0     0.0  100.0  0.0  0  0.0
+ 125.0     0.0  100.0  0.0  0  0.0
+-125.0     0.0  100.0  0.0  0  0.0
+  62.5   108.3  100.0  0.0  0  0.0
+ -62.5   108.3  100.0  0.0  0  0.0
+  62.5  -108.3  100.0  0.0  0  0.0
+ -62.5  -108.3  100.0  0.0  0  0.0
 """
 
 
@@ -114,9 +116,9 @@ def obdeect(*args, stdin=None):
 def model(tmp_path_factory):
     records, files = single_mirror_model_inputs()
     path = tmp_path_factory.mktemp("model") / "model.json"
-    OpticalModel.from_records(records, files.__getitem__, configuration_seed=1).save(
-        path
-    )
+    OpticalModel.from_records(
+        records, files.__getitem__, configuration_seed=1, propagation_group_index=1.0
+    ).save(path)
     return path
 
 

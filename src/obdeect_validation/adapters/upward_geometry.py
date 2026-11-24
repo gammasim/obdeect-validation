@@ -12,7 +12,6 @@ rounding of a stored value). Also: cx, cy, cz are kept bit for bit, and the G ->
 from __future__ import annotations
 
 import argparse
-import importlib.metadata
 from pathlib import Path
 
 import numpy as np
@@ -34,10 +33,7 @@ TELESCOPE = (0.0, 0.0, PLANE_Z_M)
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 def samples(seed: int = SEED) -> dict:

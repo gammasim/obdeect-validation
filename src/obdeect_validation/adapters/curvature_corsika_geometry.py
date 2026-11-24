@@ -12,7 +12,8 @@ Per file:
       the core, array reference at the observation level). The curved slant depth must lie in
       XMAX_BAND. The plane-parallel value thick(zem)/cos(zenith) is reported for contrast.
   (b) Directions. The photon-weighted mean zenith of the bunches within CORE_RADIUS_M of the core
-      must equal the primary zenith within ZENITH_TOLERANCE_DEG.
+      must equal the primary zenith within max(ZENITH_REQUIREMENT_DEG, 5 SE), SE from the
+      photon direction spread (mean_zenith_se_deg).
   (c) Bunch format. Every photon block (EventIO type 1205) must be in the long format, i.e. its
       header version is not 1000 + n (the compact format, io_simtel.c). The long format is the
       default of corsika7/bernlohr/iact.c and is also requested by TELFIL '+' (curved_showers).
@@ -46,7 +47,8 @@ GAUSS_ORDER = (
 
 # Limits fixed before looking at results. Each entry: (rule, justification).
 XMAX_BAND_G_CM2 = (200.0, 500.0)
-ZENITH_TOLERANCE_DEG = 0.5
+ZENITH_REQUIREMENT_DEG = 0.5  # stated requirement: refraction-scale agreement at 75 deg
+ZENITH_SE_FACTOR = 5.0  # gate = max(requirement, 5 SE), see LIMITS
 CORE_RADIUS_M = 150.0
 PHOTON_BLOCK_TYPE = (
     1205  # EventIO type of an IACT photon bunch block (eventio iact.objects)
@@ -68,14 +70,22 @@ LIMITS = {
             "the metric."
         ),
     ),
-    "zenith_tolerance_deg": (
-        "|mean zenith(|x_core| <= 150 m) - theta0| <= 0.5 deg",
+    "zenith_gate_deg": (
         (
-            "Refraction bends the arrival direction by about (n-1) tan(theta) = 2.8e-4 * 3.73 = "
-            "0.06 deg at 75 deg. The Cherenkov cone (about 1 deg half-angle) is symmetric about the "
-            "axis, so its effect on the mean zenith is second order, alpha^2 cot(theta) / 2 (0.004 "
-            "deg at 65 deg, 0.002 deg at 75 deg). 0.5 deg is about 8 times the refraction effect at "
-            "75 deg."
+            "|mean zenith(|x_core| <= 150 m) - theta0| <= max(0.5 deg, 5 SE), "
+            "SE = sqrt(sum w^2 (z - mean)^2) / sum w over the bunches near the core"
+        ),
+        (
+            "Requirement 0.5 deg: refraction bends the arrival direction by about (n-1) tan(theta) "
+            "= 2.8e-4 * 3.73 = 0.06 deg at 75 deg, and the Cherenkov cone (about 1 deg half-angle) "
+            "is symmetric about the axis, so its effect on the mean zenith is second order, "
+            "alpha^2 cot(theta) / 2 (0.004 deg at 65 deg, 0.002 deg at 75 deg); 0.5 deg is about 8 "
+            "times the refraction effect at 75 deg. The statistical term is the photon-weighted "
+            "standard error of the mean of the bunch zeniths, i.e. the spread of the photon "
+            "directions (Kish weights); a 5 SE gate is the same rule as the other statistical "
+            "gates. Bunches of one shower are correlated, so this SE is a lower bound: the gate is "
+            "wider than the statistics alone would give, and a file that exceeds it is reported, "
+            "not tuned away."
         ),
     ),
     "core_radius_m": (
@@ -236,6 +246,23 @@ def photon_weighted_median(values, weights) -> float:
     cumulative = np.cumsum(weights[order])
     index = int(np.searchsorted(cumulative, 0.5 * cumulative[-1], side="left"))
     return float(values[order][index])
+
+
+def _zenith_deg(cx, cy):
+    transverse = np.hypot(cx, cy)
+    longitudinal = np.sqrt(np.clip(1.0 - cx**2 - cy**2, 0.0, None))
+    return np.degrees(np.arctan2(transverse, longitudinal))
+
+
+def mean_zenith_se_deg(cx, cy, weights) -> float:
+    """Standard error of the photon-weighted mean zenith: sqrt(sum w^2 (z - mean)^2) / sum w."""
+    cx = np.asarray(cx, dtype=np.float64).ravel()
+    cy = np.asarray(cy, dtype=np.float64).ravel()
+    weights = np.asarray(weights, dtype=np.float64).ravel()
+    zenith = _zenith_deg(cx, cy)
+    total = float(np.sum(weights))
+    mean = float(np.sum(weights * zenith) / total)
+    return float(np.sqrt(np.sum(weights**2 * (zenith - mean) ** 2)) / total)
 
 
 def mean_zenith_deg(cx, cy, weights) -> float:
@@ -439,6 +466,10 @@ def analyse_file(
     mean_zenith = mean_zenith_deg(
         shower["cx"][near], shower["cy"][near], shower["photons"][near]
     )
+    se_zenith = mean_zenith_se_deg(
+        shower["cx"][near], shower["cy"][near], shower["photons"][near]
+    )
+    zenith_threshold = max(ZENITH_REQUIREMENT_DEG, ZENITH_SE_FACTOR * se_zenith)
     per_event = []
     for number in np.unique(shower["event"]):
         mask = shower["event"] == number
@@ -465,6 +496,9 @@ def analyse_file(
         "near_core_bunches": int(np.count_nonzero(near)),
         "mean_zenith_near_core_deg": mean_zenith,
         "mean_zenith_error_deg": mean_zenith - theta0,
+        "mean_zenith_se_deg": se_zenith,
+        "mean_zenith_threshold_deg": zenith_threshold,
+        "mean_zenith_gate_exceeded": bool(abs(mean_zenith - theta0) > zenith_threshold),
         "long_format_violations": long_format_violations,
         "curved_log": curved_showers.log_is_curved(log_text),
         "header": flags,
@@ -595,6 +629,9 @@ def main() -> int:
         "median_slant_depth_outside_range_count": len(outside),
         "mean_zenith_error_max_deg": max(
             abs(row["mean_zenith_error_deg"]) for row in rows
+        ),
+        "mean_zenith_gate_exceeded_count": sum(
+            row["mean_zenith_gate_exceeded"] for row in rows
         ),
         "long_format_violation_count": sum(
             row["long_format_violations"] for row in rows

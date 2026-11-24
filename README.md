@@ -28,13 +28,32 @@ obdeect-validate list --suite suites/smoke.json --json
 obdeect-validate run --case cases/chain/optics-bypass1.json --environment environments/workspace.json --output results/one --non-interactive
 ```
 
+The obdeect-only regression suite runs on a laptop without containers, through the same runner
+and the host environment file `environments/host.json`. The file sets no paths: it requires `obdeect`,
+`python3` and `cc` on `PATH` and the Python modules the cases import, and the runner inherits the
+caller's environment. Export `SIMTEL_REFERENCE_SOURCE`, `VALIDATION_ROOT` and `VALIDATION_MODELS`
+first where a case needs them (sim_telarray and simulation-models checkouts); `refraction-high-zenith`
+also needs the CORSIKA atmosphere and hessio sources (`CORSIKA_ATMO_DIR`, `CORSIKA_SUPPORT_DIR`,
+`CORSIKA_INCLUDE_DIRS`, see its adapter). Then:
+
+```sh
+obdeect-validate run --suite suites/regression.json --environment environments/host.json \
+  --output results/regression --non-interactive
+```
+
 Former `obdeect/validation/` scripts, now here: the flasher, LED and stream cross-checks are
 cases (`cases/sources/flasher-dish.json`, `flasher-secondary.json`, `led-reference.json`,
 `cases/stream/corsika-roundtrip.json`). The obdeect chain test runs without the container
 once obdeect is installed (`python -m pytest tests/test_obdeect_chain.py`; it skips otherwise).
 Summary of an IACT file: `python -m obdeect_validation.adapters.summarize_iact FILE.iact.gz`.
 
-The LST camera-window study is `suites/optics-window.json`. Run it with:
+The LST camera-window study is `suites/optics-window.json`. It is a study, not a validation: its three
+cases carry no gated metrics (their names say so) and the suite is not part of `suites/full.json`.
+The window parameter records (`camera_window_parameters`, `camera_window_refractive_index`,
+`camera_window_internal_transmittance`, version 1.0.0, LSTN-design) do not exist in simulation-models,
+and obdeect does not trace the camera window, so a window-on result has no reference to compare with.
+The study stops with an error while the records are missing; its config also sets
+`simulation_models_path` to `/models`, which exists only in the container. Run it with:
 
 ```sh
 obdeect-validate run --suite suites/optics-window.json \
@@ -44,12 +63,16 @@ obdeect-validate run --suite suites/optics-window.json \
 It runs obdeect only:
 window off at 6.55 cm, window on at 6.55 cm, then window on from 6.95 to 6.15 cm
 in 0.05 cm steps. The scan reports its best on-axis D80 and compares its 1-4 deg
-D80 values to the window-off case. The window parameters come from the models
-(LSTN-design); a temporary copy of the production table adds them, so the checkout
-is not changed.
+D80 values to the window-off case. The study code would add the window records to a temporary
+copy of the production table, so the checkout is not changed; that copy does not make the
+records exist.
 
 Case files are JSON. Each has an id, executable requirements, commands (argument
-arrays, without shell expansion), and metrics with metric/expected/atol.
+arrays, without shell expansion), and metrics with metric/expected/atol. Case `argv` and `inputs`
+may use the placeholders `{python}` (this interpreter), `{validation}` (`VALIDATION_ROOT`, default
+`/validation`) and `{reference}` (`SIMTEL_REFERENCE_SOURCE`, default `/reference`). The `env` block
+of the environment file overrides the process environment; the container mounts keep the defaults,
+so the host sets `VALIDATION_ROOT` and `SIMTEL_REFERENCE_SOURCE` before a run (see `environments/host.json`).
 Commands run inside an isolated case output directory and write metrics.json.
 Adapters also write details.json and PNG figures; `report.html` links them per case.
 
@@ -109,7 +132,11 @@ CORSIKA_DATA=/path/to/corsika7-interaction-tables/interaction-tables \
 
 CORSIKA reproduces the showers (same bunches and energies on other machines), but the file header
 carries a date, so the SHA-256 of a regenerated file differs; compare the `.corsika.log` instead.
-(`generate-input.sh` has not been run on Linux.)
+The hashes in `fixtures/inputs.json` are those of the files in `inputs/` regenerated on 2026-11-23 and
+2026-11-24 (per-file `generated` date); the earlier hashes are kept as `previous_sha256`.
+`generate-input.sh` mounts sim_telarray at `/reference` and the CORSIKA interaction tables at
+`/corsika-data`; CORSIKA reads its tables from there (`DATDIR /corsika-data/`), so the tables keep
+their original names. (`generate-input.sh` has not been run on Linux.)
 
 Disk: images about 2 GB each (two), inputs 2.6 GB, each case a few hundred MB while it runs, the
 results 20 MB per run. On macOS the podman VM does not give freed space back to the host; run
@@ -153,6 +180,11 @@ commit and the host; the `host` line of the report comes from it.
 
 Known FAIL: `sources.illuminator-illn-01` (`half_cx_mean` limit, one of three distances). It fails the same way on the main obdeect build, so it is not caused by the stream or propagation changes; the cause is open.
 
+Open validation design issue: `chain.optics-bypass1-40deg` (100-3000 GeV) and `chain.optics-bypass1-60deg`
+(300-5000 GeV) use different energy ranges, so their zenith comparison is confounded by energy and the
+zenith dependence is not isolated. The physics inputs are unchanged (the names say so); a matched-energy
+pair needs new shower inputs.
+
 ### Curvature suite
 
 `suites/curvature.json` validates the curved and spherical atmosphere of the obdeect
@@ -172,8 +204,10 @@ tests the predicted curved-to-plane-parallel ratio, not a zero difference. The c
 CORSIKA `DISTIP`/`TOFIP` tables needs an instrumented CORSIKA run, see
 `docs/curvature-corsika-tables.md`. Details of all curvature cases: `docs/curvature-validation.md`.
 
-Optics limits (2% D80, 1% area, 0.2% focal length) are approved 2026-11-15, taken from the
-largest deviations measured in the old validation.
+Optics requirement (set by the project, 2026-11-24): D80 and effective area agree with sim_telarray
+to 1 % (goal) and at most 2 % (acceptance, gated) per offset; effective focal length 0.2 %. The
+limits are not widened by statistical errors: a comparison whose 3-sigma error exceeds the limit is
+reported as underpowered and fails.
 Current verdicts and open issues are in the workspace project notes.
 
 Exit status: 0 pass, 1 scientific difference, 2 execution/configuration error,

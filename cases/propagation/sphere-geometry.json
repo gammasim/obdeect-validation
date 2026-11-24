@@ -6,7 +6,7 @@
     "python3"
   ],
   "inputs": [
-    "fixtures/atmprof_ecmwf_north_winter_fixed.dat"
+    "{validation}/fixtures/atmprof_ecmwf_north_winter_fixed.dat"
   ],
   "commands": [
     {

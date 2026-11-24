@@ -159,6 +159,8 @@ def main():
             "run",
             "--transmission",
             cut,
+            "--pathlen",
+            "0",
             "--site-altitude",
             atm.SITE_ALTITUDE_M,
             "--seed",

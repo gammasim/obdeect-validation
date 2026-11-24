@@ -9,6 +9,7 @@ import math
 
 import numpy as np
 import pytest
+
 from obdeect_validation.adapters import curvature_chapman as chapman_case
 from obdeect_validation.adapters import curvature_geometry as geometry_case
 

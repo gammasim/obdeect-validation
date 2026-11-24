@@ -11,6 +11,7 @@ image=${IMAGE:-obdeect-validation:local}
 mkdir -p obdeect-validation/inputs
 podman run --rm \
   --volume "$PWD/obdeect-validation:/validation:ro" \
+  --volume "$PWD/sim_telarray:/reference:ro" \
   --volume "$PWD/obdeect-validation/inputs:/out:Z" \
   --volume "$CORSIKA_DATA:/corsika-data:ro" \
   --env PYTHONPATH=/validation/src --env CORSIKA_DATA_DIR=/corsika-data \
@@ -18,7 +19,8 @@ podman run --rm \
     set -euo pipefail
     card=$1; work=$(mktemp -d); cd "$work"
     python -c "from pathlib import Path; from obdeect_validation.adapters import chain_showers as c; c.prepare_data(Path(\".\"))"
-    sed -e "s|^DATDIR .*|DATDIR ./data/|" -e "s|^TELFIL .*|TELFIL $card.iact|" -e "s|^DIRECT .*|DIRECT ./|" \
+    # CORSIKA reads its tables (qgsdat-II-04, ...) under their original names from the mount.
+    sed -e "s|^DATDIR .*|DATDIR /corsika-data/|" -e "s|^TELFIL .*|TELFIL $card.iact|" -e "s|^DIRECT .*|DIRECT ./|" \
         -e "/^EXIT/d" /validation/fixtures/corsika/$card.card > run.card
     echo EXIT >> run.card
     /workdir/simulation_software/corsika7/corsika_qgs2_urqmd_flat < run.card > $card.corsika.log 2>&1

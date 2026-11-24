@@ -1,0 +1,65 @@
+{
+  "id": "robustness.stream-rejections",
+  "name": "Robustness: invalid or unsupported stream input is rejected (unknown major, record nesting, forbidden values, to-simtel without wavelength, CORSIKA run reopen, write failure, efficiency status going backwards)",
+  "requires": [
+    "obdeect"
+  ],
+  "commands": [
+    {
+      "name": "robustness-rejections",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.robustness_rejections"
+      ],
+      "timeout": 900
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "reader_first_call_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "reader_continues_after_rejection",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "nesting_violations_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "invalid_values_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "missing_wavelength_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "corsika_run_reopen_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "write_failure_exit_zero",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "efficiency_backward_accepted",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "control_rejected",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

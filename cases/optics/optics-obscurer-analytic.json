@@ -1,0 +1,17 @@
+{
+  "id": "optics.obscurer-analytic-sct-7.0.0",
+  "name": "Obscurer mass balance (SCTS-design 7.0.0): area ratio with obscurers equals 1 - census share, obdeect only",
+  "requires": [],
+  "commands": [
+    {
+      "name": "obdeect-census",
+      "cwd": "analytic",
+      "timeout": 1800,
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.optics_obscurers", "analytic", "--config", "{validation}/fixtures/optics-inputs/optics-obscurer-shadowing.json"]
+    }
+  ],
+  "metrics": [
+    {"metric": "analytic_n_offsets", "expected": 9, "atol": 0},
+    {"metric": "analytic_limit_exceeded", "expected": 0, "atol": 0}
+  ]
+}

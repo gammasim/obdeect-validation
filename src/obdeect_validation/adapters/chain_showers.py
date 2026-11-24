@@ -12,7 +12,7 @@ from eventio import SimTelFile
 from eventio.iact import IACTFile
 
 from obdeect_validation.adapters import common
-from obdeect_validation.adapters.common import command  # noqa: F401  (re-exported for the adapters)
+from obdeect_validation.adapters.common import command
 
 PE_BIAS_FLOOR = 0.01  # mean p.e. per telescope-event within 1 % (plan step 5)
 TIME_BIAS_FLOOR_NS = 0.05
@@ -154,7 +154,12 @@ def generate(
         (root / "corsika.log").open("wb") as log,
     ):
         result = subprocess.run(
-            [corsika], cwd=root, stdin=stdin, stdout=log, stderr=subprocess.STDOUT
+            [corsika],
+            cwd=root,
+            stdin=stdin,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            check=False,
         )
     if result.returncode or not (root / "showers.iact").is_file():
         raise RuntimeError(f"CORSIKA failed: see {root}/corsika.log")

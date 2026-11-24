@@ -1,0 +1,25 @@
+{
+  "id": "sources.azimuth-convention",
+  "name": "Azimuth convention of the sources presets (muon, shower, laser-beam, lidar, beam-scan, night-sky) at zenith 30 deg: travel direction against the CORSIKA convention, and agreement between presets at 90 deg",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "presets-azimuth",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.azimuth_convention",
+        "presets"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {"metric": "convention_violations", "expected": 0, "atol": 0},
+    {"metric": "presets_disagree_90", "expected": 0, "atol": 0},
+    {"metric": "presets_disagree_all", "expected": 0, "atol": 0}
+  ]
+}

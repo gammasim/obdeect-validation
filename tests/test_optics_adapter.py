@@ -100,14 +100,16 @@ def test_rows_signed_delta_and_stat_threshold() -> None:
     assert rows[0]["eff_flen"] is None
 
 
-def test_rows_statistical_error_widens_flen_threshold() -> None:
-    # 0.5% deviation exceeds the 0.2% limit, but 3 * rel_se (se = 0.3 / 28 per backend) covers it.
+def test_rows_limit_is_not_widened_and_noisy_offsets_are_underpowered() -> None:
+    # 0.5% deviation exceeds the 0.2% limit; 3 * rel_se (se = 0.3 / 28 per backend) is larger than
+    # the limit, so the offset is also underpowered (the comparison cannot resolve the limit).
     sim = side([1.0, 1.0], [1.0, 1.0], [None, 28.0], flen_err=[None, 0.3])
     obd = side([1.0, 1.0], [1.0, 1.0], [None, 28.14], flen_err=[None, 0.3])
     row = adapter._rows(sim, obd, LIMITS)[1]["eff_flen"]
     assert row["rel_se"] == pytest.approx(math.hypot(0.3, 0.3 * 28.14 / 28.0) / 28.0)
-    assert row["threshold"] == pytest.approx(3 * row["rel_se"])
-    assert row["exceeded"] is False
+    assert row["threshold"] == LIMITS["eff_flen"]
+    assert row["exceeded"] is True
+    assert row["underpowered"] is True
 
 
 def test_rows_reject_one_sided_undefined_and_zero_reference() -> None:
@@ -198,9 +200,7 @@ def test_execute_writes_application_config_outputs_and_compares_paired_offsets(
     details = json.loads(
         (tmp_path / "output" / "details.json").read_text(encoding="utf-8")
     )
-    assert details["status"].startswith(
-        "approved 2026-11-15, from obdeect-validation-org docs/phase1.md"
-    )
+    assert details["status"].startswith("requirement set by the project")
     assert (tmp_path / "output" / "optics_relative_difference.png").stat().st_size > 0
 
 

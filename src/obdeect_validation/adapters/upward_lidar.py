@@ -30,8 +30,9 @@ downward primaries to the observation level. Arrival time at the sphere centre (
 vacuum): t = (s + D) / c. Each time bin of arrival time gives the reference by the same integral over
 the s-interval where s + D lies in the bin (s + D is monotonic).
 
-Checks: total yield pull per configuration; per-bin chi2/ndf and largest per-bin pull, the bins with a
-positive reference; propagation of the scattered photons (sky to G, extinction off, since T is already
+Checks: total yield pull per configuration; per-bin chi2 of the binned time distribution (the bins
+with a positive reference; chi2/ndf is recorded, the gate is the chi2 p-value flag, see
+chi2_p_below_limit) and largest per-bin pull; propagation of the scattered photons (sky to G, extinction off, since T is already
 in their weight): photons reaching the telescope plane with cz > 0 from below it and with cz < 0 from
 above it, and the moving_away count, exact against the scattering points.
 """
@@ -40,7 +41,6 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
-import importlib.metadata
 import math
 from pathlib import Path
 
@@ -113,10 +113,7 @@ CONFIGS = (
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 # ------------------------------------------------------------------------- references
@@ -404,11 +401,35 @@ def count_check(cfg: Config, rows: dict, root: Path) -> dict:
 # ------------------------------------------------------------------------- analysis
 
 
+CHI2_P_LIMIT = (
+    1e-4  # significance of the time-shape flag, the same level as the KS gate
+)
+
+
 def chi2_bins(obs, obs_err, ref):
     """chi2, the used bins (positive reference and error) and their pulls."""
     used = np.flatnonzero((ref > 0.0) & (obs_err > 0.0))
     pulls = (obs[used] - ref[used]) / obs_err[used]
     return float(np.sum(pulls**2)), used, pulls
+
+
+def chi2_p_value(chi2, ndf):
+    """Upper-tail p-value of chi2 with ndf degrees of freedom (the reference is fixed: no fit)."""
+    from scipy.stats import chi2 as chi2_law
+
+    return float(chi2_law.sf(chi2, ndf))
+
+
+def chi2_p_below_limit(chi2, ndf):
+    """1 if the time-shape chi2 is significant at CHI2_P_LIMIT, else 0.
+
+    Justification (same rule as the KS shape gate of source_camera): if obdeect and the reference
+    agree, the p-value is uniform on (0, 1), so a flag has a false-alarm rate of CHI2_P_LIMIT per
+    configuration; the case has three configurations, about 3e-4 in all. The reference has no free
+    parameters, so ndf is the number of used bins. Only a large chi2 (obdeect and the reference
+    disagree) is flagged; a small chi2 would mean overestimated errors and is not a model error.
+    """
+    return int(chi2_p_value(chi2, ndf) < CHI2_P_LIMIT)
 
 
 def analyse(root: Path, n_override: int | None = None, grid: int = GRID_POINTS):
@@ -453,6 +474,9 @@ def analyse(root: Path, n_override: int | None = None, grid: int = GRID_POINTS):
         counts = count_check(cfg, obd["rows"], root)
         metrics[f"{k}_total_yield_pull"] = float(pull)
         metrics[f"{k}_time_chi2_ndf"] = chi2 / ndf if ndf else math.nan
+        metrics[f"{k}_time_chi2_p_below_limit"] = (
+            chi2_p_below_limit(chi2, ndf) if ndf else math.nan
+        )
         metrics[f"{k}_time_max_abs_pull"] = (
             float(np.max(np.abs(pulls))) if ndf else math.nan
         )
@@ -488,6 +512,8 @@ def analyse(root: Path, n_override: int | None = None, grid: int = GRID_POINTS):
             "bins_used": used.tolist(),
             "bins_ndf": ndf,
             "bins_chi2": chi2,
+            "bins_chi2_ndf": chi2 / ndf if ndf else math.nan,
+            "bins_chi2_p_value": chi2_p_value(chi2, ndf) if ndf else math.nan,
             "bins_pulls": pulls.tolist(),
             "count_check": counts,
         }

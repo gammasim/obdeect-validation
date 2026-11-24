@@ -1,0 +1,19 @@
+{
+  "simtools_config": {
+    "application": "simtools-validate-optics",
+    "configuration": {
+      "site": "South",
+      "telescope": "SCTS-design",
+      "model_version": "7.0.0",
+      "simulation_models_path": "/models",
+      "zenith_angle": 20,
+      "source_distance": 10,
+      "max_offset": 4,
+      "offset_step": 1,
+      "offset_directions": "N,E",
+      "max_workers": 2
+    }
+  },
+  "analytic": {"model_version": "7.0.0", "photons": 200000, "seed": 11},
+  "compare": {"seeds": [11, 12, 13], "offsets_deg": [[0,0],[0,1],[1,0],[0,2],[2,0],[0,3],[3,0],[0,4],[4,0]]}
+}

@@ -10,9 +10,9 @@
         "-m",
         "obdeect_validation.adapters.stream_curved_flag",
         "--curved",
-        "/validation/inputs/gamma-65deg-300-5000GeV-curved.iact",
+        "{validation}/inputs/gamma-65deg-300-5000GeV-curved.iact",
         "--flat",
-        "/validation/inputs/gamma-65deg-300-5000GeV-flat.iact"
+        "{validation}/inputs/gamma-65deg-300-5000GeV-flat.iact"
       ],
       "timeout": 1200
     }

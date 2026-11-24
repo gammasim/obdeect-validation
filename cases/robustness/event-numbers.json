@@ -1,0 +1,45 @@
+{
+  "id": "robustness.event-numbers",
+  "name": "Robustness: the same photons in events 1 to 2^32-1 (1, 2, 255, 256, 300, 65535, 65536, 100000, 2^31-1, 2^32-1) through propagation, trace-stream (native and Python), to-simtel; events must not fail, must differ, and must have the same detected fraction",
+  "requires": [
+    "obdeect"
+  ],
+  "commands": [
+    {
+      "name": "robustness-event-numbers",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.robustness_event_numbers"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "stage_failures",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "events_identical_output",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "detected_fraction_pull_max",
+      "expected": 0,
+      "atol": 5
+    },
+    {
+      "metric": "native_python_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "events_without_camera_photons",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

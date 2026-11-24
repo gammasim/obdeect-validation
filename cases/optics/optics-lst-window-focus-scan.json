@@ -1,11 +1,11 @@
 {
   "id": "optics.lst-window-focus-scan",
-  "name": "Window on, focus scan and field comparison",
+  "name": "STUDY, NOT VALIDATION (report only, no gated metrics; window parameter records are not in simulation-models and obdeect does not trace the window): Window on, focus scan and field comparison",
   "requires": [
     "simtools-validate-optics"
   ],
   "inputs": [
-    "/validation/fixtures/optics-inputs/optics-lst-window-focus-scan.json"
+    "{validation}/fixtures/optics-inputs/optics-lst-window-focus-scan.json"
   ],
   "commands": [
     {
@@ -16,7 +16,7 @@
         "-m",
         "obdeect_validation.adapters.optics_window_study",
         "--config",
-        "/validation/fixtures/optics-inputs/optics-lst-window-focus-scan.json"
+        "{validation}/fixtures/optics-inputs/optics-lst-window-focus-scan.json"
       ]
     }
   ]

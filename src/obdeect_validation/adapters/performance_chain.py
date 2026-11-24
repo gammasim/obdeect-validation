@@ -791,6 +791,29 @@ def _abort_pipeline(procs, samplers):
         sampler.stop()
 
 
+def wait_for_children(running, start: float) -> dict:
+    """Reap the children of running ((name, argv, proc, sampler) tuples) concurrently.
+
+    Returns {name: (wall seconds since start, wait status, rusage, sampled peak RSS kB or None)}.
+    """
+    exits = {}
+
+    def wait(name, proc, sampler):
+        _, status, usage = os.wait4(proc.pid, 0)
+        sampled_kb = sampler.stop() if sampler else None
+        exits[name] = (time.perf_counter() - start, status, usage, sampled_kb)
+
+    waiters = [
+        threading.Thread(target=wait, args=(name, proc, sampler))
+        for name, _, proc, sampler in running
+    ]
+    for waiter in waiters:
+        waiter.start()
+    for waiter in waiters:
+        waiter.join()
+    return exits
+
+
 def run_pipeline(stages, output, logs):
     """Run (name, argv) stages as one pipe: each stdout feeds the next stdin, the last writes output.
 
@@ -833,21 +856,7 @@ def run_pipeline(stages, output, logs):
     except BaseException:
         _abort_pipeline(procs, samplers)
         raise
-    exits = {}
-
-    def wait(name, proc, sampler):
-        _, status, usage = os.wait4(proc.pid, 0)
-        sampled_kb = sampler.stop() if sampler else None
-        exits[name] = (time.perf_counter() - start, status, usage, sampled_kb)
-
-    waiters = [
-        threading.Thread(target=wait, args=(name, proc, sampler))
-        for name, _, proc, sampler in running
-    ]
-    for waiter in waiters:
-        waiter.start()
-    for waiter in waiters:
-        waiter.join()
+    exits = wait_for_children(running, start)
     rss_divisor = 1024 * 1024 if sys.platform == "darwin" else 1024
     children = []
     for name, argv, proc, _ in running:
@@ -1006,14 +1015,6 @@ def child_metrics(prefix, summaries):
         metrics[f"{prefix}_{name}_exit_s"] = _median(records, "wall_s")
         metrics[f"{prefix}_{name}_cpu_s"] = _median(records, "cpu_s")
     return metrics
-
-
-def loadavg():
-    """1-minute load average of the host, or None where it is not available."""
-    try:
-        return os.getloadavg()[0]
-    except (OSError, AttributeError):
-        return None
 
 
 def timing_reliability(metrics, labels):
@@ -1461,7 +1462,7 @@ def main():
         args.input.resolve(), args.events, work_root / "showers-input.iact"
     )
     metrics = {}
-    load_before = loadavg()
+    load_before = performance.loadavg()
     if load_before is not None:
         metrics["host_loadavg_before"] = load_before
     host = performance.host_info()
@@ -1487,7 +1488,7 @@ def main():
         )
     else:
         run_source(root, work_root, args.case, args.reps, metrics, details)
-    load_after = loadavg()
+    load_after = performance.loadavg()
     if load_after is not None:
         metrics["host_loadavg_after"] = load_after
     metrics["timing_unreliable"], details["timing_reliability"] = timing_reliability(

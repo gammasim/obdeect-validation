@@ -50,6 +50,8 @@ def propagation_argv(cut, band, stream_in, stream_out):
         "run",
         "--transmission",
         cut,
+        "--pathlen",
+        "0",
         "--site-altitude",
         atm.SITE_ALTITUDE_M,
         "--seed",
@@ -236,6 +238,7 @@ def main():
             mode="weighted",
             wavelength_range=band,
             threads=threads,
+            pathlen_m=0.0,  # as the CLI run of the same case (--pathlen 0)
         )
         prop_threads[threads] = out
     compare(

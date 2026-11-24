@@ -11,6 +11,9 @@ COLUMNS = ["x", "y", "cx", "cy", "t", "zem", "w", "wavelength"]
 def _write(path, order, shift=0.0):
     values = np.arange(12, dtype=np.float32) + shift
     columns = {name: (values + index)[order] for index, name in enumerate(COLUMNS)}
+    # The reader rejects directions outside the unit disc: scale cx and cy into it.
+    for name in ("cx", "cy"):
+        columns[name] = columns[name] * np.float32(0.01)
     with Writer(str(path), "test") as writer:
         writer.write("run", {"run_number": 1})
         writer.write("event", {"event_number": 1})

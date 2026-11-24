@@ -1,0 +1,815 @@
+{
+  "outputs": {
+    "LSTN-01.json": {
+      "bytes": 138230,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "compile",
+        "--simulation-models"
+      ],
+      "pipeline": "compile",
+      "rows": null,
+      "sha256": "0a872d67f96766a14866a596ad92d12d516933a0d034bf86b618b69d76de0bff",
+      "sum_weights": null
+    },
+    "MSTN-01.json": {
+      "bytes": 74433,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "compile",
+        "--simulation-models"
+      ],
+      "pipeline": "compile",
+      "rows": null,
+      "sha256": "c253f2dd266bc2c7c3de9b6378b9aa1917b86d38e3ac134691ebc9ef6add71e8",
+      "sum_weights": null
+    },
+    "SSTS-01.json": {
+      "bytes": 574249,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "compile",
+        "--simulation-models"
+      ],
+      "pipeline": "compile",
+      "rows": null,
+      "sha256": "cfceeab42f8ef2d4b8e1c873b4911099e7f502fb766b37d10b1d0fb9a0420486",
+      "sum_weights": null
+    },
+    "corsika-prop.pst": {
+      "bytes": 29328,
+      "command": [
+        "obdeect",
+        "propagation",
+        "run",
+        "--transmission"
+      ],
+      "pipeline": "corsika",
+      "rows": 678,
+      "sha256": "a409f54fee699778025fcdf587b1b0c85312e8f11eae9154c6fc95b520527f55",
+      "sum_weights": 678.0
+    },
+    "corsika.grisu": {
+      "bytes": 60276,
+      "command": [
+        "obdeect",
+        "stream",
+        "to-grisu",
+        "-o"
+      ],
+      "pipeline": "corsika",
+      "rows": null,
+      "sha256": "085710eefb1f47ada9d742f9f8a5cf69c24667ba3d3efe0d2e7430f56bad834d",
+      "sum_weights": null
+    },
+    "corsika.pst": {
+      "bytes": 36684,
+      "command": [
+        "obdeect",
+        "stream",
+        "from-corsika",
+        "corsika.eventio"
+      ],
+      "pipeline": "corsika",
+      "rows": 918,
+      "sha256": "c2db6fe698cd54f9172b33c72227d5b443cad5009bb8f32306f02e6e1df61d40",
+      "sum_weights": 914.723296880722
+    },
+    "curved.pst": {
+      "bytes": 650531,
+      "command": [
+        "obdeect",
+        "propagation",
+        "run",
+        "--transmission"
+      ],
+      "pipeline": "curvature-dispersion",
+      "rows": 18008,
+      "sha256": "52e6ac086d36c0de5547c5346f81284a6b87330e6c95e1c13d99918eb29fbfcf",
+      "sum_weights": 18008.0
+    },
+    "events12-prop.pst": {
+      "bytes": 72263,
+      "command": [
+        "obdeect",
+        "propagation",
+        "run",
+        "--no-extinction"
+      ],
+      "pipeline": "events-1-2",
+      "rows": 1953,
+      "sha256": "3b378dbe75a40b20f0a304dc76c7e6cbc0e7616bf12e82627d42946cc3fd988d",
+      "sum_weights": 1953.0
+    },
+    "events12-trace.pst": {
+      "bytes": 37721,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "trace-stream",
+        "--model"
+      ],
+      "pipeline": "events-1-2",
+      "rows": 981,
+      "sha256": "43837d000fc12f0c3b2592ce98cfad859b8b7a578eb3c74340a30cfd339637d9",
+      "sum_weights": 981.0
+    },
+    "events12.pst": {
+      "bytes": 79860,
+      "command": [
+        "obdeect",
+        "sources",
+        "run",
+        "point-source"
+      ],
+      "pipeline": "events-1-2",
+      "rows": 1953,
+      "sha256": "96b4f21c8d4f4b7720e4e183389e8b5564ecd1ba43e9cd42ad998c7587baad66",
+      "sum_weights": 1953.0
+    },
+    "flat-dispersion.pst": {
+      "bytes": 650460,
+      "command": [
+        "obdeect",
+        "propagation",
+        "run",
+        "--transmission"
+      ],
+      "pipeline": "curvature-dispersion",
+      "rows": 18008,
+      "sha256": "2a3db3ca6af980232022ccd31bb3fbc78153d49256546511f777c20a5897c335",
+      "sum_weights": 18008.0
+    },
+    "ground-inside.pst": {
+      "bytes": 8801808,
+      "command": [
+        "obdeect",
+        "sources",
+        "run",
+        "point-source"
+      ],
+      "pipeline": "ground-sphere",
+      "rows": 200000,
+      "sha256": "4943b989b7cd6fa16fa53f8da3e548380747eda431af5bfe5cbe68f4395d6631",
+      "sum_weights": 200000.0
+    },
+    "ground-sphere.pst": {
+      "bytes": 496777,
+      "command": [
+        "obdeect",
+        "sources",
+        "run",
+        "point-source"
+      ],
+      "pipeline": "ground-sphere",
+      "rows": 11250,
+      "sha256": "29923a69939316a9bab3962fdca9569bcea966de8cef8fe459eb2a09641a5b09",
+      "sum_weights": 11250.0
+    },
+    "ground-trace.pst": {
+      "bytes": 960418,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "trace-stream",
+        "--model"
+      ],
+      "pipeline": "ground-sphere",
+      "rows": 23954,
+      "sha256": "fde13c8b0f25fb6f7d0ce74a67e24ad6edab7e41dd8e27c4fe2850f44f487630",
+      "sum_weights": 23954.0
+    },
+    "lst-trace.pst": {
+      "bytes": 332832,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "trace-stream",
+        "--model"
+      ],
+      "pipeline": "lst-chain",
+      "rows": 9167,
+      "sha256": "1bebf68d0f3d54b210fdd5b002757e5e8bf95eb825bdc15a199cb815ebb519cc",
+      "sum_weights": 9167.0
+    },
+    "lst.simtel": {
+      "bytes": 300948,
+      "command": [
+        "obdeect",
+        "stream",
+        "to-simtel",
+        "--camera-map"
+      ],
+      "pipeline": "lst-chain",
+      "rows": null,
+      "sha256": "d5d3e55d1acd2839fb0efdd07c98d62665ffa65959f7df87c796090df0bca65c",
+      "sum_weights": null
+    },
+    "mstn-trace.pst": {
+      "bytes": 86944,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "trace-stream",
+        "--model"
+      ],
+      "pipeline": "mirror-models",
+      "rows": 2339,
+      "sha256": "bef90c7ab763bc72bc1e0f9ed248a45cbf3d8b4222ce5313033dcb006051c981",
+      "sum_weights": 2339.0
+    },
+    "mstn.simtel": {
+      "bytes": 82452,
+      "command": [
+        "obdeect",
+        "stream",
+        "to-simtel",
+        "--camera-map"
+      ],
+      "pipeline": "mirror-models",
+      "rows": null,
+      "sha256": "59b5df74f45d034db87708e3302206994d2e24a05c1ac2e89cf94afa8ae5494d",
+      "sum_weights": null
+    },
+    "point.pst": {
+      "bytes": 783021,
+      "command": [
+        "obdeect",
+        "sources",
+        "run",
+        "point-source"
+      ],
+      "pipeline": "lst-chain",
+      "rows": 19532,
+      "sha256": "d04ff8282084e69ab3b1ccf9419f983fa374195694a4dfe8c6874c924609d8c3",
+      "sum_weights": 19532.0
+    },
+    "prop.pst": {
+      "bytes": 650874,
+      "command": [
+        "obdeect",
+        "propagation",
+        "run",
+        "--transmission"
+      ],
+      "pipeline": "lst-chain",
+      "rows": 18014,
+      "sha256": "4221e3653623591d2768e8e8c1c4dcb8c00133991ea99e4d3c1b6780f187a797",
+      "sum_weights": 18014.0
+    },
+    "sky-from-ground.pst": {
+      "bytes": 722499,
+      "command": [
+        "obdeect",
+        "propagation",
+        "to-sky",
+        "--profile"
+      ],
+      "pipeline": "curvature-dispersion",
+      "rows": 18008,
+      "sha256": "ee4e0a1c8b2932a0f0aa1e5085030cfb7971df6b10e68da00a0c849ede5171ef",
+      "sum_weights": 18008.0
+    },
+    "ssts-trace.pst": {
+      "bytes": 4000,
+      "command": [
+        "obdeect",
+        "ray-tracing",
+        "trace-stream",
+        "--model"
+      ],
+      "pipeline": "mirror-models",
+      "rows": 35,
+      "sha256": "9b3a77cb529a4e7999e2f1696dd69e2aae4b6a0115f488448ce2a5a68a8d603c",
+      "sum_weights": 35.051318883895874
+    },
+    "ssts.simtel": {
+      "bytes": 8724,
+      "command": [
+        "obdeect",
+        "stream",
+        "to-simtel",
+        "--camera-map"
+      ],
+      "pipeline": "mirror-models",
+      "rows": null,
+      "sha256": "e7aa1781afda07a08d321de3c8c5d626caff0cfee25fd2efdddb6f89e16f5162",
+      "sum_weights": null
+    }
+  },
+  "platform": "darwin-arm64",
+  "platform_detail": {
+    "machine": "arm64",
+    "platform": "macOS-27.2.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.8",
+    "sys.platform": "darwin"
+  },
+  "provenance": {
+    "command": [
+      "python",
+      "-m",
+      "obdeect_validation.adapters.golden_outputs",
+      "baseline"
+    ],
+    "date": "2026-11-24",
+    "inputs": {
+      "atmprof.dat": {
+        "sha256": "af51b6bb7419beb8cedd4000c62ae3102ee7fe73be2d1ada9331deccfb2d96a1",
+        "source": "fixtures/atmprof_ecmwf_north_winter_fixed.dat"
+      },
+      "cam-dual.txt": {
+        "sha256": "1d32333baf5d47afbdd52e95d73c479e8b683cfa6f5c1e17b85c7e74ea50f4fd",
+        "source": "written by golden_outputs"
+      },
+      "cam-single.txt": {
+        "sha256": "92a187a3a1803158e275707d2fc8e57b863b39fd9244c9b614a7036e53fc547e",
+        "source": "written by golden_outputs"
+      },
+      "corsika.eventio": {
+        "sha256": "287be6668e14c9da931fabf89b8573e2902cba1561b1e34ee1a6acab1efd0a0e",
+        "source": "fixtures/golden/gamma_100gev_1216.eventio"
+      },
+      "scattering.dat": {
+        "sha256": "6c7ba82cb21bca64aa322604abef4f082e82999fb8ea907243704c4fec190fea",
+        "source": "fixtures/scattering_exponential.dat"
+      },
+      "transmission-2156.dat": {
+        "sha256": "aff66f2c48d3c36d3e1bfe5a11761a04b957305ad7114f9e527701b4e16d8fa7",
+        "source": "$SIMTEL_REFERENCE_SOURCE/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat, cut below 1000 nm"
+      },
+      "transmission-2200.dat": {
+        "sha256": "f93e594345e879eeed656d9ed4361aa06a314d9254cab4b59f298bcaf4701464",
+        "source": "$SIMTEL_REFERENCE_SOURCE/cfg/common/atm_trans_2200_1_10_0_0_2200.dat, cut below 1000 nm"
+      }
+    },
+    "obdeect_commit": "c8fe43c3f481e036d8c64c632c559bb97ebd274d",
+    "obdeect_version": [
+      "obdeect-stream 0.10.2.dev42+gc1256289b",
+      "obdeect-propagation 0.10.2.dev42+gc1256289b",
+      "obdeect-sources 0.10.2.dev42+gc1256289b",
+      "obdeect-ray-tracing 0.10.2.dev42+gc1256289b",
+      "photon-stream format 1.2"
+    ],
+    "pipelines": {
+      "compile": {
+        "depends_on": [],
+        "stages": [
+          [
+            "obdeect",
+            "ray-tracing",
+            "compile",
+            "--simulation-models",
+            "{models}",
+            "--model",
+            "LSTN-01",
+            "--version",
+            "7.0.0",
+            "--seed",
+            "11",
+            "--zenith-deg",
+            "20",
+            "--output",
+            "LSTN-01.json"
+          ],
+          [
+            "obdeect",
+            "ray-tracing",
+            "compile",
+            "--simulation-models",
+            "{models}",
+            "--model",
+            "MSTN-01",
+            "--version",
+            "7.0.0",
+            "--seed",
+            "11",
+            "--zenith-deg",
+            "20",
+            "--output",
+            "MSTN-01.json"
+          ],
+          [
+            "obdeect",
+            "ray-tracing",
+            "compile",
+            "--simulation-models",
+            "{models}",
+            "--model",
+            "SSTS-01",
+            "--version",
+            "7.0.0",
+            "--seed",
+            "11",
+            "--zenith-deg",
+            "20",
+            "--output",
+            "SSTS-01.json"
+          ]
+        ]
+      },
+      "corsika": {
+        "depends_on": [],
+        "stages": [
+          [
+            "obdeect",
+            "stream",
+            "from-corsika",
+            "corsika.eventio"
+          ],
+          [
+            "obdeect",
+            "propagation",
+            "run",
+            "--transmission",
+            "transmission-2200.dat",
+            "--pathlen",
+            "0",
+            "--site-altitude",
+            "2200",
+            "--seed",
+            "3",
+            "--threads",
+            "1",
+            "-i",
+            "corsika.pst",
+            "-o",
+            "corsika-prop.pst"
+          ],
+          [
+            "obdeect",
+            "stream",
+            "to-grisu",
+            "-o",
+            "corsika.grisu",
+            "corsika-prop.pst"
+          ]
+        ]
+      },
+      "curvature-dispersion": {
+        "depends_on": [
+          "lst-chain"
+        ],
+        "stages": [
+          [
+            "obdeect",
+            "propagation",
+            "run",
+            "--transmission",
+            "transmission-2156.dat",
+            "--pathlen",
+            "0",
+            "--site-altitude",
+            "2156",
+            "--seed",
+            "3",
+            "--threads",
+            "1",
+            "--profile",
+            "atmprof.dat",
+            "--dispersion-reference-nm",
+            "500",
+            "--curvature",
+            "spherical",
+            "-i",
+            "point.pst",
+            "-o",
+            "curved.pst"
+          ],
+          [
+            "obdeect",
+            "propagation",
+            "run",
+            "--transmission",
+            "transmission-2156.dat",
+            "--pathlen",
+            "0",
+            "--site-altitude",
+            "2156",
+            "--seed",
+            "3",
+            "--threads",
+            "1",
+            "--profile",
+            "atmprof.dat",
+            "--dispersion-reference-nm",
+            "500",
+            "-i",
+            "point.pst",
+            "-o",
+            "flat-dispersion.pst"
+          ],
+          [
+            "obdeect",
+            "propagation",
+            "to-sky",
+            "--profile",
+            "atmprof.dat",
+            "-i",
+            "flat-dispersion.pst",
+            "-o",
+            "sky-from-ground.pst"
+          ]
+        ]
+      },
+      "events-1-2": {
+        "depends_on": [],
+        "stages": [
+          [
+            "obdeect",
+            "sources",
+            "run",
+            "point-source",
+            "--observation-level",
+            "2156",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--position",
+            "0,0,2000",
+            "--photons",
+            "1e8",
+            "--events",
+            "2",
+            "--telescope-radius",
+            "12.5",
+            "--seed",
+            "9",
+            "-o",
+            "events12.pst"
+          ],
+          [
+            "obdeect",
+            "propagation",
+            "run",
+            "--no-extinction",
+            "--site-altitude",
+            "2156",
+            "--seed",
+            "9",
+            "--threads",
+            "1",
+            "-i",
+            "events12.pst",
+            "-o",
+            "events12-prop.pst"
+          ],
+          [
+            "obdeect",
+            "ray-tracing",
+            "trace-stream",
+            "--model",
+            "LSTN-01.json",
+            "--seed",
+            "7",
+            "--threads",
+            "1",
+            "--pointing-zenith-deg",
+            "20",
+            "--pointing-azimuth-deg",
+            "180",
+            "-i",
+            "events12-prop.pst",
+            "-o",
+            "events12-trace.pst"
+          ]
+        ]
+      },
+      "ground-sphere": {
+        "depends_on": [
+          "compile"
+        ],
+        "stages": [
+          [
+            "obdeect",
+            "sources",
+            "run",
+            "point-source",
+            "--observation-level",
+            "2156",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--position",
+            "0,0,10",
+            "--photons",
+            "1e5",
+            "--events",
+            "2",
+            "--telescope-radius",
+            "30",
+            "--seed",
+            "2",
+            "--set",
+            "run.frame=ground",
+            "-o",
+            "ground-inside.pst"
+          ],
+          [
+            "obdeect",
+            "ray-tracing",
+            "trace-stream",
+            "--model",
+            "LSTN-01.json",
+            "--seed",
+            "7",
+            "--threads",
+            "1",
+            "--pointing-zenith-deg",
+            "20",
+            "--pointing-azimuth-deg",
+            "180",
+            "-i",
+            "ground-inside.pst",
+            "-o",
+            "ground-trace.pst"
+          ],
+          [
+            "obdeect",
+            "sources",
+            "run",
+            "point-source",
+            "--observation-level",
+            "2156",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--position",
+            "0,0,2000",
+            "--photons",
+            "1e8",
+            "--events",
+            "2",
+            "--telescope-radius",
+            "30",
+            "--seed",
+            "4",
+            "--set",
+            "run.frame=ground",
+            "-o",
+            "ground-sphere.pst"
+          ]
+        ]
+      },
+      "lst-chain": {
+        "depends_on": [
+          "compile"
+        ],
+        "stages": [
+          [
+            "obdeect",
+            "sources",
+            "run",
+            "point-source",
+            "--observation-level",
+            "2156",
+            "--spectrum",
+            "fixed:wavelength_nm=400",
+            "--position",
+            "0,0,2000",
+            "--photons",
+            "1e9",
+            "--events",
+            "2",
+            "--telescope-radius",
+            "12.5",
+            "--seed",
+            "1",
+            "-o",
+            "point.pst"
+          ],
+          [
+            "obdeect",
+            "propagation",
+            "run",
+            "--transmission",
+            "transmission-2156.dat",
+            "--pathlen",
+            "0",
+            "--site-altitude",
+            "2156",
+            "--seed",
+            "3",
+            "--threads",
+            "1",
+            "--profile",
+            "atmprof.dat",
+            "--dispersion-reference-nm",
+            "500",
+            "--scattering",
+            "scattering.dat",
+            "-i",
+            "point.pst",
+            "-o",
+            "prop.pst"
+          ],
+          [
+            "obdeect",
+            "ray-tracing",
+            "trace-stream",
+            "--model",
+            "LSTN-01.json",
+            "--seed",
+            "7",
+            "--threads",
+            "1",
+            "--pointing-zenith-deg",
+            "20",
+            "--pointing-azimuth-deg",
+            "180",
+            "-i",
+            "prop.pst",
+            "-o",
+            "lst-trace.pst"
+          ],
+          [
+            "obdeect",
+            "stream",
+            "to-simtel",
+            "--camera-map",
+            "cam-single.txt",
+            "--atmprof",
+            "atmprof.dat",
+            "-o",
+            "lst.simtel",
+            "lst-trace.pst"
+          ]
+        ]
+      },
+      "mirror-models": {
+        "depends_on": [
+          "compile",
+          "lst-chain"
+        ],
+        "stages": [
+          [
+            "obdeect",
+            "ray-tracing",
+            "trace-stream",
+            "--model",
+            "MSTN-01.json",
+            "--seed",
+            "7",
+            "--threads",
+            "1",
+            "--pointing-zenith-deg",
+            "20",
+            "--pointing-azimuth-deg",
+            "180",
+            "-i",
+            "prop.pst",
+            "-o",
+            "mstn-trace.pst"
+          ],
+          [
+            "obdeect",
+            "stream",
+            "to-simtel",
+            "--camera-map",
+            "cam-single.txt",
+            "--atmprof",
+            "atmprof.dat",
+            "-o",
+            "mstn.simtel",
+            "mstn-trace.pst"
+          ],
+          [
+            "obdeect",
+            "ray-tracing",
+            "trace-stream",
+            "--model",
+            "SSTS-01.json",
+            "--seed",
+            "7",
+            "--threads",
+            "1",
+            "--pointing-zenith-deg",
+            "20",
+            "--pointing-azimuth-deg",
+            "180",
+            "-i",
+            "prop.pst",
+            "-o",
+            "ssts-trace.pst"
+          ],
+          [
+            "obdeect",
+            "stream",
+            "to-simtel",
+            "--camera-map",
+            "cam-dual.txt",
+            "--atmprof",
+            "atmprof.dat",
+            "-o",
+            "ssts.simtel",
+            "ssts-trace.pst"
+          ]
+        ]
+      }
+    },
+    "placeholders": {
+      "work directory": "stage commands run inside a fresh work directory",
+      "{models}": "$VALIDATION_MODELS (simulation-models checkout)"
+    },
+    "runtime_seconds": 10.5
+  }
+}
