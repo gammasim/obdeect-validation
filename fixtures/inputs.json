@@ -1,60 +1,88 @@
 {
-  "note": "Shower inputs are not in Git. Regenerate with CORSIKA 7.8010 from the cards, or copy them to inputs/; checked by sha256. Each shower file needs its CORSIKA log as <name>.corsika.log (wavelength band for the atmosphere case). The curved and flat 65 deg and the curved 75 deg files (curved and flat CORSIKA binaries, see obdeect_validation.adapters.curved_showers) have sha256 null until generated; generation command: python -m obdeect_validation.adapters.curved_showers run --geometry curved|flat --zenith ZENITH --energy-min LO --energy-max HI --root WORKDIR, then copy WORKDIR/<name>.iact and WORKDIR/<name>.corsika.log to inputs/ and set the sha256 (null until generated).",
+  "note": "Shower inputs are not in Git. Regenerate with CORSIKA 7.8010 from the cards, or copy them to inputs/; checked by sha256. Each shower file needs its CORSIKA log as <name>.corsika.log (wavelength band for the atmosphere case). The sha256 values are those of the files in inputs/ that were regenerated on 2026-11-23 and 2026-11-24 (per-file date in \"generated\", from the file modification time). CORSIKA writes the run date into the run header, so a regenerated file is not byte-identical to an earlier one and its sha256 differs even for the same showers (compare the .corsika.log instead). The earlier recorded hashes are kept as \"previous_sha256\". The curved and flat 65 deg and the curved 75 deg files (curved and flat CORSIKA binaries, see obdeect_validation.adapters.curved_showers) are generated with: python -m obdeect_validation.adapters.curved_showers run --geometry curved|flat --zenith ZENITH --energy-min LO --energy-max HI --root WORKDIR, then copy WORKDIR/<name>.iact and WORKDIR/<name>.corsika.log to inputs/ and set the sha256 (null until generated).",
   "files": {
     "gamma-20deg-100-3000GeV.iact": {
-      "sha256": "c6ade29bc6e7d0741e976a242cea3083aa253a659c2642ccf9941fc6e310883c",
+      "sha256": "bead8101ece814f11b7a882d177ed72d5b8dc3a3354888f84523c69b91dea1fe",
+      "previous_sha256": "c6ade29bc6e7d0741e976a242cea3083aa253a659c2642ccf9941fc6e310883c",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-100-3000GeV.card"
     },
     "gamma-20deg-20-100GeV.iact": {
-      "sha256": "a95cbc538d5af51ce2d04afea4d258e3db3d08f6d6f85f32a0ab6dbbe2426acd",
+      "sha256": "f6a079ddd43866184cf3bf8448d893a04560f53f2f40480fc14fdc46b657a915",
+      "previous_sha256": "a95cbc538d5af51ce2d04afea4d258e3db3d08f6d6f85f32a0ab6dbbe2426acd",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-20-100GeV.card"
     },
     "gamma-65deg-300-5000GeV-curved.iact": {
-      "sha256": "0699dd674062c2f48463767f889326fb7024db1dc75ea2cd58f32eeb1c555ac4",
+      "sha256": "51af9cba10ebee97113eb9eb1907fc0ec2689f1f9eb13c3a7934a16f709b9d8e",
+      "previous_sha256": "0699dd674062c2f48463767f889326fb7024db1dc75ea2cd58f32eeb1c555ac4",
+      "generated": "2026-11-24",
       "card": "corsika/gamma-65deg-300-5000GeV-curved.card"
     },
     "gamma-65deg-300-5000GeV-flat.iact": {
-      "sha256": "d78cfb6cabfd0070a624a0860a501580691680e89e78ac7e80c4ba700d294e9c",
+      "sha256": "fe8bddf52fb8aef3420e252072ed5ae61d5943142b0766516654f69fa4a89c99",
+      "previous_sha256": "d78cfb6cabfd0070a624a0860a501580691680e89e78ac7e80c4ba700d294e9c",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-65deg-300-5000GeV-flat.card"
     },
     "gamma-75deg-1000-10000GeV-curved.iact": {
-      "sha256": "fedf998b6937d7a8af2f2e62e3b915b8d707a6ef226d306ea6448c57c8c3cafa",
+      "sha256": "5835da521095f267870c178c51ed87a90402b95bd4fd0adc64f7d587d0f58194",
+      "previous_sha256": "fedf998b6937d7a8af2f2e62e3b915b8d707a6ef226d306ea6448c57c8c3cafa",
+      "generated": "2026-11-24",
       "card": "corsika/gamma-75deg-1000-10000GeV-curved.card"
     },
     "gamma-40deg-100-3000GeV.iact": {
-      "sha256": "d48774102c854154394b0928afed55c10797729aba3b207825c649922a3218ba",
+      "sha256": "bc3012bd81f5bba258070f1c34830d3cc95b1739500a1f7fcbdf665649fcfb37",
+      "previous_sha256": "d48774102c854154394b0928afed55c10797729aba3b207825c649922a3218ba",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-40deg-100-3000GeV.card"
     },
     "gamma-60deg-300-5000GeV.iact": {
-      "sha256": "9364592394ddc11b1545d0c9a2d6803047ec5188cc89db6294946d17f71011d8",
+      "sha256": "93963c9b13dd89b3bd9d02f012ae59959fc769377416f24ae4f0e50b1d8af88f",
+      "previous_sha256": "9364592394ddc11b1545d0c9a2d6803047ec5188cc89db6294946d17f71011d8",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-60deg-300-5000GeV.card"
     },
     "gamma-20deg-az180-100-3000GeV.iact": {
-      "sha256": "d60bd6f951b3f30180a343de0a3a0e6ebb2091e8a8916f3a0e351f6104bf131b",
+      "sha256": "d3f8d48cb4d8e24f80d442a57425d8b2e902c281ec51e8a953886afadb5e19f6",
+      "previous_sha256": "d60bd6f951b3f30180a343de0a3a0e6ebb2091e8a8916f3a0e351f6104bf131b",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-az180-100-3000GeV.card"
     },
     "gamma-20deg-South-100-3000GeV.iact": {
-      "sha256": "de37d938b25eb875b821be6762dc046223a557d0443a35de08d68a3a1ec67114",
+      "sha256": "463173b25b3a5f846ed8f1f0e4df4b9bda2cc6640eb9f483cb3389b2764e0f69",
+      "previous_sha256": "de37d938b25eb875b821be6762dc046223a557d0443a35de08d68a3a1ec67114",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-South-100-3000GeV.card"
     },
     "proton-20deg-300-10000GeV.iact": {
-      "sha256": "473914c930e8ab128b6881a4f2ba01662eac5acb8c11e40a31399b590fdd3c80",
+      "sha256": "e82a912b6931e2c534136c855242cd94e09a741dda87a8491f885cfa5dfc7bca",
+      "previous_sha256": "473914c930e8ab128b6881a4f2ba01662eac5acb8c11e40a31399b590fdd3c80",
+      "generated": "2026-11-23",
       "card": "corsika/proton-20deg-300-10000GeV.card"
     },
     "gamma-20deg-100-3000GeV-r1300.iact": {
-      "sha256": "e9a230cd290501402738134bacb319fb503a9bf60c82afe2a39a216bee6caaca",
+      "sha256": "fdcd5a2bda8477f648e98a3c8d2ed488a4afd189da5fa49db29e6dd50cd3cde4",
+      "previous_sha256": "e9a230cd290501402738134bacb319fb503a9bf60c82afe2a39a216bee6caaca",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-100-3000GeV-r1300.card"
     },
     "gamma-20deg-100-3000GeV-array-north.iact": {
-      "sha256": "06ee912fd3afb5ddc6ee0ec6def37aa297a5176f6a366cb3b1a3534c79ef46dd",
+      "sha256": "9471635596f5684443fc8474a0088e42eb3c3a78f266382a1f3b99c238c127a5",
+      "previous_sha256": "06ee912fd3afb5ddc6ee0ec6def37aa297a5176f6a366cb3b1a3534c79ef46dd",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-100-3000GeV-array-north.card"
     },
     "gamma-20deg-100-3000GeV-100showers.iact": {
-      "sha256": "2e4f7b6d856495eceffe66bd68746267271309456bf04be9cf57378226a02a77",
+      "sha256": "fb706d13af8116592e948c7c41516eabd69735ff1bda6e714111dc4de03ff99b",
+      "previous_sha256": "2e4f7b6d856495eceffe66bd68746267271309456bf04be9cf57378226a02a77",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-100-3000GeV-100showers.card"
     },
     "gamma-20deg-100-3000GeV-array-north-100showers.iact": {
-      "sha256": "6f50151a1fcfa6f71e0901166d0e34d5152fa213104c5aefaa29c15b86cdb785",
+      "sha256": "749dcbac419724ce602b84d25d2cea1b78ce10bd076f71e410e2a4d6607b9309",
+      "previous_sha256": "6f50151a1fcfa6f71e0901166d0e34d5152fa213104c5aefaa29c15b86cdb785",
+      "generated": "2026-11-23",
       "card": "corsika/gamma-20deg-100-3000GeV-array-north-100showers.card"
     }
   }

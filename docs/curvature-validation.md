@@ -23,7 +23,7 @@ Inputs: gamma showers at 65 and 75 deg from the curved CORSIKA binary (cards in
 (`TELFIL +`) and full-size telescope spheres. Generate them with
 `python -m obdeect_validation.adapters.curved_showers run --geometry curved --zenith 65 ...`;
 `run` checks the CORSIKA log for `CURVED VERSION WITH SLIDING PLANAR ATMOSPHERE`, so a flat binary
-cannot pass as curved. Hashes are in `fixtures/inputs.json` (`null` until generated).
+cannot pass as curved. Hashes are in `fixtures/inputs.json` (files generated 2026-11-24).
 
 | Case | Checks |
 |---|---|

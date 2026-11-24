@@ -1,0 +1,8 @@
+{
+  "id": "optics-window",
+  "cases": [
+    "../cases/optics/optics-lst-window-reference.json",
+    "../cases/optics/optics-lst-window-fixed.json",
+    "../cases/optics/optics-lst-window-focus-scan.json"
+  ]
+}

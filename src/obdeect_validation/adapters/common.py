@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import importlib
+import importlib.metadata
 import json
+import math
 import os
 import re
 import shutil
@@ -25,6 +28,22 @@ UNIT_TRANSMISSION = VALIDATION / "fixtures/unit-transmission.dat"
 #: validation case: 2147.01 m (South CORSIKA showers, site 2147 m) and 2147.5 m (ground sources).
 ZERO_DEPTH_BOTTOM_M = 2140.0
 _H2_HEADER = re.compile(r"H2=\s*[0-9.]+")
+
+
+def package_version(distribution: str) -> str:
+    """Installed version of a distribution (for example obdeect-propagation), or 'unknown'."""
+    try:
+        return importlib.metadata.version(distribution)
+    except importlib.metadata.PackageNotFoundError:
+        return "unknown"
+
+
+def mean_std(values: list[float]) -> tuple[float, float]:
+    """Mean and sample standard deviation (0 for fewer than two values)."""
+    mean = sum(values) / len(values)
+    if len(values) < 2:
+        return mean, 0.0
+    return mean, math.sqrt(sum((v - mean) ** 2 for v in values) / (len(values) - 1))
 
 
 def obdeect_supports_upward() -> bool:
@@ -266,6 +285,17 @@ def write_json(path, value) -> None:
         json.dumps(value, indent=2, allow_nan=False, default=_plain) + "\n",
         encoding="utf-8",
     )
+
+
+def results_main(analyse, description: str) -> None:
+    """Command line of an adapter without options: analyse the current directory and write its results there.
+
+    analyse(root) returns (metrics, details); both are written to root (metrics.json, details.json).
+    """
+    argparse.ArgumentParser(description=description).parse_args()
+    root = Path.cwd()
+    metrics, details = analyse(root)
+    write_results(metrics, details, root)
 
 
 def write_results(metrics: dict, details: dict | None = None, root: Path | None = None):

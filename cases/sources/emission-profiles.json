@@ -1,0 +1,106 @@
+{
+  "id": "sources.emission-profiles",
+  "name": "Emission profiles (angular, spectral, pulse; 2e5 photons each) against analytic distributions: KS, moments, azimuth, control; emission levels sky, T, C, G (frame identity, ground sphere rows)",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "emission-profiles",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.emission_profiles"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "ks_fail_count",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "moment_pull_max",
+      "expected": 0,
+      "atol": 5
+    },
+    {
+      "metric": "fixed_value_max_dev",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "control_fail_detected",
+      "expected": 1,
+      "atol": 0
+    },
+    {
+      "metric": "level_row_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "frame_codes_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "frame_position_max_dev_m",
+      "expected": 0,
+      "atol": 1e-05
+    },
+    {
+      "metric": "frame_direction_max_dev",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "frame_time_wavelength_max_dev",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "sky_zem_max_dev_m",
+      "expected": 0,
+      "atol": 0.00049
+    },
+    {
+      "metric": "ground_count_delta",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "ground_direction_max_dev",
+      "expected": 0,
+      "atol": 1e-06
+    },
+    {
+      "metric": "ground_entry_max_dev_m",
+      "expected": 0,
+      "atol": 1e-05
+    },
+    {
+      "metric": "ground_radius_max_dev_m",
+      "expected": 0,
+      "atol": 1e-05
+    },
+    {
+      "metric": "ground_time_max_ulp",
+      "expected": 0,
+      "atol": 2
+    },
+    {
+      "metric": "ground_zem_max_dev_m",
+      "expected": 0,
+      "atol": 0.00049
+    },
+    {
+      "metric": "ground_wavelength_max_dev",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

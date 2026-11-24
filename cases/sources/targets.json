@@ -1,0 +1,21 @@
+{
+    "id": "sources.targets",
+    "name": "Photon targets (disc, sphere, automatic sphere threshold, line with sphere target): weight sums against the analytic light fraction, zero-weight and non-finite rows, rows per hit photon, count, threshold continuity",
+    "requires": ["obdeect", "python3"],
+    "commands": [
+        {
+            "name": "targets",
+            "argv": ["{python}", "-m", "obdeect_validation.adapters.sources_targets"],
+            "timeout": 1800
+        }
+    ],
+    "metrics": [
+        {"metric": "weight_sum_pull_max", "expected": 0, "atol": 5},
+        {"metric": "zero_weight_rows", "expected": 0, "atol": 0},
+        {"metric": "rows_per_hit_photon_max", "expected": 1, "atol": 0.5},
+        {"metric": "nonfinite_weights", "expected": 0, "atol": 0},
+        {"metric": "sphere_threshold_jump", "expected": 0, "atol": 0},
+        {"metric": "expected_count_pull_max", "expected": 0, "atol": 5},
+        {"metric": "sphere_nonisotropic_accepted", "expected": 0, "atol": 0}
+    ]
+}

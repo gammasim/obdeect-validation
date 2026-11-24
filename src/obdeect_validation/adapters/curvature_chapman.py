@@ -250,7 +250,7 @@ def zenith_cosine(cx, cy):
 
 
 def _write_input(path: Path, curvature_applied: int, cx, cy, z_emission) -> None:
-    import obdeect.stream as stream
+    from obdeect import stream
 
     writer = stream.Writer(str(path), "obdeect-validation")
     writer.write(
@@ -302,7 +302,7 @@ def _read_output(path: Path):
 
 
 def main() -> None:
-    import obdeect.propagation as propagation
+    from obdeect import propagation
 
     table_path = Path("curvature-table.dat")
     write_table(table_path)
@@ -324,6 +324,7 @@ def main() -> None:
         mode="weighted",
         store_p=True,
         curvature="corsika",
+        pathlen_m=0.0,  # the chord of the atmosphere only: no in-telescope path
     )
     curved = Path("curved.pst")
     propagation.propagate(

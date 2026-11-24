@@ -286,3 +286,12 @@ def test_curved_sources_are_the_two_zenith_angles():
         "gamma-65deg-300-5000GeV-curved.iact",
         "gamma-75deg-1000-10000GeV-curved.iact",
     ]
+
+
+def test_mean_zenith_se_is_zero_for_identical_directions_and_grows_with_spread():
+    cx = np.full(50, np.sin(np.radians(60.0)))
+    assert geometry_case.mean_zenith_se_deg(
+        cx, np.zeros(50), np.ones(50)
+    ) == pytest.approx(0.0)
+    spread = np.array([0.1, 0.3] * 25)  # two zenith angles, 25 photons each
+    assert geometry_case.mean_zenith_se_deg(spread, np.zeros(50), np.ones(50)) > 0.0

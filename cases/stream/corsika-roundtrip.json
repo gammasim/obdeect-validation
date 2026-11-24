@@ -9,7 +9,7 @@
         "-m",
         "obdeect_validation.adapters.stream_chain",
         "--input",
-        "/validation/inputs/gamma-20deg-100-3000GeV.iact"
+        "{validation}/inputs/gamma-20deg-100-3000GeV.iact"
       ],
       "timeout": 3600
     }

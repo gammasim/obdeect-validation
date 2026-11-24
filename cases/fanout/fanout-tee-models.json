@@ -7,10 +7,10 @@
     "sim_telarray"
   ],
   "inputs": [
-    "/validation/inputs/gamma-20deg-20-100GeV.iact",
-    "/validation/inputs/gamma-20deg-20-100GeV.corsika.log",
-    "/validation/fixtures/unit-transmission.dat",
-    "/reference/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"
+    "{validation}/inputs/gamma-20deg-20-100GeV.iact",
+    "{validation}/inputs/gamma-20deg-20-100GeV.corsika.log",
+    "{validation}/fixtures/unit-transmission.dat",
+    "{reference}/cfg/common/atm_trans_2156_1_3_2_0_0_0.1_0.1.dat"
   ],
   "commands": [
     {

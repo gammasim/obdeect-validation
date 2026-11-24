@@ -1,0 +1,19 @@
+{
+  "id": "propagation.refraction-high-zenith",
+  "name": "Flat-atmosphere refraction at zenith 60-87 deg (5, 10, 20 km): displacement and arrival time of the stage against a depth-form Snell ray integration (solve_ivp rtol 1e-12); gates 1e-6 m and 1e-6 ns up to 82 deg, 4e-6 m and 1.4e-5 ns at 85 and 87 deg; CORSIKA raybnd residuals reported",
+  "requires": ["cc", "obdeect"],
+  "commands": [
+    {
+      "name": "high-zenith-refraction",
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.refraction_high_zenith"],
+      "timeout": 900
+    }
+  ],
+  "metrics": [
+    {"metric": "sample_count", "expected": 21, "atol": 0},
+    {"metric": "displacement_violations", "expected": 0, "atol": 0},
+    {"metric": "time_violations", "expected": 0, "atol": 0},
+    {"metric": "kernel_displacement_violations", "expected": 0, "atol": 0},
+    {"metric": "kernel_time_violations", "expected": 0, "atol": 0}
+  ]
+}

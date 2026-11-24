@@ -106,6 +106,7 @@ def test_scattered_photon_timing_includes_both_air_paths(tmp_path):
             site_altitude_m=SITE,
             seed=17,
             mode="weighted",
+            pathlen_m=0.0,  # timing only: no in-telescope path
             transmission=ROOT / "fixtures/atm_trans_2000_1_10_0_0_2000.dat",
             scattering=ROOT / "fixtures/scattering_exponential.dat",
             scattering_points=16,

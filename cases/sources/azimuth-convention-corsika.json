@@ -1,0 +1,35 @@
+{
+  "id": "sources.azimuth-convention-corsika",
+  "name": "Azimuth convention of the CORSIKA stream: from-corsika azimuth_rad and mean photon direction against the CORSIKA log (PHIP, THETAP) and the EventIO reader",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "inputs": [
+    "{validation}/inputs/gamma-20deg-az180-100-3000GeV.iact",
+    "{validation}/inputs/gamma-20deg-az180-100-3000GeV.corsika.log",
+    "{validation}/inputs/gamma-20deg-20-100GeV.iact",
+    "{validation}/inputs/gamma-20deg-20-100GeV.corsika.log"
+  ],
+  "commands": [
+    {
+      "name": "corsika-azimuth",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.azimuth_convention",
+        "corsika",
+        "{validation}/inputs/gamma-20deg-az180-100-3000GeV.iact",
+        "{validation}/inputs/gamma-20deg-20-100GeV.iact"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "metrics": [
+    {"metric": "azimuth_error_deg_max", "expected": 0, "atol": 0.001},
+    {"metric": "zenith_error_deg_max", "expected": 0, "atol": 0.001},
+    {"metric": "stream_vs_eventio_delta_rad_max", "expected": 0, "atol": 1e-6},
+    {"metric": "direction_error_rad_max", "expected": 0, "atol": 0.05},
+    {"metric": "arrival_closer_files", "expected": 0, "atol": 0}
+  ]
+}

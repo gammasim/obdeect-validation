@@ -34,6 +34,7 @@ MIN_CAMERA_EVENTS = (
     1  # with one event the standard error is the Poisson error of the total
 )
 KEYS = ("cx", "cy", "cz", "t", "z", "w", "wavelength", "x", "y")
+KS_P_LIMIT = 1e-4  # two-sample KS significance level of the shape gate, see _ks_flag
 
 # Matched parameter sets. Flasher cases follow obdeect/validation/sources/compare_*.sh; point
 # source follows the xyzls defaults (-r 1500, -s 400, -h 2150 m, -d 0,0,-1); beam scan follows the
@@ -370,6 +371,21 @@ def _ks(a, b):
     return float(result.statistic), float(result.pvalue)
 
 
+def _ks_flag(p_value):
+    """KS shape gate: fail when the two-sample p-value is below KS_P_LIMIT.
+
+    Justification: both samples come from the same physical distribution when the source is
+    right, so under that hypothesis the p-value is uniform on (0, 1) and a flag has a false-alarm
+    rate of KS_P_LIMIT per test. The emission and camera cases together run a few dozen KS tests,
+    so the family-wise false-alarm rate stays below about 0.5 %. The KS distance D is kept in the
+    metrics and details but is not gated: the repository states no physics requirement on the
+    shape of the angular or time distribution that would give an effect-size floor, and a floor
+    combined with the p-value by AND would disable the test for any small but significant shift.
+    Location shifts are gated separately by the 5 sigma mean checks.
+    """
+    return int(bool(p_value < KS_P_LIMIT))
+
+
 def _flag(value, limit):
     return int(bool(value > limit))
 
@@ -630,7 +646,7 @@ def emission_metrics(
                 ),
                 f"{key}_ks_distance": d_ks,
                 f"{key}_ks_pvalue": p_ks,
-                f"{key}_ks_limit_exceeded": int(d_ks >= 0.01 and p_ks <= 1e-3),
+                f"{key}_ks_limit_exceeded": _ks_flag(p_ks),
             }
         )
     metrics["t_reference_outside_radius_fraction"] = (
@@ -856,12 +872,8 @@ def _camera_stage(root, native_gst, reference_file, stage2):
         )
     ):
         return None, {
-            "reference_triggered_telescopes": {
-                str(k): int(len(v[0])) for k, v in a.items()
-            },
-            "candidate_triggered_telescopes": {
-                str(k): int(len(v[0])) for k, v in b.items()
-            },
+            "reference_triggered_telescopes": {str(k): len(v[0]) for k, v in a.items()},
+            "candidate_triggered_telescopes": {str(k): len(v[0]) for k, v in b.items()},
         }
     return camera_metrics(a, b), {}
 

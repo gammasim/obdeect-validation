@@ -27,7 +27,6 @@ Sections (gates in cases/propagation/sphere-extinction.json):
 from __future__ import annotations
 
 import argparse
-import importlib.metadata
 import math
 from pathlib import Path
 
@@ -49,10 +48,7 @@ NEAR_HORIZONTAL = 0.1
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 _TABLE = None
@@ -327,6 +323,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
         ground_representation="sphere",
         mode="weighted",
         store_p=True,
+        pathlen_m=0.0,  # no in-telescope path (module docstring)
     )
     spherical_groups = np.isin(groups, ["b_near_horizontal", "b_horizontal"])
     spherical_in = root / "sphere-spherical-in.pst"
@@ -343,6 +340,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
         mode="weighted",
         store_p=True,
         curvature="spherical",
+        pathlen_m=0.0,  # no in-telescope path (module docstring)
     )
     plane = root / "plane-flat.pst"
     equator = np.isin(groups, ["d_equator"])
@@ -356,6 +354,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
         seed=1,
         mode="weighted",
         store_p=True,
+        pathlen_m=0.0,  # no in-telescope path (module docstring)
     )
     return {
         "flat": flat,

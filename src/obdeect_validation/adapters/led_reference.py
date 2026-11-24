@@ -1,9 +1,9 @@
 """Compare the native LED stream writer with sim_telarray pixled."""
 
 import os
-from importlib.metadata import version
 import shutil
 import subprocess
+from importlib.metadata import version
 from pathlib import Path
 
 import numpy as np

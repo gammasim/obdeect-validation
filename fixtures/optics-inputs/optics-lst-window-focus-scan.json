@@ -1,0 +1,30 @@
+{
+  "simtools_config": {
+    "application": "simtools-validate-optics",
+    "configuration": {
+      "site": "North",
+      "telescope": "LSTN-01",
+      "model_version": "7.0.0",
+      "simulation_models_path": "/models",
+      "zenith_angle": 20,
+      "source_distance": 10,
+      "max_offset": 4,
+      "offset_step": 1,
+      "offset_directions": "N,E",
+      "instrument_seed": 11,
+      "simulation_seed": [
+        11
+      ],
+      "max_workers": 2
+    }
+  },
+  "study": {
+    "kind": "focus-scan",
+    "focus_offset_cm": 6.55,
+    "scan": {
+      "start_cm": 6.95,
+      "stop_cm": 6.15,
+      "step_cm": 0.05
+    }
+  }
+}

@@ -22,11 +22,42 @@ def test_ks_one_sample_uniform_grid():
     assert sc.ks_one_sample(u, lambda x: x) == pytest.approx(5e-4, abs=1e-12)
 
 
-def test_ks_critical_alpha_1e3():
-    assert sc.ks_critical(10000) == pytest.approx(1.9486 / 100.0, rel=1e-3)
+def test_ks_critical_at_policy_level_1e4():
+    c = math.sqrt(-0.5 * math.log(0.5e-4))  # 2.2253 at p = 1e-4
+    assert sc.KS_ALPHA == 1e-4
+    assert sc.ks_critical(10000) == pytest.approx(c / 100.0, rel=1e-9)
     assert sc.ks_critical(100, 100) == pytest.approx(
-        1.9486 * math.sqrt(2.0 / 100.0), rel=1e-3
+        c * math.sqrt(2.0 / 100.0), rel=1e-9
     )
+
+
+def test_ks_pvalue_is_kolmogorov_survival_and_uses_effective_size():
+    # Q_KS(1.36) is about 0.0495 (the classic 5 % point); two samples of 100 have n_eff = 50.
+    assert sc.ks_pvalue(1.36 / 10.0, 100) == pytest.approx(0.0495, abs=2e-3)
+    assert sc.ks_pvalue(1.36 / math.sqrt(50.0), 100, 100) == pytest.approx(
+        0.0495, abs=2e-3
+    )
+
+
+def test_ks_flags_use_p_value_below_policy_level():
+    metrics = {}
+    # D = 0.1 for n = 100 gives p of about 0.27: no flag.
+    sc.ks_flags(metrics, "fine", 0.1, 100)
+    assert metrics["fine_ks_limit_exceeded"] == 0
+    assert metrics["fine_ks_pvalue"] > 1e-4
+    # D = 0.5 for n = 100 is far below p = 1e-4: flagged.
+    sc.ks_flags(metrics, "shape", 0.5, 100)
+    assert metrics["shape_ks_limit_exceeded"] == 1
+    assert metrics["shape_ks_pvalue"] < 1e-4
+    # The critical distance is recorded at the same level as the flag.
+    assert metrics["shape_ks_critical"] == pytest.approx(sc.ks_critical(100))
+
+
+def test_ks_flag_is_the_source_camera_policy():
+    from obdeect_validation.adapters import source_camera
+
+    assert sc._ks_flag is source_camera._ks_flag
+    assert sc.KS_ALPHA == source_camera.KS_P_LIMIT
 
 
 def test_ratio_limit_floor_and_statistical_part():

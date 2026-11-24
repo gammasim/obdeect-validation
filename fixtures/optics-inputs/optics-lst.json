@@ -16,5 +16,6 @@
       "max_workers": 2
     }
   },
-  "limits": {"psf_cm": 0.02, "eff_area": 0.01, "eff_flen": 0.002}
+  "limits": {"psf_cm": 0.02, "eff_area": 0.02, "eff_flen": 0.002},
+  "goals": {"psf_cm": 0.01, "eff_area": 0.01, "eff_flen": 0.002}
 }

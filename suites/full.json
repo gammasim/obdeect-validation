@@ -62,6 +62,19 @@
     "../cases/propagation/sphere-geometry.json",
     "../cases/sources/ground-muon.json",
     "../cases/optics/sphere-vs-plane.json",
-    "../cases/propagation/sphere-extinction.json"
+    "../cases/propagation/sphere-extinction.json",
+    "../cases/robustness/stream-rejections.json",
+    "../cases/robustness/event-numbers.json",
+    "../cases/propagation/loss-accounting.json",
+    "../cases/propagation/refraction-high-zenith.json",
+    "../cases/sources/emission-profiles.json",
+    "../cases/sources/targets.json",
+    "../cases/sources/azimuth-convention.json",
+    "../cases/sources/azimuth-convention-corsika.json",
+    "../cases/optics/optics-sct.json",
+    "../cases/optics/optics-obscurer-analytic.json",
+    "../cases/optics/optics-obscurer-shadowing.json",
+    "../cases/optics/optics-psf-angles.json",
+    "../cases/determinism/golden-outputs.json"
   ]
 }
