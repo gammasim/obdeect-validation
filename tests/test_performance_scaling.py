@@ -2,7 +2,8 @@
 
 import pytest
 
-from obdeect_validation.adapters import performance_chain, performance_scaling as ps
+from obdeect_validation.adapters import performance_chain
+from obdeect_validation.adapters import performance_scaling as ps
 
 INPUTS = {"rotation": 0.0, "atmosphere": "atm.dat", "models": "/models"}
 

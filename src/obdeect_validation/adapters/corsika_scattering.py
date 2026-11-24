@@ -90,6 +90,8 @@ def run(source: Path, root: Path) -> dict:
         "run",
         "--transmission",
         common.UNIT_TRANSMISSION,
+        "--pathlen",
+        "0",
         "--site-altitude",
         "2156",
         "--seed",

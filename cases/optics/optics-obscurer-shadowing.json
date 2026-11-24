@@ -1,0 +1,21 @@
+{
+  "id": "optics.obscurer-shadowing-sct-7.0.0",
+  "name": "Secondary baffle and parameterised structure shadowing (SCTS-design 7.0.0): simtools sim_telarray vs obdeect, 3 seeds",
+  "requires": ["simtools-validate-optics"],
+  "commands": [
+    {
+      "name": "matched-backends-variants",
+      "cwd": "compare",
+      "timeout": 14400,
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.optics_obscurers", "compare", "--config", "{validation}/fixtures/optics-inputs/optics-obscurer-shadowing.json"]
+    }
+  ],
+  "metrics": [
+    {"metric": "n_offsets", "expected": 9, "atol": 0},
+    {"metric": "baffle_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "structure_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "exceeded_limits", "expected": 0, "atol": 0},
+    {"metric": "baffle_underpowered", "expected": 0, "atol": 0},
+    {"metric": "structure_underpowered", "expected": 0, "atol": 0}
+  ]
+}

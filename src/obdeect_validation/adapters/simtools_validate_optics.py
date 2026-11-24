@@ -12,11 +12,13 @@ from typing import Any
 
 METRICS = ("psf_cm", "eff_area", "eff_flen")
 LIMIT_STATUS = (
-    "approved 2026-11-15, from obdeect-validation-org docs/phase1.md measured maxima"
+    "requirement set by the project (2026-11-24): goal 1 %, acceptable at most 2 %"
 )
 LIMIT_BASIS = (
-    "phase1.md 0-4 deg maxima: D80 1.1%, effective area 0.45%, effective focal length 0.1%; "
-    "limits are about 2x these maxima"
+    "D80 and effective area: goal 1 %, acceptable at most 2 % per offset (limits = acceptance, "
+    "goals reported, not gated). Effective focal length: 0.2 % (stricter than the requirement; "
+    "measured agreement 0.1 %, phase1.md). The limit is not widened by the statistical error: an "
+    "offset whose 3-sigma error exceeds the limit is reported as underpowered and fails"
 )
 STAT_BASIS = {
     "psf_cm": "not available: simtools output has no D80 uncertainty",
@@ -35,8 +37,14 @@ def _config(path: Path) -> dict[str, Any]:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise AdapterError(f"cannot read config {path}: {exc}") from exc
-    if not isinstance(value, dict) or set(value) != {"simtools_config", "limits"}:
-        raise AdapterError("config must contain exactly simtools_config and limits")
+    if not isinstance(value, dict) or not (
+        {"simtools_config", "limits"}
+        <= set(value)
+        <= {"simtools_config", "limits", "goals"}
+    ):
+        raise AdapterError(
+            "config must contain simtools_config, limits and optionally goals"
+        )
     app = value["simtools_config"]
     if (
         not isinstance(app, dict)
@@ -107,8 +115,8 @@ def _column(
 
 def _table(path: Path) -> dict[str, list[float | None]]:
     try:
-        from astropy.table import QTable
         import astropy.units as u
+        from astropy.table import QTable
     except ImportError as exc:
         raise AdapterError(
             "astropy is required to compare simtools ECSV output"
@@ -180,7 +188,7 @@ def _rows(sim: dict, obd: dict, limits: dict[str, float]) -> list[dict[str, Any]
                     obd["eff_flen_err"][index],
                 )
                 se = math.hypot(err_obd, err_sim * right / left) / abs(left)
-            threshold = max(limits[metric], SIGMA_FACTOR * (se or 0.0))
+            threshold = limits[metric]
             row[metric] = {
                 "sim": left,
                 "obd": right,
@@ -188,6 +196,8 @@ def _rows(sim: dict, obd: dict, limits: dict[str, float]) -> list[dict[str, Any]
                 "rel_se": se,
                 "threshold": threshold,
                 "exceeded": abs(delta) > threshold,
+                # The comparison cannot resolve the limit: its 3-sigma error is larger.
+                "underpowered": SIGMA_FACTOR * (se or 0.0) > threshold,
             }
         rows.append(row)
     return rows
@@ -381,13 +391,24 @@ def execute(config_path: Path, output: Path) -> dict[str, float | int]:
     metrics["exceeded_limits"] = sum(
         metrics[f"{metric}_limit_exceeded"] for metric in METRICS
     )
+    goals = config.get("goals", {})
+    for metric in METRICS:
+        values = [row[metric] for row in rows if row[metric] is not None]
+        metrics[f"{metric}_underpowered"] = sum(int(v["underpowered"]) for v in values)
+        if metric in goals:
+            # Reported only: offsets above the goal (below the limit they still pass).
+            metrics[f"{metric}_goal_exceeded_offsets"] = sum(
+                int(abs(v["delta"]) > goals[metric]) for v in values
+            )
 
     details = {
         "status": LIMIT_STATUS,
         "limits_basis": LIMIT_BASIS,
         "limits": limits,
+        "goals": config.get("goals", {}),
         "statistical_uncertainty": STAT_BASIS,
-        "exceeded_rule": f"abs(obd/sim - 1) > max(limit, {SIGMA_FACTOR:g} * rel_se) per offset",
+        "exceeded_rule": "abs(obd/sim - 1) > limit per offset",
+        "underpowered_rule": f"{SIGMA_FACTOR:g} * rel_se > limit per offset",
         "configuration": config["simtools_config"]["configuration"],
         "versions": _versions(),
         "backends": backends,

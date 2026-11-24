@@ -6,7 +6,7 @@
     "python3"
   ],
   "inputs": [
-    "fixtures/sphere/photons3d.iact"
+    "{validation}/fixtures/sphere/photons3d.iact"
   ],
   "commands": [
     {

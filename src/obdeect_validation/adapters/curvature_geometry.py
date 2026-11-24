@@ -202,7 +202,7 @@ def lateral_shift_closed_form(
 
 
 def _write_input(path: Path, curvature_applied: int, photons, telescopes) -> None:
-    import obdeect.stream as stream
+    from obdeect import stream
 
     writer = stream.Writer(str(path), "obdeect-validation")
     writer.write(
@@ -266,6 +266,9 @@ def _read_output(path: Path):
 
 
 def _run(propagation, source, output, radius, curvature, **kwargs):
+    # The Earth radius belongs to a curved run only (the API rejects it with curvature "none").
+    if curvature != "none":
+        kwargs["earth_radius_m"] = radius
     return propagation.propagate(
         str(source),
         str(output),
@@ -273,13 +276,12 @@ def _run(propagation, source, output, radius, curvature, **kwargs):
         seed=20261115,
         extinction=False,
         curvature=curvature,
-        earth_radius_m=radius,
         **kwargs,
     )
 
 
 def main() -> None:
-    import obdeect.propagation as propagation
+    from obdeect import propagation
 
     telescopes = telescope_table()
     photons = photon_table()

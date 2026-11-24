@@ -1,0 +1,30 @@
+{
+  "id": "optics.cumulative-psf-and-angles",
+  "name": "Cumulative PSF (LSTN-01, on axis, measured curve) and mean incidence angles (SSTS-01, 1 deg): simtools sim_telarray vs obdeect, 3 seeds",
+  "requires": ["simtools-validate-optics", "simtools-derive-incident-angle"],
+  "commands": [
+    {
+      "name": "cumulative-psf",
+      "cwd": "psf",
+      "timeout": 14400,
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.optics_psf_angles", "psf", "--config", "{validation}/fixtures/optics-inputs/optics-cumulative-psf-angles.json"]
+    },
+    {
+      "name": "incidence-angles",
+      "cwd": "angles",
+      "timeout": 14400,
+      "argv": ["{python}", "-m", "obdeect_validation.adapters.optics_psf_angles", "angles", "--config", "{validation}/fixtures/optics-inputs/optics-cumulative-psf-angles.json"]
+    }
+  ],
+  "metrics": [
+    {"metric": "psf_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "angle_focal_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "angle_primary_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "angle_secondary_limit_exceeded", "expected": 0, "atol": 0},
+    {"metric": "angle_exceeded_limits", "expected": 0, "atol": 0},
+    {"metric": "psf_underpowered", "expected": 0, "atol": 0},
+    {"metric": "angle_focal_underpowered", "expected": 0, "atol": 0},
+    {"metric": "angle_primary_underpowered", "expected": 0, "atol": 0},
+    {"metric": "angle_secondary_underpowered", "expected": 0, "atol": 0}
+  ]
+}

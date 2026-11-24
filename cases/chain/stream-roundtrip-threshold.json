@@ -6,7 +6,7 @@
     {
       "name": "roundtrip-and-camera-threshold",
       "argv": ["{python}", "-m", "obdeect_validation.adapters.chain_showers",
-               "--input", "/validation/inputs/gamma-20deg-20-100GeV.iact"],
+               "--input", "{validation}/inputs/gamma-20deg-20-100GeV.iact"],
       "timeout": 1200
     }
   ],

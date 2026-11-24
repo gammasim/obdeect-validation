@@ -2,12 +2,12 @@
   "id": "propagation.corsika-to-sky-scattering",
   "name": "Real CORSIKA shower through to-sky and single scattering",
   "requires": ["obdeect"],
-  "inputs": ["/validation/inputs/gamma-20deg-100-3000GeV.iact"],
+  "inputs": ["{validation}/inputs/gamma-20deg-100-3000GeV.iact"],
   "commands": [
     {
       "name": "convert-and-scatter-corsika-shower",
       "argv": ["{python}", "-m", "obdeect_validation.adapters.corsika_scattering",
-               "--input", "/validation/inputs/gamma-20deg-100-3000GeV.iact"],
+               "--input", "{validation}/inputs/gamma-20deg-100-3000GeV.iact"],
       "timeout": 1800
     }
   ],

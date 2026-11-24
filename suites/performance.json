@@ -10,6 +10,7 @@
     "../cases/performance/air-shower-proton.json",
     "../cases/performance/stream-pipe.json",
     "../cases/performance/bottleneck.json",
-    "../cases/performance/scaling.json"
+    "../cases/performance/scaling.json",
+    "../cases/performance/regression.json"
   ]
 }

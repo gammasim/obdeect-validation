@@ -236,6 +236,8 @@ def _cli_command(case: dict, stream: Path, output: Path) -> list[str]:
         *head,
         "--transmission",
         str(TRANSMISSION),
+        "--pathlen",
+        "0",
         "--site-altitude",
         str(SITE_ALTITUDE_M),
         "--seed",
@@ -285,6 +287,7 @@ def run_api(case: dict, stream: Path, output: Path) -> dict:
             transmission=TRANSMISSION,
             site_altitude_m=SITE_ALTITUDE_M,
             seed=SEED,
+            pathlen_m=0.0,  # no in-telescope path (the case tests the curvature guards)
             **kwargs,
         )
     except (ValueError, RuntimeError) as error:

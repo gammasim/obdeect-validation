@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-import hashlib
 import copy
-import importlib.metadata
+import hashlib
 import html
+import importlib.metadata
 import json
 import math
 import os
 import platform
-import signal
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -212,7 +212,10 @@ def _git(root: Path, *args: str, timeout: float = 120) -> bytes | None:
     """Raw git output, b"" on a git error and None on timeout (recorded as unknown)."""
     try:
         proc = subprocess.run(
-            ["git", "-C", str(root), *args], capture_output=True, timeout=timeout
+            ["git", "-C", str(root), *args],
+            capture_output=True,
+            timeout=timeout,
+            check=False,
         )
     except subprocess.TimeoutExpired:
         return None
@@ -308,7 +311,7 @@ def _signal_group(process: subprocess.Popen[bytes], sig: int) -> bool:
     """
     try:
         os.killpg(process.pid, sig)
-    except (ProcessLookupError, PermissionError):
+    except ProcessLookupError, PermissionError:
         return False
     return True
 
@@ -449,11 +452,38 @@ def _safe_id(value: str) -> str:
     return cleaned
 
 
-def _expand_case(case: dict[str, Any]) -> dict[str, Any]:
+def placeholder_values(environment: dict[str, Any]) -> dict[str, str]:
+    """Values of the placeholders in case argv and inputs.
+
+    ``{python}`` is this interpreter. ``{validation}`` and ``{reference}`` are the
+    validation repository (``VALIDATION_ROOT``, default ``/validation``) and the
+    sim_telarray checkout (``SIMTEL_REFERENCE_SOURCE``, default ``/reference``).
+    They are read from the environment file's ``env`` block first, then from the
+    process environment, so the container defaults are unchanged.
+    """
+    env = {**os.environ, **environment["env"]}
+    return {
+        "python": sys.executable,
+        "validation": env.get("VALIDATION_ROOT") or "/validation",
+        "reference": env.get("SIMTEL_REFERENCE_SOURCE") or "/reference",
+    }
+
+
+def expand_placeholders(text: str, values: dict[str, str]) -> str:
+    """Replace each ``{name}`` placeholder of ``values`` in ``text``; others are kept."""
+    for name, value in values.items():
+        text = text.replace("{" + name + "}", value)
+    return text
+
+
+def _expand_case(case: dict[str, Any], environment: dict[str, Any]) -> dict[str, Any]:
+    values = placeholder_values(environment)
     expanded = copy.deepcopy(case)
     for command in expanded["commands"]:
-        command["argv"] = [
-            arg.replace("{python}", sys.executable) for arg in command["argv"]
+        command["argv"] = [expand_placeholders(arg, values) for arg in command["argv"]]
+    if "inputs" in expanded:
+        expanded["inputs"] = [
+            expand_placeholders(item, values) for item in expanded["inputs"]
         ]
     return expanded
 
@@ -725,7 +755,7 @@ def run(
         }
     results = []
     for case in suite["cases"]:
-        case = _expand_case(case)
+        case = _expand_case(case, environment)
         tools, _ = _tool_fingerprints(case, environment)
         fingerprint = _fingerprint(case, provenance, tools)
         cached = previous.get(case["id"])

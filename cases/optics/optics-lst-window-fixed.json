@@ -1,11 +1,11 @@
 {
   "id": "optics.lst-window-fixed",
-  "name": "Window on, 6.55 cm focus",
+  "name": "STUDY (report only, no gated metrics; needs obdeect window tracing, obdeect branch lst-window): Window on, 6.55 cm focus",
   "requires": [
     "simtools-validate-optics"
   ],
   "inputs": [
-    "/validation/fixtures/optics-inputs/optics-lst-window-fixed.json"
+    "{validation}/fixtures/optics-inputs/optics-lst-window-fixed.json"
   ],
   "commands": [
     {
@@ -16,7 +16,7 @@
         "-m",
         "obdeect_validation.adapters.optics_window_study",
         "--config",
-        "/validation/fixtures/optics-inputs/optics-lst-window-fixed.json"
+        "{validation}/fixtures/optics-inputs/optics-lst-window-fixed.json"
       ]
     }
   ]

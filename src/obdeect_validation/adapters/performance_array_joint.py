@@ -356,7 +356,7 @@ def main():
         args.input.resolve(), args.events, work_root / "showers-input.iact"
     )
     metrics = {}
-    load_before = pc.loadavg()
+    load_before = performance.loadavg()
     if load_before is not None:
         metrics["host_loadavg_before"] = load_before
     details = {
@@ -380,7 +380,7 @@ def main():
         details["failures"]["run"] = traceback.format_exc()[-800:]
         raise
     finally:
-        load_after = pc.loadavg()
+        load_after = performance.loadavg()
         if load_after is not None:
             metrics["host_loadavg_after"] = load_after
         metrics["timing_unreliable"], details["timing_reliability"] = (

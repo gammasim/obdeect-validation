@@ -32,7 +32,7 @@ differ between the sites. The two camera samples are independent (no pairing).
 
 Limits (set before the first run, not changed to pass):
   stage 1 and camera p.e. ratio: as in source_camera (photon ratio max(0.5 %, 5 se); mean
-  direction 5 sigma; KS distance 0.01 with p <= 1e-3; mean time max(0.05 ns, 5 se); wavelength
+  direction 5 sigma; KS shape: fail when the two-sample p-value is below 1e-4 (source_camera _ks_flag); mean time max(0.05 ns, 5 se); wavelength
   max(0.01 nm, 5 se); camera p.e. ratio max(1 %, 5 se); image shape reduced chi2 <= 2).
   Per-pixel p.e. map: pixels with at least PIXEL_MIN_MEAN_PE p.e. per event in the reference;
   R_i = mean native / mean reference with the event-to-event standard errors of both means;

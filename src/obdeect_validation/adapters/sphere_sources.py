@@ -21,8 +21,6 @@ for rows with path 0):
 
 from __future__ import annotations
 
-import argparse
-import importlib.metadata
 import math
 from pathlib import Path
 
@@ -47,10 +45,7 @@ EPS32 = 2.0**-24
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-sources")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-sources")
 
 
 def description() -> dict:
@@ -255,10 +250,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    metrics, details = run_all(Path.cwd())
-    common.write_results(metrics, details, Path.cwd())
+    common.results_main(run_all, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":
