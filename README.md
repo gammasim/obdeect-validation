@@ -62,8 +62,10 @@ obdeect-validate run --suite suites/optics-window.json \
 
 It runs obdeect only:
 window off at 6.55 cm, window on at 6.55 cm, then window on from 6.95 to 6.15 cm
-in 0.05 cm steps. The scan reports its best on-axis D80 and compares its 1-4 deg
-D80 values to the window-off case. The study adds the window records to a temporary copy of the
+in 0.05 cm steps. The scan reports its best on-axis D80 (the scan point nearest to the vertex
+of a parabola fitted to on-axis D80, if there is one; the grid minimum is reported too) and compares
+its off-axis D80 values, every offset above 0 deg up to `max_offset` (0 to 2.25 deg in 0.25 deg steps),
+to the window-off case. The study adds the window records to a temporary copy of the
 production table, so the checkout is not changed.
 
 Case files are JSON. Each has an id, executable requirements, commands (argument

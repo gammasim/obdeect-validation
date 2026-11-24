@@ -17,6 +17,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from obdeect_validation.adapters.simtools_validate_optics import _table
 
 WINDOW_PARAMETERS = (
@@ -76,9 +78,65 @@ def _focus_scan(study: dict[str, Any]) -> list[float]:
     return values
 
 
-def _focus_override(focus_cm: float) -> dict[str, Any]:
-    """simtools overwrite_model_parameters entry for the focus offset."""
-    return {"LSTN-design": {"focus_offset": {"value": [focus_cm, 0.0, 0.0, 0.0]}}}
+def _fitted_vertex(focus: list[float], d80: list[float]) -> float | None:
+    """Vertex of a parabola fitted to on-axis D80 vs focus offset.
+
+    None unless the curvature is positive and the vertex lies inside the scan range.
+    """
+    if len(focus) < 3:
+        return None
+    a, b, _ = np.polyfit(focus, d80, 2)
+    if not a > 0:
+        return None
+    vertex = float(-b / (2 * a))
+    if not min(focus) <= vertex <= max(focus):
+        return None
+    return vertex
+
+
+def _best_focus(
+    scan: list[dict[str, Any]], focus: float
+) -> tuple[dict[str, Any], float | None]:
+    """Scan point nearest to the fitted vertex (plain minimum if no vertex), and the vertex."""
+    vertex = _fitted_vertex(
+        [row["focus_offset_cm"] for row in scan],
+        [row["on_axis_d80_cm"] for row in scan],
+    )
+    if vertex is None:
+        return _grid_minimum(scan, focus), None
+    best = min(
+        scan,
+        key=lambda row: (abs(row["focus_offset_cm"] - vertex), row["on_axis_d80_cm"]),
+    )
+    return best, vertex
+
+
+def _grid_minimum(scan: list[dict[str, Any]], focus: float) -> dict[str, Any]:
+    return min(
+        scan,
+        key=lambda row: (row["on_axis_d80_cm"], abs(row["focus_offset_cm"] - focus)),
+    )
+
+
+def _max_offset(options: dict[str, Any]) -> float:
+    value = options.get("max_offset")
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+        raise StudyError(
+            "simtools_config.configuration.max_offset must be a positive number"
+        )
+    return float(value)
+
+
+def _focus_override(focus_cm: float, *, window: bool = False) -> dict[str, Any]:
+    """simtools overwrite_model_parameters entry for the focus offset.
+
+    With the window traced, camera_filter is "none": the traced window replaces it (obdeect
+    rejects a model that would count the window transmission twice).
+    """
+    parameters: dict[str, Any] = {"focus_offset": {"value": [focus_cm, 0.0, 0.0, 0.0]}}
+    if window:
+        parameters["camera_filter"] = {"value": None}
+    return {"LSTN-design": parameters}
 
 
 def _model_overlay(models: Path, destination: Path, version: str) -> Path:
@@ -115,10 +173,17 @@ def _model_overlay(models: Path, destination: Path, version: str) -> Path:
 
 
 def _run_one(
-    options: dict[str, Any], output: Path, models: Path, focus_cm: float
+    options: dict[str, Any],
+    output: Path,
+    models: Path,
+    focus_cm: float,
+    *,
+    window: bool = False,
 ) -> dict[str, list[float | None]]:
     output.mkdir(parents=True, exist_ok=True)
-    overrides = json.dumps(_focus_override(focus_cm), separators=(",", ":"))
+    overrides = json.dumps(
+        _focus_override(focus_cm, window=window), separators=(",", ":")
+    )
     config = {
         "applications": [
             {
@@ -225,7 +290,7 @@ def _reference(options, output, models, focus):
 
 def _fixed_window(options, output, models, window_models, focus):
     reference = _run_one(options, output / "window-off", models, focus)
-    window = _run_one(options, output / "window-on", window_models, focus)
+    window = _run_one(options, output / "window-on", window_models, focus, window=True)
     rows = _paired_metrics(reference, window)
     metrics = {"n_offsets": len(window["off_x"]), "focus_offset_cm": focus}
     metrics["on_axis_d80_cm"] = _on_axis(window)
@@ -241,6 +306,7 @@ def _fixed_window(options, output, models, window_models, focus):
 
 
 def _focus_scan_study(options, output, models, window_models, focus, study):
+    max_offset = _max_offset(options)
     reference = _run_one(options, output / "window-off", models, focus)
     scan = []
     for candidate in _focus_scan(study):
@@ -249,6 +315,7 @@ def _focus_scan_study(options, output, models, window_models, focus, study):
             output / f"window-on-focus-{candidate:.2f}",
             window_models,
             candidate,
+            window=True,
         )
         scan.append(
             {
@@ -257,20 +324,21 @@ def _focus_scan_study(options, output, models, window_models, focus, study):
                 "table": table,
             }
         )
-    best = min(
-        scan,
-        key=lambda row: (row["on_axis_d80_cm"], abs(row["focus_offset_cm"] - focus)),
-    )
+    best, vertex = _best_focus(scan, focus)
     off_axis = _paired_metrics(reference, best["table"])
-    at_1_to_4 = [row for row in off_axis if 1 - 1e-9 <= row["angle_deg"] <= 4 + 1e-9]
+    rows_off_axis = [
+        row for row in off_axis if 1e-9 < row["angle_deg"] <= max_offset + 1e-9
+    ]
     metrics = {
         "n_focus_points": len(scan),
+        "grid_min_focus_offset_cm": _grid_minimum(scan, focus)["focus_offset_cm"],
+        "fitted_best_focus_offset_cm": vertex,
         "best_focus_offset_cm": best["focus_offset_cm"],
         "best_on_axis_d80_cm": best["on_axis_d80_cm"],
-        "n_off_axis_1_to_4_deg": len(at_1_to_4),
-        "max_abs_rel_d80_1_to_4_deg": _max_abs(at_1_to_4, "psf_cm_relative_delta"),
+        "n_off_axis": len(rows_off_axis),
+        "max_abs_rel_d80_off_axis": _max_abs(rows_off_axis, "psf_cm_relative_delta"),
         "n_offsets_over_2pct": sum(
-            abs(row["psf_cm_relative_delta"]) > 0.02 for row in at_1_to_4
+            abs(row["psf_cm_relative_delta"]) > 0.02 for row in rows_off_axis
         ),
     }
     details = {
@@ -278,8 +346,9 @@ def _focus_scan_study(options, output, models, window_models, focus, study):
         "comparison": f"best window-on focus vs window-off reference at {focus} cm",
         "focus_scan": [{k: v for k, v in row.items() if k != "table"} for row in scan],
         "best_focus_offset_cm": best["focus_offset_cm"],
+        "fitted_best_focus_offset_cm": vertex,
         "best_scan_table": best["table"],
-        "best_focus_off_axis_d80": at_1_to_4,
+        "best_focus_off_axis_d80": rows_off_axis,
     }
     return metrics, details
 
