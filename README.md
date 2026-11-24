@@ -47,13 +47,13 @@ cases (`cases/sources/flasher-dish.json`, `flasher-secondary.json`, `led-referen
 once obdeect is installed (`python -m pytest tests/test_obdeect_chain.py`; it skips otherwise).
 Summary of an IACT file: `python -m obdeect_validation.adapters.summarize_iact FILE.iact.gz`.
 
-The LST camera-window study is `suites/optics-window.json`. It is a study, not a validation: its three
-cases carry no gated metrics (their names say so) and the suite is not part of `suites/full.json`.
-The window parameter records (`camera_window_parameters`, `camera_window_refractive_index`,
-`camera_window_internal_transmittance`, version 1.0.0, LSTN-design) do not exist in simulation-models,
-and obdeect does not trace the camera window, so a window-on result has no reference to compare with.
-The study stops with an error while the records are missing; its config also sets
-`simulation_models_path` to `/models`, which exists only in the container. Run it with:
+The LST camera-window study is `suites/optics-window.json`. It is a study, not a gated validation:
+its three cases carry no metrics (their names say so) and the suite is not part of `suites/full.json`.
+It needs obdeect with camera-window tracing (obdeect branch `lst-window`, not yet in obdeect `main`)
+and the LSTN-design window parameter records (`camera_window_parameters`,
+`camera_window_refractive_index`, `camera_window_internal_transmittance`, version 1.0.0), which are
+not in the simulation-models production checkout; the study stops with an error while they are
+missing. Its config sets `simulation_models_path` to `/models` (container). Run it with:
 
 ```sh
 obdeect-validate run --suite suites/optics-window.json \
@@ -63,9 +63,8 @@ obdeect-validate run --suite suites/optics-window.json \
 It runs obdeect only:
 window off at 6.55 cm, window on at 6.55 cm, then window on from 6.95 to 6.15 cm
 in 0.05 cm steps. The scan reports its best on-axis D80 and compares its 1-4 deg
-D80 values to the window-off case. The study code would add the window records to a temporary
-copy of the production table, so the checkout is not changed; that copy does not make the
-records exist.
+D80 values to the window-off case. The study adds the window records to a temporary copy of the
+production table, so the checkout is not changed.
 
 Case files are JSON. Each has an id, executable requirements, commands (argument
 arrays, without shell expansion), and metrics with metric/expected/atol. Case `argv` and `inputs`

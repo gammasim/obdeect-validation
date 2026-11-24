@@ -1,6 +1,6 @@
 {
   "id": "optics.lst-window-fixed",
-  "name": "STUDY, NOT VALIDATION (report only, no gated metrics; window parameter records are not in simulation-models and obdeect does not trace the window): Window on, 6.55 cm focus",
+  "name": "STUDY (report only, no gated metrics; needs obdeect window tracing, obdeect branch lst-window): Window on, 6.55 cm focus",
   "requires": [
     "simtools-validate-optics"
   ],
