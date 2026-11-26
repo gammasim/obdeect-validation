@@ -20,8 +20,6 @@ Tampered chains (LSTN-01, telescope 1, 20 showers, zenith 20 deg):
 Positive controls: genuine camera chain; qe envelope with --scaled-factor qe; angular with --allow-pending.
 """
 
-from pathlib import Path
-
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
 from obdeect_validation.adapters import obdeect_cli as cli
@@ -115,14 +113,6 @@ def tool_argv_trace(model, stream, output, extra=()):
         pointing_zenith_deg=ZENITH_DEG,
         pointing_azimuth_deg=AZIMUTH_DEG,
         extra=extra,
-    )
-
-
-def add_input(parser):
-    parser.add_argument(
-        "--input",
-        type=Path,
-        default=common.VALIDATION / "inputs/gamma-20deg-20-100GeV.iact",
     )
 
 
@@ -326,7 +316,9 @@ def analyse(root, args):
 
 
 def main():
-    common.results_main(analyse, __doc__.split("\n")[0], add_arguments=add_input)
+    common.results_main(
+        analyse, __doc__.split("\n")[0], add_arguments=cli.input_argument
+    )
 
 
 if __name__ == "__main__":

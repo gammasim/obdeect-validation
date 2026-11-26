@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
 
-from obdeect_validation.adapters import performance, performance_profile
+from obdeect_validation.adapters import performance_common as pcm
+from obdeect_validation.adapters import performance_profile
 
 REPORT = """# Samples: 1K of event 'cycles:P'
 # Event count (approx.): 1234567
@@ -112,7 +113,7 @@ def test_profile_stage_falls_back_to_timing_without_perf(monkeypatch, tmp_path) 
         timed.append((argv, stdout_file))
         return {"wall_s": 1.5}
 
-    monkeypatch.setattr(performance, "run_timed", fake_run_timed)
+    monkeypatch.setattr(pcm, "run_timed", fake_run_timed)
     metrics, details = {}, {"profile": {}}
     performance_profile.profile_stage(
         "propagation",

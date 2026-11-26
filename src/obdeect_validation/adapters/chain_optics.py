@@ -407,7 +407,7 @@ def candidate_stream(
 
 
 def _add_arguments(parser):
-    parser.add_argument("--input", type=Path, default=common.SHOWERS)
+    cli.input_argument(parser, default=common.SHOWERS)
     parser.add_argument(
         "--config",
         type=Path,

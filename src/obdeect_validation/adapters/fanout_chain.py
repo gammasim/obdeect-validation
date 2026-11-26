@@ -14,7 +14,6 @@ comparison uses the photo-electron arrays and the trigger flags of the sim_telar
 
 from pathlib import Path
 
-from obdeect_validation.adapters import atmosphere_chain as atm
 from obdeect_validation.adapters import chain_optics as optics
 from obdeect_validation.adapters import chain_showers as cs
 from obdeect_validation.adapters import common
@@ -117,11 +116,7 @@ def camera_output(root, traced, name, config, extra, camera_rotation):
 
 
 def add_arguments(parser):
-    parser.add_argument(
-        "--input",
-        type=Path,
-        default=common.VALIDATION / "inputs/gamma-20deg-20-100GeV.iact",
-    )
+    cli.input_argument(parser)
     parser.add_argument(
         "--config",
         type=Path,
@@ -136,13 +131,8 @@ def analyse(root, args):
     config_dir = config.parent
     cfg_text = (config_dir / "CTAO-LSTN-01.cfg").read_text()
     rotation = optics.camera_rotation_deg(config_dir, cfg_text)
-    band = atm.cherenkov_band(
-        source.with_suffix(".corsika.log").read_text(errors="replace")
-    )
-    cut = root / "cut-transmission.dat"
-    cut.write_text(
-        atm.cut_table(common.TRANSMISSION_TABLE.read_text(), atm.MAX_LAMBDA_NM)
-    )
+    chain = cli.prepare_chain(root, source, model=None, camera_map_text=None)
+    band, cut = chain.band, chain.cut
     unit = common.write_zero_depth_table(root, optics.UNIT_ATMOSPHERE)
     extra = [
         "-I" + str(config_dir),

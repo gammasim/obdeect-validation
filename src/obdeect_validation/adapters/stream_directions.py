@@ -18,7 +18,7 @@ from pathlib import Path
 import numpy as np
 from obdeect.stream import FRAMES, Reader, Writer, format_major, format_minor
 
-from obdeect_validation.adapters import common, plotting
+from obdeect_validation.adapters import common, plotting, streams
 from obdeect_validation.adapters import obdeect_cli as cli
 
 GRID_SIZE = 1000  # full-sphere directions per frame
@@ -214,15 +214,14 @@ def stream_with_photons(path: Path, frame: str, cx, cy, cz) -> Path:
         "w": column(1.0),
         "wavelength": column(400.0),
     }
-    with Writer(str(path), "obdeect validation: to-simtel rejection") as writer:
-        writer.write("run", _run(1))
-        writer.write("event", {"event_number": 1})
-        writer.write("telescope", {"telescope_id": 1, "frame": frame, "array_index": 0})
-        writer.write_photons(1, frame, 0, columns)
-        writer.write("telescope_end", {"telescope_id": 1, "photons": float(rows)})
-        writer.write("event_end", {})
-        writer.write("run_end", {})
-    return path
+    return streams.write_stream(
+        path,
+        "obdeect validation: to-simtel rejection",
+        _run(1),
+        [(1, columns)],
+        frame=frame,
+        telescope_extra={"array_index": 0},
+    )
 
 
 def to_simtel(stream: Path, output: Path, camera_map: str | None, log: Path):

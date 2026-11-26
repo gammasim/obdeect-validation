@@ -3,7 +3,6 @@
 import json
 import os
 import shutil
-import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -149,19 +148,14 @@ def generate(
         if geometry == "flat"
         else str(curved_showers.corsika_executable("curved"))
     )
-    with (
-        (root / "corsika.card").open("rb") as stdin,
-        (root / "corsika.log").open("wb") as log,
-    ):
-        result = subprocess.run(
-            [corsika],
-            cwd=root,
-            stdin=stdin,
-            stdout=log,
-            stderr=subprocess.STDOUT,
-            check=False,
-        )
-    if result.returncode or not (root / "showers.iact").is_file():
+    returncode = command(
+        [corsika],
+        root / "corsika.log",
+        cwd=root,
+        stdin_file=root / "corsika.card",
+        check=False,
+    )
+    if returncode or not (root / "showers.iact").is_file():
         raise RuntimeError(f"CORSIKA failed: see {root}/corsika.log")
     (root / "input-hashes.json").write_text(json.dumps(hashes, indent=2) + "\n")
     return root / "showers.iact"

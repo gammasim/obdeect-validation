@@ -26,6 +26,7 @@ from pathlib import Path
 import numpy as np
 
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import endtoend_common as e2e
 from obdeect_validation.adapters import upward_common as uc
 
 N = 25
@@ -133,8 +134,6 @@ def analyse(root: Path) -> tuple[dict, dict]:
     )
     # Reaching rows: zem identifies them (above the observation level by z; the reaching ones: 2100 m,
     # 2800 m). Count the categories in the output.
-    from obdeect_validation.adapters import endtoend_common as e2e
-
     rows = e2e.photon_rows(root / "direction-losses-out.pst")
     zem = rows["zem"]
     up_count = int(np.count_nonzero(np.isclose(zem, uc.SITE_M + 100.0, atol=1e-3)))

@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 
 from obdeect_validation.adapters import common, curved_showers
+from obdeect_validation.adapters import obdeect_cli as cli
 
 SUMMARY = re.compile(
     r"photons in (\d+), out (\d+) \(weight ([\d.e+-]+)\), dropped (\d+)"
@@ -60,7 +61,6 @@ def telescope_totals(path: Path) -> tuple[dict[int, int], dict[int, float]]:
 
 
 def run(source: Path, root: Path) -> dict:
-    from obdeect_validation.adapters import obdeect_cli as cli
     from obdeect_validation.adapters.endtoend_common import rewrite
 
     source = source.resolve()
@@ -161,7 +161,7 @@ def run(source: Path, root: Path) -> dict:
 
 
 def _add_arguments(parser):
-    parser.add_argument("--input", type=Path, default=common.SHOWERS)
+    cli.input_argument(parser, default=common.SHOWERS)
 
 
 def analyse(root, args):

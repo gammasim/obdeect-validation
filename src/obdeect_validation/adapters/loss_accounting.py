@@ -52,6 +52,7 @@ import numpy as np
 
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import obdeect_cli as cli
 
 SEED = 20261123
 SITE_M = 2000.0
@@ -249,29 +250,20 @@ def run_api(stream, output, **options):
 
 def run_cli(stream, output, transmission, log, **flags):
     """obdeect propagation run; its summary line (counts) parsed from stderr."""
-    argv = [
-        common.tool("obdeect"),
+    argv = cli.obdeect(
         "propagation",
         "run",
-        "--transmission",
-        str(transmission),
-        "--pathlen",
-        "0",
-        "--site-altitude",
-        str(SITE_M),
-        "--seed",
-        "1",
-        "-i",
-        str(stream),
-        "-o",
-        str(output),
-    ]
-    if flags.get("mode"):
-        argv += ["--mode", flags["mode"]]
-    if flags.get("sphere"):
-        argv += ["--ground-representation", "sphere"]
-    if flags.get("scattering"):
-        argv += ["--scattering", str(flags["scattering"])]
+        executable=common.tool("obdeect"),
+        transmission=str(transmission),
+        pathlen="0",
+        site_altitude=str(SITE_M),
+        seed="1",
+        i=str(stream),
+        o=str(output),
+        mode=flags.get("mode") or None,
+        ground_representation="sphere" if flags.get("sphere") else None,
+        scattering=str(flags["scattering"]) if flags.get("scattering") else None,
+    )
     text = common.run_tool(argv, log)
     match = SUMMARY_LINE.search(text)
     if match is None:
@@ -300,7 +292,9 @@ def expected_reasons(categories):
     return counts, reaching, total
 
 
-def population_metrics(prefix, summary, categories, reasons, cli=None, stream_out=None):
+def population_metrics(
+    prefix, summary, categories, reasons, cli_summary=None, stream_out=None
+):
     """Balance, reason and reaching counts of one population run (integers) and the weight checks."""
     expected, reaching, total = expected_reasons(categories)
     by_reason = {r: int(summary["dropped_by_reason"][r]) for r in REASONS}
@@ -318,10 +312,10 @@ def population_metrics(prefix, summary, categories, reasons, cli=None, stream_ou
             sum(1 for r in reasons if by_reason[r] == 0)
         ),
     }
-    if cli is not None:
+    if cli_summary is not None:
         out[f"{prefix}_cli_mismatch"] = int(
             sum(
-                abs(cli[k] - summary[k])
+                abs(cli_summary[k] - summary[k])
                 for k in ("photons_in", "photons_out", "dropped")
             )
         )
@@ -338,7 +332,7 @@ def population_metrics(prefix, summary, categories, reasons, cli=None, stream_ou
         "expected_reason": expected,
         "expected_reaching": reaching,
         "expected_total": total,
-        "cli": cli,
+        "cli": cli_summary,
     }
     return out, details
 
@@ -470,9 +464,9 @@ def analyse(root: Path) -> tuple[dict, dict]:
     }.items():
         out_file = root / f"{label}.pst"
         summary = run_api(stream, out_file, **options)
-        cli = None
+        cli_summary = None
         if label == "plane_weighted":
-            cli = run_cli(
+            cli_summary = run_cli(
                 stream,
                 root / "plane_weighted-cli.pst",
                 zero,
@@ -480,7 +474,12 @@ def analyse(root: Path) -> tuple[dict, dict]:
                 mode="weighted",
             )
         m, d = population_metrics(
-            label, summary, plane, PLANE_EXPECTED, cli=cli, stream_out=out_file
+            label,
+            summary,
+            plane,
+            PLANE_EXPECTED,
+            cli_summary=cli_summary,
+            stream_out=out_file,
         )
         metrics.update(m)
         details[label] = d

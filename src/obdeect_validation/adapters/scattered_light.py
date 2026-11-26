@@ -247,13 +247,14 @@ def _propagate(work, primary, out, transmission, table, mode, scattering):
         wavelength_range=("300", "800"),
         seed="1",
         mode=mode,
+        executable=common.tool("obdeect"),
         extra=(
             ["--scattering", str(table), "--scattering-points", str(SCATTERING_POINTS)]
             if scattering
             else ()
         ),
     )
-    common.run_tool([common.tool("obdeect"), *argv[1:]], out.with_suffix(".log"))
+    common.run_tool(argv, out.with_suffix(".log"))
 
 
 def run(work):
@@ -280,9 +281,10 @@ def run(work):
         telescope_azimuth=sweep["telescope_phi"],
         telescope_radius=sweep["telescope_radius"],
         fov_deg=sweep["fov"],
+        executable=common.tool("obdeect"),
         o=str(primary),
     )
-    common.run_tool([common.tool("obdeect"), *argv[1:]], work / "primary.log")
+    common.run_tool(argv, work / "primary.log")
     # Weighted output with and without scattering: the primaries pass through in both, so the
     # difference of their weight sums is the scattered weight (CLI cross-check of the API run).
     base, with_scatter = work / "cli-base.gst", work / "cli-scattered.gst"

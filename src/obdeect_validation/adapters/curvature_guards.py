@@ -230,12 +230,22 @@ def _cli_command(case: dict, stream: Path, output: Path) -> list[str]:
         options["scattering_points"] = "8"
     if "earth_radius" in extra:
         options["earth_radius_m"] = repr(extra["earth_radius"])
-    # cli.obdeect starts with the name "obdeect": replace it by the executable found on PATH, or
-    # run the stream module with this interpreter when obdeect is not installed as a command.
     obdeect = shutil.which("obdeect")
-    head = [obdeect] if obdeect else [sys.executable, "-m", "obdeect.stream.cli"]
-    argv = cli.propagation_run(stream, output, **options)
-    return [str(arg) for arg in [*head, *argv[1:]]]
+    if obdeect is not None:
+        argv = cli.propagation_run(stream, output, executable=obdeect, **options)
+    else:
+        # Not installed as a command: the console script is obdeect.stream.cli, run as a module.
+        argv = cli.obdeect(
+            "-m",
+            "obdeect.stream.cli",
+            "propagation",
+            "run",
+            executable=sys.executable,
+            **options,
+            i=stream,
+            o=output,
+        )
+    return [str(arg) for arg in argv]
 
 
 def run_cli(case: dict, stream: Path, output: Path) -> dict:

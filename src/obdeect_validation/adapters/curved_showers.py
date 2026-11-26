@@ -44,7 +44,6 @@ import argparse
 import json
 import os
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -52,7 +51,7 @@ import numpy as np
 from eventio import EventIOFile
 from eventio.iact import IACTFile
 
-from obdeect_validation.adapters import chain_showers
+from obdeect_validation.adapters import chain_showers, common
 
 CURVED_LOG_PATTERN = "CURVED VERSION WITH SLIDING PLANAR ATMOSPHERE"
 GEOMETRIES = ("flat", "curved")
@@ -298,17 +297,7 @@ def write_card(
 
 def _execute(executable, card, log, cwd) -> None:
     """Run CORSIKA with the card on stdin; stdout and stderr go to log."""
-    with Path(card).open("rb") as stdin, Path(log).open("wb") as output:
-        result = subprocess.run(
-            [str(executable)],
-            cwd=cwd,
-            stdin=stdin,
-            stdout=output,
-            stderr=subprocess.STDOUT,
-            check=False,
-        )
-    if result.returncode:
-        raise RuntimeError(f"{executable} exited {result.returncode}; see {log}")
+    common.command([executable], log, cwd=cwd, stdin_file=card)
 
 
 def run_corsika(

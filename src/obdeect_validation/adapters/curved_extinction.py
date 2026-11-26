@@ -92,13 +92,19 @@ def parse_table(text: str) -> Table:
     )
 
 
+def _log_nodes(table: Table) -> tuple[np.ndarray, np.ndarray]:
+    """log10 of the table nodes (edges_m) and tau at the nodes, shape (n_wavelengths, n_nodes)."""
+    x = np.log10(table.edges_m)
+    nodes = np.concatenate([np.zeros((table.tau.shape[0], 1)), table.tau], axis=1)
+    return x, nodes
+
+
 def vertical_depth(table: Table, heights_m) -> np.ndarray:
     """Vertical optical depth tau(lambda, h) of the table, shape (n_wavelengths, n_heights)."""
     heights = np.atleast_1d(np.asarray(heights_m, dtype=float))
     if not np.all(np.isfinite(heights)) or np.any(heights < 0.0):
         raise ValueError("heights must be finite and not negative")
-    x = np.log10(table.edges_m)
-    nodes = np.concatenate([np.zeros((table.tau.shape[0], 1)), table.tau], axis=1)
+    x, nodes = _log_nodes(table)
     lh = np.log10(np.maximum(heights, 1.0))
     j = np.clip(np.searchsorted(x, lh, side="right") - 1, 0, x.size - 2)
     t = np.clip((lh - x[j]) / (x[j + 1] - x[j]), 0.0, 1.0)
@@ -107,8 +113,7 @@ def vertical_depth(table: Table, heights_m) -> np.ndarray:
 
 def segment_slopes(table: Table) -> np.ndarray:
     """a_j(lambda) = d tau / d log10(h) on each table segment, shape (n_wavelengths, n_heights)."""
-    x = np.log10(table.edges_m)
-    nodes = np.concatenate([np.zeros((table.tau.shape[0], 1)), table.tau], axis=1)
+    x, nodes = _log_nodes(table)
     return np.diff(nodes, axis=1) / np.diff(x)
 
 
@@ -322,23 +327,26 @@ def unit_variance(band, weight=None) -> float:
     return max(second - norm * norm, 0.0) / (norm * norm)
 
 
-def weighted_mean(values, photons) -> float:
-    """Photon-weighted mean of per-bunch values."""
-    values = np.asarray(values, dtype=float)
+def _photon_total(photons) -> tuple[np.ndarray, float]:
+    """Photons as float array and their positive total."""
     photons = np.asarray(photons, dtype=float)
     total = float(photons.sum())
     if not total > 0.0:
         raise ValueError("photon total must be positive")
+    return photons, total
+
+
+def weighted_mean(values, photons) -> float:
+    """Photon-weighted mean of per-bunch values."""
+    values = np.asarray(values, dtype=float)
+    photons, total = _photon_total(photons)
     return float(np.sum(photons * values) / total)
 
 
 def weighted_standard_error(variances, photons) -> float:
     """Standard error of the photon-weighted mean from the per-bunch wavelength variances."""
     variances = np.asarray(variances, dtype=float)
-    photons = np.asarray(photons, dtype=float)
-    total = float(photons.sum())
-    if not total > 0.0:
-        raise ValueError("photon total must be positive")
+    photons, total = _photon_total(photons)
     return float(math.sqrt(np.sum(photons * photons * variances)) / total)
 
 

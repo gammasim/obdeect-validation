@@ -146,8 +146,6 @@ def ids_of(wavelength) -> np.ndarray:
 
 
 def write_input(path: Path, columns: dict) -> Path:
-    from obdeect.stream import Writer
-
     run = {
         "run_number": 1,
         "observation_level_m": OBS_M,
@@ -159,17 +157,14 @@ def write_input(path: Path, columns: dict) -> Path:
         "wavelength_max_nm": 700.0,
         "curvature_applied": 0,
     }
-    with Writer(str(path), "obdeect validation: sphere extinction") as writer:
-        writer.write("run", run)
-        writer.write("event", {"event_number": 1})
-        writer.write("telescope", {"telescope_id": 1, "frame": 0, "array_index": 0})
-        writer.write_photons(1, "sky", 0, columns)
-        writer.write(
-            "telescope_end", {"telescope_id": 1, "photons": float(len(columns["x"]))}
-        )
-        writer.write("event_end", {})
-        writer.write("run_end", {})
-    return path
+    return streams.write_stream(
+        path,
+        "obdeect validation: sphere extinction",
+        run,
+        [(1, columns)],
+        photon_frame="sky",
+        telescope_extra={"array_index": 0},
+    )
 
 
 def photon_sets(seed: int = SEED) -> dict:

@@ -142,14 +142,6 @@ def run_trace(root, name, stream, model, timeout=300):
     return stages, out
 
 
-def add_input(parser):
-    parser.add_argument(
-        "--input",
-        type=Path,
-        default=common.VALIDATION / "inputs/gamma-20deg-20-100GeV.iact",
-    )
-
-
 def analyse(root, args):
     source = args.input.resolve()
     chain = cli.prepare_chain(root, source, zenith_deg=ZENITH_DEG)
@@ -272,7 +264,9 @@ def analyse(root, args):
 
 
 def main():
-    common.results_main(analyse, __doc__.split("\n")[0], add_arguments=add_input)
+    common.results_main(
+        analyse, __doc__.split("\n")[0], add_arguments=cli.input_argument
+    )
 
 
 if __name__ == "__main__":

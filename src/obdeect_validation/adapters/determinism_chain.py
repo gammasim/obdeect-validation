@@ -9,7 +9,6 @@ threads are only in the Python API (propagate(threads=)); the propagation CLI ha
 """
 
 import os
-from pathlib import Path
 
 from obdeect_validation.adapters import atmosphere_chain as atm
 from obdeect_validation.adapters import common
@@ -46,23 +45,10 @@ def compare(metrics, details, name, left, right):
     return result
 
 
-def add_input(parser):
-    parser.add_argument(
-        "--input",
-        type=Path,
-        default=common.VALIDATION / "inputs/gamma-20deg-20-100GeV.iact",
-    )
-
-
 def analyse(root, args):
     source = args.input.resolve()
-    band = atm.cherenkov_band(
-        source.with_suffix(".corsika.log").read_text(errors="replace")
-    )
-    cut = root / "cut-transmission.dat"
-    cut.write_text(
-        atm.cut_table(common.TRANSMISSION_TABLE.read_text(), atm.MAX_LAMBDA_NM)
-    )
+    chain = cli.prepare_chain(root, source, model=None, camera_map_text=None)
+    band, cut = chain.band, chain.cut
     metrics, details = (
         {},
         {
@@ -245,7 +231,9 @@ def analyse(root, args):
 
 
 def main():
-    common.results_main(analyse, __doc__.split("\n")[0], add_arguments=add_input)
+    common.results_main(
+        analyse, __doc__.split("\n")[0], add_arguments=cli.input_argument
+    )
 
 
 if __name__ == "__main__":

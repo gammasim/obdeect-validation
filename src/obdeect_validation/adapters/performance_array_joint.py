@@ -40,10 +40,11 @@ import numpy as np
 
 from obdeect_validation.adapters import chain_optics as co
 from obdeect_validation.adapters import chain_showers as cs
-from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import common
 from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters import performance_array as pa
 from obdeect_validation.adapters import performance_chain as pc
+from obdeect_validation.adapters import performance_common as pcm
 
 ARRAY = pa.ARRAY
 #: Photoelectron bias budget as in performance_array (checks of chain_showers).
@@ -225,7 +226,7 @@ def run_joint(root, work_root, source, config, reps, variants, metrics, details)
     config_dir = config.parent
     atmosphere_in = config_dir / pa.ATMOSPHERE_FILE
     atmosphere = work_root / "atmosphere-below-1000nm.dat"
-    performance.restrict_table(atmosphere_in, atmosphere)
+    pcm.restrict_table(atmosphere_in, atmosphere)
     inputs = {
         "config": config,
         "models": str(common.models_root()),
@@ -342,10 +343,7 @@ def run_joint(root, work_root, source, config, reps, variants, metrics, details)
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("case", choices=["air-shower-array-joint"])
-    parser.add_argument("--config", type=Path, required=True)
-    parser.add_argument("--input", type=Path, default=pa.INPUT)
-    parser.add_argument("--events", type=int, default=None)
-    parser.add_argument("--reps", type=int, default=1)
+    pcm.add_arguments(parser, input_default=pa.INPUT, reps_default=1)
     parser.add_argument("--variants", default=",".join(VARIANTS))
     args = parser.parse_args()
     variants = tuple(v for v in args.variants.split(",") if v)
@@ -356,19 +354,19 @@ def main():
         os.environ.get("PERF_WORK_DIR") or tempfile.mkdtemp(prefix="perf-joint-")
     )
     work_root.mkdir(parents=True, exist_ok=True)
-    showers = performance.select_input(
+    showers = pcm.select_input(
         args.input.resolve(), args.events, work_root / "showers-input.iact"
     )
     metrics = {}
-    load_before = performance.loadavg()
+    load_before = pcm.loadavg()
     if load_before is not None:
         metrics["host_loadavg_before"] = load_before
     details = {
         "case": args.case,
-        "host": performance.host_info(),
+        "host": pcm.host_info(),
         "settings": {
             "reps": args.reps,
-            "showers": performance.shower_count(showers),
+            "showers": pcm.shower_count(showers),
         },
         "threads": {},
         "stages": {},
@@ -384,7 +382,7 @@ def main():
         details["failures"]["run"] = traceback.format_exc()[-800:]
         raise
     finally:
-        load_after = performance.loadavg()
+        load_after = pcm.loadavg()
         if load_after is not None:
             metrics["host_loadavg_after"] = load_after
         metrics["timing_unreliable"], details["timing_reliability"] = (

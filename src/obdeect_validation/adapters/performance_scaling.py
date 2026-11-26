@@ -23,17 +23,15 @@ Usage (inside the container, in an empty case directory):
 from __future__ import annotations
 
 import argparse
-import os
-import shutil
 import statistics
-import tempfile
 from pathlib import Path
 
 import numpy as np
 
 from obdeect_validation.adapters import chain_optics as co
-from obdeect_validation.adapters import common, performance, performance_chain
+from obdeect_validation.adapters import common, performance_chain
 from obdeect_validation.adapters import obdeect_cli as cli
+from obdeect_validation.adapters import performance_common as pcm
 
 EVENTS = 10
 REPS = 3
@@ -226,7 +224,7 @@ def run_chain_once(work, iact, inputs, records, failures):
             records[stage].append(
                 performance_chain.run_timed(argv, log, stdout_file=stdout)
             )
-        except Exception as error:  # a failed stage is recorded; the chain stops here
+        except Exception as error:  # noqa: BLE001 a failed stage is recorded; the chain stops here
             failures.setdefault(stage, str(error))
             return [name for name, *_ in commands[position + 1 :]]
     return []
@@ -296,7 +294,7 @@ def measure_threads(work, nproc, reps):
                         argvs[k], thread_dir / f"threads{k}.log"
                     )
                 )
-            except Exception as error:
+            except Exception as error:  # noqa: BLE001
                 failures[k] = str(error)
         active = [k for k in active if k not in failures]
     for k in argvs:
@@ -340,19 +338,19 @@ def _plot(path, fits, thread_rows):
 
 def run_scaling(source, work, config, events, reps):
     """Measurements D and G in work. Returns (metrics, details, fits, thread_rows)."""
-    if performance.shower_count(source) < 2 * events:
+    if pcm.shower_count(source) < 2 * events:
         raise ValueError(
             f"{source} holds fewer than {2 * events} showers (2 x --events)"
         )
     inputs, _ = performance_chain.prepare_inputs(work, config)
-    host = performance.host_info()
+    host = pcm.host_info()
     nproc = host["nproc"]
     points, details_points, kept_by, runs = {}, {}, {}, {}
     for requested in (0, events, 2 * events):
         point = work / f"showers-{requested}"
         point.mkdir(parents=True, exist_ok=True)
         iact = point / "showers.iact"
-        kept_by[requested] = performance.subset_showers(source, iact, requested)
+        kept_by[requested] = pcm.subset_showers(source, iact, requested)
         runs[requested] = (point, iact)
     results = measure_points(runs, inputs, reps)
     for requested, (records, failures, skipped) in results.items():
@@ -401,40 +399,25 @@ def run_scaling(source, work, config, events, reps):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--config",
-        type=Path,
-        required=True,
-        help="CTAO.cfg of the LSTN-01 configuration (cfg/model/7.0.0/CTAO.cfg)",
+    pcm.add_arguments(
+        parser,
+        config_help="CTAO.cfg of the LSTN-01 configuration (cfg/model/7.0.0/CTAO.cfg)",
+        input_default=pcm.INPUT,
+        events_default=EVENTS,
+        events_help="N: the stages run on 0, N and 2N showers",
+        reps_default=REPS,
     )
-    parser.add_argument("--input", type=Path, default=performance.INPUT)
-    parser.add_argument(
-        "--events",
-        type=int,
-        default=EVENTS,
-        help="N: the stages run on 0, N and 2N showers",
-    )
-    parser.add_argument("--reps", type=int, default=REPS)
     args = parser.parse_args()
     if args.events < 1 or args.reps < 1:
         parser.error("--events and --reps must be at least 1")
     root = Path.cwd().resolve()
     # Stream files go to a container-local directory (PERF_WORK_DIR), not the bind-mounted results.
-    env_dir = os.environ.get("PERF_WORK_DIR")
-    base = Path(env_dir) if env_dir else Path(tempfile.mkdtemp(prefix="perf-scaling-"))
-    work = base / "scaling-work"
-    shutil.rmtree(work, ignore_errors=True)
-    work.mkdir(parents=True, exist_ok=True)
-    try:
+    with pcm.work_dir("perf-scaling-", "scaling-work") as work:
         metrics, details, fits, thread_rows = run_scaling(
             args.input.resolve(), work, args.config.resolve(), args.events, args.reps
         )
         _plot(root / "scaling.png", fits, thread_rows)
         common.write_results(metrics, details, root)
-    finally:
-        shutil.rmtree(work, ignore_errors=True)
-        if not env_dir:
-            shutil.rmtree(base, ignore_errors=True)
 
 
 if __name__ == "__main__":

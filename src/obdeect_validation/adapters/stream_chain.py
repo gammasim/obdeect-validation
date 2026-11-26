@@ -7,7 +7,6 @@ event and telescope (canonical digest of photons sorted by all columns, bit-exac
 """
 
 import hashlib
-import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -16,19 +15,6 @@ from obdeect.stream import Reader
 from obdeect_validation.adapters import chain_showers as chain
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import obdeect_cli as cli
-
-
-def run_stdin(argv, stdin_path, stdout_path, log):
-    with (
-        Path(stdin_path).open("rb") as stdin,
-        Path(stdout_path).open("wb") as output,
-        Path(log).open("wb") as err,
-    ):
-        result = subprocess.run(
-            list(map(str, argv)), stdin=stdin, stdout=output, stderr=err, check=False
-        )
-    if result.returncode:
-        raise RuntimeError(f"{argv[0]} exited {result.returncode}; see {log}")
 
 
 def canonical(path):
@@ -77,23 +63,23 @@ def variants(root, source, native):
         root / "var-cat-file.log",
         stdout_file=outputs["cat_file"],
     )
-    run_stdin(
+    common.command(
         cli.obdeect("stream", "cat", "-"),
-        native,
-        outputs["cat_stdin"],
         root / "var-cat-stdin.log",
+        stdin_file=native,
+        stdout_file=outputs["cat_stdin"],
     )
-    run_stdin(
+    common.command(
         cli.obdeect("stream", "tee", outputs["tee"]),
-        native,
-        root / "var-tee-stdout.gst",
         root / "var-tee.log",
+        stdin_file=native,
+        stdout_file=root / "var-tee-stdout.gst",
     )
-    run_stdin(
+    common.command(
         cli.from_corsika("-"),
-        source,
-        outputs["from_corsika_stdin"],
         root / "var-from-corsika.log",
+        stdin_file=source,
+        stdout_file=outputs["from_corsika_stdin"],
     )
     metrics = {
         f"variant_{name}_photon_mismatch": differing(reference, canonical(path))
@@ -103,11 +89,11 @@ def variants(root, source, native):
         reference, canonical(root / "var-tee-stdout.gst")
     )
     to_simtel_stdin = root / "var-to-simtel-stdin.iact"
-    run_stdin(
+    common.command(
         cli.obdeect("stream", "to-simtel", o=to_simtel_stdin, extra=["-"]),
-        native,
-        "/dev/null",
         root / "var-to-simtel.log",
+        stdin_file=native,
+        stdout_file="/dev/null",
     )
     to_simtel_file = root / "var-to-simtel-file.iact"
     common.command(

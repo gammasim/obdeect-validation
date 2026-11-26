@@ -32,8 +32,9 @@ import tempfile
 from pathlib import Path
 
 from obdeect_validation.adapters import chain_optics as co
-from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import common
 from obdeect_validation.adapters import obdeect_cli as cli
+from obdeect_validation.adapters import performance_common as pcm
 from obdeect_validation.adapters.performance_chain import (
     compile_argv,
     envelope_files,
@@ -305,7 +306,7 @@ def profile_stage(name, argv, stdout_file, perf, work, case_dir, metrics, detail
                 entry["report"] = stat.name
         if entry["mode"] is None:
             entry["mode"] = "timing"
-            record = performance.run_timed(
+            record = pcm.run_timed(
                 native_argv(argv), work / f"{name}-timing.log", stdout_file=stdout_file
             )
             entry["wall_s"] = record["wall_s"]
@@ -318,7 +319,7 @@ def main():
     parser.add_argument(
         "--config", type=Path, required=True, help="sim_telarray config from simtools"
     )
-    parser.add_argument("--input", type=Path, default=performance.INPUT)
+    parser.add_argument("--input", type=Path, default=pcm.INPUT)
     parser.add_argument("--events", type=int, default=5, help="first N showers")
     parser.add_argument(
         "--stage", choices=[*STAGES, "all"], default="all", help="stage to profile"
@@ -334,7 +335,7 @@ def main():
     metrics = {}
     details = {
         "case": "performance.profile",
-        "host": performance.host_info(),
+        "host": pcm.host_info(),
         "settings": {
             "events": args.events,
             "perf": perf or "not found",
@@ -345,10 +346,10 @@ def main():
         "profile": {},
     }
     try:
-        showers = performance.select_input(
+        showers = pcm.select_input(
             args.input.resolve(), args.events, work / "showers-input.iact"
         )
-        details["settings"]["showers"] = performance.shower_count(showers)
+        details["settings"]["showers"] = pcm.shower_count(showers)
         inputs, _ = prepare_inputs(work, args.config)
         details["settings"]["config"] = str(inputs["config"])
         envelope = envelope_files(

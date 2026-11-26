@@ -114,8 +114,6 @@ def horizontal_rows(n: int, seed: int) -> dict:
 
 
 def _write(path: Path, columns: dict, radius_m: float) -> Path:
-    from obdeect.stream import Writer
-
     run = {
         "run_number": 1,
         "observation_level_m": 0.0,
@@ -126,17 +124,14 @@ def _write(path: Path, columns: dict, radius_m: float) -> Path:
         "wavelength_min_nm": 250.0,
         "wavelength_max_nm": 800.0,
     }
-    with Writer(str(path), "obdeect validation: sphere optics") as writer:
-        writer.write("run", run)
-        writer.write("event", {"event_number": 1})
-        writer.write("telescope", {"telescope_id": 1, "frame": 0, "array_index": 0})
-        writer.write_photons(1, "sky", 0, columns)
-        writer.write(
-            "telescope_end", {"telescope_id": 1, "photons": float(len(columns["x"]))}
-        )
-        writer.write("event_end", {})
-        writer.write("run_end", {})
-    return path
+    return streams.write_stream(
+        path,
+        "obdeect validation: sphere optics",
+        run,
+        [(1, columns)],
+        photon_frame="sky",
+        telescope_extra={"array_index": 0},
+    )
 
 
 def propagate_pair(

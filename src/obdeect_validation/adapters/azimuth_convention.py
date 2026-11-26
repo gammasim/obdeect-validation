@@ -113,7 +113,6 @@ stream) and ``readers.read_iact`` (EventIO).
 
 from __future__ import annotations
 
-import argparse
 import math
 import re
 from pathlib import Path
@@ -206,11 +205,6 @@ def astro_unit(zenith_deg: float, azimuth_deg: float) -> np.ndarray:
     )
 
 
-def _installed(argv: list) -> list:
-    """argv of cli.obdeect with the obdeect executable found on PATH (common.tool) as argv[0]."""
-    return [common.tool("obdeect"), *argv[1:]]
-
-
 class Preset:
     """A preset run: how to call it and what its zenith/azimuth mean (see the docstring)."""
 
@@ -230,10 +224,14 @@ class Preset:
         return -travel if self.role == ROLE_SOURCE else travel
 
     def argv(self, azimuth_deg: float, out: Path) -> list:
-        return self.argv_builder(self.zenith_input, azimuth_deg) + ["-o", str(out)]
+        executable = common.tool("obdeect")
+        return self.argv_builder(self.zenith_input, azimuth_deg, executable) + [
+            "-o",
+            str(out),
+        ]
 
 
-def _muon_argv(zenith, azimuth):
+def _muon_argv(zenith, azimuth, executable):
     return cli.obdeect(
         "sources",
         "run",
@@ -248,10 +246,11 @@ def _muon_argv(zenith, azimuth):
         azimuth=str(azimuth),
         events="1",
         seed=str(SEED),
+        executable=executable,
     )
 
 
-def _shower_argv(zenith, azimuth):
+def _shower_argv(zenith, azimuth, executable):
     return cli.obdeect(
         "sources",
         "run",
@@ -274,10 +273,11 @@ def _shower_argv(zenith, azimuth):
         fluorescence_yield=str(SHOWER_FLUORESCENCE_YIELD),
         fluorescence_spectrum="fixed:wavelength_nm=337",
         seed=str(SEED),
+        executable=executable,
     )
 
 
-def _laser_argv(zenith, azimuth):
+def _laser_argv(zenith, azimuth, executable):
     return cli.obdeect(
         "sources",
         "run",
@@ -293,10 +293,11 @@ def _laser_argv(zenith, azimuth):
         rows="200",
         allow_direct_beam=True,
         seed=str(SEED),
+        executable=executable,
     )
 
 
-def _lidar_argv(zenith, azimuth):
+def _lidar_argv(zenith, azimuth, executable):
     return cli.obdeect(
         "sources",
         "run",
@@ -314,10 +315,11 @@ def _lidar_argv(zenith, azimuth):
         rows="128",
         allow_direct_beam=True,
         seed=str(SEED),
+        executable=executable,
     )
 
 
-def _beam_scan_argv(zenith, azimuth):
+def _beam_scan_argv(zenith, azimuth, executable):
     return cli.obdeect(
         "sources",
         "run",
@@ -334,10 +336,11 @@ def _beam_scan_argv(zenith, azimuth):
         beam_zenith=str(zenith),
         beam_azimuth=str(azimuth),
         seed=str(SEED),
+        executable=executable,
     )
 
 
-def _night_sky_argv(zenith, azimuth):
+def _night_sky_argv(zenith, azimuth, executable):
     return cli.obdeect(
         "sources",
         "run",
@@ -351,6 +354,7 @@ def _night_sky_argv(zenith, azimuth):
         telescope_zenith=str(zenith),
         telescope_azimuth=str(azimuth),
         seed=str(SEED),
+        executable=executable,
     )
 
 
@@ -369,7 +373,7 @@ def measure_preset(preset: Preset, azimuth_deg: float, root: Path) -> dict:
     """Run one preset at one azimuth, read its photons and return the measured direction."""
     tag = f"{preset.name}-az{int(azimuth_deg)}"
     out = root / f"{tag}.pst"
-    common.command(_installed(preset.argv(azimuth_deg, out)), root / f"{tag}.log")
+    common.command(preset.argv(azimuth_deg, out), root / f"{tag}.log")
     _, data = readers.read_native(
         out, keys=("cx", "cy", "cz", "w"), require_events=False
     )
@@ -459,7 +463,7 @@ def corsika_file(path: Path, root: Path) -> dict:
     stem = path.name.removesuffix(".iact")
     stream = root / f"{stem}.pst"
     common.command(
-        _installed(cli.from_corsika(str(path))),
+        cli.from_corsika(str(path), executable=common.tool("obdeect")),
         root / f"{stem}-from-corsika.log",
         stdout_file=stream,
     )
@@ -538,14 +542,14 @@ def version() -> str:
     return common.package_version("obdeect-sources")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+def add_arguments(parser) -> None:
     sub = parser.add_subparsers(dest="part", required=True)
     sub.add_parser("presets", help="presets at zenith 30 deg and four azimuths")
     corsika = sub.add_parser("corsika", help="CORSIKA IACT files against their logs")
     corsika.add_argument("inputs", nargs="+", type=Path, metavar="FILE.iact")
-    args = parser.parse_args()
-    root = Path.cwd()
+
+
+def analyse(root: Path, args) -> tuple[dict, dict]:
     if args.part == "presets":
         part = presets_part(root)
         metrics = {
@@ -580,7 +584,11 @@ def main() -> None:
             "corsika_tolerance_rad": CORSIKA_TOL_RAD,
             "files": part["files"],
         }
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__.splitlines()[0], add_arguments)
 
 
 if __name__ == "__main__":

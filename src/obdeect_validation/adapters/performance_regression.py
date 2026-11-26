@@ -1,6 +1,6 @@
 """Per-stage CPU cost per photon against a stored per-host baseline (case performance.regression).
 
-Five stages. Every child is timed with performance.run_timed (os.wait4: ru_utime + ru_stime of the
+Five stages. Every child is timed with pcm.run_timed (os.wait4: ru_utime + ru_stime of the
 child, threads 1). A stage's CPU is the sum over its children; the cost is CPU / photons.
 
   propagation           propagation run, extinction + refraction (fixture atmosphere and profile),
@@ -53,10 +53,7 @@ import argparse
 import json
 import math
 import os
-import platform
-import re
 import shutil
-import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -64,8 +61,9 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import common
 from obdeect_validation.adapters import obdeect_cli as cli
+from obdeect_validation.adapters import performance_common as pcm
 
 REPS = 5
 FLOOR = 0.05
@@ -127,46 +125,6 @@ class Stage:
 
 
 # --- host -------------------------------------------------------------------------------------
-
-
-def cpu_brand() -> str:
-    """CPU brand string: sysctl on macOS, /proc/cpuinfo 'model name' on Linux, else the processor."""
-    if sys.platform == "darwin":
-        try:
-            out = subprocess.run(
-                ["sysctl", "-n", "machdep.cpu.brand_string"],
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout.strip()
-            if out:
-                return out
-        except OSError, subprocess.CalledProcessError:
-            pass
-    try:
-        match = re.search(
-            r"^model name\s*:\s*(.+)$",
-            Path("/proc/cpuinfo").read_text(),
-            re.MULTILINE,
-        )
-        if match:
-            return match[1].strip()
-    except OSError:
-        pass
-    return platform.processor() or platform.machine()
-
-
-def host_key(system: str, machine: str, brand: str) -> str:
-    """Stable file-name key of a host: platform, machine and CPU brand, sanitised."""
-    text = "-".join(part for part in (system, machine, brand) if part)
-    key = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
-    if not key:
-        raise ValueError("host key is empty: platform, machine and CPU brand unknown")
-    return key
-
-
-def current_host_key() -> str:
-    return host_key(platform.system(), platform.machine(), cpu_brand())
 
 
 def default_baseline(key: str) -> Path:
@@ -526,10 +484,10 @@ def prepare(work: Path) -> dict[str, Stage]:
     )
     sphere = write_sphere(work / "sphere.pst", SPHERE_PER_TELESCOPE, dish, 103)
     ground = write_ground(work / "ground.pst", GROUND_ROWS, 104)
-    sphere_rows = performance.stream_weight(sphere)[0]
-    ground_rows = performance.stream_weight(ground)[0]
-    sky_rows = performance.stream_weight(sky_wide)[0]
-    scatter_rows = performance.stream_weight(sky_scatter)[0]
+    sphere_rows = pcm.stream_weight(sphere)[0]
+    ground_rows = pcm.stream_weight(ground)[0]
+    sky_rows = pcm.stream_weight(sky_wide)[0]
+    scatter_rows = pcm.stream_weight(sky_scatter)[0]
     if sphere_rows != SPHERE_PER_TELESCOPE * len(dish):
         raise RuntimeError(f"sphere input has {sphere_rows} rows")
     if ground_rows != GROUND_ROWS:
@@ -538,7 +496,7 @@ def prepare(work: Path) -> dict[str, Stage]:
         raise RuntimeError("sky input has an unexpected number of rows")
     flasher_out = work / "flasher-untimed.pst"
     common.command(flasher_argv(flasher_out), work / "flasher-untimed.log")
-    flasher_rows = performance.stream_weight(flasher_out)[0]
+    flasher_rows = pcm.stream_weight(flasher_out)[0]
 
     model_args = []
     for index, name in enumerate(MODEL_NAMES, start=1):
@@ -659,7 +617,7 @@ def run_stage(stage: Stage, work: Path) -> float:
     """CPU seconds of one pass of the stage (sum of its children; wall is not used)."""
     cpu = 0.0
     for child in stage.children:
-        record = performance.run_timed(
+        record = pcm.run_timed(
             list(child.argv),
             work / child.log,
             stdout_file=(work / child.stdout) if child.stdout else None,
@@ -676,7 +634,7 @@ def measure(work: Path, reps: int) -> tuple[dict, dict]:
     stages = prepare(work)
     samples: dict[str, list[float]] = {name: [] for name in stages}
     failures: dict[str, str] = {}
-    loads = {"before": performance.loadavg()}
+    loads = {"before": pcm.loadavg()}
     for _ in range(reps):
         for name, stage in stages.items():
             if name in failures:
@@ -685,7 +643,7 @@ def measure(work: Path, reps: int) -> tuple[dict, dict]:
                 samples[name].append(run_stage(stage, work))
             except (RuntimeError, OSError) as error:
                 failures[name] = str(error)[:400]
-    loads["after"] = performance.loadavg()
+    loads["after"] = pcm.loadavg()
     measured = {
         name: summarise(samples[name], stages[name].photons)
         for name in stages
@@ -707,9 +665,9 @@ def measure(work: Path, reps: int) -> tuple[dict, dict]:
 
 def run_host() -> dict:
     """Host record of the baseline and the case."""
-    info = performance.host_info()
-    info["cpu_brand"] = cpu_brand()
-    info["host_key"] = current_host_key()
+    info = pcm.host_info()
+    info["cpu_brand"] = pcm.cpu_brand()
+    info["host_key"] = pcm.current_host_key()
     return info
 
 
@@ -750,7 +708,7 @@ def cmd_baseline(args) -> int:
 
 
 def cmd_compare(args) -> int:
-    key = current_host_key()
+    key = pcm.current_host_key()
     path = Path(args.baseline) if args.baseline else default_baseline(key)
     measured, details, work = _run(args.reps)
     baseline_stages: dict = {}

@@ -12,6 +12,7 @@ from eventio.iact import IACTFile
 from obdeect.stream import Reader, Writer
 
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 
 FIXTURE = Path(__file__).with_name("compare-led-camera.txt")
 HEADER_ORDER = [
@@ -108,48 +109,35 @@ def main():
     shutil.copyfile(FIXTURE, camera)
     camera_map.write_text("1 1 0\n", encoding="utf-8")
     subprocess.run(
-        [
-            obdeect,
+        cli.obdeect(
             "sources",
             "run",
             "led",
-            "--camera-file",
-            str(camera),
-            "--use",
-            "0 1 2",
-            "--require",
-            "2",
-            "--photons",
-            "10",
-            "--seed",
-            "17",
-            "--observation-level",
-            "2150",
-            "--atmosphere-id",
-            "1",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--camera-radius",
-            "1.23",
-            "-o",
-            str(source),
-        ],
+            executable=obdeect,
+            camera_file=str(camera),
+            use="0 1 2",
+            require="2",
+            photons="10",
+            seed="17",
+            observation_level="2150",
+            atmosphere_id="1",
+            spectrum="fixed:wavelength_nm=400",
+            camera_radius="1.23",
+            o=str(source),
+        ),
         check=True,
     )
     _add_zem(source, prepared)
     subprocess.run(
-        [
-            obdeect,
+        cli.obdeect(
             "stream",
             "to-simtel",
-            "--camera-map",
-            str(camera_map),
-            "--atmprof",
-            str(profile),
-            str(prepared),
-            "-o",
-            str(converted),
-        ],
+            executable=obdeect,
+            camera_map=str(camera_map),
+            atmprof=str(profile),
+            o=str(converted),
+            extra=[str(prepared)],
+        ),
         check=True,
     )
 

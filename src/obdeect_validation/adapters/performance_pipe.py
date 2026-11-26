@@ -27,11 +27,11 @@ from pathlib import Path
 
 from obdeect_validation.adapters import (
     common,
-    performance,
     performance_budget,
     performance_chain,
 )
 from obdeect_validation.adapters import obdeect_cli as cli
+from obdeect_validation.adapters import performance_common as pcm
 
 REPS = 3
 
@@ -96,7 +96,7 @@ def measure_pipe(name, stages, native_bytes, reps, work, metrics, details):
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, default=performance.INPUT)
+    parser.add_argument("--input", type=Path, default=pcm.INPUT)
     parser.add_argument(
         "--events", type=int, default=None, help="first N showers (default all)"
     )
@@ -106,7 +106,7 @@ def main() -> None:
     work_dir = os.environ.get("PERF_WORK_DIR")
     work = Path(work_dir or tempfile.mkdtemp(prefix="perf-pipe-"))
     work.mkdir(parents=True, exist_ok=True)
-    source = performance.select_input(
+    source = pcm.select_input(
         args.input.resolve(), args.events, work / "showers-input.iact"
     )
     native = work / "showers.gst"
@@ -118,13 +118,13 @@ def main() -> None:
     native_bytes = native.stat().st_size
     metrics: dict = {}
     details: dict = {
-        "host": performance.host_info(),
+        "host": pcm.host_info(),
         "pipes": {},
         "failures": {},
         "settings": {
             "reps": args.reps,
             "input": str(source),
-            "events": performance.shower_count(source),
+            "events": pcm.shower_count(source),
             "work_dir": str(work),
             "native_stream_bytes": native_bytes,
             "limit_gb_per_s": performance_budget.PIPE_LIMIT_GB_PER_S,

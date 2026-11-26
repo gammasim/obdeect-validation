@@ -323,9 +323,10 @@ def run(work):
         viewcone_deg=str(viewcone),
         telescope_position="0,0,0",
         telescope_radius=str(radius),
+        executable=common.tool("obdeect"),
         o=str(native_file),
     )
-    common.run_tool([common.tool("obdeect"), *argv[1:]], work / "native-sources.log")
+    common.run_tool(argv, work / "native-sources.log")
     camera_input = sc.propagate_to_simtel(
         work, native_file, sc.NIGHT["altitude_m"], sc.NIGHT["band_nm"], sc.NIGHT["seed"]
     )
