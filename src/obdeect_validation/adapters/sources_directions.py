@@ -28,7 +28,6 @@ the plane). The kept photons have P(r < R | kept) = 1 - c(R).
 from __future__ import annotations
 
 import argparse
-import importlib.metadata
 import math
 from pathlib import Path
 
@@ -639,10 +638,7 @@ def plot_plane_wave(path: Path, targets: np.ndarray) -> None:
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-sources")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-sources")
 
 
 def run_all(

@@ -1,12 +1,12 @@
 {
   "id": "chain.optics-bypass1-60deg",
-  "name": "CORSIKA -> obdeect trace-stream -> sim_telarray Bypass_Optics (candidate) vs direct sim_telarray, LSTN-01 North, zenith 60 deg, N->E azimuth 180 deg, gamma, unit atmosphere",
+  "name": "CORSIKA -> obdeect trace-stream -> sim_telarray Bypass_Optics (candidate) vs direct sim_telarray, LSTN-01 North, zenith 60 deg, N->E azimuth 180 deg, gamma, unit atmosphere NOTE: energy range 300-5000 GeV differs from chain.optics-bypass1-40deg (100-3000 GeV), so the zenith dependence of the two cases is not isolated.",
   "requires": [
     "obdeect",
     "simtools-generate-array-config"
   ],
   "inputs": [
-    "/validation/inputs/gamma-60deg-300-5000GeV.iact"
+    "{validation}/inputs/gamma-60deg-300-5000GeV.iact"
   ],
   "commands": [
     {
@@ -41,7 +41,7 @@
         "--model-version",
         "7.0.0",
         "--input",
-        "/validation/inputs/gamma-60deg-300-5000GeV.iact",
+        "{validation}/inputs/gamma-60deg-300-5000GeV.iact",
         "--azimuth",
         "180"
       ],

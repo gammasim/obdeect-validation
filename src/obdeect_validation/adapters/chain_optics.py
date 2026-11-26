@@ -370,6 +370,8 @@ def candidate_stream(
             "run",
             "--transmission",
             propagation_table(root),
+            "--pathlen",
+            "0",
             "--site-altitude",
             f"{site_altitude_m:g}",
             "--seed",

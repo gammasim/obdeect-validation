@@ -243,6 +243,8 @@ def _propagate(work, primary, out, transmission, table, mode, scattering):
         "run",
         "--transmission",
         str(transmission),
+        "--pathlen",
+        "0",
         "--site-altitude",
         SWEEP["altitude"],
         "--wavelength-range",

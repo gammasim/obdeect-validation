@@ -17,10 +17,11 @@ import numpy as np
 from obdeect_validation.adapters import common, readers
 from obdeect_validation.adapters.chain_showers import camera_events, simulate
 from obdeect_validation.adapters.common import REFERENCE, run_tool, tool
+from obdeect_validation.adapters.source_camera import KS_P_LIMIT, _ks_flag
 
 C_M_NS = 0.299792458
 ALPHA = 0.0072973526
-KS_ALPHA = 1e-3
+KS_ALPHA = KS_P_LIMIT  # critical distances are quoted at the same level as the flags
 RATIO_FLOOR = 0.01
 FWHM_TO_SIGMA = 2.35482004503095
 
@@ -96,6 +97,14 @@ def ks_critical(n, m=None, alpha=KS_ALPHA):
     """Critical KS distance at significance alpha (asymptotic); one or two samples."""
     c = math.sqrt(-0.5 * math.log(alpha / 2.0))
     return c / math.sqrt(n) if m is None else c * math.sqrt((n + m) / (n * m))
+
+
+def ks_pvalue(statistic, n, m=None):
+    """Asymptotic p-value of the KS distance: Q_KS(sqrt(n_eff) D), n_eff = n m / (n + m)."""
+    from scipy.special import kolmogorov
+
+    n_eff = n if m is None else n * m / (n + m)
+    return float(kolmogorov(math.sqrt(n_eff) * statistic))
 
 
 def ratio_limit(ratio_se):
@@ -350,10 +359,17 @@ def flag(metrics, name, value, limit):
     metrics[f"{name}_limit_exceeded"] = int(abs(value) > limit)
 
 
-def ks_flags(metrics, name, statistic, critical):
+def ks_flags(metrics, name, statistic, n, m=None):
+    """KS distance, its p-value and the shape flag (p below KS_P_LIMIT, as source_camera).
+
+    The critical distance at KS_P_LIMIT is recorded next to the p-value for reference; the
+    flag is set by the p-value, not by comparing D with the critical distance.
+    """
+    p_value = ks_pvalue(statistic, n, m)
     metrics[f"{name}_ks"] = float(statistic)
-    metrics[f"{name}_ks_critical"] = float(critical)
-    metrics[f"{name}_ks_limit_exceeded"] = int(statistic > critical)
+    metrics[f"{name}_ks_critical"] = ks_critical(n, m)
+    metrics[f"{name}_ks_pvalue"] = p_value
+    metrics[f"{name}_ks_limit_exceeded"] = _ks_flag(p_value)
 
 
 def write_outputs(metrics, details, plot, plot_path, rows=2, columns=2):
@@ -541,19 +557,20 @@ def muon_track(work):
         metrics,
         "wavelength_native_vs_analytic",
         ks_one_sample(native["wavelength"], wl_cdf),
-        ks_critical(native["wavelength"].size),
+        native["wavelength"].size,
     )
     ks_flags(
         metrics,
         "wavelength_reference_vs_analytic",
         ks_one_sample(reference["wavelength"], wl_cdf),
-        ks_critical(reference["wavelength"].size),
+        reference["wavelength"].size,
     )
     ks_flags(
         metrics,
         "wavelength_native_vs_reference",
         ks_statistic(native["wavelength"], reference["wavelength"]),
-        ks_critical(native["wavelength"].size, reference["wavelength"].size),
+        native["wavelength"].size,
+        reference["wavelength"].size,
     )
 
     # Azimuth around the track (uniform for Cherenkov light) and direction against reference.
@@ -563,13 +580,13 @@ def muon_track(work):
         metrics,
         "azimuth_native_vs_analytic",
         ks_one_sample(azimuth_n, lambda x: x),
-        ks_critical(azimuth_n.size),
+        azimuth_n.size,
     )
     ks_flags(
         metrics,
         "azimuth_reference_vs_analytic",
         ks_one_sample(azimuth_r, lambda x: x),
-        ks_critical(azimuth_r.size),
+        azimuth_r.size,
     )
     # cz spans only ~2e-5 around cos(theta_c) and is stored as float32 (6e-8 resolution): the KS distance is
     # reported but not limited; the mean is limited at the float32 quantum and the 5 se.
@@ -589,7 +606,8 @@ def muon_track(work):
         metrics,
         "obs_plane_xy_radius_native_vs_reference",
         ks_statistic(radial_n, radial_r),
-        ks_critical(radial_n.size, radial_r.size),
+        radial_n.size,
+        radial_r.size,
     )
 
     # Time: arrival at the telescope plane z = 0 (IACT time = emission time + optical path to z = 0, air
@@ -627,7 +645,8 @@ def muon_track(work):
         metrics,
         "time_native_vs_analytic",
         ks_statistic(t_native, t_expected_native),
-        ks_critical(t_native.size, t_expected_native.size),
+        t_native.size,
+        t_expected_native.size,
     )
     # Recorded, not judged: sim_telarray against the analytic arrival and native against reference KS.
     metrics["time_reference_vs_analytic_mean_difference_ns"] = float(
@@ -689,7 +708,7 @@ def muon_track(work):
                 "yield": "max(0.01, 5 se) (task rule)",
                 "cherenkov_cos": "max(1e-6, 5 se): float32 directions and 5e-8 index table precision",
                 "time_mean": "max(0.05 ns, 5 se): float32 timestamps",
-                "ks": "two-sample / one-sample KS at alpha=1e-3 (statistical)",
+                "ks": "two-sample / one-sample KS, p-value below 1e-4 (statistical, source_camera policy)",
                 "camera": "max(0.01, 5 se) on the relative p.e. per event ratio (task rule)",
             },
             "limit_setting": "Set before the first run: yield, Cherenkov angle, wavelength, azimuth, camera ratio. "
@@ -907,19 +926,20 @@ def night_sky(work):
         metrics,
         "cone_uniform_native_vs_analytic",
         ks_one_sample(uniform_n, lambda x: x),
-        ks_critical(uniform_n.size),
+        uniform_n.size,
     )
     ks_flags(
         metrics,
         "cone_uniform_reference_vs_analytic",
         ks_one_sample(uniform_r, lambda x: x),
-        ks_critical(uniform_r.size),
+        uniform_r.size,
     )
     ks_flags(
         metrics,
         "cz_native_vs_reference",
         ks_statistic(dirs_n[:, 2], dirs_r[:, 2]),
-        ks_critical(dirs_n.shape[0], dirs_r.shape[0]),
+        dirs_n.shape[0],
+        dirs_r.shape[0],
     )
 
     # Impact density on the projected sphere: an isotropic flux is uniform in projected area,
@@ -938,26 +958,27 @@ def night_sky(work):
         metrics,
         "projected_area_uniform_native_vs_analytic",
         ks_one_sample(np.clip(rho2_n, 0, 1), lambda x: x),
-        ks_critical(rho2_n.size),
+        rho2_n.size,
     )
     ks_flags(
         metrics,
         "projected_area_uniform_reference_vs_analytic",
         ks_one_sample(np.clip(rho2_r, 0, 1), lambda x: x),
-        ks_critical(rho2_r.size),
+        rho2_r.size,
     )
     ks_flags(
         metrics,
         "impact_parameter_native_vs_reference",
         ks_statistic(b_n, b_r),
-        ks_critical(b_n.size, b_r.size),
+        b_n.size,
+        b_r.size,
     )
     # Analytic CDF of b/R = ri for an area-uniform disc (ri^2 uniform): P(ri <= r) = r^2.
     ks_flags(
         metrics,
         "impact_parameter_native_vs_sampler",
         ks_one_sample(np.clip(b_n / radius, 0, 1), lambda r: r * r),
-        ks_critical(b_n.size),
+        b_n.size,
     )
 
     # Time: arrival at the sphere-centre plane (perpendicular to the ray through the origin) for both,
@@ -974,19 +995,20 @@ def night_sky(work):
         metrics,
         "time_native_vs_pulse",
         ks_one_sample(t_centre, pulse_cdf),
-        ks_critical(t_centre.size),
+        t_centre.size,
     )
     ks_flags(
         metrics,
         "time_reference_vs_pulse",
         ks_one_sample(t_ref_centre, pulse_cdf),
-        ks_critical(t_ref_centre.size),
+        t_ref_centre.size,
     )
     ks_flags(
         metrics,
         "time_native_vs_reference",
         ks_statistic(t_centre, t_ref_centre),
-        ks_critical(t_centre.size, t_ref_centre.size),
+        t_centre.size,
+        t_ref_centre.size,
     )
     mean_diff, se_diff = time_difference(t_centre, t_ref_centre)
     flag(metrics, "time_mean_difference_ns", mean_diff, max(0.05, 5 * se_diff))
@@ -1034,9 +1056,9 @@ def night_sky(work):
             },
             "physics_limits": {
                 "yield_and_rate": "max(0.01, 5 se) with se=0: fixed photon count per event in both",
-                "cone_and_direction": "KS alpha=1e-3",
+                "cone_and_direction": "KS p-value below 1e-4",
                 "projected_area": "for a fixed direction an isotropic flux is uniform over the disc perpendicular to d, "
-                "so b^2 is uniform on [0, R^2] (checked with a numpy toy MC: KS 0.002 at 2e5 rays); KS alpha=1e-3. "
+                "so b^2 is uniform on [0, R^2] (checked with a numpy toy MC: KS 0.002 at 2e5 rays); KS p-value below 1e-4. "
                 "Impact parameter native vs sampler: analytic CDF of b/R is r^2",
                 "time_mean": "max(0.05 ns, 5 se)",
                 "camera": "max(0.01, 5 se) on the relative p.e. per event ratio (task rule)",

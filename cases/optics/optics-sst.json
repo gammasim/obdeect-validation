@@ -2,12 +2,15 @@
   "id": "optics.sst-7.0.0",
   "name": "Optics SSTS-01 (dual mirror) (model 7.0.0): simtools sim_telarray vs obdeect, offsets 0-4 deg, N/E",
   "requires": ["simtools-validate-optics"],
-  "commands": [{"name": "matched-backends", "timeout": 3600, "argv": ["{python}", "-m", "obdeect_validation.adapters.simtools_validate_optics", "--config", "/validation/fixtures/optics-inputs/optics-sst.json"]}],
+  "commands": [{"name": "matched-backends", "timeout": 3600, "argv": ["{python}", "-m", "obdeect_validation.adapters.simtools_validate_optics", "--config", "{validation}/fixtures/optics-inputs/optics-sst.json"]}],
   "metrics": [
     {"metric": "n_offsets", "expected": 9, "atol": 0},
     {"metric": "psf_cm_limit_exceeded", "expected": 0, "atol": 0},
     {"metric": "eff_area_limit_exceeded", "expected": 0, "atol": 0},
     {"metric": "eff_flen_limit_exceeded", "expected": 0, "atol": 0},
-    {"metric": "exceeded_limits", "expected": 0, "atol": 0}
+    {"metric": "exceeded_limits", "expected": 0, "atol": 0},
+    {"metric": "psf_cm_underpowered", "expected": 0, "atol": 0},
+    {"metric": "eff_area_underpowered", "expected": 0, "atol": 0},
+    {"metric": "eff_flen_underpowered", "expected": 0, "atol": 0}
   ]
 }

@@ -44,12 +44,7 @@ DIRECTION_GATE = 1e-6
 
 
 def version() -> str:
-    try:
-        import importlib.metadata
-
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 def upward_cases(prof: uc.Profile):

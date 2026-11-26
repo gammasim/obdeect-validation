@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+
 from obdeect_validation.adapters import curved_extinction as ce
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"

@@ -1,0 +1,41 @@
+{
+  "id": "determinism.golden-outputs",
+  "name": "Determinism: 23 outputs of seven fixed obdeect pipelines (sky, dual mirror, ground sphere, curvature and dispersion, CORSIKA, events 1-2, compile) bit-identical to the frozen baseline of this platform",
+  "requires": [
+    "obdeect"
+  ],
+  "commands": [
+    {
+      "name": "golden-outputs",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.golden_outputs",
+        "run"
+      ],
+      "timeout": 900
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "outputs_mismatch",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "outputs_missing",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "pipeline_failures",
+      "expected": 0,
+      "atol": 0
+    },
+    {
+      "metric": "baseline_missing",
+      "expected": 0,
+      "atol": 0
+    }
+  ]
+}

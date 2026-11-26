@@ -1,0 +1,14 @@
+{
+  "id": "regression",
+  "cases": [
+    "../cases/determinism/golden-outputs.json",
+    "../cases/robustness/stream-rejections.json",
+    "../cases/robustness/event-numbers.json",
+    "../cases/propagation/loss-accounting.json",
+    "../cases/propagation/refraction-high-zenith.json",
+    "../cases/sources/emission-profiles.json",
+    "../cases/sources/targets.json",
+    "../cases/sources/azimuth-convention.json",
+    "../cases/optics/optics-obscurer-analytic.json"
+  ]
+}

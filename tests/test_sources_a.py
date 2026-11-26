@@ -154,3 +154,21 @@ def test_plotted_times_are_the_compared_arrival_times():
     assert abs(t_native.mean() - t_reference.mean()) < 0.5
     m = sc.emission_metrics([1000.0], native, [1000.0], reference, "geometric")
     assert m["t_mean_native"] == pytest.approx(np.mean(t_native))
+
+
+def test_ks_gate_is_significance_only():
+    # Fail below KS_P_LIMIT, pass above it, whatever the distance D (kept in the details).
+    assert sc.KS_P_LIMIT == 1e-4
+    assert sc._ks_flag(1e-5) == 1
+    assert sc._ks_flag(1e-3) == 0
+    assert sc._ks_flag(1.0) == 0
+
+
+def test_ks_gate_flags_significant_small_shift():
+    # Large samples: a shift of 0.02 sd gives D < 0.01 but is highly significant. The old gate
+    # (D >= 0.01 AND p <= 1e-3) passed this; the significance gate must flag it.
+    rng = np.random.default_rng(7)
+    d, p = sc._ks(rng.normal(0.0, 1.0, 200000), rng.normal(0.02, 1.0, 200000))
+    assert d < 0.01
+    assert p < sc.KS_P_LIMIT
+    assert sc._ks_flag(p) == 1

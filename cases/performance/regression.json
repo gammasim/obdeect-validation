@@ -1,0 +1,26 @@
+{
+  "id": "performance.regression",
+  "name": "Per-stage CPU cost per photon of obdeect (propagation, scattering, trace-stream of LSTN-01/MSTN-01/SSTS-01, stream cat and to-simtel, flasher dish), best of 5 repetitions, threads 1, against the stored baseline of this host (no regression: ratio <= 1 + max(0.05, 3 x spread))",
+  "requires": [
+    "obdeect",
+    "python3"
+  ],
+  "commands": [
+    {
+      "name": "measure-regression",
+      "argv": [
+        "{python}",
+        "-m",
+        "obdeect_validation.adapters.performance_regression",
+        "compare"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "metrics": [
+    {"metric": "regressions", "expected": 0, "atol": 0},
+    {"metric": "baseline_missing", "expected": 0, "atol": 0},
+    {"metric": "stages_failed", "expected": 0, "atol": 0},
+    {"metric": "stages_completed", "expected": 5, "atol": 0}
+  ]
+}

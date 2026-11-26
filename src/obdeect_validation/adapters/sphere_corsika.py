@@ -26,8 +26,6 @@ reader (long format: x, y, zem in cm, time in ns).
 
 from __future__ import annotations
 
-import argparse
-import importlib.metadata
 import math
 import struct
 import subprocess
@@ -47,10 +45,7 @@ CM = 0.01
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-stream")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-stream")
 
 
 # ----------------------------------------------------------------- EventIO, independent reader
@@ -466,10 +461,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    metrics, details = run_all(Path.cwd())
-    common.write_results(metrics, details, Path.cwd())
+    common.results_main(run_all, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

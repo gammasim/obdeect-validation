@@ -18,7 +18,6 @@ Case propagation.upward-extinction. Upward photons (cz > 0) below the telescope,
 from __future__ import annotations
 
 import argparse
-import importlib.metadata
 import itertools
 import math
 from pathlib import Path
@@ -50,10 +49,7 @@ C_SITE_M = uc.SITE_M
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 def upward_sample(rng, n: int) -> dict:
@@ -184,6 +180,7 @@ def run(
         site_altitude_m=uc.SITE_M,
         seed=1,
         mode="weighted",
+        pathlen_m=0.0,  # the reference has no in-telescope path (T uses the telescope height)
         **options,
     )
     return stream, out, summary

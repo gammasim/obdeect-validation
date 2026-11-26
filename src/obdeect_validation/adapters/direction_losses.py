@@ -20,8 +20,6 @@ output rows of the reaching categories (zem identifies them) are exactly the exp
 
 from __future__ import annotations
 
-import argparse
-import importlib.metadata
 import math
 from pathlib import Path
 
@@ -56,10 +54,7 @@ AZIMUTH_DEG = 70.0
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 def population():
@@ -178,11 +173,7 @@ def analyse(root: Path) -> tuple[dict, dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
-    metrics, details = analyse(root)
-    common.write_results(metrics, details, root)
+    common.results_main(analyse, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

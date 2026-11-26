@@ -6,7 +6,7 @@
     "simtools-generate-array-config"
   ],
   "inputs": [
-    "/validation/inputs/gamma-20deg-South-100-3000GeV.iact"
+    "{validation}/inputs/gamma-20deg-South-100-3000GeV.iact"
   ],
   "commands": [
     {
@@ -41,7 +41,7 @@
         "--model-version",
         "7.0.0",
         "--input",
-        "/validation/inputs/gamma-20deg-South-100-3000GeV.iact",
+        "{validation}/inputs/gamma-20deg-South-100-3000GeV.iact",
         "--azimuth",
         "180"
       ],

@@ -26,8 +26,6 @@ stored cz is computed the same way and rounded to float32, so both conventions a
 
 from __future__ import annotations
 
-import argparse
-import importlib.metadata
 import math
 from pathlib import Path
 
@@ -60,10 +58,7 @@ ID_STEP_NM = np.float32(0.01)
 
 
 def version() -> str:
-    try:
-        return importlib.metadata.version("obdeect-propagation")
-    except importlib.metadata.PackageNotFoundError:
-        return "unknown"
+    return common.package_version("obdeect-propagation")
 
 
 def unit(v) -> np.ndarray:
@@ -481,13 +476,7 @@ def run_obdeect(
         threads=threads,
         **kwargs,
     )
-    return summary, read_rows(out), out
-
-
-def read_rows(path) -> dict:
-    """Rows of the output by photon index: columns (float32) and run key and run_end metadata."""
-    rows = e2e.photon_rows(path)
-    return rows
+    return summary, e2e.photon_rows(out), out
 
 
 def match_by_index(rows: dict, n: int) -> dict:
@@ -780,10 +769,7 @@ def turning_reference(columns: dict) -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    metrics, details = run_all(Path.cwd())
-    common.write_results(metrics, details, Path.cwd())
+    common.results_main(run_all, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

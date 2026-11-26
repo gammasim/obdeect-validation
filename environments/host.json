@@ -1,0 +1,17 @@
+{
+  "env": {},
+  "requires": [
+    "cc",
+    "obdeect",
+    "python3"
+  ],
+  "modules": [
+    "eventio",
+    "numpy",
+    "obdeect.propagation",
+    "obdeect.ray_tracing",
+    "obdeect.sources",
+    "obdeect.stream",
+    "scipy"
+  ]
+}

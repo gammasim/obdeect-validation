@@ -538,9 +538,9 @@ def test_loadavg_is_none_where_the_host_does_not_report_it(monkeypatch) -> None:
         raise OSError("no load average")
 
     monkeypatch.setattr(performance_chain.os, "getloadavg", unavailable)
-    assert performance_chain.loadavg() is None
+    assert performance.loadavg() is None
     monkeypatch.delattr(performance_chain.os, "getloadavg")
-    assert performance_chain.loadavg() is None
+    assert performance.loadavg() is None
 
 
 def test_normalised_metrics_per_shower_per_photon_and_cpu_shares() -> None:

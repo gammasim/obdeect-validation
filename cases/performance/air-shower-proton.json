@@ -7,7 +7,7 @@
     "python3"
   ],
   "inputs": [
-    "/validation/inputs/proton-20deg-300-10000GeV.iact"
+    "{validation}/inputs/proton-20deg-300-10000GeV.iact"
   ],
   "commands": [
     {
@@ -37,7 +37,7 @@
         "--config",
         "cfg/model/7.0.0/CTAO.cfg",
         "--input",
-        "/validation/inputs/proton-20deg-300-10000GeV.iact"
+        "{validation}/inputs/proton-20deg-300-10000GeV.iact"
       ],
       "timeout": 7200
     }

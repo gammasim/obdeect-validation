@@ -57,7 +57,6 @@ import statistics
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 import traceback
 from pathlib import Path
@@ -375,21 +374,7 @@ def run_fan_out(pipe, branches, logs):
             [sampler for _, _, _, sampler in running if sampler],
         )
         raise
-    exits = {}
-
-    def wait(name, proc, sampler):
-        _, status, usage = os.wait4(proc.pid, 0)
-        sampled_kb = sampler.stop() if sampler else None
-        exits[name] = (time.perf_counter() - start, status, usage, sampled_kb)
-
-    waiters = [
-        threading.Thread(target=wait, args=(name, proc, sampler))
-        for name, _, proc, sampler in running
-    ]
-    for waiter in waiters:
-        waiter.start()
-    for waiter in waiters:
-        waiter.join()
+    exits = pc.wait_for_children(running, start)
     rss_divisor = 1024 * 1024 if sys.platform == "darwin" else 1024
     children = []
     for name, argv, proc, _ in running:
@@ -829,7 +814,7 @@ def main():
         args.input.resolve(), args.events, work_root / "showers-input.iact"
     )
     metrics = {}
-    load_before = pc.loadavg()
+    load_before = performance.loadavg()
     if load_before is not None:
         metrics["host_loadavg_before"] = load_before
     details = {
@@ -852,7 +837,7 @@ def main():
         details["failures"]["run"] = traceback.format_exc()[-800:]
         raise
     finally:
-        load_after = pc.loadavg()
+        load_after = performance.loadavg()
         if load_after is not None:
             metrics["host_loadavg_after"] = load_after
         metrics["timing_unreliable"], details["timing_reliability"] = (

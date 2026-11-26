@@ -400,7 +400,7 @@ def _log_mismatch(path: Path, shower: Shower) -> int:
     """1 when the <name>.corsika.log next to a shower file is missing or fails check_log."""
     try:
         check_log(path.with_suffix(".corsika.log").read_text(errors="replace"), shower)
-    except (OSError, ValueError):
+    except OSError, ValueError:
         return 1
     return 0
 

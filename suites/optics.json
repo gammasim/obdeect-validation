@@ -5,6 +5,10 @@
     "../cases/optics/optics-mst.json",
     "../cases/optics/optics-sst.json",
     "../cases/optics/upward-absorption.json",
-    "../cases/optics/sphere-vs-plane.json"
+    "../cases/optics/sphere-vs-plane.json",
+    "../cases/optics/optics-sct.json",
+    "../cases/optics/optics-obscurer-analytic.json",
+    "../cases/optics/optics-obscurer-shadowing.json",
+    "../cases/optics/optics-psf-angles.json"
   ]
 }

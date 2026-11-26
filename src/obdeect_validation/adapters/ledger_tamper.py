@@ -58,21 +58,42 @@ def status_editor(name, state, *, add=False):
 
 
 def backward_editor():
-    """Keep the run status and add two qe-only records: envelope, then pending (a backward step)."""
+    """Keep the run status and add a qe-only envelope record (valid; see write_backward)."""
 
     def edit(record):
         if record["type"] != "efficiency_status":
             return None
         metadata = dict(record["metadata"])
         envelope = {"factors": "qe", "qe.state": "envelope", "qe.source": SOURCE_NAME}
-        pending = {"factors": "qe", "qe.state": "pending", "qe.source": SOURCE_NAME}
         return [
             ("meta", "efficiency_status", metadata),
             ("meta", "efficiency_status", envelope),
-            ("meta", "efficiency_status", pending),
         ]
 
     return edit
+
+
+def write_backward(source, destination):
+    """The backward-state stream: qe envelope, then qe pending (a backward step).
+
+    The obdeect Writer refuses to write an invalid status transition, so the stream is written up
+    to the envelope record by the Writer and the pending record is spliced in as raw bytes after
+    it (the tampering under test).
+    """
+    from obdeect_validation.adapters import robustness_rejections as raw
+
+    valid = destination.with_name(destination.name + ".valid")
+    e2e.rewrite(source, valid, backward_editor())
+    records = raw.split_records(valid.read_bytes())
+    status = raw.RECORD_TYPE["efficiency_status"]
+    last = max(i for i, (kind, _) in enumerate(records) if kind == status)
+    pending = {"factors": "qe", "qe.state": "pending", "qe.source": SOURCE_NAME}
+    spliced = raw.raw_record(status, raw.encode_metadata(pending))
+    data = [bytes(r) for _, r in records]
+    data.insert(last + 1, spliced)
+    destination.write_bytes(b"".join(data))
+    valid.unlink()
+    return destination
 
 
 def tool_argv_to_simtel(camera_map, stream, output, flags=()):
@@ -159,6 +180,8 @@ def main():
             "run",
             "--transmission",
             cut,
+            "--pathlen",
+            "0",
             "--site-altitude",
             atm.SITE_ALTITUDE_M,
             "--seed",
@@ -215,7 +238,7 @@ def main():
     e2e.rewrite(
         prop, root / "t-qe-applied.gst", status_editor("qe", "applied", add=True)
     )
-    e2e.rewrite(prop, root / "t-backward.gst", backward_editor())
+    write_backward(prop, root / "t-backward.gst")
     e2e.rewrite(
         prop,
         root / "t-trace-applied-mirror.gst",
@@ -287,7 +310,9 @@ def main():
         (
             "retrace_camera_frame",
             tool_argv_trace(model, camera, root / "o.gst"),
-            "frame",
+            # Either reason proves the stream was traced already: the run's efficiency status
+            # (read first) has the optics factors applied, or the telescope frame is the camera.
+            ("frame", "already applied"),
             True,
         ),
         (
@@ -338,8 +363,10 @@ def main():
             crashes += 1
         if must_reject:
             metrics[f"{name}_accepted"] = int(verdict == "ok")
+            reasons = factor if isinstance(factor, tuple) else (factor,)
             metrics[f"{name}_no_factor_in_message"] = int(
-                verdict != "ok" and factor not in stage.stderr
+                verdict != "ok"
+                and not any(reason in stage.stderr for reason in reasons)
             )
         else:
             metrics[f"{name}_rejected"] = int(verdict != "ok")

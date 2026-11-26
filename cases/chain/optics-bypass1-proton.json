@@ -6,7 +6,7 @@
     "simtools-generate-array-config"
   ],
   "inputs": [
-    "/validation/inputs/proton-20deg-300-10000GeV.iact"
+    "{validation}/inputs/proton-20deg-300-10000GeV.iact"
   ],
   "commands": [
     {
@@ -41,7 +41,7 @@
         "--model-version",
         "7.0.0",
         "--input",
-        "/validation/inputs/proton-20deg-300-10000GeV.iact",
+        "{validation}/inputs/proton-20deg-300-10000GeV.iact",
         "--azimuth",
         "180"
       ],
