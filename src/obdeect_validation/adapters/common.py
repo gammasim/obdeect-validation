@@ -149,10 +149,13 @@ def tool(name: str) -> str:
     return path
 
 
-def command(argv, log, cwd=None, stdout_file=None) -> None:
-    """Run argv; stdout and stderr go to log (stdout to stdout_file when given).
+def command(argv, log, cwd=None, stdout_file=None, *, check=True, stdout=None) -> int:
+    """Run argv; stdout and stderr go to log (stdout to stdout_file, or to stdout, e.g.
+    subprocess.DEVNULL, when given). Returns the exit status.
 
-    Raises RuntimeError with the log tail when the command fails.
+    check: raise RuntimeError with the log tail when the command fails. Every adapter runs its
+    commands through this function, endtoend_common.pipeline (pipes, timeouts) or
+    performance.run_timed (CPU time and peak RSS).
     """
     argv = [str(arg) for arg in argv]
     with Path(log).open("wb") as log_stream:
@@ -161,6 +164,10 @@ def command(argv, log, cwd=None, stdout_file=None) -> None:
                 process = subprocess.run(
                     argv, cwd=cwd, stdout=output, stderr=log_stream, check=False
                 )
+        elif stdout is not None:
+            process = subprocess.run(
+                argv, cwd=cwd, stdout=stdout, stderr=log_stream, check=False
+            )
         else:
             process = subprocess.run(
                 argv,
@@ -169,7 +176,7 @@ def command(argv, log, cwd=None, stdout_file=None) -> None:
                 stderr=subprocess.STDOUT,
                 check=False,
             )
-    if process.returncode:
+    if process.returncode and check:
         tail = " | ".join(
             Path(log).read_text(errors="replace").strip().splitlines()[-3:]
         )
@@ -177,6 +184,7 @@ def command(argv, log, cwd=None, stdout_file=None) -> None:
             f"{argv[0]} exited {process.returncode}; see {log}"
             + (f": {tail}" if tail else "")
         )
+    return process.returncode
 
 
 def run_tool(argv, log) -> str:
@@ -287,14 +295,18 @@ def write_json(path, value) -> None:
     )
 
 
-def results_main(analyse, description: str) -> None:
-    """Command line of an adapter without options: analyse the current directory and write its results there.
+def results_main(analyse, description: str, add_arguments=None, argv=None) -> None:
+    """The command line of an adapter: analyse the current directory and write its results there.
 
     analyse(root) returns (metrics, details); both are written to root (metrics.json, details.json).
+    With add_arguments(parser), the adapter takes options and analyse is called as analyse(root, args).
     """
-    argparse.ArgumentParser(description=description).parse_args()
+    parser = argparse.ArgumentParser(description=description)
+    if add_arguments is not None:
+        add_arguments(parser)
+    args = parser.parse_args(argv)
     root = Path.cwd()
-    metrics, details = analyse(root)
+    metrics, details = analyse(root) if add_arguments is None else analyse(root, args)
     write_results(metrics, details, root)
 
 
