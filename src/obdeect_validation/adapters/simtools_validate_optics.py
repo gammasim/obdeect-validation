@@ -65,14 +65,20 @@ def _config(path: Path) -> dict[str, Any]:
         raise AdapterError(
             "limits must define psf_cm, eff_area, and eff_flen relative limits"
         )
-    for key, limit in limits.items():
-        if (
-            isinstance(limit, bool)
-            or not isinstance(limit, (int, float))
-            or not math.isfinite(limit)
-            or limit < 0
-        ):
-            raise AdapterError(f"limits.{key} must be a finite non-negative number")
+    goals = value.get("goals", {})
+    if not isinstance(goals, dict) or not set(goals) <= set(METRICS):
+        raise AdapterError("goals may only define psf_cm, eff_area, and eff_flen")
+    for block, entries in (("limits", limits), ("goals", goals)):
+        for key, limit in entries.items():
+            if (
+                isinstance(limit, bool)
+                or not isinstance(limit, (int, float))
+                or not math.isfinite(limit)
+                or limit < 0
+            ):
+                raise AdapterError(
+                    f"{block}.{key} must be a finite non-negative number"
+                )
     return value
 
 

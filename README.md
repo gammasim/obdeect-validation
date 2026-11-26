@@ -12,7 +12,7 @@ bash obdeect-validation/containers/run-validation.sh full obdeect-validation/res
 ```
 
 Suites: `smoke`, `stream`, `propagation`, `sources`, `optics`, `optics-window`, `chain`, `curvature`, `endtoend`, `full`,
-`performance` (report only). The launcher builds obdeect and simtools from the
+`regression` (obdeect only, host), `performance` (report only). The launcher builds obdeect and simtools from the
 checkouts on a digest-pinned simtools-prod image and mounts this repository
 (`/validation`), sim_telarray (`/reference`) and the models (`/models`) read-only.
 
@@ -40,6 +40,15 @@ also needs the CORSIKA atmosphere and hessio sources (`CORSIKA_ATMO_DIR`, `CORSI
 obdeect-validate run --suite suites/regression.json --environment environments/host.json \
   --output results/regression --non-interactive
 ```
+
+Two cases compare with a baseline stored per host and fail (`baseline_missing` > 0) where none
+exists, so a missing baseline never passes silently: `determinism.golden-outputs`
+(`fixtures/golden/<platform>.json`; stored for `darwin-arm64` and `linux-aarch64`) and
+`performance.regression` (`fixtures/performance/<host>.json`; stored for `darwin-arm64-apple-m3-pro`).
+On another host, record the baseline first from a known-good obdeect build:
+`python -m obdeect_validation.adapters.golden_outputs baseline --output fixtures/golden/<platform>.json`
+and `python -m obdeect_validation.adapters.performance_regression baseline --output fixtures/performance/<host>.json`
+(the file names are the `platform_key()` and `current_host_key()` of that host).
 
 Former `obdeect/validation/` scripts, now here: the flasher, LED and stream cross-checks are
 cases (`cases/sources/flasher-dish.json`, `flasher-secondary.json`, `led-reference.json`,

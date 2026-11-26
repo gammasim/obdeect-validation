@@ -246,3 +246,29 @@ def test_execute_rejects_mismatched_offset_pairing(monkeypatch, tmp_path: Path) 
     monkeypatch.setattr(adapter, "_table", lambda _path: next(result_tables))
     with pytest.raises(adapter.AdapterError, match="offset rows do not align"):
         adapter.execute(config, tmp_path / "output")
+
+
+@pytest.mark.parametrize(
+    ("goals", "message"),
+    [
+        ({"psf": 0.01}, "goals may only define"),
+        ({"psf_cm": "1%"}, "goals.psf_cm must be a finite non-negative number"),
+        ({"eff_area": -0.01}, "goals.eff_area must be a finite non-negative number"),
+    ],
+)
+def test_config_rejects_malformed_goals(tmp_path: Path, goals, message):
+    config = tmp_path / "config.json"
+    config.write_text(
+        json.dumps(
+            {
+                "simtools_config": {
+                    "application": "simtools-validate-optics",
+                    "configuration": {},
+                },
+                "limits": LIMITS,
+                "goals": goals,
+            }
+        )
+    )
+    with pytest.raises(adapter.AdapterError, match=message):
+        adapter._config(config)
