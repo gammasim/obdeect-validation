@@ -47,7 +47,6 @@ details.json in the current directory).
 
 from __future__ import annotations
 
-import argparse
 import itertools
 import math
 import sys
@@ -57,6 +56,7 @@ import numpy as np
 
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import obdeect_cli as cli
 
 LST = "LSTN-01"
 VERSION = "7.0.0"
@@ -192,28 +192,16 @@ def run_event(
     e2e.rewrite(base, stream, lambda r: _event_edit(r, event))
     prop = root / f"{name}.prop.pst"
     stage = e2e.run_stage(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            common.VALIDATION / TRANSMISSION,
-            "--pathlen",
-            "0",
-            "--site-altitude",
-            SITE_ALTITUDE_M,
-            "--wavelength-range",
-            300,
-            600,
-            "--seed",
-            PROPAGATION_SEED,
-            "--mode",
-            "weighted",
-            "-i",
+        cli.propagation_run(
             stream,
-            "-o",
             prop,
-        ],
+            transmission=common.VALIDATION / TRANSMISSION,
+            pathlen="0",
+            site_altitude=SITE_ALTITUDE_M,
+            wavelength_range=(300, 600),
+            seed=PROPAGATION_SEED,
+            mode="weighted",
+        ),
         log=root / f"{name}.propagation.log",
     )
     record["stages"]["propagation"] = e2e.describe(stage)
@@ -223,27 +211,16 @@ def run_event(
 
     native = root / f"{name}.trace-native.pst"
     stage = e2e.run_stage(
-        [
-            "obdeect",
-            "ray-tracing",
-            "trace-stream",
-            "--model",
+        cli.trace_stream(
             model,
-            "--seed",
-            TRACE_SEED,
-            "--threads",
-            TRACE_THREADS,
-            "--telescopes",
-            str(TELESCOPE),
-            "--pointing-zenith-deg",
-            POINTING_ZENITH_DEG,
-            "--pointing-azimuth-deg",
-            POINTING_AZIMUTH_DEG,
-            "-i",
             prop,
-            "-o",
             native,
-        ],
+            seed=TRACE_SEED,
+            threads=TRACE_THREADS,
+            telescopes=str(TELESCOPE),
+            pointing_zenith_deg=POINTING_ZENITH_DEG,
+            pointing_azimuth_deg=POINTING_AZIMUTH_DEG,
+        ),
         log=root / f"{name}.trace-native.log",
     )
     record["stages"]["trace-native"] = e2e.describe(stage)
@@ -265,16 +242,9 @@ def run_event(
     if native_ok:
         simtel = root / f"{name}.simtel.iact"
         stage = e2e.run_stage(
-            [
-                "obdeect",
-                "stream",
-                "to-simtel",
-                "--camera-map",
-                camera_map,
-                "-o",
-                simtel,
-                native,
-            ],
+            cli.obdeect(
+                "stream", "to-simtel", camera_map=camera_map, o=simtel, extra=[native]
+            ),
             log=root / f"{name}.to-simtel.log",
         )
         record["stages"]["to-simtel"] = e2e.describe(stage)
@@ -289,62 +259,34 @@ def _event_edit(record: dict, event: int):
     return None
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.parse_args()
-    root = Path.cwd().resolve()
-
+def analyse(root: Path) -> tuple[dict, dict]:
     camera_map = root / "camera-map.txt"
     camera_map.write_text("1 1 0.0\n")
     model = root / "model.json"
     common.command(
-        [
-            "obdeect",
-            "ray-tracing",
-            "compile",
-            "--simulation-models",
-            common.models_root(),
-            "--model",
-            LST,
-            "--version",
-            VERSION,
-            "--seed",
-            COMPILE_SEED,
-            "--zenith-deg",
-            POINTING_ZENITH_DEG,
-            "--output",
-            model,
-        ],
+        cli.compile_model(
+            model, LST, VERSION, seed=COMPILE_SEED, zenith_deg=POINTING_ZENITH_DEG
+        ),
         root / "compile.log",
     )
 
     base = root / "base.pst"
     x, y, z = source_position_m()
     common.command(
-        [
-            "obdeect",
+        cli.obdeect(
             "sources",
             "run",
             "point-source",
-            "--position",
-            f"{x:.6f},{y:.6f},{z:.6f}",
-            "--photons",
-            f"{SOURCE_PHOTONS:g}",
-            "--bunch-size",
-            SOURCE_BUNCH,
-            "--telescope-radius",
-            SOURCE_RADIUS_M,
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--observation-level",
-            SITE_ALTITUDE_M,
-            "--atmosphere-id",
-            1,
-            "--seed",
-            SOURCE_SEED,
-            "-o",
-            base,
-        ],
+            position=f"{x:.6f},{y:.6f},{z:.6f}",
+            photons=f"{SOURCE_PHOTONS:g}",
+            bunch_size=SOURCE_BUNCH,
+            telescope_radius=SOURCE_RADIUS_M,
+            spectrum="fixed:wavelength_nm=400",
+            observation_level=SITE_ALTITUDE_M,
+            atmosphere_id=1,
+            seed=SOURCE_SEED,
+            o=base,
+        ),
         root / "point-source.log",
     )
 
@@ -422,7 +364,11 @@ def main():
         "pull_missing_value": PULL_MISSING,
         "source_position_m": [x, y, z],
     }
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def main():
+    common.results_main(analyse, __doc__.split("\n")[0])
 
 
 if __name__ == "__main__":

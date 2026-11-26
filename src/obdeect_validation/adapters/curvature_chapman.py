@@ -52,7 +52,7 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 
 EARTH_RADIUS_M = 6371315.0
 SCALE_HEIGHT_M = 8000.0
@@ -73,28 +73,36 @@ CHAPMAN_UPPER_Y = 2.0
 LIMITS = {
     "max_transmission_relative_error_vs_reference": (
         1e-5,
-        "the table-form reference is converged to about 5e-6 in tau (Simpson with 10^6 "
-        "intervals agrees with 8-point Gauss-Legendre per table segment to 4e-6), which is the "
-        "tolerance in transmission; the float32 acceptance column adds 6e-8 relative.",
+        (
+            "the table-form reference is converged to about 5e-6 in tau (Simpson with 10^6 "
+            "intervals agrees with 8-point Gauss-Legendre per table segment to 4e-6), which is the "
+            "tolerance in transmission; the float32 acceptance column adds 6e-8 relative."
+        ),
     ),
     "max_transmission_relative_error_vs_chapman": (
         2.8e-3,
-        "triangle inequality: |T_obdeect/T_chapman - 1| <= 1e-5 (vs reference) + the table-only "
-        "error measured in this adapter (2.711e-3 at 89.5 deg, 5 km; the tabulated optical depth "
-        "is log-linear in h), rounded up to 2.8e-3.",
+        (
+            "triangle inequality: |T_obdeect/T_chapman - 1| <= 1e-5 (vs reference) + the table-only "
+            "error measured in this adapter (2.711e-3 at 89.5 deg, 5 km; the tabulated optical depth "
+            "is log-linear in h), rounded up to 2.8e-3."
+        ),
     ),
     "flat_limit_max_relative_error": (
         1e-6,
-        "R = 1e12 m against the plane-parallel result on the table, for zenith <= 60 deg. "
-        "The physical 1/R residual of the spherical geometry is (H_emission/R)/cos^2(theta) "
-        "relative in cos^2: about 1.5e-7 at 60 deg, 1e-3 at 89.5 deg, so the flat limit is "
-        "tested only where it is reached (the residual at larger zenith is in details.json).",
+        (
+            "R = 1e12 m against the plane-parallel result on the table, for zenith <= 60 deg. "
+            "The physical 1/R residual of the spherical geometry is (H_emission/R)/cos^2(theta) "
+            "relative in cos^2: about 1.5e-7 at 60 deg, 1e-3 at 89.5 deg, so the flat limit is "
+            "tested only where it is reached (the residual at larger zenith is in details.json)."
+        ),
     ),
     "curved_below_plane_violations": (
         0,
-        "curvature shortens the slant path, so the curved transmission is not below the "
-        "plane-parallel one from 60 deg on. A violation counts only below plane * (1 - 1e-6), "
-        "the float32 noise of the acceptance column.",
+        (
+            "curvature shortens the slant path, so the curved transmission is not below the "
+            "plane-parallel one from 60 deg on. A violation counts only below plane * (1 - 1e-6), "
+            "the float32 noise of the acceptance column."
+        ),
     ),
     "sample_count": (30, "10 zenith angles x 3 emission heights; exact count."),
 }
@@ -120,8 +128,10 @@ def write_table(path: Path) -> None:
     tau = exact_depth(heights_m)
     lines = [
         "# Synthetic exponential atmosphere (validation case propagation.curvature-chapman)",
-        f"# tau(h) = {VERTICAL_DEPTH:g} (1 - exp(-(h - H2) / {SCALE_HEIGHT_M / 1000:g} km)); "
-        "the same depth at every wavelength",
+        (
+            f"# tau(h) = {VERTICAL_DEPTH:g} (1 - exp(-(h - H2) / {SCALE_HEIGHT_M / 1000:g} km)); "
+            "the same depth at every wavelength"
+        ),
         f"# H2= {SITE_M / 1000:.3f}, H1= " + " ".join(f"{h:.6f}" for h in heights_km),
     ]
     row = " ".join(f"{t:.12f}" for t in tau)
@@ -250,61 +260,44 @@ def zenith_cosine(cx, cy):
 
 
 def _write_input(path: Path, curvature_applied: int, cx, cy, z_emission) -> None:
-    from obdeect import stream
-
-    writer = stream.Writer(str(path), "obdeect-validation")
-    writer.write(
-        "run",
-        {
-            "run_number": 1,
-            "observation_level_m": SITE_M,
-            "telescope_x_m": [0.0],
-            "telescope_y_m": [0.0],
-            "telescope_z_m": [0.0],
-            "telescope_r_m": [12.0],
-            "refraction_applied": 0,
-            "wavelength_min_nm": float(WAVELENGTHS_NM[0]),
-            "wavelength_max_nm": float(WAVELENGTHS_NM[-1]),
-            "curvature_applied": curvature_applied,
-        },
-    )
-    writer.write("event", {"event_number": 1})
-    writer.write("telescope", {"telescope_id": 1, "frame": 1})
-    n = len(cx)
     arrays = {
-        "x": np.zeros(n, dtype=np.float32),
-        "y": np.zeros(n, dtype=np.float32),
+        "x": np.zeros(len(cx), dtype=np.float32),
+        "y": np.zeros(len(cx), dtype=np.float32),
         "cx": np.asarray(cx, dtype=np.float32),
         "cy": np.asarray(cy, dtype=np.float32),
-        "t": np.zeros(n, dtype=np.float32),
+        "t": np.zeros(len(cx), dtype=np.float32),
         "zem": np.asarray(z_emission, dtype=np.float32),
-        "w": np.ones(n, dtype=np.float32),
+        "w": np.ones(len(cx), dtype=np.float32),
     }
-    writer.write_photons(1, 1, 0, arrays)
-    writer.write("telescope_end", {"telescope_id": 1, "photons": float(n)})
-    writer.write("event_end", {})
-    writer.write("run_end", {})
-    writer.close()
+    run = {
+        "run_number": 1,
+        "observation_level_m": SITE_M,
+        "telescope_x_m": [0.0],
+        "telescope_y_m": [0.0],
+        "telescope_z_m": [0.0],
+        "telescope_r_m": [12.0],
+        "refraction_applied": 0,
+        "wavelength_min_nm": float(WAVELENGTHS_NM[0]),
+        "wavelength_max_nm": float(WAVELENGTHS_NM[-1]),
+        "curvature_applied": curvature_applied,
+    }
+    streams.write_stream(path, "obdeect-validation", run, [(1, arrays)], frame=1)
 
 
 def _read_output(path: Path):
     """Acceptance p and weight w of the single telescope block, as float64."""
-    from obdeect.stream import Reader
-
-    p, w, zem = [], [], []
-    for record in Reader(str(path)):
-        if record["type"] == "photons":
-            columns = record["columns"]
-            p.append(np.asarray(columns["p"], dtype=np.float64))
-            w.append(np.asarray(columns["w"], dtype=np.float64))
-            zem.append(np.asarray(columns["zem"], dtype=np.float64))
-    return np.concatenate(p), np.concatenate(w), np.concatenate(zem)
+    columns = streams.read_columns(path)
+    return (
+        np.asarray(columns["p"], dtype=np.float64),
+        np.asarray(columns["w"], dtype=np.float64),
+        np.asarray(columns["zem"], dtype=np.float64),
+    )
 
 
-def main() -> None:
+def analyse(root: Path) -> tuple[dict, dict]:
     from obdeect import propagation
 
-    table_path = Path("curvature-table.dat")
+    table_path = root / "curvature-table.dat"
     write_table(table_path)
     heights, tau_row = read_table(table_path)
     table = PiecewiseTable(heights, tau_row)
@@ -316,19 +309,19 @@ def main() -> None:
     cos_stored = zenith_cosine(cx, cy)
     z_emission = np.array([z for _, z in samples], dtype=np.float32)
 
-    _write_input(Path("in-curved.pst"), 1, cx, cy, z_emission)
-    kwargs = dict(
-        transmission=table_path,
-        site_altitude_m=SITE_M,
-        seed=20261115,
-        mode="weighted",
-        store_p=True,
-        curvature="corsika",
-        pathlen_m=0.0,  # the chord of the atmosphere only: no in-telescope path
-    )
-    curved = Path("curved.pst")
+    _write_input(root / "in-curved.pst", 1, cx, cy, z_emission)
+    kwargs = {
+        "transmission": table_path,
+        "site_altitude_m": SITE_M,
+        "seed": 20261115,
+        "mode": "weighted",
+        "store_p": True,
+        "curvature": "corsika",
+        "pathlen_m": 0.0,  # the chord of the atmosphere only: no in-telescope path
+    }
+    curved = root / "curved.pst"
     propagation.propagate(
-        "in-curved.pst", curved, earth_radius_m=EARTH_RADIUS_M, **kwargs
+        root / "in-curved.pst", curved, earth_radius_m=EARTH_RADIUS_M, **kwargs
     )
     p_curved, w_curved, zem_out = _read_output(curved)
     if p_curved.size != len(samples):
@@ -345,10 +338,12 @@ def main() -> None:
         i for i, (zenith, _) in enumerate(samples) if zenith <= FLAT_MAX_ZENITH_DEG
     ]
     _write_input(
-        Path("in-flat.pst"), 1, cx[flat_index], cy[flat_index], z_emission[flat_index]
+        root / "in-flat.pst", 1, cx[flat_index], cy[flat_index], z_emission[flat_index]
     )
-    flat = Path("flat.pst")
-    propagation.propagate("in-flat.pst", flat, earth_radius_m=FLAT_RADIUS_M, **kwargs)
+    flat = root / "flat.pst"
+    propagation.propagate(
+        root / "in-flat.pst", flat, earth_radius_m=FLAT_RADIUS_M, **kwargs
+    )
     p_flat_subset, _, zem_flat = _read_output(flat)
     if p_flat_subset.size != len(flat_index) or not np.array_equal(
         zem_flat.astype(np.float32), z_emission[flat_index]
@@ -415,7 +410,7 @@ def main() -> None:
     details = {
         "limits": LIMITS,
         "table": {
-            "file": str(table_path),
+            "file": table_path.name,
             "heights_km": heights[1:] / 1000.0,
             "wavelengths_nm": [WAVELENGTHS_NM[0], WAVELENGTHS_NM[-1]],
             "tau_exact_model": "A (1 - exp(-(h - H2)/H)), A = 1, H = 8 km, H2 = 2 km",
@@ -442,8 +437,8 @@ def main() -> None:
             "chapman_upper_y": CHAPMAN_UPPER_Y,
         },
     }
-    common.write_results(metrics, details)
-    _plot(rows, Path("curvature-chapman.png"))
+    _plot(rows, root / "curvature-chapman.png")
+    return metrics, details
 
 
 def _plot(rows, path: Path) -> None:
@@ -496,4 +491,4 @@ def _plot(rows, path: Path) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

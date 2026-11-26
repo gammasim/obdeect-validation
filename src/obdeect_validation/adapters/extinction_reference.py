@@ -44,6 +44,10 @@ def table_reference(path: Path):
 
 
 def main() -> None:
+    common.results_main(_analyse, __doc__.splitlines()[0])
+
+
+def _analyse(root: Path):
     from obdeect.propagation import TransmissionTable, apply_extinction
 
     table_path = Path(
@@ -109,16 +113,16 @@ def main() -> None:
         )
     expected = np.repeat(np.asarray(expected_by_group), repetitions)
 
-    options = dict(
-        table=table,
-        envelope_wavelength=[200.0, 999.0],
-        envelope_value=[1.0, 1.0],
-        seed=20261113,
-        event=7,
-        telescope=3,
-        first_index=0,
-        wavelength_range=(300.0, 850.0),
-    )
+    options = {
+        "table": table,
+        "envelope_wavelength": [200.0, 999.0],
+        "envelope_value": [1.0, 1.0],
+        "seed": 20261113,
+        "event": 7,
+        "telescope": 3,
+        "first_index": 0,
+        "wavelength_range": (300.0, 850.0),
+    }
     actual_p = []
     actual_w = []
     row_wavelengths = []
@@ -191,7 +195,7 @@ def main() -> None:
         "thinning_count_residual_sigma": thinning_sigma,
     }
     common.write_json(
-        "extinction-samples.json",
+        root / "extinction-samples.json",
         {
             "source_table": str(table_path),
             "table_used": str(normalized_path),
@@ -214,9 +218,9 @@ def main() -> None:
         expected,
         candidate_p,
         np.concatenate(row_wavelengths),
-        Path("extinction-weighted.png"),
+        root / "extinction-weighted.png",
     )
-    common.write_results(metrics)
+    return metrics, None
 
 
 def _plot(expected, weighted, wavelengths, path):

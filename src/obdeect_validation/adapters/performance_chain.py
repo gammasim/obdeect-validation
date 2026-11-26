@@ -4,7 +4,7 @@ Each case times a reference pipeline and an obdeect pipeline on the same physica
 photon counts. The reference is CORSIKA IACT -> sim_telarray with full optics (air shower) or
 LightEmission -> sim_telarray (sources). The candidate is the obdeect chain ending in the
 sim_telarray camera stage (Bypass_Optics=1 for the air shower, as in cases/chain/optics-bypass1.json).
-Every child process is timed with performance.run_timed. A pipeline total is the sum of its stage
+Every child process is timed with pcm.run_timed. A pipeline total is the sum of its stage
 wall and CPU times and the maximum of its stage peak RSS (stages run one after another).
 The repetitions alternate between pipelines (rep 1 of each, then rep 2 of each), so a change in host
 state affects all pipelines alike (run_interleaved).
@@ -49,12 +49,11 @@ from obdeect_validation.adapters import chain_optics as co
 from obdeect_validation.adapters import chain_showers as cs
 from obdeect_validation.adapters import (
     common,
-    performance,
     performance_budget,
     source_camera,
 )
-from obdeect_validation.adapters.performance import iact_weight
-from obdeect_validation.adapters.performance import run_timed as _run_timed
+from obdeect_validation.adapters import obdeect_cli as cli
+from obdeect_validation.adapters import performance_common as pcm
 
 REPS = 3
 # Production atmosphere of the LSTN-01 model (CTAO.cfg, set only under #if TELESCOPE == 0). The
@@ -131,8 +130,8 @@ def native_argv(argv):
 
 
 def run_timed(argv, log, **kwargs):
-    """performance.run_timed of the native form of argv (see native_argv)."""
-    return _run_timed(native_argv(argv), log, **kwargs)
+    """pcm.run_timed of the native form of argv (see native_argv)."""
+    return pcm.run_timed(native_argv(argv), log, **kwargs)
 
 
 SKY_PROPAGATION = [
@@ -150,66 +149,47 @@ SOURCES = {
     "flasher-dish": {
         "events": 2,
         "photons": 20_000_000,
-        "candidate": lambda n, p: [
-            "obdeect",
+        "candidate": lambda n, p: cli.obdeect(
             "sources",
             "run",
             "flasher",
-            "--type",
-            "dish",
-            "--observation-level",
-            "2150",
-            "--seed",
-            "1",
-            "--atmosphere-id",
-            "1",
-            "--position",
-            "0,0,16",
-            "--camera-radius",
-            "1.2",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--angular",
-            "isotropic",
-            "--events",
-            n,
-            "--photons",
-            p,
-            "--set",
-            "run.frame=sky",
-            "--set",
-            "events[0].emissions[0].to_plane_z0=false",
-        ],
+            type="dish",
+            observation_level="2150",
+            seed="1",
+            atmosphere_id="1",
+            position="0,0,16",
+            camera_radius="1.2",
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+            events=n,
+            photons=p,
+            extra=(
+                "--set",
+                "run.frame=sky",
+                "--set",
+                "events[0].emissions[0].to_plane_z0=false",
+            ),
+        ),
         "reference": lambda n, p: ["ff-1m", "--events", n, "--photons", p],
         "bypass": 1,  # as in source_camera stage 2
     },
     "point-source": {
         "events": 2,
         "photons": 10_000_000,
-        "candidate": lambda n, p: [
-            "obdeect",
+        "candidate": lambda n, p: cli.obdeect(
             "sources",
             "run",
             "point-source",
-            "--observation-level",
-            "2150",
-            "--seed",
-            "17",
-            "--atmosphere-id",
-            "1",
-            "--events",
-            n,
-            "--photons",
-            p,
-            "--position",
-            "0,0,1000",
-            "--telescope-radius",
-            "15",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--angular",
-            "isotropic",
-        ],
+            observation_level="2150",
+            seed="17",
+            atmosphere_id="1",
+            events=n,
+            photons=p,
+            position="0,0,1000",
+            telescope_radius="15",
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+        ),
         "reference": lambda n, p: [
             "xyzls",
             "-N",
@@ -287,9 +267,9 @@ def measure(steps, reps):
     for _ in range(reps):
         rep = []
         for name, step in steps:
-            start = len(performance.RUSAGE)
+            start = len(pcm.RUSAGE)
             step()
-            summary = summarise(performance.RUSAGE[start:])
+            summary = summarise(pcm.RUSAGE[start:])
             per_stage[name].append(summary)
             rep.append(summary)
         totals.append(total(rep))
@@ -391,7 +371,7 @@ def shower_candidate(work, source, inputs, threads):
         (
             "from_corsika",
             lambda: run_timed(
-                ["obdeect", "stream", "from-corsika", source],
+                cli.from_corsika(source),
                 work / "from-corsika.log",
                 stdout_file=native,
             ),
@@ -399,96 +379,51 @@ def shower_candidate(work, source, inputs, threads):
         (
             "propagation",
             lambda: run_timed(
-                [
-                    "obdeect",
-                    "propagation",
-                    "run",
-                    "--transmission",
-                    inputs["atmosphere"],
-                    "--site-altitude",
-                    2156,
-                    "--pathlen",
-                    28,
-                    "--seed",
-                    123,
-                    "--mode",
-                    "weighted",
-                    "--wavelength-range",
-                    250,
-                    700,
-                    "--telescopes",
-                    ",".join(map(str, co.TELESCOPES)),
-                    "-i",
+                cli.propagation_run(
                     native,
-                    "-o",
                     propagated,
-                ],
+                    transmission=inputs["atmosphere"],
+                    site_altitude=2156,
+                    pathlen=28,
+                    seed=123,
+                    mode="weighted",
+                    wavelength_range=(250, 700),
+                    telescopes=",".join(map(str, co.TELESCOPES)),
+                ),
                 work / "propagation.log",
             ),
         ),
         (
             "compile_model",
-            lambda: run_timed(
-                [
-                    "obdeect",
-                    "ray-tracing",
-                    "compile",
-                    "--simulation-models",
-                    inputs["models"],
-                    "--model",
-                    co.MODEL,
-                    "--version",
-                    co.VERSION,
-                    "--seed",
-                    co.SEED,
-                    "--output",
-                    model,
-                ],
-                work / "compile.log",
-            ),
+            lambda: run_timed(compile_argv(inputs, model), work / "compile.log"),
         ),
         (
             "trace_stream",
             lambda: run_timed(
-                [
-                    "obdeect",
-                    "ray-tracing",
-                    "trace-stream",
-                    "--model",
+                cli.trace_stream(
                     model,
-                    "--seed",
-                    co.SEED,
-                    "--threads",
-                    threads,
-                    "--telescopes",
-                    ",".join(map(str, co.TELESCOPES)),
-                    "--pointing-zenith-deg",
-                    co.ZENITH_DEG,
-                    "--pointing-azimuth-deg",
-                    co.AZIMUTH_DEG,
-                    "--telescope-transmission",
-                    "full",
-                    "-i",
                     propagated,
-                    "-o",
                     traced,
-                ],
+                    seed=co.SEED,
+                    threads=threads,
+                    telescopes=",".join(map(str, co.TELESCOPES)),
+                    pointing_zenith_deg=co.ZENITH_DEG,
+                    pointing_azimuth_deg=co.AZIMUTH_DEG,
+                    telescope_transmission="full",
+                ),
                 work / "trace.log",
             ),
         ),
         (
             "to_simtel",
             lambda: run_timed(
-                [
-                    "obdeect",
+                cli.obdeect(
                     "stream",
                     "to-simtel",
-                    "--camera-map",
-                    camera_map,
-                    "-o",
-                    camera_stream,
-                    traced,
-                ],
+                    camera_map=camera_map,
+                    o=camera_stream,
+                    extra=(traced,),
+                ),
                 work / "to-simtel.log",
             ),
         ),
@@ -517,23 +452,16 @@ def source_candidate(work, spec):
         (
             "propagation",
             lambda: run_timed(
-                [
-                    "obdeect",
-                    "propagation",
-                    "run",
-                    *SKY_PROPAGATION,
-                    "-i",
-                    native,
-                    "-o",
-                    propagated,
-                ],
+                cli.obdeect(
+                    "propagation", "run", *SKY_PROPAGATION, i=native, o=propagated
+                ),
                 work / "propagation.log",
             ),
         ),
         (
             "to_simtel",
             lambda: run_timed(
-                ["obdeect", "stream", "to-simtel", "-o", candidate, propagated],
+                cli.obdeect("stream", "to-simtel", o=candidate, extra=(propagated,)),
                 work / "to-simtel.log",
             ),
         ),
@@ -690,21 +618,13 @@ def envelope_files(work, qe_path, headroom):
 
 def compile_argv(inputs, model):
     """obdeect ray-tracing compile of the LSTN-01 optical model (as in shower_candidate)."""
-    return [
-        "obdeect",
-        "ray-tracing",
-        "compile",
-        "--simulation-models",
-        inputs["models"],
-        "--model",
-        co.MODEL,
-        "--version",
-        co.VERSION,
-        "--seed",
-        co.SEED,
-        "--output",
+    return cli.compile_model(
         model,
-    ]
+        co.MODEL,
+        co.VERSION,
+        seed=co.SEED,
+        simulation_models=inputs["models"],
+    )
 
 
 def envelope_pipeline(
@@ -724,58 +644,40 @@ def envelope_pipeline(
     sim_argv reads standard input ("-") and is the last stage.
     """
     thinned = envelope is not None
-    propagation = [
-        "obdeect",
-        "propagation",
-        "run",
-        "--transmission",
-        table,
-        "--site-altitude",
-        2156,
-        "--pathlen",
-        28,
-        "--seed",
-        123,
-        "--telescopes",
-        str(telescope),
-    ]
-    if thinned:
-        propagation += ["--envelope", f"{ENVELOPE_FACTOR}={envelope}"]
-    else:
-        propagation += ["--mode", "weighted"]
-    propagation += ["-i", "-", "-o", "-"]
-    to_simtel = ["obdeect", "stream", "to-simtel", "--camera-map", camera_map]
-    if thinned:
-        to_simtel += ["--scaled-factor", ENVELOPE_FACTOR]
-    to_simtel += ["-o", "-"]
+    propagation = cli.propagation_run(
+        "-",
+        "-",
+        transmission=table,
+        site_altitude=2156,
+        pathlen=28,
+        seed=123,
+        telescopes=str(telescope),
+        envelope=f"{ENVELOPE_FACTOR}={envelope}" if thinned else None,
+        mode=None if thinned else "weighted",
+    )
+    to_simtel = cli.obdeect(
+        "stream",
+        "to-simtel",
+        camera_map=camera_map,
+        scaled_factor=ENVELOPE_FACTOR if thinned else None,
+        o="-",
+    )
     return [
-        ("from_corsika", ["obdeect", "stream", "from-corsika", source]),
+        ("from_corsika", cli.from_corsika(source)),
         ("propagation", propagation),
         (
             "trace_stream",
-            [
-                "obdeect",
-                "ray-tracing",
-                "trace-stream",
-                "--model",
+            cli.trace_stream(
                 model,
-                "--seed",
-                co.SEED,
-                "--threads",
-                threads,
-                "--telescopes",
-                str(telescope),
-                "--pointing-zenith-deg",
-                co.ZENITH_DEG,
-                "--pointing-azimuth-deg",
-                co.AZIMUTH_DEG,
-                "--telescope-transmission",
-                "full",
-                "-i",
                 "-",
-                "-o",
                 "-",
-            ],
+                seed=co.SEED,
+                threads=threads,
+                telescopes=str(telescope),
+                pointing_zenith_deg=co.ZENITH_DEG,
+                pointing_azimuth_deg=co.AZIMUTH_DEG,
+                telescope_transmission="full",
+            ),
         ),
         ("to_simtel", to_simtel),
         ("sim_telarray", sim_argv),
@@ -819,7 +721,7 @@ def run_pipeline(stages, output, logs):
 
     All stages run at once. A stage's wall time runs from the start of the pipe to its exit; its
     CPU time and peak RSS are its own (wait4 rusage; sampled VmHWM on Linux). One pipeline record
-    is appended to performance.RUSAGE: wall to the last exit, CPU summed, RSS maximal, and the
+    is appended to pcm.RUSAGE: wall to the last exit, CPU summed, RSS maximal, and the
     stages in 'children'. A failed stage raises RuntimeError after the record is kept.
     """
     start = time.perf_counter()
@@ -844,9 +746,7 @@ def run_pipeline(stages, output, logs):
             if previous is not subprocess.DEVNULL:
                 previous.close()  # the parent keeps no copy of the pipe end
             sampler = (
-                performance.RssSampler(proc.pid)
-                if sys.platform.startswith("linux")
-                else None
+                pcm.RssSampler(proc.pid) if sys.platform.startswith("linux") else None
             )
             if sampler:
                 sampler.start()
@@ -881,7 +781,7 @@ def run_pipeline(stages, output, logs):
         "peak_rss_mb": max(child["peak_rss_mb"] for child in children),
         "children": children,
     }
-    performance.RUSAGE.append(record)
+    pcm.RUSAGE.append(record)
     for child in children:
         if child["returncode"]:
             raise RuntimeError(
@@ -988,7 +888,7 @@ def iact_telescope_weight(path, telescope=0):
 
 def variant_counts(work, camera):
     """Photons into trace (telescope 1 rows in the trace-stream summary) and into sim_telarray (camera weight)."""
-    counts = {"into_simtel_weight": iact_weight(camera)}
+    counts = {"into_simtel_weight": pcm.iact_weight(camera)}
     for log in (work / "trace.log", work / "trace_stream.log"):
         if log.is_file():
             match = TRACE_SUMMARY.search(log.read_text(errors="replace"))
@@ -1252,7 +1152,7 @@ def prepare_inputs(root, config):
         "reference_atmosphere": config_dir / ATMOSPHERE_FILE,
     }
     inputs["unit"] = common.write_zero_depth_table(root, co.UNIT_ATMOSPHERE)
-    performance.restrict_table(inputs["reference_atmosphere"], inputs["atmosphere"])
+    pcm.restrict_table(inputs["reference_atmosphere"], inputs["atmosphere"])
     return inputs, cfg_text
 
 
@@ -1440,7 +1340,7 @@ def main():
     parser.add_argument(
         "--config", type=Path, help="sim_telarray config from simtools (air-shower)"
     )
-    parser.add_argument("--input", type=Path, default=performance.INPUT)
+    parser.add_argument("--input", type=Path, default=pcm.INPUT)
     parser.add_argument(
         "--events",
         type=int,
@@ -1458,14 +1358,14 @@ def main():
         os.environ.get("PERF_WORK_DIR") or tempfile.mkdtemp(prefix="perf-chain-")
     )
     work_root.mkdir(parents=True, exist_ok=True)
-    showers = performance.select_input(
+    showers = pcm.select_input(
         args.input.resolve(), args.events, work_root / "showers-input.iact"
     )
     metrics = {}
-    load_before = performance.loadavg()
+    load_before = pcm.loadavg()
     if load_before is not None:
         metrics["host_loadavg_before"] = load_before
-    host = performance.host_info()
+    host = pcm.host_info()
     if host["nproc"]:
         metrics["host_nproc"] = host["nproc"]
     details = {
@@ -1482,13 +1382,13 @@ def main():
         "failures": {},
     }
     if args.case == "air-shower":
-        details["settings"]["showers"] = performance.shower_count(showers)
+        details["settings"]["showers"] = pcm.shower_count(showers)
         run_air_shower(
             root, work_root, showers, args.config, args.reps, metrics, details
         )
     else:
         run_source(root, work_root, args.case, args.reps, metrics, details)
-    load_after = performance.loadavg()
+    load_after = pcm.loadavg()
     if load_after is not None:
         metrics["host_loadavg_after"] = load_after
     metrics["timing_unreliable"], details["timing_reliability"] = timing_reliability(

@@ -28,13 +28,16 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 from obdeect_validation.adapters import common
-from obdeect_validation.adapters.simtools_validate_optics import _table
+from obdeect_validation.adapters.simtools_validate_optics import (
+    AdapterError,
+    _table,
+    run_simtools,
+)
 
 BACKENDS = ("sim_telarray", "obdeect")
 PSF_LIMIT = 0.02  # optics requirement: acceptable at most 2 % (relative D80)
@@ -44,8 +47,7 @@ SIGMA_FACTOR = 3.0
 MIRRORS = ("focal", "primary", "secondary")
 
 
-class StudyError(ValueError):
-    """Invalid configuration or result."""
+StudyError = AdapterError
 
 
 def _config(path: Path, part: str) -> dict[str, Any]:
@@ -76,47 +78,6 @@ def _config(path: Path, part: str) -> dict[str, Any]:
 
 def _seed_options(options: dict[str, Any], seed: int) -> dict[str, Any]:
     return {**options, "instrument_seed": seed, "simulation_seed": [seed]}
-
-
-def _run(argv_app: str, options: dict[str, Any], backend: str, output: Path) -> Path:
-    """Run one simtools application with a backend; returns its output directory."""
-    output.mkdir(parents=True, exist_ok=True)
-    configuration = {
-        **options,
-        "ray_tracing_backend": backend,
-        "output_path": str(output),
-    }
-    config_path = output / "simtools-config.json"
-    config_path.write_text(
-        json.dumps(
-            {
-                "applications": [
-                    {"application": argv_app, "configuration": configuration}
-                ]
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    with (
-        (output / "stdout.log").open("wb") as stdout,
-        (output / "stderr.log").open("wb") as stderr,
-    ):
-        try:
-            process = subprocess.run(
-                [argv_app, "--config", str(config_path)],
-                stdout=stdout,
-                stderr=stderr,
-                check=False,
-            )
-        except OSError as exc:
-            raise StudyError(f"cannot run {argv_app}: {exc}") from exc
-    if process.returncode:
-        raise StudyError(
-            f"{argv_app} ({backend}) exited {process.returncode}; see {output}"
-        )
-    return output
 
 
 def _gate(stats: dict[str, dict[str, float]], requirement: float) -> dict[str, Any]:
@@ -157,11 +118,12 @@ def execute_psf(section: dict[str, Any], output: Path) -> dict[str, float | int]
     for backend in BACKENDS:
         values[backend] = []
         for seed in section["seeds"]:
-            run = _run(
+            run = output / backend / f"seed{seed}"
+            run_simtools(
                 "simtools-validate-optics",
                 _seed_options(options, int(seed)),
                 backend,
-                output / backend / f"seed{seed}",
+                run,
             )
             values[backend].append(_on_axis_d80_cm(run))
     stats = {}
@@ -225,11 +187,12 @@ def execute_angles(section: dict[str, Any], output: Path) -> dict[str, float | i
     }
     for backend in BACKENDS:
         for seed in section["seeds"]:
-            run = _run(
+            run = output / backend / f"seed{seed}"
+            run_simtools(
                 "simtools-derive-incident-angle",
                 _seed_options(options, int(seed)),
                 backend,
-                output / backend / f"seed{seed}",
+                run,
             )
             for mirror, mean in _angle_means(run, telescope).items():
                 values[backend][mirror].append(mean)

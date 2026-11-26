@@ -20,14 +20,11 @@ Tampered chains (LSTN-01, telescope 1, 20 showers, zenith 20 deg):
 Positive controls: genuine camera chain; qe envelope with --scaled-factor qe; angular with --allow-pending.
 """
 
-import argparse
-from pathlib import Path
-
-from obdeect_validation.adapters import atmosphere_chain as atm
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import obdeect_cli as cli
 
-LST, VERSION, ZENITH_DEG, AZIMUTH_DEG, SEED = "LSTN-01", "7.0.0", 20, 180, 5
+ZENITH_DEG, AZIMUTH_DEG, SEED = 20, 180, 5
 PROPAGATION_SEED = 123
 SOURCE_NAME = "endtoend-ledger tamper"
 
@@ -98,104 +95,44 @@ def write_backward(source, destination):
 
 def tool_argv_to_simtel(camera_map, stream, output, flags=()):
     """to-simtel; camera_map None for ground-frame streams (telescope 1 is then a ground telescope)."""
-    mapping = ["--camera-map", camera_map] if camera_map else []
-    return ["obdeect", "stream", "to-simtel", *mapping, *flags, stream, "-o", output]
+    return cli.obdeect(
+        "stream",
+        "to-simtel",
+        camera_map=camera_map,
+        extra=[*flags, stream, "-o", output],
+    )
 
 
-def tool_argv_trace(model, stream, output):
-    return [
-        "obdeect",
-        "ray-tracing",
-        "trace-stream",
-        "--model",
+def tool_argv_trace(model, stream, output, extra=()):
+    return cli.trace_stream(
         model,
-        "--seed",
-        SEED,
-        "--telescopes",
-        "1",
-        "--pointing-zenith-deg",
-        ZENITH_DEG,
-        "--pointing-azimuth-deg",
-        AZIMUTH_DEG,
-        "-i",
         stream,
-        "-o",
         output,
-    ]
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--input",
-        type=Path,
-        default=common.VALIDATION / "inputs/gamma-20deg-20-100GeV.iact",
+        seed=SEED,
+        telescopes="1",
+        pointing_zenith_deg=ZENITH_DEG,
+        pointing_azimuth_deg=AZIMUTH_DEG,
+        extra=extra,
     )
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+
+
+def analyse(root, args):
     source = args.input.resolve()
-    band = atm.cherenkov_band(
-        source.with_suffix(".corsika.log").read_text(errors="replace")
-    )
-    cut = root / "cut-transmission.dat"
-    cut.write_text(
-        atm.cut_table(common.TRANSMISSION_TABLE.read_text(), atm.MAX_LAMBDA_NM)
-    )
-    camera_map = root / "camera-map.txt"
-    camera_map.write_text("1 1 0.0\n")
-    model = root / "model.json"
-    common.command(
-        [
-            "obdeect",
-            "ray-tracing",
-            "compile",
-            "--simulation-models",
-            common.models_root(),
-            "--model",
-            LST,
-            "--version",
-            VERSION,
-            "--seed",
-            1,
-            "--zenith-deg",
-            ZENITH_DEG,
-            "--output",
-            model,
-        ],
-        root / "compile.log",
-    )
+    chain = cli.prepare_chain(root, source, zenith_deg=ZENITH_DEG)
+    camera_map, model = chain.camera_map, chain.model
 
     stages = {}
     native = root / "native.gst"
     stages["from-corsika"] = e2e.run_stage(
-        ["obdeect", "stream", "from-corsika", source],
+        cli.from_corsika(source),
         log=root / "from-corsika.log",
         output=native,
     )
     prop = root / "prop.gst"
     stages["propagation"] = e2e.run_stage(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            cut,
-            "--pathlen",
-            "0",
-            "--site-altitude",
-            atm.SITE_ALTITUDE_M,
-            "--seed",
-            123,
-            "--mode",
-            "weighted",
-            "--wavelength-range",
-            band[0],
-            band[1],
-            "-i",
-            native,
-            "-o",
-            prop,
-        ],
+        cli.weighted_propagation(
+            chain.cut, chain.band, native, prop, seed=PROPAGATION_SEED
+        ),
         log=root / "propagation.log",
     )
     # Streams with the chain's own records and with the tampered records.
@@ -204,11 +141,12 @@ def main():
     )
     camera = root / "lst.gst"
     stages["trace-angular"] = e2e.run_stage(
-        [
-            *tool_argv_trace(model, prop, root / "lst-angular.gst"),
-            "--telescope-transmission",
-            "angular",
-        ],
+        tool_argv_trace(
+            model,
+            prop,
+            root / "lst-angular.gst",
+            extra=["--telescope-transmission", "angular"],
+        ),
         log=root / "trace-angular.log",
     )
     angular = root / "lst-angular.gst"
@@ -371,9 +309,15 @@ def main():
         else:
             metrics[f"{name}_rejected"] = int(verdict != "ok")
     metrics["crash_or_hang_total"] = crashes
-    common.write_results(metrics, details, root)
     e2e.summary_figure(
         root / "summary.png", metrics, "efficiency ledger (tampered chains)"
+    )
+    return metrics, details
+
+
+def main():
+    common.results_main(
+        analyse, __doc__.split("\n")[0], add_arguments=cli.input_argument
     )
 
 

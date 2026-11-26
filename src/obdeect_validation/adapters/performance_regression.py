@@ -1,6 +1,6 @@
 """Per-stage CPU cost per photon against a stored per-host baseline (case performance.regression).
 
-Five stages. Every child is timed with performance.run_timed (os.wait4: ru_utime + ru_stime of the
+Five stages. Every child is timed with pcm.run_timed (os.wait4: ru_utime + ru_stime of the
 child, threads 1). A stage's CPU is the sum over its children; the cost is CPU / photons.
 
   propagation           propagation run, extinction + refraction (fixture atmosphere and profile),
@@ -53,10 +53,7 @@ import argparse
 import json
 import math
 import os
-import platform
-import re
 import shutil
-import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -64,7 +61,9 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
+from obdeect_validation.adapters import performance_common as pcm
 
 REPS = 5
 FLOOR = 0.05
@@ -126,46 +125,6 @@ class Stage:
 
 
 # --- host -------------------------------------------------------------------------------------
-
-
-def cpu_brand() -> str:
-    """CPU brand string: sysctl on macOS, /proc/cpuinfo 'model name' on Linux, else the processor."""
-    if sys.platform == "darwin":
-        try:
-            out = subprocess.run(
-                ["sysctl", "-n", "machdep.cpu.brand_string"],
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout.strip()
-            if out:
-                return out
-        except OSError, subprocess.CalledProcessError:
-            pass
-    try:
-        match = re.search(
-            r"^model name\s*:\s*(.+)$",
-            Path("/proc/cpuinfo").read_text(),
-            re.MULTILINE,
-        )
-        if match:
-            return match[1].strip()
-    except OSError:
-        pass
-    return platform.processor() or platform.machine()
-
-
-def host_key(system: str, machine: str, brand: str) -> str:
-    """Stable file-name key of a host: platform, machine and CPU brand, sanitised."""
-    text = "-".join(part for part in (system, machine, brand) if part)
-    key = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
-    if not key:
-        raise ValueError("host key is empty: platform, machine and CPU brand unknown")
-    return key
-
-
-def current_host_key() -> str:
-    return host_key(platform.system(), platform.machine(), cpu_brand())
 
 
 def default_baseline(key: str) -> Path:
@@ -461,23 +420,14 @@ def _compile_models(work: Path) -> dict[str, Path]:
     for name in MODEL_NAMES:
         output = work / f"model-{name}.json"
         common.command(
-            [
-                "obdeect",
-                "ray-tracing",
-                "compile",
-                "--simulation-models",
-                str(common.models_root()),
-                "--model",
-                name,
-                "--version",
-                MODEL_VERSION,
-                "--seed",
-                str(MODEL_SEED),
-                "--zenith-deg",
-                str(MODEL_ZENITH_DEG),
-                "--output",
+            cli.compile_model(
                 str(output),
-            ],
+                name,
+                MODEL_VERSION,
+                seed=str(MODEL_SEED),
+                zenith_deg=str(MODEL_ZENITH_DEG),
+                simulation_models=str(common.models_root()),
+            ),
             work / f"compile-{name}.log",
         )
         models[name] = output
@@ -486,23 +436,32 @@ def _compile_models(work: Path) -> dict[str, Path]:
 
 def flasher_argv(output: Path) -> tuple[str, ...]:
     """sources run flasher: a dish flasher in front of the camera, a disc target of FLASHER_CAMERA_RADIUS_M."""
-    return (
-        "obdeect", "sources", "run", "flasher",
-        "--type", "dish",
-        "--observation-level", str(int(OBSERVATION_LEVEL_M)),
-        "--seed", "1",
-        "--atmosphere-id", "1",
-        "--position", "0,0,16",
-        "--camera-radius", str(FLASHER_CAMERA_RADIUS_M),
-        "--spectrum", "fixed:wavelength_nm=400",
-        "--angular", "isotropic",
-        "--events", "1",
-        "--photons", str(FLASHER_PHOTONS),
-        "--bunch-size", "1",
-        "--set", "run.frame=sky",
-        "--set", "events[0].emissions[0].to_plane_z0=false",
-        "-o", str(output),
-    )  # fmt: skip
+    return tuple(
+        cli.obdeect(
+            "sources",
+            "run",
+            "flasher",
+            type="dish",
+            observation_level=str(int(OBSERVATION_LEVEL_M)),
+            seed="1",
+            atmosphere_id="1",
+            position="0,0,16",
+            camera_radius=str(FLASHER_CAMERA_RADIUS_M),
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+            events="1",
+            photons=str(FLASHER_PHOTONS),
+            bunch_size="1",
+            extra=(
+                "--set",
+                "run.frame=sky",
+                "--set",
+                "events[0].emissions[0].to_plane_z0=false",
+                "-o",
+                str(output),
+            ),
+        )
+    )
 
 
 def prepare(work: Path) -> dict[str, Stage]:
@@ -525,10 +484,10 @@ def prepare(work: Path) -> dict[str, Stage]:
     )
     sphere = write_sphere(work / "sphere.pst", SPHERE_PER_TELESCOPE, dish, 103)
     ground = write_ground(work / "ground.pst", GROUND_ROWS, 104)
-    sphere_rows = performance.stream_weight(sphere)[0]
-    ground_rows = performance.stream_weight(ground)[0]
-    sky_rows = performance.stream_weight(sky_wide)[0]
-    scatter_rows = performance.stream_weight(sky_scatter)[0]
+    sphere_rows = pcm.stream_weight(sphere)[0]
+    ground_rows = pcm.stream_weight(ground)[0]
+    sky_rows = pcm.stream_weight(sky_wide)[0]
+    scatter_rows = pcm.stream_weight(sky_scatter)[0]
     if sphere_rows != SPHERE_PER_TELESCOPE * len(dish):
         raise RuntimeError(f"sphere input has {sphere_rows} rows")
     if ground_rows != GROUND_ROWS:
@@ -537,7 +496,7 @@ def prepare(work: Path) -> dict[str, Stage]:
         raise RuntimeError("sky input has an unexpected number of rows")
     flasher_out = work / "flasher-untimed.pst"
     common.command(flasher_argv(flasher_out), work / "flasher-untimed.log")
-    flasher_rows = performance.stream_weight(flasher_out)[0]
+    flasher_rows = pcm.stream_weight(flasher_out)[0]
 
     model_args = []
     for index, name in enumerate(MODEL_NAMES, start=1):
@@ -553,29 +512,21 @@ def prepare(work: Path) -> dict[str, Stage]:
             "propagation",
             (
                 Child(
-                    (
-                        "obdeect",
-                        "propagation",
-                        "run",
-                        "--transmission",
-                        transmission,
-                        "--pathlen",
-                        "0",
-                        "--profile",
-                        profile,
-                        "--site-altitude",
-                        str(int(OBSERVATION_LEVEL_M)),
-                        "--seed",
-                        str(SEED_PROPAGATION),
-                        "--wavelength-range",
-                        str(WAVELENGTHS_NM[0]),
-                        str(WAVELENGTHS_NM[1]),
-                        "--threads",
-                        "1",
-                        "-i",
-                        str(sky_wide),
-                        "-o",
-                        str(propagation_out),
+                    tuple(
+                        cli.propagation_run(
+                            str(sky_wide),
+                            str(propagation_out),
+                            transmission=transmission,
+                            pathlen="0",
+                            profile=profile,
+                            site_altitude=str(int(OBSERVATION_LEVEL_M)),
+                            seed=str(SEED_PROPAGATION),
+                            wavelength_range=(
+                                str(WAVELENGTHS_NM[0]),
+                                str(WAVELENGTHS_NM[1]),
+                            ),
+                            threads="1",
+                        )
                     ),
                     "propagation.log",
                 ),
@@ -586,26 +537,17 @@ def prepare(work: Path) -> dict[str, Stage]:
             "propagation_scattering",
             (
                 Child(
-                    (
-                        "obdeect",
-                        "propagation",
-                        "run",
-                        "--scattering",
-                        scattering,
-                        "--transmission",
-                        transmission,
-                        "--pathlen",
-                        "0",
-                        "--site-altitude",
-                        str(int(OBSERVATION_LEVEL_M)),
-                        "--seed",
-                        str(SEED_PROPAGATION),
-                        "--threads",
-                        "1",
-                        "-i",
-                        str(sky_scatter),
-                        "-o",
-                        str(scattered_out),
+                    tuple(
+                        cli.propagation_run(
+                            str(sky_scatter),
+                            str(scattered_out),
+                            scattering=scattering,
+                            transmission=transmission,
+                            pathlen="0",
+                            site_altitude=str(int(OBSERVATION_LEVEL_M)),
+                            seed=str(SEED_PROPAGATION),
+                            threads="1",
+                        )
                     ),
                     "scattering.log",
                 ),
@@ -616,27 +558,20 @@ def prepare(work: Path) -> dict[str, Stage]:
             "trace_stream",
             (
                 Child(
-                    (
-                        "obdeect",
-                        "ray-tracing",
-                        "trace-stream",
-                        *model_args,
-                        "--seed",
-                        str(SEED_TRACE),
-                        "--threads",
-                        "1",
-                        "--telescopes",
-                        telescopes,
-                        "--pointing-zenith-deg",
-                        str(POINTING_ZENITH_DEG),
-                        "--pointing-azimuth-deg",
-                        str(POINTING_AZIMUTH_DEG),
-                        "--telescope-transmission",
-                        "full",
-                        "-i",
-                        str(sphere),
-                        "-o",
-                        str(camera_out),
+                    tuple(
+                        cli.obdeect(
+                            "ray-tracing",
+                            "trace-stream",
+                            *model_args,
+                            seed=str(SEED_TRACE),
+                            threads="1",
+                            telescopes=telescopes,
+                            pointing_zenith_deg=str(POINTING_ZENITH_DEG),
+                            pointing_azimuth_deg=str(POINTING_AZIMUTH_DEG),
+                            telescope_transmission="full",
+                            i=str(sphere),
+                            o=str(camera_out),
+                        )
                     ),
                     "trace-stream.log",
                 ),
@@ -647,18 +582,18 @@ def prepare(work: Path) -> dict[str, Stage]:
             "stream",
             (
                 Child(
-                    ("obdeect", "stream", "cat", str(ground)),
+                    tuple(cli.obdeect("stream", "cat", str(ground))),
                     "cat.log",
                     stdout=str(cat_out),
                 ),
                 Child(
-                    (
-                        "obdeect",
-                        "stream",
-                        "to-simtel",
-                        "-o",
-                        str(simtel_out),
-                        str(ground),
+                    tuple(
+                        cli.obdeect(
+                            "stream",
+                            "to-simtel",
+                            o=str(simtel_out),
+                            extra=(str(ground),),
+                        )
                     ),
                     "to-simtel.log",
                 ),
@@ -682,7 +617,7 @@ def run_stage(stage: Stage, work: Path) -> float:
     """CPU seconds of one pass of the stage (sum of its children; wall is not used)."""
     cpu = 0.0
     for child in stage.children:
-        record = performance.run_timed(
+        record = pcm.run_timed(
             list(child.argv),
             work / child.log,
             stdout_file=(work / child.stdout) if child.stdout else None,
@@ -699,7 +634,7 @@ def measure(work: Path, reps: int) -> tuple[dict, dict]:
     stages = prepare(work)
     samples: dict[str, list[float]] = {name: [] for name in stages}
     failures: dict[str, str] = {}
-    loads = {"before": performance.loadavg()}
+    loads = {"before": pcm.loadavg()}
     for _ in range(reps):
         for name, stage in stages.items():
             if name in failures:
@@ -708,7 +643,7 @@ def measure(work: Path, reps: int) -> tuple[dict, dict]:
                 samples[name].append(run_stage(stage, work))
             except (RuntimeError, OSError) as error:
                 failures[name] = str(error)[:400]
-    loads["after"] = performance.loadavg()
+    loads["after"] = pcm.loadavg()
     measured = {
         name: summarise(samples[name], stages[name].photons)
         for name in stages
@@ -730,9 +665,9 @@ def measure(work: Path, reps: int) -> tuple[dict, dict]:
 
 def run_host() -> dict:
     """Host record of the baseline and the case."""
-    info = performance.host_info()
-    info["cpu_brand"] = cpu_brand()
-    info["host_key"] = current_host_key()
+    info = pcm.host_info()
+    info["cpu_brand"] = pcm.cpu_brand()
+    info["host_key"] = pcm.current_host_key()
     return info
 
 
@@ -773,7 +708,7 @@ def cmd_baseline(args) -> int:
 
 
 def cmd_compare(args) -> int:
-    key = current_host_key()
+    key = pcm.current_host_key()
     path = Path(args.baseline) if args.baseline else default_baseline(key)
     measured, details, work = _run(args.reps)
     baseline_stages: dict = {}

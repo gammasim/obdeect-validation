@@ -66,7 +66,6 @@ the disc targets need a density, so the filled cone ``filled_cone`` is used for 
 
 from __future__ import annotations
 
-import argparse
 import math
 import tempfile
 from pathlib import Path
@@ -491,9 +490,7 @@ def run_all() -> tuple[dict, dict]:
 
 
 def main() -> None:
-    argparse.ArgumentParser(description=__doc__.splitlines()[0]).parse_args()
-    metrics, details = run_all()
-    common.write_results(metrics, details, Path.cwd())
+    common.results_main(lambda _root: run_all(), __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

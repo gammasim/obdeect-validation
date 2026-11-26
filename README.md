@@ -86,6 +86,19 @@ so the host sets `VALIDATION_ROOT` and `SIMTEL_REFERENCE_SOURCE` before a run (s
 Commands run inside an isolated case output directory and write metrics.json.
 Adapters also write details.json and PNG figures; `report.html` links them per case.
 
+An adapter (`src/obdeect_validation/adapters/<name>.py`) holds only its physics: inputs,
+reference and comparison. The rest goes through shared modules:
+
+- `obdeect_cli`: obdeect command lines (`obdeect(*command, **options)`, `compile_model`,
+  `propagation_run`, `weighted_propagation`, `trace_stream`, `to_simtel`) and the standard
+  air-shower chain setup (`prepare_chain`: Cherenkov band, cut table, camera map, compiled model);
+- `common`: running commands (`command`), sim_telarray, paths, and the entry point
+  `results_main(analyse, description)`, which writes metrics.json and details.json;
+- `endtoend_common`: pipes with timeouts and exact photon-by-photon comparison;
+- `streams`: reading and writing photon streams, `ulp32` (the float32 rounding unit);
+- `plotting`: figure style; `performance_common`: timing, host description and input selection
+  of the performance cases.
+
 Reports: `python scripts/collect_report.py RUN reports/DATE` copies verdicts, metrics,
 details and figures of a run and writes `reports/DATE/README.md`, the page to read: overview
 table, then one section per validation step (stream, propagation, sources, optics, chain)

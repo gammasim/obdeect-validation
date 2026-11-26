@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import os
 import shutil
-import sys
 import traceback
 from pathlib import Path
 
@@ -27,6 +26,7 @@ import numpy as np
 from eventio import SimTelFile
 
 from obdeect_validation.adapters import common, readers
+from obdeect_validation.adapters import obdeect_cli as cli
 
 C_M_NS = 0.299792458
 TIME_RADIUS_CM = 1500.0
@@ -41,70 +41,52 @@ KS_P_LIMIT = 1e-4  # two-sample KS significance level of the shape gate, see _ks
 # xyls defaults with -r 123 (obdeect beam-scan defaults are the same fractions of 123 cm).
 CASES = {
     "flasher-dish": {
-        "native": [
-            "obdeect",
+        "native": cli.obdeect(
             "sources",
             "run",
             "flasher",
-            "--type",
-            "dish",
-            "--observation-level",
-            "2150",
-            "--seed",
-            "1",
-            "--atmosphere-id",
-            "1",
-            "--position",
-            "0,0,16",
-            "--camera-radius",
-            "1.2",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--angular",
-            "isotropic",
-            "--photons",
-            "2500000",
-            "--events",
-            "20",
-            "--set",
-            "run.frame=sky",
-            "--set",
-            "events[0].emissions[0].to_plane_z0=false",
-        ],
-        "reference": ["ff-1m", "--events", "20"],
-        "stage2": {
-            "path": "propagate",
-            "bypass": 1,
-            "native": [
-                "obdeect",
-                "sources",
-                "run",
-                "flasher",
-                "--type",
-                "dish",
-                "--observation-level",
-                "2150",
-                "--seed",
-                "1",
-                "--atmosphere-id",
-                "1",
-                "--position",
-                "0,0,16",
-                "--camera-radius",
-                "1.2",
-                "--spectrum",
-                "fixed:wavelength_nm=400",
-                "--angular",
-                "isotropic",
-                "--photons",
-                "150000000",
-                "--events",
-                "5",
+            type="dish",
+            observation_level="2150",
+            seed="1",
+            atmosphere_id="1",
+            position="0,0,16",
+            camera_radius="1.2",
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+            photons="2500000",
+            events="20",
+            extra=[
                 "--set",
                 "run.frame=sky",
                 "--set",
                 "events[0].emissions[0].to_plane_z0=false",
             ],
+        ),
+        "reference": ["ff-1m", "--events", "20"],
+        "stage2": {
+            "path": "propagate",
+            "bypass": 1,
+            "native": cli.obdeect(
+                "sources",
+                "run",
+                "flasher",
+                type="dish",
+                observation_level="2150",
+                seed="1",
+                atmosphere_id="1",
+                position="0,0,16",
+                camera_radius="1.2",
+                spectrum="fixed:wavelength_nm=400",
+                angular="isotropic",
+                photons="150000000",
+                events="5",
+                extra=[
+                    "--set",
+                    "run.frame=sky",
+                    "--set",
+                    "events[0].emissions[0].to_plane_z0=false",
+                ],
+            ),
             "reference": ["ff-1m", "--events", "5", "--photons", "150000000"],
             "photon_factor": 60,
         },
@@ -116,38 +98,24 @@ CASES = {
         "native_frame": "sky",
     },
     "flasher-secondary": {
-        "native": [
-            "obdeect",
+        "native": cli.obdeect(
             "sources",
             "run",
             "flasher",
-            "--type",
-            "secondary",
-            "--observation-level",
-            "2100",
-            "--seed",
-            "1",
-            "--atmosphere-id",
-            "1",
-            "--flasher-offset",
-            "0.1462",
-            "--flasher-depth",
-            "0.0246",
-            "--flasher-inclination",
-            "0",
-            "--mirror-camera-distance",
-            "0.5106949",
-            "--fiducial-radius",
-            "1.2",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--angular",
-            "isotropic",
-            "--photons",
-            "1e5",
-            "--events",
-            "1",
-        ],
+            type="secondary",
+            observation_level="2100",
+            seed="1",
+            atmosphere_id="1",
+            flasher_offset="0.1462",
+            flasher_depth="0.0246",
+            flasher_inclination="0",
+            mirror_camera_distance="0.5106949",
+            fiducial_radius="1.2",
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+            photons="1e5",
+            events="1",
+        ),
         "reference": ["ff-gct", "--photons", "1e5", "--events", "1"],
         "frame": {
             "native": "telescope (T)",
@@ -169,38 +137,24 @@ CASES = {
             "atmospheric_transmission": "atm_trans_2100_1_10_0_0_2100.dat",
             "camera_map": True,
             "defines": [],
-            "native": [
-                "obdeect",
+            "native": cli.obdeect(
                 "sources",
                 "run",
                 "flasher",
-                "--type",
-                "secondary",
-                "--observation-level",
-                "2100",
-                "--seed",
-                "1",
-                "--atmosphere-id",
-                "1",
-                "--flasher-offset",
-                "0.1462",
-                "--flasher-depth",
-                "0.0246",
-                "--flasher-inclination",
-                "0",
-                "--mirror-camera-distance",
-                "0.5106949",
-                "--fiducial-radius",
-                "1.2",
-                "--spectrum",
-                "fixed:wavelength_nm=400",
-                "--angular",
-                "isotropic",
-                "--photons",
-                "1000000",
-                "--events",
-                "1",
-            ],
+                type="secondary",
+                observation_level="2100",
+                seed="1",
+                atmosphere_id="1",
+                flasher_offset="0.1462",
+                flasher_depth="0.0246",
+                flasher_inclination="0",
+                mirror_camera_distance="0.5106949",
+                fiducial_radius="1.2",
+                spectrum="fixed:wavelength_nm=400",
+                angular="isotropic",
+                photons="1000000",
+                events="1",
+            ),
             # 1e6 per flasher: ~57000 p.e. per event. At 1e7 the 1.28 GB event block exceeds the
             # default sim_telarray input buffer (CORSIKA_IO_BUFFER, MAX_BUNCHES), which skips the block.
             "reference": ["ff-gct", "--photons", "1000000", "--events", "1"],
@@ -208,30 +162,20 @@ CASES = {
         },
     },
     "point-source": {
-        "native": [
-            "obdeect",
+        "native": cli.obdeect(
             "sources",
             "run",
             "point-source",
-            "--observation-level",
-            "2150",
-            "--seed",
-            "17",
-            "--atmosphere-id",
-            "1",
-            "--position",
-            "0,0,1000",
-            "--telescope-radius",
-            "15",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--angular",
-            "isotropic",
-            "--events",
-            "30",
-            "--photons",
-            "10000000",
-        ],
+            observation_level="2150",
+            seed="17",
+            atmosphere_id="1",
+            position="0,0,1000",
+            telescope_radius="15",
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+            events="30",
+            photons="10000000",
+        ),
         "reference": [
             "xyzls",
             "-N",
@@ -256,30 +200,20 @@ CASES = {
             # Photons reach the telescope sphere, not the camera: full optics (simtools: bypass only for flat fielding).
             "path": "propagate",
             "bypass": 0,
-            "native": [
-                "obdeect",
+            "native": cli.obdeect(
                 "sources",
                 "run",
                 "point-source",
-                "--observation-level",
-                "2150",
-                "--seed",
-                "17",
-                "--atmosphere-id",
-                "1",
-                "--position",
-                "0,0,1000",
-                "--telescope-radius",
-                "15",
-                "--spectrum",
-                "fixed:wavelength_nm=400",
-                "--angular",
-                "isotropic",
-                "--events",
-                "2",
-                "--photons",
-                "3000000000",
-            ],
+                observation_level="2150",
+                seed="17",
+                atmosphere_id="1",
+                position="0,0,1000",
+                telescope_radius="15",
+                spectrum="fixed:wavelength_nm=400",
+                angular="isotropic",
+                events="2",
+                photons="3000000000",
+            ),
             "reference": [
                 "xyzls",
                 "-N",
@@ -295,37 +229,23 @@ CASES = {
         },
     },
     "beam-scan": {
-        "native": [
-            "obdeect",
+        "native": cli.obdeect(
             "sources",
             "run",
             "beam-scan",
-            "--observation-level",
-            "2150",
-            "--seed",
-            "1",
-            "--atmosphere-id",
-            "1",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--photons-per-position",
-            "100",
-            "--bunch-size",
-            "1",
-            "--camera-radius",
-            "1.23",
-            "--scan-start",
-            "0.369",
-            "0.246",
-            "--scan-extent-x",
-            "0.492",
-            "--scan-extent-y",
-            "0.246",
-            "--scan-step",
-            "0.00123",
-            "--height",
-            "0.0615",
-        ],
+            observation_level="2150",
+            seed="1",
+            atmosphere_id="1",
+            spectrum="fixed:wavelength_nm=400",
+            photons_per_position="100",
+            bunch_size="1",
+            camera_radius="1.23",
+            scan_start=("0.369", "0.246"),
+            scan_extent_x="0.492",
+            scan_extent_y="0.246",
+            scan_step="0.00123",
+            height="0.0615",
+        ),
         "reference": ["xyls", "-r", "123"],
         "stage2": {
             "blocked": "no intensity option: obdeect beam-scan and xyls emit a fixed 100 photons per "
@@ -821,36 +741,36 @@ def _camera_stage(root, native_gst, reference_file, stage2):
     if stage2["path"] == "propagate":
         propagated = root / "propagated.gst"
         common.command(
-            [
-                "obdeect",
-                "propagation",
-                "run",
-                "--no-extinction",
-                "--site-altitude",
-                "2150",
-                "--seed",
-                "1",
-                "--wavelength-range",
-                "300",
-                "800",
-                "-i",
+            cli.propagation_run(
                 native_gst,
-                "-o",
                 propagated,
-            ],
+                no_extinction=True,
+                site_altitude="2150",
+                seed="1",
+                wavelength_range=("300", "800"),
+            ),
             root / "propagation.log",
         )
         common.command(
-            ["obdeect", "stream", "to-simtel", "-o", candidate, propagated],
+            cli.obdeect("stream", "to-simtel", o=candidate, extra=[propagated]),
             root / "to-simtel.log",
         )
     else:
-        argv = ["obdeect", "stream", "to-simtel", "-o", candidate]
+        camera_map = None
         if stage2.get("camera_map"):
             # Telescope 1 of the reference program as a dual-mirror (class 2) telescope in the telescope frame.
-            (root / "camera-map.txt").write_text("1 2 0.0\n", encoding="utf-8")
-            argv += ["--camera-map", root / "camera-map.txt"]
-        common.command([*argv, native_gst], root / "to-simtel.log")
+            camera_map = root / "camera-map.txt"
+            camera_map.write_text("1 2 0.0\n", encoding="utf-8")
+        common.command(
+            cli.obdeect(
+                "stream",
+                "to-simtel",
+                o=candidate,
+                camera_map=camera_map,
+                extra=[native_gst],
+            ),
+            root / "to-simtel.log",
+        )
     cfg = stage2.get("cfg", "CTA/CTA-PROD6-LST.cfg")
     defines = stage2.get("defines", ["-DCTA_NORTH", "-DLST1"])
     site = {
@@ -892,9 +812,10 @@ def _reference_argv(argv, root):
     return argv
 
 
-def main(case):
+def analyse(root: Path, args) -> tuple[dict, dict]:
+    """Stages 1 and 2 of the case args.case in root (results are returned, see common.results_main)."""
+    case = args.case
     spec = CASES[case]
-    root = Path.cwd()
     native_gst, reference_file = root / "native.gst", root / "reference.dat.gz"
     common.command([*spec["native"], "-o", native_gst], root / "native.log")
     common.command(
@@ -974,8 +895,16 @@ def main(case):
                 "stage 1 uses the matched stage 1 counts",
             }
         )
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def _add_arguments(parser) -> None:
+    parser.add_argument("case", help=f"case name: {', '.join(CASES)}")
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__.splitlines()[0], _add_arguments)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main()

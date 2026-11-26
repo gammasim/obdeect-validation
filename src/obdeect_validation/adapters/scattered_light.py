@@ -56,6 +56,7 @@ from pathlib import Path
 import numpy as np
 
 from obdeect_validation.adapters import common, readers
+from obdeect_validation.adapters import obdeect_cli as cli
 
 LAMBDA_NM = 355
 SITE_ALTITUDE_M = 2156.0
@@ -237,35 +238,22 @@ def weighted_moments(weights, cos_theta, z):
 
 def _propagate(work, primary, out, transmission, table, mode, scattering):
     """obdeect propagation run on the primaries, with or without single scattering (CLI)."""
-    argv = [
-        common.tool("obdeect"),
-        "propagation",
-        "run",
-        "--transmission",
-        str(transmission),
-        "--pathlen",
-        "0",
-        "--site-altitude",
-        SWEEP["altitude"],
-        "--wavelength-range",
-        "300",
-        "800",
-        "--seed",
-        "1",
-        "--mode",
-        mode,
-        "-i",
+    argv = cli.propagation_run(
         str(primary),
-        "-o",
         str(out),
-    ]
-    if scattering:
-        argv += [
-            "--scattering",
-            str(table),
-            "--scattering-points",
-            str(SCATTERING_POINTS),
-        ]
+        transmission=str(transmission),
+        pathlen="0",
+        site_altitude=SWEEP["altitude"],
+        wavelength_range=("300", "800"),
+        seed="1",
+        mode=mode,
+        executable=common.tool("obdeect"),
+        extra=(
+            ["--scattering", str(table), "--scattering-points", str(SCATTERING_POINTS)]
+            if scattering
+            else ()
+        ),
+    )
     common.run_tool(argv, out.with_suffix(".log"))
 
 
@@ -275,45 +263,28 @@ def run(work):
     transmission = write_zero_transmission(work / "transmission.dat")
     primary = work / "primary.gst"
     sweep = SWEEP
-    common.run_tool(
-        [
-            common.tool("obdeect"),
-            "sources",
-            "run",
-            "laser-beam",
-            "--observation-level",
-            sweep["altitude"],
-            "--atmosphere-id",
-            "1",
-            "--events",
-            "1",
-            "--seed",
-            sweep["seed"],
-            "--bunch-size",
-            "3",
-            "--photons-per-m",
-            sweep["primary_per_m"],
-            "--spectrum",
-            f"fixed:wavelength_nm={sweep['spectrum']}",
-            "--laser-position",
-            sweep["laser_position"],
-            "--laser-zenith",
-            sweep["laser_theta"],
-            "--laser-azimuth",
-            sweep["laser_phi"],
-            "--telescope-zenith",
-            sweep["telescope_theta"],
-            "--telescope-azimuth",
-            sweep["telescope_phi"],
-            "--telescope-radius",
-            sweep["telescope_radius"],
-            "--fov-deg",
-            sweep["fov"],
-            "-o",
-            str(primary),
-        ],
-        work / "primary.log",
+    argv = cli.obdeect(
+        "sources",
+        "run",
+        "laser-beam",
+        observation_level=sweep["altitude"],
+        atmosphere_id="1",
+        events="1",
+        seed=sweep["seed"],
+        bunch_size="3",
+        photons_per_m=sweep["primary_per_m"],
+        spectrum=f"fixed:wavelength_nm={sweep['spectrum']}",
+        laser_position=sweep["laser_position"],
+        laser_zenith=sweep["laser_theta"],
+        laser_azimuth=sweep["laser_phi"],
+        telescope_zenith=sweep["telescope_theta"],
+        telescope_azimuth=sweep["telescope_phi"],
+        telescope_radius=sweep["telescope_radius"],
+        fov_deg=sweep["fov"],
+        executable=common.tool("obdeect"),
+        o=str(primary),
     )
+    common.run_tool(argv, work / "primary.log")
     # Weighted output with and without scattering: the primaries pass through in both, so the
     # difference of their weight sums is the scattered weight (CLI cross-check of the API run).
     base, with_scatter = work / "cli-base.gst", work / "cli-scattered.gst"
@@ -390,7 +361,11 @@ def _weight_sum(path):
 API_SEEDS = (1, 2, 3, 4)
 
 
-def main():
+def main() -> None:
+    common.results_main(_analyse, __doc__.splitlines()[0])
+
+
+def _analyse(root: Path):
     from obdeect.propagation import (
         AtmosphereProfile,
         ScatteringTable,
@@ -399,7 +374,7 @@ def main():
         scatter,
     )
 
-    work = Path.cwd().resolve()
+    work = root.resolve()
     primary, base, with_scatter, table, transmission, ls_out, _ = run(work)
     cols = _sky_columns(primary)
     cx_mean, cy_mean = float(np.mean(cols["cx"])), float(np.mean(cols["cy"]))
@@ -537,7 +512,11 @@ def main():
             "altitude": f"max({ALTITUDE_FLOOR_M} m, 5 se) on the mean altitude",
         },
     }
-    common.write_results(metrics, details)
+    _plot(z, w, cos_beam, root / "scattered-light.png")
+    return metrics, details
+
+
+def _plot(z, w, cos_beam, path) -> None:
     from obdeect_validation.adapters import plotting
 
     fig, axes = plotting.figure(1, 2, (10, 3.6))
@@ -555,8 +534,7 @@ def main():
     )
     axes[0, 1].set(xlabel="cos(scattering angle)", ylabel="weight")
     axes[0, 1].legend()
-    plotting.save(fig, Path("scattered-light.png"))
-    return 0
+    plotting.save(fig, path)
 
 
 if __name__ == "__main__":

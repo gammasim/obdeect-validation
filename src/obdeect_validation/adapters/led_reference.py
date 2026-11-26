@@ -11,6 +11,7 @@ from eventio.iact import IACTFile
 from obdeect.stream import Reader
 
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 
 FIXTURE = Path(__file__).with_name("compare-led-camera.txt")
 
@@ -91,27 +92,22 @@ def main():
     seed = 17
     shared = ["--use", "0 1 2", "--require", "2", "--photons", "10"]
     subprocess.run(
-        [
-            obdeect,
+        cli.obdeect(
             "sources",
             "run",
             "led",
-            "--camera-file",
-            str(camera),
-            *shared,
-            "--seed",
-            str(seed),
-            "--observation-level",
-            "2150",
-            "--atmosphere-id",
-            "1",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--camera-radius",
-            "1.23",
-            "-o",
-            str(native_output),
-        ],
+            executable=obdeect,
+            camera_file=str(camera),
+            use="0 1 2",
+            require="2",
+            photons="10",
+            seed=str(seed),
+            observation_level="2150",
+            atmosphere_id="1",
+            spectrum="fixed:wavelength_nm=400",
+            camera_radius="1.23",
+            o=str(native_output),
+        ),
         check=True,
     )
     process = subprocess.run(

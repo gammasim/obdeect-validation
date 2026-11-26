@@ -67,13 +67,14 @@ from obdeect_validation.adapters import (
 from obdeect_validation.adapters import (
     chain_showers as cs,
 )
+from obdeect_validation.adapters import common
 from obdeect_validation.adapters import (
-    common,
-    performance,
+    obdeect_cli as cli,
 )
 from obdeect_validation.adapters import (
     performance_chain as pc,
 )
+from obdeect_validation.adapters import performance_common as pcm
 
 INPUT = common.VALIDATION / "inputs/gamma-20deg-100-3000GeV-array-north-100showers.iact"
 # (CORSIKA telescope number = sim_telarray TELESCOPE index, element name), as in the simtools config.
@@ -127,23 +128,14 @@ def camera_map(root, telescope, rotation):
 
 def compile_argv(models, element, model_path):
     """obdeect optical model of one element, with the pointing zenith (needed for the MSTs)."""
-    return [
-        "obdeect",
-        "ray-tracing",
-        "compile",
-        "--simulation-models",
-        models,
-        "--model",
-        element,
-        "--version",
-        VERSION,
-        "--seed",
-        co.SEED,
-        "--zenith-deg",
-        ZENITH_DEG,
-        "--output",
+    return cli.compile_model(
         model_path,
-    ]
+        element,
+        VERSION,
+        seed=co.SEED,
+        zenith_deg=ZENITH_DEG,
+        simulation_models=models,
+    )
 
 
 def reference_options(atmosphere):
@@ -343,11 +335,7 @@ def _start_pipe(stages, output, logs, running):
                 proc = subprocess.Popen(argv, stdin=previous, stdout=stdout, stderr=log)
         if previous is not subprocess.DEVNULL:
             previous.close()  # the parent keeps no copy of the pipe end
-        sampler = (
-            performance.RssSampler(proc.pid)
-            if sys.platform.startswith("linux")
-            else None
-        )
+        sampler = pcm.RssSampler(proc.pid) if sys.platform.startswith("linux") else None
         if sampler:
             sampler.start()
         running.append((name, argv, proc, sampler))
@@ -359,7 +347,7 @@ def run_fan_out(pipe, branches, logs):
 
     pipe: [(name, argv)] ending in the tee, whose standard output is discarded. branches:
     [(stages, output)], one pipe each; its first stage reads its FIFO through its argv. One pipeline
-    record goes to performance.RUSAGE (wall to the last exit, CPU summed, RSS maximal, children).
+    record goes to pcm.RUSAGE (wall to the last exit, CPU summed, RSS maximal, children).
     A failed stage raises RuntimeError after the record is kept.
     """
     start = time.perf_counter()
@@ -399,7 +387,7 @@ def run_fan_out(pipe, branches, logs):
         "peak_rss_mb": max(child["peak_rss_mb"] for child in children),
         "children": children,
     }
-    performance.RUSAGE.append(record)
+    pcm.RUSAGE.append(record)
     failed = [child for child in children if child["returncode"]]
     if failed:
         # The temporary work directory is removed afterwards: keep the evidence in the error.
@@ -439,7 +427,7 @@ def tee_pipe(telescopes, branches):
                 propagation_stage[0],
                 with_telescopes(propagation_stage[1], telescopes),
             ),
-            ("tee", ["obdeect", "stream", "tee", *fifos.values()]),
+            ("tee", cli.obdeect("stream", "tee", *fifos.values())),
         ]
         logs = {
             "from_corsika": first["logs"]["from_corsika"],
@@ -704,7 +692,7 @@ def run_array(root, work_root, source, config, reps, metrics, details):
     source = source.resolve()
     atmosphere_in = config_dir / ATMOSPHERE_FILE
     atmosphere = work_root / "atmosphere-below-1000nm.dat"
-    performance.restrict_table(atmosphere_in, atmosphere)
+    pcm.restrict_table(atmosphere_in, atmosphere)
     inputs = {
         "config": config,
         "models": str(common.models_root()),
@@ -798,32 +786,32 @@ def run_array(root, work_root, source, config, reps, metrics, details):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("case", choices=["air-shower-array"])
-    parser.add_argument("--config", type=Path, required=True)
-    parser.add_argument("--input", type=Path, default=INPUT)
-    parser.add_argument(
-        "--events", type=int, default=None, help="first N showers (default all)"
+    pcm.add_arguments(
+        parser,
+        input_default=INPUT,
+        events_help="first N showers (default all)",
+        reps_default=pc.REPS,
     )
-    parser.add_argument("--reps", type=int, default=pc.REPS)
     args = parser.parse_args()
     root = Path.cwd().resolve()
     work_root = Path(
         os.environ.get("PERF_WORK_DIR") or tempfile.mkdtemp(prefix="perf-array-")
     )
     work_root.mkdir(parents=True, exist_ok=True)
-    showers = performance.select_input(
+    showers = pcm.select_input(
         args.input.resolve(), args.events, work_root / "showers-input.iact"
     )
     metrics = {}
-    load_before = performance.loadavg()
+    load_before = pcm.loadavg()
     if load_before is not None:
         metrics["host_loadavg_before"] = load_before
     details = {
         "case": args.case,
-        "host": performance.host_info(),
+        "host": pcm.host_info(),
         "settings": {
             "reps": args.reps,
             "timing": "wall and CPU: wait4 rusage per child; peak RSS: sampled /proc VmHWM on Linux",
-            "showers": performance.shower_count(showers),
+            "showers": pcm.shower_count(showers),
         },
         "threads": {},
         "stages": {},
@@ -837,7 +825,7 @@ def main():
         details["failures"]["run"] = traceback.format_exc()[-800:]
         raise
     finally:
-        load_after = performance.loadavg()
+        load_after = pcm.loadavg()
         if load_after is not None:
             metrics["host_loadavg_after"] = load_after
         metrics["timing_unreliable"], details["timing_reliability"] = (

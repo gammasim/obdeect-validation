@@ -4,20 +4,23 @@ import math
 
 import pytest
 
+from obdeect_validation.adapters import performance_common as pcm
 from obdeect_validation.adapters import performance_regression as pr
 
 
 def test_host_key_is_platform_machine_and_brand_sanitised() -> None:
-    assert pr.host_key("Darwin", "arm64", "Apple M3 Max") == "darwin-arm64-apple-m3-max"
     assert (
-        pr.host_key("Linux", "x86_64", "Intel(R) Xeon(R) CPU @ 2.40GHz")
+        pcm.host_key("Darwin", "arm64", "Apple M3 Max") == "darwin-arm64-apple-m3-max"
+    )
+    assert (
+        pcm.host_key("Linux", "x86_64", "Intel(R) Xeon(R) CPU @ 2.40GHz")
         == "linux-x86-64-intel-r-xeon-r-cpu-2-40ghz"
     )
 
 
 def test_host_key_rejects_an_empty_identity() -> None:
     with pytest.raises(ValueError):
-        pr.host_key("", "", "")
+        pcm.host_key("", "", "")
 
 
 def test_summarise_takes_the_best_repetition_and_the_relative_spread() -> None:

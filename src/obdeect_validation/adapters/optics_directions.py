@@ -35,7 +35,6 @@ f4ea1bb (7 circular facets, one plate obscurer; the model's own sha256 is inside
 
 from __future__ import annotations
 
-import argparse
 import itertools
 import math
 from dataclasses import dataclass
@@ -854,16 +853,17 @@ def plot_fractions(path: Path, sections: list[dict]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
+    common.results_main(_analyse, __doc__.splitlines()[0])
+
+
+def _analyse(root: Path):
     models = common.models_root()
     if not (models / "productions" / MODEL_VERSION).is_dir():
         raise AdapterError(f"no simulation models {MODEL_VERSION} under {models}")
     metrics, details, arrays = run_all(models, common.VALIDATION / FIXTURE)
     plot_start_map(root / "upward-start-map.png", arrays)
     plot_fractions(root / "upward-blocked-fraction.png", details["models"])
-    common.write_results(metrics, details, root)
+    return metrics, details
 
 
 if __name__ == "__main__":

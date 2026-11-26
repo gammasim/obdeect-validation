@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 
 from obdeect_validation.adapters import chain_optics as co
-from obdeect_validation.adapters import performance, performance_chain
+from obdeect_validation.adapters import performance_chain
+from obdeect_validation.adapters import performance_common as pcm
 
 
 def option(argv, *names):
@@ -48,13 +49,13 @@ def test_total_is_sequential_sum_and_maximum_peak() -> None:
 
 
 def test_measure_runs_steps_in_order_and_records_each_repetition(monkeypatch) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     order = []
 
     def step(name, wall):
         def run():
             order.append(name)
-            performance.RUSAGE.append(
+            pcm.RUSAGE.append(
                 {
                     "argv": [name],
                     "wall_s": wall,
@@ -119,7 +120,7 @@ def _timed_step(calls, label, wall=1.0, cpu=1.0, rss=5.0):
 
     def run():
         calls.append(label)
-        performance.RUSAGE.append(
+        pcm.RUSAGE.append(
             {"argv": [label], "wall_s": wall, "cpu_s": cpu, "peak_rss_mb": rss}
         )
 
@@ -129,7 +130,7 @@ def _timed_step(calls, label, wall=1.0, cpu=1.0, rss=5.0):
 def test_run_interleaved_alternates_pipelines_and_keeps_the_repetition_count(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     calls = []
     metrics, details = {}, {"failures": {}, "stages": {}, "pipelines": {}}
     ok = performance_chain.run_interleaved(
@@ -149,7 +150,7 @@ def test_run_interleaved_alternates_pipelines_and_keeps_the_repetition_count(
 
 
 def test_run_interleaved_failure_skips_only_the_failing_label(monkeypatch) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     calls = []
 
     def missing():
@@ -178,7 +179,7 @@ def test_run_interleaved_failure_skips_only_the_failing_label(monkeypatch) -> No
 def test_run_single_label_records_the_same_metrics_as_pipeline_metrics(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     calls = []
     step = _timed_step(calls, "reference", wall=2.0, cpu=1.0, rss=5.0)
     metrics, details = {}, {"failures": {}, "stages": {}, "pipelines": {}}
@@ -419,7 +420,7 @@ def test_candidate_steps_and_camera_stage_precedence(tmp_path: Path) -> None:
 def test_run_pipeline_pipes_stages_and_records_each_member(
     tmp_path: Path, monkeypatch
 ) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     output = tmp_path / "out.bin"
     logs = {"producer": tmp_path / "p.log", "consumer": tmp_path / "c.log"}
     record = performance_chain.run_pipeline(
@@ -430,11 +431,11 @@ def test_run_pipeline_pipes_stages_and_records_each_member(
     assert (
         record["wall_s"] >= max(child["wall_s"] for child in record["children"]) - 1e-9
     )
-    assert performance.RUSAGE[-1] is record
+    assert pcm.RUSAGE[-1] is record
 
 
 def test_run_pipeline_raises_on_a_failed_member(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     logs = {"bad": tmp_path / "b.log", "sink": tmp_path / "s.log"}
     with pytest.raises(RuntimeError, match="bad exited 1"):
         performance_chain.run_pipeline(
@@ -445,7 +446,7 @@ def test_run_pipeline_raises_on_a_failed_member(tmp_path: Path, monkeypatch) -> 
 def test_run_pipeline_kills_started_members_when_setup_fails(
     tmp_path: Path, monkeypatch
 ) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     started = []
     real_popen = subprocess.Popen
 
@@ -465,7 +466,7 @@ def test_run_pipeline_kills_started_members_when_setup_fails(
     with pytest.raises(FileNotFoundError):
         performance_chain.run_pipeline(stages, tmp_path / "out.bin", logs)
     assert started[0].returncode < 0  # killed and reaped, not left running
-    assert performance.RUSAGE == []
+    assert pcm.RUSAGE == []
 
 
 def test_summarise_keeps_pipeline_members() -> None:
@@ -538,9 +539,9 @@ def test_loadavg_is_none_where_the_host_does_not_report_it(monkeypatch) -> None:
         raise OSError("no load average")
 
     monkeypatch.setattr(performance_chain.os, "getloadavg", unavailable)
-    assert performance.loadavg() is None
+    assert pcm.loadavg() is None
     monkeypatch.delattr(performance_chain.os, "getloadavg")
-    assert performance.loadavg() is None
+    assert pcm.loadavg() is None
 
 
 def test_normalised_metrics_per_shower_per_photon_and_cpu_shares() -> None:
@@ -706,7 +707,7 @@ def test_variant_counts_parse_the_trace_summary(tmp_path: Path, monkeypatch) -> 
     (tmp_path / "trace_stream.log").write_text(
         "trace-stream: 20 events, 1399647 photons in, 780587 out\n"
     )
-    monkeypatch.setattr(performance_chain, "iact_weight", lambda path: 17.0)
+    monkeypatch.setattr(pcm, "iact_weight", lambda path: 17.0)
     assert performance_chain.variant_counts(tmp_path, tmp_path / "c.iact") == {
         "into_simtel_weight": 17.0,
         "into_trace_photons": 1399647,

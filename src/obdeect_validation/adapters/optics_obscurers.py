@@ -37,13 +37,16 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 from obdeect_validation.adapters import common
-from obdeect_validation.adapters.simtools_validate_optics import _table
+from obdeect_validation.adapters.simtools_validate_optics import (
+    AdapterError,
+    _table,
+    run_simtools,
+)
 
 LIMIT = 0.02  # optics requirement: acceptable at most 2 % (relative)
 GOAL = 0.01  # optics requirement: goal 1 % (reported, not gated)
@@ -56,8 +59,7 @@ BAFFLE = "secondary_mirror_baffle"
 TRANSMISSION = "telescope_transmission"
 
 
-class StudyError(ValueError):
-    """Invalid configuration or result."""
+StudyError = AdapterError
 
 
 # --- configuration --------------------------------------------------------------------------
@@ -230,49 +232,9 @@ def _run_simtools(
     options, overrides, backend: str, output: Path
 ) -> dict[tuple[float, float], float]:
     """Run simtools-validate-optics once; effective area [m^2] keyed by field offset (x, y) [deg]."""
-    output.mkdir(parents=True, exist_ok=True)
-    configuration = {
-        **options,
-        "ray_tracing_backend": backend,
-        "output_path": str(output),
-    }
-    if overrides is not None:
-        configuration["overwrite_model_parameters"] = json.dumps(
-            overrides, separators=(",", ":")
-        )
-    config_path = output / "simtools-config.json"
-    config_path.write_text(
-        json.dumps(
-            {
-                "applications": [
-                    {
-                        "application": "simtools-validate-optics",
-                        "configuration": configuration,
-                    }
-                ]
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
+    run_simtools(
+        "simtools-validate-optics", options, backend, output, overrides=overrides
     )
-    with (
-        (output / "stdout.log").open("wb") as stdout,
-        (output / "stderr.log").open("wb") as stderr,
-    ):
-        try:
-            process = subprocess.run(
-                ["simtools-validate-optics", "--config", str(config_path)],
-                stdout=stdout,
-                stderr=stderr,
-                check=False,
-            )
-        except OSError as exc:
-            raise StudyError(f"cannot run simtools-validate-optics: {exc}") from exc
-    if process.returncode:
-        raise StudyError(
-            f"simtools-validate-optics exited {process.returncode}; see {output}"
-        )
     table = _table(output)
     areas: dict[tuple[float, float], float] = {}
     for x, y, value in zip(

@@ -29,7 +29,8 @@ import tempfile
 from pathlib import Path
 
 from obdeect_validation.adapters import chain_optics as co
-from obdeect_validation.adapters import common, performance, performance_chain
+from obdeect_validation.adapters import common, performance_chain
+from obdeect_validation.adapters import performance_common as pcm
 
 REPS = 3
 THREADS = 1
@@ -144,14 +145,13 @@ def _plot(path, names, metrics):
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--config", type=Path, required=True, help="sim_telarray config from simtools"
+    pcm.add_arguments(
+        parser,
+        config_help="sim_telarray config from simtools",
+        input_default=pcm.INPUT,
+        events_help="first N showers (default all)",
+        reps_default=REPS,
     )
-    parser.add_argument("--input", type=Path, default=performance.INPUT)
-    parser.add_argument(
-        "--events", type=int, default=None, help="first N showers (default all)"
-    )
-    parser.add_argument("--reps", type=int, default=REPS)
     parser.add_argument(
         "--threads",
         type=int,
@@ -164,7 +164,7 @@ def main() -> None:
     work = Path(work_dir or tempfile.mkdtemp(prefix="perf-bottleneck-"))
     work.mkdir(parents=True, exist_ok=True)
     try:
-        source = performance.select_input(
+        source = pcm.select_input(
             args.input.resolve(), args.events, work / "showers-input.iact"
         )
         inputs, _ = performance_chain.prepare_inputs(work, args.config)
@@ -199,12 +199,12 @@ def main() -> None:
             "records": records,
             "compile": compile_record,
             "failures": failures,
-            "host_info": performance.host_info(),
+            "host_info": pcm.host_info(),
             "settings": {
                 "reps": args.reps,
                 "threads": args.threads,
                 "input": str(source),
-                "events": performance.shower_count(source),
+                "events": pcm.shower_count(source),
                 "config": str(inputs["config"]),
                 "candidate_atmosphere": "obdeect propagation (reference atmosphere below 1000 nm); sim_telarray unit table",
                 "headroom": headroom,

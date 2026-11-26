@@ -32,7 +32,9 @@ import tempfile
 from pathlib import Path
 
 from obdeect_validation.adapters import chain_optics as co
-from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
+from obdeect_validation.adapters import performance_common as pcm
 from obdeect_validation.adapters.performance_chain import (
     compile_argv,
     envelope_files,
@@ -88,98 +90,61 @@ def stage_argv(name, work, source, inputs, envelope):
     """
     paths = {key: work / value for key, value in FILES.items()}
     if name == "from_corsika":
-        return ["obdeect", "stream", "from-corsika", source], paths["native"]
+        return cli.from_corsika(source), paths["native"]
     if name == "propagation":
         return (
-            [
-                "obdeect",
-                "propagation",
-                "run",
-                "--transmission",
-                inputs["atmosphere"],
-                "--site-altitude",
-                2156,
-                "--pathlen",
-                28,
-                "--seed",
-                123,
-                "--mode",
-                "weighted",
-                "--wavelength-range",
-                250,
-                700,
-                "-i",
+            cli.propagation_run(
                 paths["native"],
-                "-o",
                 paths["propagated"],
-            ],
+                transmission=inputs["atmosphere"],
+                site_altitude=2156,
+                pathlen=28,
+                seed=123,
+                mode="weighted",
+                wavelength_range=(250, 700),
+            ),
             None,
         )
     if name == "propagation_envelope":
         return (
-            [
-                "obdeect",
-                "propagation",
-                "run",
-                "--transmission",
-                inputs["atmosphere"],
-                "--site-altitude",
-                2156,
-                "--pathlen",
-                28,
-                "--seed",
-                123,
-                # ENVELOPE_FACTOR of performance_chain ("qe")
-                "--envelope",
-                f"qe={envelope['envelope']}",
-                "-i",
+            cli.propagation_run(
                 paths["native"],
-                "-o",
                 paths["propagated_envelope"],
-            ],
+                transmission=inputs["atmosphere"],
+                site_altitude=2156,
+                pathlen=28,
+                seed=123,
+                # ENVELOPE_FACTOR of performance_chain ("qe")
+                envelope=f"qe={envelope['envelope']}",
+            ),
             None,
         )
     if name == "compile_model":
         return compile_argv(inputs, paths["model"]), None
     if name == "trace_stream":
         return (
-            [
-                "obdeect",
-                "ray-tracing",
-                "trace-stream",
-                "--model",
+            cli.trace_stream(
                 paths["model"],
-                "--seed",
-                co.SEED,
-                "--threads",
-                1,
-                "--telescopes",
-                ",".join(map(str, co.TELESCOPES)),
-                "--pointing-zenith-deg",
-                co.ZENITH_DEG,
-                "--pointing-azimuth-deg",
-                co.AZIMUTH_DEG,
-                "--telescope-transmission",
-                "full",
-                "-i",
                 paths["propagated"],
-                "-o",
                 paths["traced"],
-            ],
+                seed=co.SEED,
+                threads=1,
+                telescopes=",".join(map(str, co.TELESCOPES)),
+                pointing_zenith_deg=co.ZENITH_DEG,
+                pointing_azimuth_deg=co.AZIMUTH_DEG,
+                telescope_transmission="full",
+            ),
             None,
         )
     if name == "to_simtel":
         return (
-            [
-                "obdeect",
+            cli.obdeect(
                 "stream",
                 "to-simtel",
-                "--camera-map",
-                paths["camera_map"],
-                "-o",
-                paths["camera_stream"],
-                paths["traced"],
-            ],
+                camera_map=paths["camera_map"],
+                o=paths["camera_stream"],
+                extra=(paths["traced"],),
+            ),
             None,
         )
     raise ValueError(f"unknown stage {name}")
@@ -341,7 +306,7 @@ def profile_stage(name, argv, stdout_file, perf, work, case_dir, metrics, detail
                 entry["report"] = stat.name
         if entry["mode"] is None:
             entry["mode"] = "timing"
-            record = performance.run_timed(
+            record = pcm.run_timed(
                 native_argv(argv), work / f"{name}-timing.log", stdout_file=stdout_file
             )
             entry["wall_s"] = record["wall_s"]
@@ -354,7 +319,7 @@ def main():
     parser.add_argument(
         "--config", type=Path, required=True, help="sim_telarray config from simtools"
     )
-    parser.add_argument("--input", type=Path, default=performance.INPUT)
+    parser.add_argument("--input", type=Path, default=pcm.INPUT)
     parser.add_argument("--events", type=int, default=5, help="first N showers")
     parser.add_argument(
         "--stage", choices=[*STAGES, "all"], default="all", help="stage to profile"
@@ -370,7 +335,7 @@ def main():
     metrics = {}
     details = {
         "case": "performance.profile",
-        "host": performance.host_info(),
+        "host": pcm.host_info(),
         "settings": {
             "events": args.events,
             "perf": perf or "not found",
@@ -381,10 +346,10 @@ def main():
         "profile": {},
     }
     try:
-        showers = performance.select_input(
+        showers = pcm.select_input(
             args.input.resolve(), args.events, work / "showers-input.iact"
         )
-        details["settings"]["showers"] = performance.shower_count(showers)
+        details["settings"]["showers"] = pcm.shower_count(showers)
         inputs, _ = prepare_inputs(work, args.config)
         details["settings"]["config"] = str(inputs["config"])
         envelope = envelope_files(

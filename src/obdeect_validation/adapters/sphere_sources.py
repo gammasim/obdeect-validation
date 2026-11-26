@@ -26,7 +26,7 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 from obdeect_validation.adapters import upward_common as uc
 
 SEED = 20261126
@@ -82,20 +82,8 @@ def description() -> dict:
 
 
 def read_rows(path: Path) -> dict:
-    from obdeect.stream import Reader
-
-    columns = {}
-    run_end = {}
-    for record in Reader(str(path)):
-        if record["type"] == "photons":
-            for name, values in record["columns"].items():
-                columns.setdefault(name, []).append(np.asarray(values))
-        elif record["type"] == "run_end":
-            run_end = dict(record["metadata"])
-        elif record["type"] == "run":
-            run_meta = dict(record["metadata"])
-    data = {name: np.concatenate(parts) for name, parts in columns.items()}
-    return {"columns": data, "run_end": run_end, "run": run_meta}
+    content = streams.read_stream(path)
+    return {"columns": content.columns, "run_end": content.run_end, "run": content.run}
 
 
 def chord_fraction() -> float:
@@ -118,10 +106,7 @@ def pull(count: int, n: int, p: float) -> float:
 
 def float32_budget(value, extra=0.0):
     """One float32 spacing of the stored value (floored at 1 unit) plus the direction budget extra."""
-    spacing = np.spacing(
-        np.maximum(np.abs(np.asarray(value, dtype=np.float32)), 1.0).astype(np.float32)
-    ).astype(np.float64)
-    return spacing + extra
+    return streams.ulp32(value) + extra
 
 
 def check(data: dict, summary: dict) -> tuple[dict, dict]:

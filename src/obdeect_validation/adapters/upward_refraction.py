@@ -22,7 +22,6 @@ ns). The compared quantities are therefore the bending itself, at the stated acc
 
 from __future__ import annotations
 
-import argparse
 import math
 from pathlib import Path
 
@@ -130,7 +129,7 @@ def build_upward(prof, root: Path):
     blocks.append(
         (turn_id, _columns(0.0, 0.0, z_turn, cx_t, cy_t, cz_t, np.float32(0.0)))
     )
-    path = write_stream(root / "upward-refraction-in.pst", telescopes, blocks)
+    path = uc.write_stream(root / "upward-refraction-in.pst", telescopes, blocks)
     return (
         path,
         cases,
@@ -162,10 +161,6 @@ def _stored_from_sin(sin_theta: float, azimuth_deg: float):
         np.float32(sin_theta * math.sin(az)),
         np.float32(math.sqrt(1.0 - sin_theta**2)),
     )
-
-
-def write_stream(path, telescopes, blocks):
-    return uc.write_stream(path, telescopes, blocks, refraction_applied=0)
 
 
 def build_reversed(prof, cases, root: Path):
@@ -217,7 +212,9 @@ def build_reversed(prof, cases, root: Path):
             }
         )
         t_inputs.append(float(t_in))
-    path = write_stream(root / "upward-refraction-reversed-in.pst", telescopes, blocks)
+    path = uc.write_stream(
+        root / "upward-refraction-reversed-in.pst", telescopes, blocks
+    )
     return path, refs, t_inputs
 
 
@@ -384,6 +381,7 @@ def analyse(root: Path) -> tuple[dict, dict]:
         "time_convention": "t_out - (t_in + integral of n / cos(theta) dh / c), t_in = -reference (float32)",
     }
     details["_arrays"] = {"zenith": zen_of, "time": time_err}
+    plot(root / "upward-refraction.png", details)
     return metrics, details
 
 
@@ -409,14 +407,5 @@ def plot(path: Path, details: dict) -> None:
     plotting.save(fig, path)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
-    metrics, details = analyse(root)
-    plot(root / "upward-refraction.png", details)
-    common.write_results(metrics, details, root)
-
-
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

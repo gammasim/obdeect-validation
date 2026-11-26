@@ -26,14 +26,13 @@ Sections (gates in cases/propagation/sphere-extinction.json):
 
 from __future__ import annotations
 
-import argparse
 import math
 from pathlib import Path
 
 import numpy as np
 from scipy.integrate import quad
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 from obdeect_validation.adapters import upward_common as uc
 
 SEED = 20261128
@@ -136,14 +135,7 @@ def spherical_chord_depth(wl, q_rel, direction, length) -> tuple[float, float]:
 
 
 def read_rows(path) -> dict:
-    from obdeect.stream import Reader
-
-    columns: dict[str, list] = {}
-    for record in Reader(str(path)):
-        if record["type"] == "photons":
-            for name, values in record["columns"].items():
-                columns.setdefault(name, []).append(np.asarray(values))
-    return {k: np.concatenate(v) for k, v in columns.items()} if columns else {}
+    return streams.read_columns(path)
 
 
 def ids_of(wavelength) -> np.ndarray:
@@ -154,8 +146,6 @@ def ids_of(wavelength) -> np.ndarray:
 
 
 def write_input(path: Path, columns: dict) -> Path:
-    from obdeect.stream import Writer
-
     run = {
         "run_number": 1,
         "observation_level_m": OBS_M,
@@ -167,17 +157,14 @@ def write_input(path: Path, columns: dict) -> Path:
         "wavelength_max_nm": 700.0,
         "curvature_applied": 0,
     }
-    with Writer(str(path), "obdeect validation: sphere extinction") as writer:
-        writer.write("run", run)
-        writer.write("event", {"event_number": 1})
-        writer.write("telescope", {"telescope_id": 1, "frame": 0, "array_index": 0})
-        writer.write_photons(1, "sky", 0, columns)
-        writer.write(
-            "telescope_end", {"telescope_id": 1, "photons": float(len(columns["x"]))}
-        )
-        writer.write("event_end", {})
-        writer.write("run_end", {})
-    return path
+    return streams.write_stream(
+        path,
+        "obdeect validation: sphere extinction",
+        run,
+        [(1, columns)],
+        photon_frame="sky",
+        telescope_extra={"array_index": 0},
+    )
 
 
 def photon_sets(seed: int = SEED) -> dict:
@@ -520,13 +507,13 @@ def evaluate(paths: dict) -> tuple[dict, dict]:
     return metrics, details
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
+def analyse(root: Path) -> tuple[dict, dict]:
     paths, _ = run_all(root)
-    metrics, details = evaluate(paths)
-    common.write_results(metrics, details, root)
+    return evaluate(paths)
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

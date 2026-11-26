@@ -30,7 +30,6 @@ is reported, not gated. The gate is a paired test of the trigger probability per
 two-sided McNemar on the discordant showers, p > 0.01 (plan.md). It is not a 0-mismatch count.
 """
 
-import argparse
 import math
 import re
 from pathlib import Path
@@ -40,6 +39,7 @@ from eventio.iact import IACTFile
 
 from obdeect_validation.adapters import chain_showers as cs
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 
 UNIT_ATMOSPHERE = common.VALIDATION / "fixtures/unit-transmission.dat"
 MODEL, VERSION = "LSTN-01", "7.0.0"  # defaults: array element and production version
@@ -359,97 +359,55 @@ def candidate_stream(
     )
     model, iact = root / "telescope.model", root / "candidate.iact"
     common.command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / "from-corsika.log",
-        stdout_file=native,
+        cli.from_corsika(source), root / "from-corsika.log", stdout_file=native
     )
     common.command(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            propagation_table(root),
-            "--pathlen",
-            "0",
-            "--site-altitude",
-            f"{site_altitude_m:g}",
-            "--seed",
-            SEED,
-            "--mode",
-            "weighted",
-            "-i",
+        cli.propagation_run(
             native,
-            "-o",
             propagated,
-        ],
+            transmission=propagation_table(root),
+            pathlen="0",
+            site_altitude=f"{site_altitude_m:g}",
+            seed=SEED,
+            mode="weighted",
+        ),
         root / "propagate.log",
     )
     common.command(
-        [
-            "obdeect",
-            "ray-tracing",
-            "compile",
-            "--simulation-models",
-            common.models_root(),
-            "--model",
-            telescope,
-            "--version",
-            model_version,
-            "--seed",
-            SEED,
-            "--zenith-deg",
-            zenith,
-            "--output",
-            model,
-        ],
+        cli.compile_model(
+            model, telescope, model_version, seed=SEED, zenith_deg=zenith
+        ),
         root / "compile.log",
     )
     common.command(
-        [
-            "obdeect",
-            "ray-tracing",
-            "trace-stream",
-            "--model",
+        cli.trace_stream(
             model,
-            "--seed",
-            SEED,
-            "--threads",
-            2,
-            "--telescopes",
-            ",".join(map(str, TELESCOPES)),
-            "--pointing-zenith-deg",
-            zenith,
-            "--pointing-azimuth-deg",
-            azimuth,
-            "--telescope-transmission",
-            "full",
-            "-i",
             propagated,
-            "-o",
             traced,
-        ],
+            seed=SEED,
+            threads=2,
+            telescopes=",".join(map(str, TELESCOPES)),
+            pointing_zenith_deg=zenith,
+            pointing_azimuth_deg=azimuth,
+            telescope_transmission="full",
+        ),
         root / "trace.log",
     )
     common.command(
-        [
-            "obdeect",
+        cli.obdeect(
             "stream",
             "to-simtel",
-            "--camera-map",
-            camera_map(root, rotation, mirror_class),
-            "-o",
-            iact,
-            traced,
-        ],
+            camera_map=camera_map(root, rotation, mirror_class),
+            o=iact,
+            extra=[traced],
+        ),
         root / "to-simtel.log",
     )
     return iact, bypass_from_log(root / "to-simtel.log")
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, default=common.SHOWERS)
+def _add_arguments(parser):
+    cli.input_argument(parser, default=common.SHOWERS)
     parser.add_argument(
         "--config",
         type=Path,
@@ -473,8 +431,11 @@ def main():
         default=None,
         help="telescope azimuth [deg]; default 180",
     )
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+
+
+def analyse(root, args):
+    """Camera of the telescope against the obdeect candidate (sim_telarray with Bypass_Optics): (metrics, details)."""
+    root = Path(root).resolve()
     source = args.input.resolve()
     config = args.config.resolve()
     config_dir = config.parent
@@ -554,8 +515,7 @@ def main():
         plotting.message(
             root / "camera-comparison.png", "candidate pipeline blocked:\n" + str(error)
         )
-        common.write_results(metrics, details, root)
-        return
+        return metrics, details
     details["bypass_optics_candidate"] = bypass
     output = cs.simulate(
         root,
@@ -595,7 +555,11 @@ def main():
         any(row["flag"] for row in triggers.values())
     )
     metrics.update(centroid_offsets(a, b))
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def main():
+    common.results_main(analyse, "", add_arguments=_add_arguments)
 
 
 if __name__ == "__main__":

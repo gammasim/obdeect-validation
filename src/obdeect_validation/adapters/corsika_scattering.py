@@ -7,13 +7,13 @@ physics agreement test.
 
 from __future__ import annotations
 
-import argparse
 import re
 from pathlib import Path
 
 import numpy as np
 
 from obdeect_validation.adapters import common, curved_showers
+from obdeect_validation.adapters import obdeect_cli as cli
 
 SUMMARY = re.compile(
     r"photons in (\d+), out (\d+) \(weight ([\d.e+-]+)\), dropped (\d+)"
@@ -61,19 +61,26 @@ def telescope_totals(path: Path) -> tuple[dict[int, int], dict[int, float]]:
 
 
 def run(source: Path, root: Path) -> dict:
+    from obdeect_validation.adapters.endtoend_common import rewrite
+
     source = source.resolve()
     ground, sky = root / "shower.pst", root / "shower-sky.pst"
     common.command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / "from-corsika.log",
-        stdout_file=ground,
+        cli.from_corsika(source), root / "from-corsika.log", stdout_file=ground
     )
     profile = common.REFERENCE / "cfg/common/atmprof1.dat"
-    to_sky = ["obdeect", "propagation", "to-sky"]
     flags = curved_showers.read_header_flags(source)
-    if profile.is_file() and flags["refraction_bit"]:
-        to_sky += ["--profile", profile]
-    common.command(to_sky + ["-i", ground, "-o", sky], root / "to-sky.log")
+    use_profile = profile.is_file() and flags["refraction_bit"]
+    common.command(
+        cli.obdeect(
+            "propagation",
+            "to-sky",
+            profile=profile if use_profile else None,
+            i=ground,
+            o=sky,
+        ),
+        root / "to-sky.log",
+    )
     to_sky_in, to_sky_out, to_sky_dropped = _summary(
         TO_SKY_SUMMARY, root / "to-sky.log"
     )
@@ -81,46 +88,36 @@ def run(source: Path, root: Path) -> dict:
     table = write_rayleigh_table(root / "rayleigh-scattering.dat")
     base, scattered = root / "base.pst", root / "scattered.pst"
     chunked_sky = root / "shower-sky-rechunked.pst"
-    from obdeect_validation.adapters.endtoend_common import rewrite
-
     rewrite(sky, chunked_sky, split_rows=257)
-    shared = [
-        "obdeect",
-        "propagation",
-        "run",
-        "--transmission",
-        common.UNIT_TRANSMISSION,
-        "--pathlen",
-        "0",
-        "--site-altitude",
-        "2156",
-        "--seed",
-        "17",
-        "--mode",
-        "weighted",
-        "--wavelength-range",
-        "200",
-        "1000",
-    ]
-    if profile.is_file() and flags["refraction_bit"]:
-        shared += ["--profile", profile]
-    shared += ["-i"]
-    selectors = ["--telescopes", "2,3"]
-    common.command(shared + [sky] + selectors + ["-o", base], root / "base.log")
-    selected_args = (
-        shared
-        + [
-            sky,
-            "--scattering",
-            table,
-            "--scattering-points",
-            "32",
-            "--scattering-primaries",
-            "1",
-        ]
-        + selectors
-    )
-    common.command(selected_args + ["-o", scattered], root / "scattered.log")
+
+    def propagation(i, o, *, scattering=False, threads=None):
+        """Weighted propagation of telescopes 2 and 3, optionally with single scattering."""
+        scatter = {}
+        if scattering:
+            scatter = {
+                "scattering": table,
+                "scattering_points": "32",
+                "scattering_primaries": "1",
+            }
+        return cli.obdeect(
+            "propagation",
+            "run",
+            transmission=common.UNIT_TRANSMISSION,
+            pathlen="0",
+            site_altitude="2156",
+            seed="17",
+            mode="weighted",
+            wavelength_range=("200", "1000"),
+            profile=profile if use_profile else None,
+            i=i,
+            **scatter,
+            telescopes="2,3",
+            threads=threads,
+            o=o,
+        )
+
+    common.command(propagation(sky, base), root / "base.log")
+    common.command(propagation(sky, scattered, scattering=True), root / "scattered.log")
     _, base_out, _, base_dropped = _summary(SUMMARY, root / "base.log")
     in_count, out_count, _, dropped = _summary(SUMMARY, root / "scattered.log")
     _, base_weights = telescope_totals(base)
@@ -129,10 +126,10 @@ def run(source: Path, root: Path) -> dict:
 
     invariant = root / "scattered-rechunked.pst"
     invariant_log = root / "scattered-rechunked.log"
-    invariant_args = [*selected_args]
-    invariant_args[invariant_args.index(sky)] = chunked_sky
-    invariant_args += ["--threads", "2"]
-    common.command(invariant_args + ["-o", invariant], invariant_log)
+    common.command(
+        propagation(chunked_sky, invariant, scattering=True, threads="2"),
+        invariant_log,
+    )
     invariant_rows, invariant_weights = telescope_totals(invariant)
     row_delta = sum(
         abs(selected_rows.get(t, 0) - invariant_rows.get(t, 0)) for t in (2, 3)
@@ -159,18 +156,22 @@ def run(source: Path, root: Path) -> dict:
         "selection_chunk_thread_max_weight_difference": weight_delta,
         "scattering_dropped": int(dropped),
         "base_dropped": int(base_dropped),
-        "profile_used": int(profile.is_file() and flags["refraction_bit"]),
+        "profile_used": int(use_profile),
     }
 
 
+def _add_arguments(parser):
+    cli.input_argument(parser, default=common.SHOWERS)
+
+
+def analyse(root, args):
+    """Scattering run of the input shower file in root: (result, details)."""
+    result = run(args.input, Path(root).resolve())
+    return result, {"interpretation": "scattered yield is diagnostic only"}
+
+
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, default=common.SHOWERS)
-    args = parser.parse_args()
-    result = run(args.input, Path.cwd().resolve())
-    common.write_results(
-        result, {"interpretation": "scattered yield is diagnostic only"}
-    )
+    common.results_main(analyse, "", add_arguments=_add_arguments)
 
 
 if __name__ == "__main__":

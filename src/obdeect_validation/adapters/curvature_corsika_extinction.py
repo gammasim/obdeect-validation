@@ -28,6 +28,7 @@ import numpy as np
 from obdeect_validation.adapters import atmosphere_chain as chain
 from obdeect_validation.adapters import common, curved_showers
 from obdeect_validation.adapters import curved_extinction as ce
+from obdeect_validation.adapters import obdeect_cli as cli
 
 SITE_ALTITUDE_M = chain.SITE_ALTITUDE_M  # 2156 m, observation level of the CORSIKA runs
 PATHLEN_M = chain.PATHLEN_M  # 28 m optical path inside the telescope
@@ -174,37 +175,22 @@ def propagate(root, source, table_path, band, curvature, tag):
     native = root / f"{tag}-native.gst"
     propagated = root / f"{tag}-propagated.gst"
     common.command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / f"{tag}-from-corsika.log",
-        stdout_file=native,
+        cli.from_corsika(source), root / f"{tag}-from-corsika.log", stdout_file=native
     )
     log = root / f"{tag}-propagate.log"
     common.command(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            table_path,
-            "--site-altitude",
-            SITE_ALTITUDE_M,
-            "--pathlen",
-            PATHLEN_M,
-            "--seed",
-            SEED,
-            "--mode",
-            "weighted",
-            "--store-p",
-            "--curvature",
-            curvature,
-            "--wavelength-range",
-            band[0],
-            band[1],
-            "-i",
+        cli.propagation_run(
             native,
-            "-o",
             propagated,
-        ],
+            transmission=table_path,
+            site_altitude=SITE_ALTITUDE_M,
+            pathlen=PATHLEN_M,
+            seed=SEED,
+            mode="weighted",
+            store_p=True,
+            curvature=curvature,
+            wavelength_range=tuple(band),
+        ),
         log,
     )
     return chain.propagation_summary(log.read_text(errors="replace")), propagated

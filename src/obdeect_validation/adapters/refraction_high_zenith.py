@@ -312,8 +312,7 @@ def kernel_run(rays):
 # ----------------------------------------------------------------- main
 
 
-def main() -> None:
-    root = Path.cwd()
+def analyse(root: Path) -> tuple[dict, dict]:
     prof = uc.profile()
     rays = build_rays()
     for ray in rays:
@@ -425,8 +424,8 @@ def main() -> None:
         "reference": "flat Snell ray equation, depth form, scipy solve_ivp DOP853 rtol 1e-12; "
         "CORSIKA IACT/atmo raybnd secondary (not gated)",
     }
-    common.write_results(metrics, details)
+    return metrics, details
 
 
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

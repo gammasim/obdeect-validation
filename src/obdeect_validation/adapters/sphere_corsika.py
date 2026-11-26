@@ -33,7 +33,8 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters import upward_common as uc
 
 FIXTURE = uc.ROOT / "fixtures/sphere/photons3d.iact"
@@ -212,12 +213,9 @@ def reference_rows(run: dict) -> list[dict]:
 def ulp_error(got, want) -> np.ndarray:
     """|got - want| in float32 spacings of want (spacing floored at 1 unit), per element."""
     want32 = np.asarray(want, dtype=np.float32)
-    spacing = np.spacing(np.maximum(np.abs(want32), 1.0).astype(np.float32)).astype(
-        np.float64
-    )
-    return (
-        np.abs(np.asarray(got, dtype=np.float64) - want32.astype(np.float64)) / spacing
-    )
+    return np.abs(
+        np.asarray(got, dtype=np.float64) - want32.astype(np.float64)
+    ) / streams.ulp32(want)
 
 
 def read_stream(path) -> dict:
@@ -276,40 +274,35 @@ def downward_on_sphere(reference: list[dict]) -> np.ndarray:
 
 def subset_stream(stream: dict, mask: np.ndarray, out: Path) -> Path:
     """obdeect stream of the masked rows (same run and event records), one chunk per telescope."""
-    from obdeect.stream import Writer
-
     rows = [row for row, keep in zip(stream["rows"], mask) if keep]
-    with Writer(str(out), "obdeect validation: sphere subset") as writer:
-        writer.write("run", stream["run"])
-        writer.write("event", {"event_number": 1})
-        for tel in sorted({row["telescope"] for row in rows}):
-            selected = [row for row in rows if row["telescope"] == tel]
-            columns = {
-                name: np.array([row[name] for row in selected], dtype=np.float32)
-                for name in (
-                    "x",
-                    "y",
-                    "z",
-                    "cx",
-                    "cy",
-                    "cz",
-                    "t",
-                    "zem",
-                    "w",
-                    "path",
-                    "wavelength",
-                )
-            }
-            writer.write(
-                "telescope", {"telescope_id": tel, "frame": "ground", "array_index": 0}
+    blocks = []
+    for tel in sorted({row["telescope"] for row in rows}):
+        selected = [row for row in rows if row["telescope"] == tel]
+        columns = {
+            name: np.array([row[name] for row in selected], dtype=np.float32)
+            for name in (
+                "x",
+                "y",
+                "z",
+                "cx",
+                "cy",
+                "cz",
+                "t",
+                "zem",
+                "w",
+                "path",
+                "wavelength",
             )
-            writer.write_photons(tel, "ground", 0, columns)
-            writer.write(
-                "telescope_end", {"telescope_id": tel, "photons": float(len(selected))}
-            )
-        writer.write("event_end", {})
-        writer.write("run_end", {})
-    return out
+        }
+        blocks.append((tel, columns))
+    return streams.write_stream(
+        out,
+        "obdeect validation: sphere subset",
+        stream["run"],
+        blocks,
+        frame="ground",
+        telescope_extra={"array_index": 0},
+    )
 
 
 def simtel_rows(path: Path) -> list[dict]:
@@ -361,22 +354,11 @@ def plane_reference(rows: list[dict]) -> list[dict]:
     return out
 
 
-def status(argv, log: Path) -> int:
-    """Exit status of argv; its stderr goes to log (no exception on failure)."""
-    with Path(log).open("wb") as stream:
-        return subprocess.run(
-            [str(a) for a in argv],
-            stdout=subprocess.DEVNULL,
-            stderr=stream,
-            check=False,
-        ).returncode
-
-
 def run_all(root: Path) -> tuple[dict, dict]:
     tool = common.tool("obdeect")
     pst = root / "photons3d.pst"
     common.command(
-        [tool, "stream", "from-corsika", FIXTURE],
+        cli.from_corsika(FIXTURE, executable=tool),
         root / "from-corsika.log",
         stdout_file=pst,
     )
@@ -391,7 +373,12 @@ def run_all(root: Path) -> tuple[dict, dict]:
 
     # to-simtel: the full fixture is refused; the downward on-sphere subset converts to the plane.
     full_log = root / "to-simtel-full.log"
-    full_status = status([tool, "stream", "to-simtel", pst], full_log)
+    full_status = common.command(
+        cli.obdeect("stream", "to-simtel", pst, executable=tool),
+        full_log,
+        check=False,
+        stdout=subprocess.DEVNULL,
+    )
     refused_full = int(
         full_status != 0 and "inside the telescope sphere" in full_log.read_text()
     )
@@ -399,7 +386,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
     subset = subset_stream(stream, mask, root / "subset.pst")
     converted = root / "subset.simtel"
     common.command(
-        [tool, "stream", "to-simtel", subset],
+        cli.obdeect("stream", "to-simtel", subset, executable=tool),
         root / "to-simtel-subset.log",
         stdout_file=converted,
     )

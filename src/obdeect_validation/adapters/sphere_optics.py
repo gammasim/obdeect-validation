@@ -28,7 +28,7 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 from obdeect_validation.adapters import optics_directions as od
 from obdeect_validation.adapters import upward_common as uc
 
@@ -114,8 +114,6 @@ def horizontal_rows(n: int, seed: int) -> dict:
 
 
 def _write(path: Path, columns: dict, radius_m: float) -> Path:
-    from obdeect.stream import Writer
-
     run = {
         "run_number": 1,
         "observation_level_m": 0.0,
@@ -126,17 +124,14 @@ def _write(path: Path, columns: dict, radius_m: float) -> Path:
         "wavelength_min_nm": 250.0,
         "wavelength_max_nm": 800.0,
     }
-    with Writer(str(path), "obdeect validation: sphere optics") as writer:
-        writer.write("run", run)
-        writer.write("event", {"event_number": 1})
-        writer.write("telescope", {"telescope_id": 1, "frame": 0, "array_index": 0})
-        writer.write_photons(1, "sky", 0, columns)
-        writer.write(
-            "telescope_end", {"telescope_id": 1, "photons": float(len(columns["x"]))}
-        )
-        writer.write("event_end", {})
-        writer.write("run_end", {})
-    return path
+    return streams.write_stream(
+        path,
+        "obdeect validation: sphere optics",
+        run,
+        [(1, columns)],
+        photon_frame="sky",
+        telescope_extra={"array_index": 0},
+    )
 
 
 def propagate_pair(
@@ -159,20 +154,6 @@ def propagate_pair(
     return plane, sphere
 
 
-def read_camera(path: Path) -> dict:
-    from obdeect.stream import Reader
-
-    columns: dict[str, list] = {}
-    for record in Reader(str(path)):
-        if record["type"] == "photons":
-            for name, values in record["columns"].items():
-                columns.setdefault(name, []).append(np.asarray(values))
-    return {
-        k: np.concatenate(v) if v else np.empty(0, dtype=np.float32)
-        for k, v in columns.items()
-    }
-
-
 def trace(model, grid: Path, out: Path, seed: int, pointing) -> dict:
     from obdeect.ray_tracing.stream import trace_stream
 
@@ -191,10 +172,7 @@ BUDGET_SPACINGS = 4.0
 
 
 def budget(values, factor: float = BUDGET_SPACINGS) -> np.ndarray:
-    v = np.asarray(values, dtype=np.float32)
-    return factor * np.spacing(np.maximum(np.abs(v), 1.0).astype(np.float32)).astype(
-        np.float64
-    )
+    return factor * streams.ulp32(values)
 
 
 def compare_camera(plane: dict, sphere: dict) -> dict:
@@ -296,8 +274,8 @@ def time_convention(
 
     n_g = float(model.propagation_group_index)
     plane_z = float(minimum_input_plane_height_m(model, ZENITH_DEG, AZIMUTH_DEG))
-    grid_plane = read_camera(plane_grid)
-    grid_sphere = read_camera(sphere_grid)
+    grid_plane = streams.read_columns(plane_grid)
+    grid_sphere = streams.read_columns(sphere_grid)
 
     def index(cols):
         return {v: i for i, v in enumerate(ids_of(cols["wavelength"]).tolist())}
@@ -367,8 +345,8 @@ def pair_part(root: Path, name: str, model, columns: dict, radius_m: float) -> d
         seed=5,
         pointing=(ZENITH_DEG, AZIMUTH_DEG),
     )
-    plane_cam = read_camera(root / f"{name}-plane-cam.pst")
-    sphere_cam = read_camera(root / f"{name}-sphere-cam.pst")
+    plane_cam = streams.read_columns(root / f"{name}-plane-cam.pst")
+    sphere_cam = streams.read_columns(root / f"{name}-sphere-cam.pst")
     result = compare_camera(plane_cam, sphere_cam)
     result["time_convention"] = time_convention(
         model, plane_grid, sphere_grid, plane_cam, sphere_cam
@@ -397,7 +375,7 @@ def run_all(root: Path) -> tuple[dict, dict]:
     # horizontal sphere rows on the tilted fixture telescope: traced, not rejected
     horiz = horizontal_rows(2000, SEED + 1)
     _hplane, hsphere = propagate_pair(root, "horizontal", horiz, FIXTURE_RADIUS_M)
-    hrows = read_camera(hsphere)
+    hrows = streams.read_columns(hsphere)
     hsummary = trace(
         fixture,
         hsphere,

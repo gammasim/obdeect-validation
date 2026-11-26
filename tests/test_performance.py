@@ -4,13 +4,14 @@ from pathlib import Path
 import pytest
 
 from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import performance_common as pcm
 
 
 def test_restrict_table_keeps_comments_and_rows_below_limit(tmp_path: Path) -> None:
     source = tmp_path / "source.dat"
     source.write_text("# header\n\n 999 0.1 0.2\n1000 0.3 0.4\n 1200 0.5\n")
     target = tmp_path / "target.dat"
-    assert performance.restrict_table(source, target) == 3
+    assert pcm.restrict_table(source, target) == 3
     assert target.read_text() == "# header\n\n 999 0.1 0.2\n"
 
 
@@ -18,7 +19,7 @@ def test_restrict_table_keeps_non_numeric_lines(tmp_path: Path) -> None:
     source = tmp_path / "source.dat"
     source.write_text("lambda 1 2\n500 0.1\n")
     target = tmp_path / "target.dat"
-    performance.restrict_table(source, target)
+    pcm.restrict_table(source, target)
     assert target.read_text() == "lambda 1 2\n500 0.1\n"
 
 
@@ -28,15 +29,15 @@ def test_stream_weight_parses_obdeect_summary(tmp_path: Path, monkeypatch) -> No
             "records:\n  photons 3\ntotal: 10888516 photons, weight sum 54210207.61\n"
         )
 
-    monkeypatch.setattr(performance.subprocess, "run", lambda *args, **kwargs: Result())
-    assert performance.stream_weight(tmp_path / "x.gst") == (10888516, 54210207.61)
+    monkeypatch.setattr(pcm.subprocess, "run", lambda *args, **kwargs: Result())
+    assert pcm.stream_weight(tmp_path / "x.gst") == (10888516, 54210207.61)
 
 
 def test_run_timed_records_child_usage_and_raises_on_failure(tmp_path: Path) -> None:
-    record = performance.run_timed(["true"], tmp_path / "log.txt")
+    record = pcm.run_timed(["true"], tmp_path / "log.txt")
     assert record["returncode"] == 0 and record["wall_s"] >= 0 and record["cpu_s"] >= 0
     try:
-        performance.run_timed(["false"], tmp_path / "log2.txt")
+        pcm.run_timed(["false"], tmp_path / "log2.txt")
     except RuntimeError as error:
         assert "exited 1" in str(error)
     else:
@@ -45,8 +46,8 @@ def test_run_timed_records_child_usage_and_raises_on_failure(tmp_path: Path) -> 
 
 def test_parse_vmhwm_reads_peak_resident_set_in_kb() -> None:
     status = "Name:\tsleep\nVmPeak:\t  9000 kB\nVmHWM:\t    1536 kB\nVmRSS:\t 1200 kB\n"
-    assert performance.parse_vmhwm_kb(status) == 1536
-    assert performance.parse_vmhwm_kb("Name:\tzombie\n") is None
+    assert pcm.parse_vmhwm_kb(status) == 1536
+    assert pcm.parse_vmhwm_kb("Name:\tzombie\n") is None
 
 
 def test_rss_sampler_keeps_the_largest_sample() -> None:
@@ -57,7 +58,7 @@ def test_rss_sampler_keeps_the_largest_sample() -> None:
         seen.append(None)
         return next(values, None)
 
-    sampler = performance.RssSampler(pid=0, read=read, interval=0)
+    sampler = pcm.RssSampler(pid=0, read=read, interval=0)
     sampler.start()
     while len(seen) < 5:
         pass
@@ -65,7 +66,7 @@ def test_rss_sampler_keeps_the_largest_sample() -> None:
 
 
 def test_rss_sampler_without_samples_returns_none() -> None:
-    sampler = performance.RssSampler(pid=0, read=lambda: None, interval=0)
+    sampler = pcm.RssSampler(pid=0, read=lambda: None, interval=0)
     sampler.start()
     assert sampler.stop() is None
 
@@ -75,7 +76,7 @@ def test_run_timed_small_child_does_not_report_parent_peak(tmp_path: Path) -> No
     parent_ballast = bytearray(200 * 1024 * 1024)
     for offset in range(0, len(parent_ballast), 4096):
         parent_ballast[offset] = 1
-    record = performance.run_timed(["sleep", "0.3"], tmp_path / "log.txt")
+    record = pcm.run_timed(["sleep", "0.3"], tmp_path / "log.txt")
     assert record["argv"] == ["sleep", "0.3"]
     assert record["peak_rss_mb"] < 100, record
     assert record["peak_rss_source"] in {"proc-VmHWM-sampled", "wait4-ru_maxrss"}
@@ -113,7 +114,7 @@ def fake_runner(walls, cpu=1.0):
     walls = iter(walls)
 
     def run_once():
-        performance.RUSAGE.append(
+        pcm.RUSAGE.append(
             {
                 "argv": ["fake"],
                 "wall_s": next(walls),
@@ -129,7 +130,7 @@ def fake_runner(walls, cpu=1.0):
 def test_measure_reports_wall_spread_and_rate_only_with_photons(
     tmp_path: Path, monkeypatch
 ) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
     stage_in = tmp_path / "in.gst"
     stage_in.write_bytes(b"12")
     stage_out = tmp_path / "out.gst"
@@ -171,7 +172,7 @@ def test_measure_reports_wall_spread_and_rate_only_with_photons(
 
 
 def test_measure_records_a_failed_stage(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(performance, "RUSAGE", [])
+    monkeypatch.setattr(pcm, "RUSAGE", [])
 
     def fail():
         raise RuntimeError("bad input")
@@ -185,8 +186,8 @@ def test_measure_records_a_failed_stage(tmp_path: Path, monkeypatch) -> None:
 
 
 def test_run_timed_records_load_average_before(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(performance, "loadavg", lambda: 0.25)
-    record = performance.run_timed(["true"], tmp_path / "log.txt")
+    monkeypatch.setattr(pcm, "loadavg", lambda: 0.25)
+    record = pcm.run_timed(["true"], tmp_path / "log.txt")
     assert record["loadavg_before"] == 0.25
 
 
@@ -194,8 +195,8 @@ def test_loadavg_is_none_without_os_support(monkeypatch) -> None:
     def unavailable():
         raise OSError("no load average")
 
-    monkeypatch.setattr(performance.os, "getloadavg", unavailable)
-    assert performance.loadavg() is None
+    monkeypatch.setattr(pcm.os, "getloadavg", unavailable)
+    assert pcm.loadavg() is None
 
 
 def test_cpu_metrics_share_of_envelope_chain_and_ns_per_photon() -> None:

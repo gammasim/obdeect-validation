@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from obdeect_validation.adapters import performance, performance_budget
+from obdeect_validation.adapters import performance_common as pcm
 
 
 def shower_metrics(**overrides):
@@ -126,7 +127,7 @@ def test_throughput_is_decimal_gigabytes_per_second():
 
 def fake_blocks(monkeypatch, layout):
     """Replace the eventio reader by (type, start, end) blocks laid out in the given order."""
-    monkeypatch.setattr(performance, "_top_level_blocks", lambda path: iter(layout))
+    monkeypatch.setattr(pcm, "_top_level_blocks", lambda path: iter(layout))
 
 
 def test_subset_keeps_header_first_events_and_run_end(
@@ -147,7 +148,7 @@ def test_subset_keeps_header_first_events_and_run_end(
     ]
     fake_blocks(monkeypatch, layout)
     target = tmp_path / "out.iact"
-    assert performance.subset_showers(source, target, 2) == 2
+    assert pcm.subset_showers(source, target, 2) == 2
     assert target.read_bytes() == data[0:40] + data[56:64]
 
 
@@ -156,15 +157,15 @@ def test_subset_zero_showers_and_negative_count(tmp_path: Path, monkeypatch) -> 
     source.write_bytes(bytes(32))
     fake_blocks(monkeypatch, [(1200, 0, 8), (1202, 8, 16), (1210, 16, 32)])
     target = tmp_path / "out.iact"
-    assert performance.subset_showers(source, target, 0) == 0
+    assert pcm.subset_showers(source, target, 0) == 0
     assert target.read_bytes() == bytes(8) + bytes(16)
     with pytest.raises(ValueError):
-        performance.subset_showers(source, target, -1)
+        pcm.subset_showers(source, target, -1)
 
 
 def test_select_input_returns_source_without_events(tmp_path: Path) -> None:
     source = tmp_path / "in.iact"
-    assert performance.select_input(source, None, tmp_path / "x") == source
+    assert pcm.select_input(source, None, tmp_path / "x") == source
 
 
 def test_metrics_file_is_strict_json(tmp_path: Path) -> None:

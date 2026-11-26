@@ -5,10 +5,11 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any
+
+from obdeect_validation.adapters import common
 
 METRICS = ("psf_cm", "eff_area", "eff_flen")
 LIMIT_STATUS = (
@@ -335,6 +336,61 @@ def _versions() -> dict[str, str | None]:
     return out
 
 
+def run_simtools(
+    application: str,
+    options: dict[str, Any],
+    backend: str,
+    output: Path,
+    *,
+    overrides: dict[str, Any] | None = None,
+) -> int:
+    """Run one simtools application with a ray-tracing backend in output (shared by the optics adapters).
+
+    The configuration (options, the backend and output_path, and overwrite_model_parameters when
+    overrides is given) is written to output/simtools-config.json; stdout and stderr go to
+    output/stdout.log and output/stderr.log. Raises AdapterError when the application cannot be
+    started or exits non-zero. Returns the exit status.
+    """
+    output.mkdir(parents=True, exist_ok=True)
+    configuration = {
+        **options,
+        "ray_tracing_backend": backend,
+        "output_path": str(output),
+    }
+    if overrides is not None:
+        configuration["overwrite_model_parameters"] = json.dumps(
+            overrides, separators=(",", ":")
+        )
+    config_file = output / "simtools-config.json"
+    config_file.write_text(
+        json.dumps(
+            {
+                "applications": [
+                    {"application": application, "configuration": configuration}
+                ]
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    try:
+        returncode = common.command(
+            [application, "--config", config_file],
+            output / "stderr.log",
+            stdout_file=output / "stdout.log",
+            check=False,
+        )
+    except OSError as exc:
+        raise AdapterError(f"cannot run {application}: {exc}") from exc
+    if returncode:
+        raise AdapterError(
+            f"{application} ({backend}) exited {returncode}; see {output}"
+        )
+    return returncode
+
+
 def execute(config_path: Path, output: Path) -> dict[str, float | int]:
     config = _config(config_path)
     limits = config["limits"]
@@ -343,36 +399,13 @@ def execute(config_path: Path, output: Path) -> dict[str, float | int]:
     backends: dict[str, Any] = {}
     for backend in ("sim_telarray", "obdeect"):
         backend_dir = output / backend
-        backend_dir.mkdir(parents=True, exist_ok=True)
-        app_config = {
-            "application": "simtools-validate-optics",
-            "configuration": {
-                **config["simtools_config"]["configuration"],
-                "ray_tracing_backend": backend,
-                "output_path": str(backend_dir),
-            },
-        }
-        config_file = backend_dir / "simtools-config.json"
-        config_file.write_text(
-            json.dumps({"applications": [app_config]}, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+        returncode = run_simtools(
+            "simtools-validate-optics",
+            config["simtools_config"]["configuration"],
+            backend,
+            backend_dir,
         )
-        command = ["simtools-validate-optics", "--config", str(config_file)]
-        try:
-            with (
-                (backend_dir / "stdout.log").open("wb") as stdout,
-                (backend_dir / "stderr.log").open("wb") as stderr,
-            ):
-                proc = subprocess.run(
-                    command, stdout=stdout, stderr=stderr, check=False
-                )
-        except OSError as exc:
-            raise AdapterError(f"cannot run {command[0]}: {exc}") from exc
-        if proc.returncode:
-            raise AdapterError(
-                f"{command[0]} ({backend}) exited {proc.returncode}; see {backend_dir}"
-            )
-        backends[backend] = {"dir": str(backend_dir), "returncode": proc.returncode}
+        backends[backend] = {"dir": str(backend_dir), "returncode": returncode}
         result_tables[backend] = _table(backend_dir)
 
     sim = _sorted(result_tables["sim_telarray"])

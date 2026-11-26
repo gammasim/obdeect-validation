@@ -46,13 +46,13 @@ from __future__ import annotations
 
 import json
 import math
-import sys
 import traceback
 from pathlib import Path
 
 import numpy as np
 
 from obdeect_validation.adapters import common, source_camera
+from obdeect_validation.adapters import obdeect_cli as cli
 
 ILLUMINATORS = {
     "ILLN-01": {"site": "North", "telescope": "LSTN-01"},
@@ -366,25 +366,15 @@ def propagate_bent(root, native_gst):
     extinction; photons end on the plane z = 0 with their arrival time (xyzls -A 1 counterpart)."""
     propagated = root / "native-bent.gst"
     common.command(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--no-extinction",
-            "--site-altitude",
-            str(OBS_LEVEL_M),
-            "--wavelength-range",
-            "300",
-            "800",
-            "--seed",
-            "1",
-            "--profile",
-            str(common.reference_config_dir() / "atmprof1.dat"),
-            "-i",
+        cli.propagation_run(
             native_gst,
-            "-o",
             propagated,
-        ],
+            no_extinction=True,
+            site_altitude=str(OBS_LEVEL_M),
+            wavelength_range=("300", "800"),
+            seed="1",
+            profile=str(common.reference_config_dir() / "atmprof1.dat"),
+        ),
         root / "propagate.log",
     )
     return propagated
@@ -395,16 +385,13 @@ def _camera_stage(root, propagated, reference_iact, geo, label):
     both through sim_telarray with the telescope pointed at the illuminator."""
     candidate = root / "stage2-candidate.iact"
     common.command(
-        [
-            "obdeect",
+        cli.obdeect(
             "stream",
             "to-simtel",
-            "--atmprof",
-            str(common.reference_config_dir() / "atmprof1.dat"),
-            "-o",
-            candidate,
-            propagated,
-        ],
+            atmprof=str(common.reference_config_dir() / "atmprof1.dat"),
+            o=candidate,
+            extra=[propagated],
+        ),
         root / "stage2-to-simtel.log",
     )
     options = {
@@ -453,36 +440,26 @@ def _camera_stage(root, propagated, reference_iact, geo, label):
     return {**camera, **pixel}, counts
 
 
-def native_argv(geo, events, photons):
-    """obdeect sources run point-source with the arguments of source_argv (SI units, m)."""
+def native_argv(geo, events, photons, output):
+    """obdeect sources run point-source with the arguments of source_argv (SI units, m), -o output."""
     x, y, z = (v / 100.0 for v in geo["source_cm"])
-    return [
+    return cli.obdeect(
         "sources",
         "run",
         "point-source",
-        "--observation-level",
-        f"{OBS_LEVEL_M:.1f}",
-        "--seed",
-        str(SEED),
-        "--atmosphere-id",
-        "1",
-        "--events",
-        str(events),
-        "--photons",
-        str(photons),
-        "--position",
-        f"{x:.8f},{y:.8f},{z:.8f}",
-        "--direction",
-        ",".join(f"{v:.8f}" for v in geo["pointing"]),
-        "--telescope-radius",
-        f"{TELESCOPE_RADIUS_CM / 100.0:.4f}",
-        "--bunch-size",
-        "1",
-        "--spectrum",
-        f"fixed:wavelength_nm={WAVELENGTH_NM}",
-        "--angular",
-        ANGULAR,
-    ]
+        observation_level=f"{OBS_LEVEL_M:.1f}",
+        seed=str(SEED),
+        atmosphere_id="1",
+        events=str(events),
+        photons=str(photons),
+        position=f"{x:.8f},{y:.8f},{z:.8f}",
+        direction=",".join(f"{v:.8f}" for v in geo["pointing"]),
+        telescope_radius=f"{TELESCOPE_RADIUS_CM / 100.0:.4f}",
+        bunch_size="1",
+        spectrum=f"fixed:wavelength_nm={WAVELENGTH_NM}",
+        angular=ANGULAR,
+        o=output,
+    )
 
 
 def run_configuration(root, instrument, label, scale):
@@ -491,12 +468,7 @@ def run_configuration(root, instrument, label, scale):
     geo = geometry(instrument, scale)
     native_gst, reference_iact = root / "native.gst", root / "reference.iact.gz"
     common.command(
-        [
-            "obdeect",
-            *native_argv(geo, EVENTS, PHOTONS_PER_EVENT),
-            "-o",
-            native_gst,
-        ],
+        native_argv(geo, EVENTS, PHOTONS_PER_EVENT, native_gst),
         root / "native.log",
     )
     common.command(
@@ -568,10 +540,11 @@ def run_configuration(root, instrument, label, scale):
     return metrics, details
 
 
-def main(instrument):
+def analyse(root: Path, args) -> tuple[dict, dict]:
+    """Both distances of the illuminator args.instrument in root (see common.results_main)."""
+    instrument = args.instrument
     if instrument not in ILLUMINATORS:
         raise ValueError(f"unknown illuminator {instrument}")
-    root = Path.cwd()
     metrics, details = (
         {},
         {"case": f"{instrument} versus xyzls (LightEmission)", "configurations": {}},
@@ -596,8 +569,16 @@ def main(instrument):
         "bent-ray integral per photon; xyzls times recorded only (grazing raybnd_ term)",
         "limits": "see the module docstring",
     }
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def _add_arguments(parser) -> None:
+    parser.add_argument("instrument", help=f"illuminator: {', '.join(ILLUMINATORS)}")
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__.splitlines()[0], _add_arguments)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main()

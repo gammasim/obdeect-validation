@@ -1,10 +1,8 @@
 """Real CORSIKA showers through the stream codec and sim_telarray camera."""
 
-import argparse
 import json
 import os
 import shutil
-import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -12,6 +10,7 @@ from eventio import SimTelFile
 from eventio.iact import IACTFile
 
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters.common import command
 
 PE_BIAS_FLOOR = 0.01  # mean p.e. per telescope-event within 1 % (plan step 5)
@@ -149,19 +148,14 @@ def generate(
         if geometry == "flat"
         else str(curved_showers.corsika_executable("curved"))
     )
-    with (
-        (root / "corsika.card").open("rb") as stdin,
-        (root / "corsika.log").open("wb") as log,
-    ):
-        result = subprocess.run(
-            [corsika],
-            cwd=root,
-            stdin=stdin,
-            stdout=log,
-            stderr=subprocess.STDOUT,
-            check=False,
-        )
-    if result.returncode or not (root / "showers.iact").is_file():
+    returncode = command(
+        [corsika],
+        root / "corsika.log",
+        cwd=root,
+        stdin_file=root / "corsika.card",
+        check=False,
+    )
+    if returncode or not (root / "showers.iact").is_file():
         raise RuntimeError(f"CORSIKA failed: see {root}/corsika.log")
     (root / "input-hashes.json").write_text(json.dumps(hashes, indent=2) + "\n")
     return root / "showers.iact"
@@ -400,15 +394,8 @@ def roundtrip(root, source):
     Returns (native stream, metrics, per-field codec errors, reference events, candidate events).
     """
     native, converted = root / "showers.gst", root / "roundtrip.iact"
-    command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / "from-corsika.log",
-        stdout_file=native,
-    )
-    command(
-        ["obdeect", "stream", "to-simtel", native, "-o", converted],
-        root / "to-simtel.log",
-    )
+    command(cli.from_corsika(source), root / "from-corsika.log", stdout_file=native)
+    command(cli.to_simtel(native, converted), root / "to-simtel.log")
     metrics, fields = compare_photons(source, converted)
     a = camera_events(simulate(root, source, "direct"))
     b = camera_events(simulate(root, converted, "roundtrip"))
@@ -423,14 +410,16 @@ def roundtrip(root, source):
     return native, metrics, fields, a, b
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def _add_arguments(parser):
     parser.add_argument("--showers", type=int, default=20)
     parser.add_argument("--input", type=Path)
     parser.add_argument("--energy-min", type=float, default=100)
     parser.add_argument("--energy-max", type=float, default=3000)
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+
+
+def analyse(root, args):
+    """Round trip of the showers (args.input, or generated with CORSIKA): (metrics, details)."""
+    root = Path(root).resolve()
     source = (
         args.input.resolve()
         if args.input
@@ -439,15 +428,16 @@ def main():
         )
     )
     _, metrics, fields, a, b = roundtrip(root, source)
-    common.write_results(
-        metrics,
-        {
-            "codec_per_field_normalized_error": fields,
-            "reference_event_ids": list(a),
-            "candidate_event_ids": list(b),
-            "camera_event_keys": list(next(iter(a.values())).keys()) if a else [],
-        },
-    )
+    return metrics, {
+        "codec_per_field_normalized_error": fields,
+        "reference_event_ids": list(a),
+        "candidate_event_ids": list(b),
+        "camera_event_keys": list(next(iter(a.values())).keys()) if a else [],
+    }
+
+
+def main():
+    common.results_main(analyse, "", add_arguments=_add_arguments)
 
 
 if __name__ == "__main__":

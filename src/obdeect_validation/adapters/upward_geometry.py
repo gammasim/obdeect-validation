@@ -11,7 +11,6 @@ rounding of a stored value). Also: cx, cy, cz are kept bit for bit, and the G ->
 
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 
 import numpy as np
@@ -206,6 +205,7 @@ def analyse(root: Path) -> tuple[dict, dict]:
         "x": ref["x"],
         "y": ref["y"],
     }
+    plot(root / "upward-geometry.png", details)
     return metrics, details
 
 
@@ -213,7 +213,7 @@ def plot(path: Path, details: dict) -> None:
     arrays = details.pop("_arrays")
     fig, axis = plotting.figure(1, 1, (6.0, 4.0))
     axis.plot(
-        np.abs(arrays["zenith"]) * 0 + arrays["zenith"],
+        arrays["zenith"],
         arrays["pos"],
         "o",
         markersize=4,
@@ -236,14 +236,5 @@ def plot(path: Path, details: dict) -> None:
     plotting.save(fig, path)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
-    metrics, details = analyse(root)
-    plot(root / "upward-geometry.png", details)
-    common.write_results(metrics, details, root)
-
-
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

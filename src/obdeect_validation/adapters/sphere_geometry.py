@@ -32,7 +32,7 @@ from pathlib import Path
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 from obdeect_validation.adapters import endtoend_common as e2e
 from obdeect_validation.adapters import upward_common as uc
 
@@ -514,11 +514,8 @@ def float32_budget(value, path, time: bool = False) -> np.ndarray:
     The stored direction is unit to 6e-8 (float32); a path s then moves the row by 2 eps s (eps = 2^-24).
     Times add the same budget divided by c. Spacing floored at 1 unit (a metre or a ns).
     """
-    spacing = np.spacing(
-        np.maximum(np.abs(np.asarray(value, dtype=np.float32)), 1.0).astype(np.float32)
-    ).astype(np.float64)
     direction = 2.0 * EPS32 * np.asarray(path, dtype=np.float64)
-    return spacing + (direction / C_M_NS if time else direction)
+    return streams.ulp32(value) + (direction / C_M_NS if time else direction)
 
 
 def run_all(root: Path) -> tuple[dict, dict]:

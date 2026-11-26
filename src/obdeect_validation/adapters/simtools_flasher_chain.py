@@ -39,7 +39,6 @@ The moment gate, per event:
 - total p.e. ratio: as above.
 """
 
-import argparse
 from pathlib import Path
 
 import numpy as np
@@ -268,30 +267,29 @@ def moment_camera_comparison(reference_path, candidate_path):
     return metrics, details
 
 
-def main():
-    """Compare the two flasher outputs and write metrics.json and details.json."""
-    parser = argparse.ArgumentParser()
+def _add_arguments(parser):
     parser.add_argument("--reference", type=Path, required=True)
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--gate", choices=("pixels", "moments"), default="pixels")
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+
+
+def analyse(root, args):
+    """Metrics and details of the comparison; a candidate that did not produce output is blocked."""
     if not args.candidate.exists():
-        common.write_results(
+        return (
             {"candidate_pipeline_complete": 0},
             {"candidate_blocked": "candidate sim_telarray output missing"},
-            root,
         )
-        return
     if args.gate == "moments":
-        metrics, details = moment_camera_comparison(
+        return moment_camera_comparison(
             args.reference.resolve(), args.candidate.resolve()
         )
-    else:
-        metrics, details = camera_comparison(
-            args.reference.resolve(), args.candidate.resolve()
-        )
-    common.write_results(metrics, details, root)
+    return camera_comparison(args.reference.resolve(), args.candidate.resolve())
+
+
+def main():
+    """Compare the two flasher outputs and write metrics.json and details.json."""
+    common.results_main(analyse, __doc__, add_arguments=_add_arguments)
 
 
 if __name__ == "__main__":

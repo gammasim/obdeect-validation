@@ -28,6 +28,7 @@ import numpy as np
 
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters import upward_common as uc
 
 SEED = 20261127
@@ -95,31 +96,21 @@ def population():
     return cols, reach
 
 
-def cli(root: Path, stream: Path, out: Path, threads: int, seed: int) -> None:
-    argv = [
-        "obdeect",
-        "propagation",
-        "run",
-        "--transmission",
-        uc.TRANSMISSION,
-        "--pathlen",
-        "0",
-        "--site-altitude",
-        uc.SITE_M,
-        "--profile",
-        uc.PROFILE,
-        "--seed",
-        seed,
-        "--mode",
-        "weighted",
-        "--threads",
-        threads,
-        "-i",
-        stream,
-        "-o",
-        out,
-    ]
-    common.command(argv, root / f"cli-{out.stem}.log")
+def run_cli(root: Path, stream: Path, out: Path, threads: int, seed: int) -> None:
+    common.command(
+        cli.propagation_run(
+            stream,
+            out,
+            transmission=uc.TRANSMISSION,
+            pathlen="0",
+            site_altitude=uc.SITE_M,
+            profile=uc.PROFILE,
+            seed=seed,
+            mode="weighted",
+            threads=threads,
+        ),
+        root / f"cli-{out.stem}.log",
+    )
 
 
 def api(stream: Path, out: Path, threads: int, seed: int) -> dict:
@@ -184,9 +175,9 @@ def analyse(root: Path) -> tuple[dict, dict]:
 
     outs = {}
     outs["cli1"] = root / "out-cli1.pst"
-    cli(root, natural, outs["cli1"], 1, 7)
+    run_cli(root, natural, outs["cli1"], 1, 7)
     outs["cli4"] = root / "out-cli4.pst"
-    cli(root, natural, outs["cli4"], 4, 7)
+    run_cli(root, natural, outs["cli4"], 4, 7)
     summaries = {}
     outs["api4_chunked"] = root / "out-api4-chunked.pst"
     summaries["api4_chunked"] = api(chunked, outs["api4_chunked"], 4, 7)

@@ -39,7 +39,6 @@ above it, and the moving_away count, exact against the scattering points.
 
 from __future__ import annotations
 
-import argparse
 import dataclasses
 import math
 from pathlib import Path
@@ -337,8 +336,8 @@ def obdeect_run(cfg: Config, scat_path: Path, tr_path: Path, n: int | None = Non
         arrival_ns = np.asarray(out["t"], np.float64) + dist / C_M_NS
         totals[i] = w.sum()
         binned[i] = np.histogram(arrival_ns, bins=edges, weights=w)[0]
-        for name in columns:
-            columns[name].append(np.asarray(out[name]))
+        for name, values in columns.items():
+            values.append(np.asarray(out[name]))
     stacked = {
         k: np.concatenate(v) if v else np.zeros(0, np.float32)
         for k, v in columns.items()
@@ -449,7 +448,7 @@ def analyse(root: Path, n_override: int | None = None, grid: int = GRID_POINTS):
         "telescope_z_m": TELESCOPE_Z_M,
         "emit_z_m": EMIT_Z_M,
         "scatter_points": SCATTER_POINTS,
-        "reference": "trapezoid on %d points of the path (see module docstring)" % grid,
+        "reference": f"trapezoid on {grid} points of the path (see module docstring)",
         "configurations": {},
     }
     arrays = {}
@@ -537,6 +536,7 @@ def analyse(root: Path, n_override: int | None = None, grid: int = GRID_POINTS):
         for c in CONFIGS
     )
     details["_arrays"] = arrays
+    plot(root / "upward-lidar.png", details)
     return metrics, details
 
 
@@ -591,14 +591,5 @@ def plot(path: Path, details: dict) -> None:
     plotting.save(fig, path)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
-    metrics, details = analyse(root)
-    plot(root / "upward-lidar.png", details)
-    common.write_results(metrics, details, root)
-
-
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])
