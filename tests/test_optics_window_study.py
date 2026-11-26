@@ -33,7 +33,7 @@ def test_window_runs_set_camera_filter_none():
     assert study._focus_override(6.3, window=True) == {
         "LSTN-design": {
             "focus_offset": {"value": [6.3, 0.0, 0.0, 0.0]},
-            "camera_filter": {"value": "none"},
+            "camera_filter": {"value": None},
         }
     }
 

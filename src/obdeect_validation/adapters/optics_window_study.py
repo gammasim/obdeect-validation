@@ -130,8 +130,9 @@ def _max_offset(options: dict[str, Any]) -> float:
 def _focus_override(focus_cm: float, *, window: bool = False) -> dict[str, Any]:
     """simtools overwrite_model_parameters entry for the focus offset.
 
-    With the window traced, camera_filter is "none": the traced window replaces it (obdeect
-    rejects a model that would count the window transmission twice).
+    With the window traced, camera_filter is null (simtools writes "none" for sim_telarray): the
+    traced window replaces it (obdeect rejects a model that would count the window transmission
+    twice).
     """
     parameters: dict[str, Any] = {"focus_offset": {"value": [focus_cm, 0.0, 0.0, 0.0]}}
     if window:
