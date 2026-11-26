@@ -41,6 +41,7 @@ import numpy as np
 from obdeect_validation.adapters import chain_optics as co
 from obdeect_validation.adapters import chain_showers as cs
 from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters import performance_array as pa
 from obdeect_validation.adapters import performance_chain as pc
 
@@ -102,36 +103,39 @@ def camera_map(path, elements):
 def joint_stages(work, source, inputs, files, models, camera, sim_argv):
     """from-corsika | propagation | trace-stream | to-simtel | sim_telarray for all telescopes."""
     ids = ",".join(str(t) for t, _ in ARRAY)
-    propagation = [
-        "obdeect", "propagation", "run",
-        "--transmission", inputs["atmosphere"],
-        "--site-altitude", 2156,
-        "--pathlen", 28,
-        "--seed", 123,
-        "--telescopes", ids,
-        "--envelope", f"{pc.ENVELOPE_FACTOR}={files['envelope']}",
-        "-i", "-", "-o", "-",
-    ]  # fmt: skip
-    trace = [
-        "obdeect", "ray-tracing", "trace-stream",
+    propagation = cli.propagation_run(
+        "-",
+        "-",
+        transmission=inputs["atmosphere"],
+        site_altitude=2156,
+        pathlen=28,
+        seed=123,
+        telescopes=ids,
+        envelope=f"{pc.ENVELOPE_FACTOR}={files['envelope']}",
+    )
+    trace = cli.obdeect(
+        "ray-tracing",
+        "trace-stream",
         *[arg for t, _ in ARRAY for arg in ("--model", f"{t}={models[t]}")],
-        "--seed", co.SEED,
-        "--threads", 0,
-        "--telescopes", ids,
-        "--pointing-zenith-deg", co.ZENITH_DEG,
-        "--pointing-azimuth-deg", co.AZIMUTH_DEG,
-        "--telescope-transmission", "full",
-        "-i", "-", "-o", "-",
-    ]  # fmt: skip
-    to_simtel = [
-        "obdeect", "stream", "to-simtel",
-        "--camera-map", camera,
-        "--scaled-factor", pc.ENVELOPE_FACTOR,
-        "--keep-telpos-height",  # sim_telarray's array trigger needs the real heights
-        "-o", "-",
-    ]  # fmt: skip
+        seed=co.SEED,
+        threads=0,
+        telescopes=ids,
+        pointing_zenith_deg=co.ZENITH_DEG,
+        pointing_azimuth_deg=co.AZIMUTH_DEG,
+        telescope_transmission="full",
+        i="-",
+        o="-",
+    )
+    to_simtel = cli.obdeect(
+        "stream",
+        "to-simtel",
+        camera_map=camera,
+        scaled_factor=pc.ENVELOPE_FACTOR,
+        keep_telpos_height=True,  # sim_telarray's array trigger needs the real heights
+        o="-",
+    )
     return [
-        ("from_corsika", ["obdeect", "stream", "from-corsika", source]),
+        ("from_corsika", cli.from_corsika(source)),
         ("propagation", propagation),
         ("trace_stream", trace),
         ("to_simtel", to_simtel),

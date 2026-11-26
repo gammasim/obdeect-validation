@@ -74,6 +74,7 @@ from pathlib import Path
 import numpy as np
 
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters import source_comparison as sc
 
 CFG = common.REFERENCE / "cfg"
@@ -307,39 +308,24 @@ def run(work):
             sc.NIGHT["rate_per_sr_ns_cm2"], viewcone, radius, window_ns
         )
     )
-    common.run_tool(
-        [
-            common.tool("obdeect"),
-            "sources",
-            "run",
-            "night-sky",
-            "--observation-level",
-            str(sc.NIGHT["altitude_m"]),
-            "--atmosphere-id",
-            "1",
-            "--seed",
-            str(sc.NIGHT["seed"]),
-            "--events",
-            str(sc.NIGHT["events"]),
-            "--photons",
-            str(photons),
-            "--spectrum",
-            f"fixed:wavelength_nm={sc.NIGHT['spectrum_nm']}",
-            "--pulse",
-            sc.NIGHT_PULSE,
-            "--bunch-size",
-            str(sc.NIGHT["bunch_size"]),
-            "--viewcone-deg",
-            str(viewcone),
-            "--telescope-position",
-            "0,0,0",
-            "--telescope-radius",
-            str(radius),
-            "-o",
-            str(native_file),
-        ],
-        work / "native-sources.log",
+    argv = cli.obdeect(
+        "sources",
+        "run",
+        "night-sky",
+        observation_level=str(sc.NIGHT["altitude_m"]),
+        atmosphere_id="1",
+        seed=str(sc.NIGHT["seed"]),
+        events=str(sc.NIGHT["events"]),
+        photons=str(photons),
+        spectrum=f"fixed:wavelength_nm={sc.NIGHT['spectrum_nm']}",
+        pulse=sc.NIGHT_PULSE,
+        bunch_size=str(sc.NIGHT["bunch_size"]),
+        viewcone_deg=str(viewcone),
+        telescope_position="0,0,0",
+        telescope_radius=str(radius),
+        o=str(native_file),
     )
+    common.run_tool([common.tool("obdeect"), *argv[1:]], work / "native-sources.log")
     camera_input = sc.propagate_to_simtel(
         work, native_file, sc.NIGHT["altitude_m"], sc.NIGHT["band_nm"], sc.NIGHT["seed"]
     )
@@ -357,8 +343,12 @@ def run(work):
     return sc.camera_pe(output), photons
 
 
-def main():
-    work = Path.cwd().resolve()
+def main() -> None:
+    common.results_main(_analyse, __doc__.splitlines()[0])
+
+
+def _analyse(root: Path):
+    work = root.resolve()
     values, photons = run(work)
     expected = analytic_expectation()
     metrics = {
@@ -400,7 +390,11 @@ def main():
             }
         )
         details["status"] = "run"
-    common.write_results(metrics, details)
+    _plot(values, expected, root / "night-sky-camera.png")
+    return metrics, details
+
+
+def _plot(values, expected, path) -> None:
     from obdeect_validation.adapters import plotting
 
     fig, axis = plotting.figure(1, 1, (6, 3.6))
@@ -420,7 +414,7 @@ def main():
     )
     axis.set(xlabel="p.e. per event", ylabel="events")
     axis.legend()
-    plotting.save(fig, Path("night-sky-camera.png"))
+    plotting.save(fig, path)
 
 
 if __name__ == "__main__":

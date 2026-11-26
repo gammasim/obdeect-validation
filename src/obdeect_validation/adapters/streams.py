@@ -8,6 +8,7 @@ Readers (all read the whole stream; validation inputs are small):
 
 Writer: write_stream(path, producer, run, blocks, ...) writes one run with one event; blocks are
 (telescope_id, columns) pairs. Columns are written as given (the stream format takes float32).
+The telescope record frame (frame) and the photon frame (photon_frame, e.g. "sky") may differ.
 
 ulp32(values) is the float32 spacing at the magnitude of each value, floored at 1 (a metre, a ns):
 the rounding unit of a float32 position or time.
@@ -70,29 +71,41 @@ def write_stream(
     run: dict,
     blocks,
     *,
-    frame: int = 0,
+    frame=0,
+    photon_frame=None,
+    telescope_extra: dict | None = None,
     event: dict | None = None,
     chunk_rows: int | None = None,
     telescope_end: bool = True,
 ):
-    """Write one run with one event: for each (telescope_id, columns) in blocks a telescope record,
-    its photons in chunks of chunk_rows (default one chunk) and (telescope_end) a telescope_end
-    record with the row count. Returns path.
+    """Write one run with one event and return path.
+
+    blocks: (telescope_id, columns) pairs. columns is a dict of arrays (written in chunks of
+    chunk_rows, default one chunk) or an iterable of such dicts (one chunk each, e.g. a generator
+    that draws the rows chunk by chunk). Per block: a telescope record {"telescope_id", "frame":
+    frame, **telescope_extra}, the photon chunks (frame photon_frame, default frame; first_index =
+    row offset) and (telescope_end) {"telescope_id", "photons": float(rows)}; then event_end and
+    run_end, both empty.
     """
     from obdeect.stream import Writer
 
+    photon_frame = frame if photon_frame is None else photon_frame
     with Writer(str(path), producer) as writer:
         writer.write("run", run)
         writer.write("event", event or {"event_number": 1})
         for telescope_id, columns in blocks:
-            rows = len(next(iter(columns.values())))
-            writer.write("telescope", {"telescope_id": telescope_id, "frame": frame})
-            step = chunk_rows or rows
-            for first in range(0, rows, max(step, 1)):
-                piece = {
-                    k: np.asarray(v)[first : first + step] for k, v in columns.items()
-                }
-                writer.write_photons(telescope_id, frame, first, piece)
+            writer.write(
+                "telescope",
+                {
+                    "telescope_id": telescope_id,
+                    "frame": frame,
+                    **(telescope_extra or {}),
+                },
+            )
+            rows = 0
+            for piece in _chunks(columns, chunk_rows):
+                writer.write_photons(telescope_id, photon_frame, rows, piece)
+                rows += len(next(iter(piece.values())))
             if telescope_end:
                 writer.write(
                     "telescope_end",
@@ -101,6 +114,16 @@ def write_stream(
         writer.write("event_end", {})
         writer.write("run_end", {})
     return path
+
+
+def _chunks(columns, chunk_rows):
+    if not isinstance(columns, dict):
+        yield from columns
+        return
+    rows = len(next(iter(columns.values())))
+    step = chunk_rows or rows
+    for first in range(0, rows, max(step, 1)):
+        yield {k: np.asarray(v)[first : first + step] for k, v in columns.items()}
 
 
 def ulp32(values, floor: float = 1.0) -> np.ndarray:

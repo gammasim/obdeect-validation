@@ -278,7 +278,7 @@ def muon_expected_hits(table, step_m=0.5, azimuths=3600):
     )
     e2 = np.array([-math.sin(phi), math.cos(phi), 0.0])
     length = MUON["height_m"] / math.cos(theta)
-    s = (np.arange(int(round(length / step_m))) + 0.5) * step_m
+    s = (np.arange(round(length / step_m)) + 0.5) * step_m
     height = s * math.cos(theta)
     n_minus_one = np.interp(height, table[:, 0], table[:, 1])
     cos_c = cherenkov_cos(n_minus_one)

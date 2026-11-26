@@ -10,7 +10,7 @@ import numpy as np
 from obdeect_validation.adapters import common
 
 
-def main() -> None:
+def analyse(root: Path) -> tuple[dict, None]:
     import astropy.units as u
     from obdeect.propagation import TransmissionTable, in_telescope_path_m
     from obdeect.ray_tracing import OpticalModel
@@ -37,7 +37,7 @@ def main() -> None:
         np.full_like(tau, 0.2),
         metadata={"backend": "synthetic-exponential", "version": "1"},
     )
-    source = Path("synthetic-properties.ecsv")
+    source = root / "synthetic-properties.ecsv"
     write_optical_properties(properties, source)
     generated = get_backend("ecsv", file_name=source).compute(
         wavelength * u.nm, altitude * u.m
@@ -48,7 +48,7 @@ def main() -> None:
         )
 
     observation_level = 1000.0
-    transmission_file = Path("synthetic-transmission.dat")
+    transmission_file = root / "synthetic-transmission.dat"
     write_obdeect_transmission_table(
         generated, transmission_file, observation_level * u.m
     )
@@ -199,7 +199,7 @@ def main() -> None:
         )
 
     common.write_json(
-        "samples.json",
+        root / "samples.json",
         [
             *(
                 {"candidate": actual, "reference": expected}
@@ -208,18 +208,20 @@ def main() -> None:
             *model_samples,
         ],
     )
-    common.write_results(
-        {
-            "wavelength_count": len(wavelength),
-            "height_count": 3,
-            "zenith_count": 3,
-            "transmission_max_absolute_error": error,
-            "telescope_path_depth_max_absolute_error": telescope_error,
-            "optical_model_count": len(models),
-            "optical_model_path_max_absolute_error_m": path_error,
-            "path_extinction_max_absolute_error": path_transmission_error,
-        }
-    )
+    return {
+        "wavelength_count": len(wavelength),
+        "height_count": 3,
+        "zenith_count": 3,
+        "transmission_max_absolute_error": error,
+        "telescope_path_depth_max_absolute_error": telescope_error,
+        "optical_model_count": len(models),
+        "optical_model_path_max_absolute_error_m": path_error,
+        "path_extinction_max_absolute_error": path_transmission_error,
+    }, None
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__)
 
 
 if __name__ == "__main__":

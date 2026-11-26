@@ -44,7 +44,6 @@ Usage (inside the container, in an empty case directory):
 
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 
 import numpy as np
@@ -52,6 +51,7 @@ import numpy as np
 from obdeect_validation.adapters import chain_optics as co
 from obdeect_validation.adapters import chain_showers as cs
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters import performance_chain as pc
 
 PE_BIAS_FLOOR = 0.01  # relative; camera limit of plan step 5
@@ -163,30 +163,18 @@ def weighted_reference(root, source, inputs):
     root.mkdir(parents=True, exist_ok=True)
     native, weighted = root / "showers.gst", root / "weighted.gst"
     common.command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / "from-corsika.log",
-        stdout_file=native,
+        cli.from_corsika(source), root / "from-corsika.log", stdout_file=native
     )
     common.command(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            inputs["atmosphere"],
-            "--site-altitude",
-            2156,
-            "--pathlen",
-            28,
-            "--seed",
-            123,
-            "--mode",
-            "weighted",
-            "-i",
+        cli.propagation_run(
             native,
-            "-o",
             weighted,
-        ],
+            transmission=inputs["atmosphere"],
+            site_altitude=2156,
+            pathlen=28,
+            seed=123,
+            mode="weighted",
+        ),
         root / "propagation.log",
     )
     return telescope_photons(weighted, co.TELESCOPES[0])
@@ -229,8 +217,7 @@ def configuration_failures(inputs, files, simtel_argv, texts):
     return {"atmosphere": atmosphere, "qe_table": qe, "bypass_mode": bypass}
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def _add_arguments(parser):
     parser.add_argument("--input", type=Path, default=common.SHOWERS)
     parser.add_argument(
         "--config",
@@ -243,8 +230,11 @@ def main():
         required=True,
         help="sim_telarray with Bypass_Optics=3 (camera only) for the candidate camera stage",
     )
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+
+
+def analyse(root, args):
+    """Functional checks of the candidate chain against the reference: (metrics, details)."""
+    root = Path(root).resolve()
     source = args.input.resolve()
     pc.CANDIDATE_SIMTEL = str(args.candidate_binary)
     pc.CANDIDATE_OPTIONS = (
@@ -357,7 +347,11 @@ def main():
         details["settings"]["candidate_command"] = argv
     except (RuntimeError, OSError, ValueError) as error:  # reported, not hidden
         details["blocked"] = str(error)[:800]
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def main():
+    common.results_main(analyse, "", add_arguments=_add_arguments)
 
 
 if __name__ == "__main__":

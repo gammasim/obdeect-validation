@@ -13,7 +13,6 @@ it includes the telescope altitude term tau(h_t) and the in-telescope focus term
 tau(h_t + pathlen) - tau(h_t), as obdeect does with --site-altitude and --pathlen.
 """
 
-import argparse
 import math
 import re
 from pathlib import Path
@@ -220,13 +219,7 @@ def read_bunches(path, fraction, seed):
     return total, sample
 
 
-def main():
-    import numpy as np
-
-    from obdeect_validation.adapters import chain_showers as cs
-    from obdeect_validation.adapters.extinction_reference import table_reference
-
-    parser = argparse.ArgumentParser()
+def _add_arguments(parser):
     parser.add_argument(
         "--showers",
         type=Path,
@@ -240,9 +233,17 @@ def main():
     parser.add_argument("--site-altitude", type=float, default=SITE_ALTITUDE_M)
     parser.add_argument("--pathlen", type=float, default=PATHLEN_M)
     parser.add_argument("--seed", type=int, default=SEED)
-    args = parser.parse_args()
 
-    root = Path.cwd().resolve()
+
+def analyse(root, args):
+    """Showers through obdeect and sim_telarray against sim_telarray's own atmosphere: (metrics, details)."""
+    import numpy as np
+
+    from obdeect_validation.adapters import chain_showers as cs
+    from obdeect_validation.adapters import obdeect_cli as cli
+    from obdeect_validation.adapters.extinction_reference import table_reference
+
+    root = Path(root).resolve()
     source = args.showers.resolve()
     band = cherenkov_band(
         source.with_suffix(".corsika.log").read_text(errors="replace")
@@ -256,70 +257,39 @@ def main():
     native = root / "showers.gst"
     propagated = root / "propagated.gst"
     common.command(
-        ["obdeect", "stream", "from-corsika", source],
-        root / "from-corsika.log",
-        stdout_file=native,
+        cli.from_corsika(source), root / "from-corsika.log", stdout_file=native
     )
     common.command(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            cut_path,
-            "--site-altitude",
-            args.site_altitude,
-            "--pathlen",
-            args.pathlen,
-            "--seed",
-            args.seed,
-            "--mode",
-            "weighted",
-            "--wavelength-interpolation",
-            "floor",
-            "--wavelength-range",
-            band[0],
-            band[1],
-            "-i",
+        cli.propagation_run(
             native,
-            "-o",
             propagated,
-        ],
+            transmission=cut_path,
+            site_altitude=args.site_altitude,
+            pathlen=args.pathlen,
+            seed=args.seed,
+            mode="weighted",
+            wavelength_interpolation="floor",
+            wavelength_range=band,
+        ),
         root / "propagate.log",
     )
     candidate_input = root / "propagated.iact"
-    common.command(
-        ["obdeect", "stream", "to-simtel", propagated, "-o", candidate_input],
-        root / "to-simtel.log",
-    )
+    common.command(cli.to_simtel(propagated, candidate_input), root / "to-simtel.log")
 
     summary = propagation_summary((root / "propagate.log").read_text(errors="replace"))
     linear = root / "propagated-linear.pst"
     common.command(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            cut_path,
-            "--site-altitude",
-            args.site_altitude,
-            "--pathlen",
-            args.pathlen,
-            "--seed",
-            args.seed,
-            "--mode",
-            "weighted",
-            "--wavelength-interpolation",
-            "linear",
-            "--wavelength-range",
-            band[0],
-            band[1],
-            "-i",
+        cli.propagation_run(
             native,
-            "-o",
             linear,
-        ],
+            transmission=cut_path,
+            site_altitude=args.site_altitude,
+            pathlen=args.pathlen,
+            seed=args.seed,
+            mode="weighted",
+            wavelength_interpolation="linear",
+            wavelength_range=band,
+        ),
         root / "propagate-linear.log",
     )
     linear_summary = propagation_summary(
@@ -405,9 +375,11 @@ def main():
         "direct_photon_statistics": stats_direct,
         "candidate_photon_statistics": stats_candidate,
     }
-    common.write_results(
-        {key: float(value) for key, value in metrics.items()}, details, root
-    )
+    return {key: float(value) for key, value in metrics.items()}, details
+
+
+def main():
+    common.results_main(analyse, "", add_arguments=_add_arguments)
 
 
 if __name__ == "__main__":

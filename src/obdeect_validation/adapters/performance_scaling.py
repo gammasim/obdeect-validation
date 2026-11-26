@@ -33,6 +33,7 @@ import numpy as np
 
 from obdeect_validation.adapters import chain_optics as co
 from obdeect_validation.adapters import common, performance, performance_chain
+from obdeect_validation.adapters import obdeect_cli as cli
 
 EVENTS = 10
 REPS = 3
@@ -148,29 +149,17 @@ def assemble(points, events, thread_rows, nproc):
 
 def trace_argv(model, propagated, traced, threads):
     """trace-stream of performance_chain.shower_candidate with the given thread count."""
-    return [
-        "obdeect",
-        "ray-tracing",
-        "trace-stream",
-        "--model",
+    return cli.trace_stream(
         model,
-        "--seed",
-        co.SEED,
-        "--threads",
-        threads,
-        "--telescopes",
-        ",".join(map(str, co.TELESCOPES)),
-        "--pointing-zenith-deg",
-        co.ZENITH_DEG,
-        "--pointing-azimuth-deg",
-        co.AZIMUTH_DEG,
-        "--telescope-transmission",
-        "full",
-        "-i",
         propagated,
-        "-o",
         traced,
-    ]
+        seed=co.SEED,
+        threads=threads,
+        telescopes=",".join(map(str, co.TELESCOPES)),
+        pointing_zenith_deg=co.ZENITH_DEG,
+        pointing_azimuth_deg=co.AZIMUTH_DEG,
+        telescope_transmission="full",
+    )
 
 
 def chain_commands(work, iact, inputs):
@@ -182,36 +171,23 @@ def chain_commands(work, iact, inputs):
     return [
         (
             "from_corsika",
-            ["obdeect", "stream", "from-corsika", iact],
+            cli.from_corsika(iact),
             work / "from-corsika.log",
             native,
         ),
         (
             "propagation",
-            [
-                "obdeect",
-                "propagation",
-                "run",
-                "--transmission",
-                inputs["atmosphere"],
-                "--site-altitude",
-                2156,
-                "--pathlen",
-                28,
-                "--seed",
-                123,
-                "--mode",
-                "weighted",
-                "--wavelength-range",
-                250,
-                700,
-                "--telescopes",
-                ",".join(map(str, co.TELESCOPES)),
-                "-i",
+            cli.propagation_run(
                 native,
-                "-o",
                 propagated,
-            ],
+                transmission=inputs["atmosphere"],
+                site_altitude=2156,
+                pathlen=28,
+                seed=123,
+                mode="weighted",
+                wavelength_range=(250, 700),
+                telescopes=",".join(map(str, co.TELESCOPES)),
+            ),
             work / "propagation.log",
             None,
         ),
@@ -229,16 +205,13 @@ def chain_commands(work, iact, inputs):
         ),
         (
             "to_simtel",
-            [
-                "obdeect",
+            cli.obdeect(
                 "stream",
                 "to-simtel",
-                "--camera-map",
-                camera_map,
-                "-o",
-                camera_stream,
-                traced,
-            ],
+                camera_map=camera_map,
+                o=camera_stream,
+                extra=(traced,),
+            ),
             work / "to-simtel.log",
             None,
         ),

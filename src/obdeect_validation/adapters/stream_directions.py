@@ -12,7 +12,6 @@ layout) must convert. The reference is the input itself; sim_telarray is not nee
 
 from __future__ import annotations
 
-import argparse
 import importlib.metadata
 from pathlib import Path
 
@@ -20,6 +19,7 @@ import numpy as np
 from obdeect.stream import FRAMES, Reader, Writer, format_major, format_minor
 
 from obdeect_validation.adapters import common, plotting
+from obdeect_validation.adapters import obdeect_cli as cli
 
 GRID_SIZE = 1000  # full-sphere directions per frame
 UP, DOWN, FIRST_HORIZONTAL, HORIZONTAL = 0, 1, 2, 16  # exact directions in the grid
@@ -227,12 +227,13 @@ def stream_with_photons(path: Path, frame: str, cx, cy, cz) -> Path:
 
 def to_simtel(stream: Path, output: Path, camera_map: str | None, log: Path):
     """Run `obdeect stream to-simtel`; returns (converted, log text)."""
-    argv = ["obdeect", "stream", "to-simtel"]
+    map_file = None
     if camera_map is not None:
         map_file = stream.with_suffix(".map")
         map_file.write_text(camera_map, encoding="utf-8")
-        argv += ["--camera-map", map_file]
-    argv += ["-o", output, stream]
+    argv = cli.obdeect(
+        "stream", "to-simtel", camera_map=map_file, o=output, extra=[stream]
+    )
     try:
         common.command(argv, log)
         converted = True
@@ -343,10 +344,7 @@ def plot_sky(path: Path, chunks: dict) -> None:
     plotting.save(fig, path)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
+def analyse(root: Path) -> tuple[dict, dict]:
     grid = directions()
     expected_counts = sign_counts(grid["cz"])
 
@@ -415,7 +413,11 @@ def main() -> None:
         "downward_control_by_frame": accepted,
         "command": "obdeect stream to-simtel [--camera-map FILE] -o OUT IN",
     }
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

@@ -53,6 +53,7 @@ from obdeect_validation.adapters import (
     performance_budget,
     source_camera,
 )
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters.performance import iact_weight
 from obdeect_validation.adapters.performance import run_timed as _run_timed
 
@@ -150,66 +151,47 @@ SOURCES = {
     "flasher-dish": {
         "events": 2,
         "photons": 20_000_000,
-        "candidate": lambda n, p: [
-            "obdeect",
+        "candidate": lambda n, p: cli.obdeect(
             "sources",
             "run",
             "flasher",
-            "--type",
-            "dish",
-            "--observation-level",
-            "2150",
-            "--seed",
-            "1",
-            "--atmosphere-id",
-            "1",
-            "--position",
-            "0,0,16",
-            "--camera-radius",
-            "1.2",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--angular",
-            "isotropic",
-            "--events",
-            n,
-            "--photons",
-            p,
-            "--set",
-            "run.frame=sky",
-            "--set",
-            "events[0].emissions[0].to_plane_z0=false",
-        ],
+            type="dish",
+            observation_level="2150",
+            seed="1",
+            atmosphere_id="1",
+            position="0,0,16",
+            camera_radius="1.2",
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+            events=n,
+            photons=p,
+            extra=(
+                "--set",
+                "run.frame=sky",
+                "--set",
+                "events[0].emissions[0].to_plane_z0=false",
+            ),
+        ),
         "reference": lambda n, p: ["ff-1m", "--events", n, "--photons", p],
         "bypass": 1,  # as in source_camera stage 2
     },
     "point-source": {
         "events": 2,
         "photons": 10_000_000,
-        "candidate": lambda n, p: [
-            "obdeect",
+        "candidate": lambda n, p: cli.obdeect(
             "sources",
             "run",
             "point-source",
-            "--observation-level",
-            "2150",
-            "--seed",
-            "17",
-            "--atmosphere-id",
-            "1",
-            "--events",
-            n,
-            "--photons",
-            p,
-            "--position",
-            "0,0,1000",
-            "--telescope-radius",
-            "15",
-            "--spectrum",
-            "fixed:wavelength_nm=400",
-            "--angular",
-            "isotropic",
-        ],
+            observation_level="2150",
+            seed="17",
+            atmosphere_id="1",
+            events=n,
+            photons=p,
+            position="0,0,1000",
+            telescope_radius="15",
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+        ),
         "reference": lambda n, p: [
             "xyzls",
             "-N",
@@ -391,7 +373,7 @@ def shower_candidate(work, source, inputs, threads):
         (
             "from_corsika",
             lambda: run_timed(
-                ["obdeect", "stream", "from-corsika", source],
+                cli.from_corsika(source),
                 work / "from-corsika.log",
                 stdout_file=native,
             ),
@@ -399,96 +381,51 @@ def shower_candidate(work, source, inputs, threads):
         (
             "propagation",
             lambda: run_timed(
-                [
-                    "obdeect",
-                    "propagation",
-                    "run",
-                    "--transmission",
-                    inputs["atmosphere"],
-                    "--site-altitude",
-                    2156,
-                    "--pathlen",
-                    28,
-                    "--seed",
-                    123,
-                    "--mode",
-                    "weighted",
-                    "--wavelength-range",
-                    250,
-                    700,
-                    "--telescopes",
-                    ",".join(map(str, co.TELESCOPES)),
-                    "-i",
+                cli.propagation_run(
                     native,
-                    "-o",
                     propagated,
-                ],
+                    transmission=inputs["atmosphere"],
+                    site_altitude=2156,
+                    pathlen=28,
+                    seed=123,
+                    mode="weighted",
+                    wavelength_range=(250, 700),
+                    telescopes=",".join(map(str, co.TELESCOPES)),
+                ),
                 work / "propagation.log",
             ),
         ),
         (
             "compile_model",
-            lambda: run_timed(
-                [
-                    "obdeect",
-                    "ray-tracing",
-                    "compile",
-                    "--simulation-models",
-                    inputs["models"],
-                    "--model",
-                    co.MODEL,
-                    "--version",
-                    co.VERSION,
-                    "--seed",
-                    co.SEED,
-                    "--output",
-                    model,
-                ],
-                work / "compile.log",
-            ),
+            lambda: run_timed(compile_argv(inputs, model), work / "compile.log"),
         ),
         (
             "trace_stream",
             lambda: run_timed(
-                [
-                    "obdeect",
-                    "ray-tracing",
-                    "trace-stream",
-                    "--model",
+                cli.trace_stream(
                     model,
-                    "--seed",
-                    co.SEED,
-                    "--threads",
-                    threads,
-                    "--telescopes",
-                    ",".join(map(str, co.TELESCOPES)),
-                    "--pointing-zenith-deg",
-                    co.ZENITH_DEG,
-                    "--pointing-azimuth-deg",
-                    co.AZIMUTH_DEG,
-                    "--telescope-transmission",
-                    "full",
-                    "-i",
                     propagated,
-                    "-o",
                     traced,
-                ],
+                    seed=co.SEED,
+                    threads=threads,
+                    telescopes=",".join(map(str, co.TELESCOPES)),
+                    pointing_zenith_deg=co.ZENITH_DEG,
+                    pointing_azimuth_deg=co.AZIMUTH_DEG,
+                    telescope_transmission="full",
+                ),
                 work / "trace.log",
             ),
         ),
         (
             "to_simtel",
             lambda: run_timed(
-                [
-                    "obdeect",
+                cli.obdeect(
                     "stream",
                     "to-simtel",
-                    "--camera-map",
-                    camera_map,
-                    "-o",
-                    camera_stream,
-                    traced,
-                ],
+                    camera_map=camera_map,
+                    o=camera_stream,
+                    extra=(traced,),
+                ),
                 work / "to-simtel.log",
             ),
         ),
@@ -517,23 +454,16 @@ def source_candidate(work, spec):
         (
             "propagation",
             lambda: run_timed(
-                [
-                    "obdeect",
-                    "propagation",
-                    "run",
-                    *SKY_PROPAGATION,
-                    "-i",
-                    native,
-                    "-o",
-                    propagated,
-                ],
+                cli.obdeect(
+                    "propagation", "run", *SKY_PROPAGATION, i=native, o=propagated
+                ),
                 work / "propagation.log",
             ),
         ),
         (
             "to_simtel",
             lambda: run_timed(
-                ["obdeect", "stream", "to-simtel", "-o", candidate, propagated],
+                cli.obdeect("stream", "to-simtel", o=candidate, extra=(propagated,)),
                 work / "to-simtel.log",
             ),
         ),
@@ -690,21 +620,13 @@ def envelope_files(work, qe_path, headroom):
 
 def compile_argv(inputs, model):
     """obdeect ray-tracing compile of the LSTN-01 optical model (as in shower_candidate)."""
-    return [
-        "obdeect",
-        "ray-tracing",
-        "compile",
-        "--simulation-models",
-        inputs["models"],
-        "--model",
-        co.MODEL,
-        "--version",
-        co.VERSION,
-        "--seed",
-        co.SEED,
-        "--output",
+    return cli.compile_model(
         model,
-    ]
+        co.MODEL,
+        co.VERSION,
+        seed=co.SEED,
+        simulation_models=inputs["models"],
+    )
 
 
 def envelope_pipeline(
@@ -724,58 +646,40 @@ def envelope_pipeline(
     sim_argv reads standard input ("-") and is the last stage.
     """
     thinned = envelope is not None
-    propagation = [
-        "obdeect",
-        "propagation",
-        "run",
-        "--transmission",
-        table,
-        "--site-altitude",
-        2156,
-        "--pathlen",
-        28,
-        "--seed",
-        123,
-        "--telescopes",
-        str(telescope),
-    ]
-    if thinned:
-        propagation += ["--envelope", f"{ENVELOPE_FACTOR}={envelope}"]
-    else:
-        propagation += ["--mode", "weighted"]
-    propagation += ["-i", "-", "-o", "-"]
-    to_simtel = ["obdeect", "stream", "to-simtel", "--camera-map", camera_map]
-    if thinned:
-        to_simtel += ["--scaled-factor", ENVELOPE_FACTOR]
-    to_simtel += ["-o", "-"]
+    propagation = cli.propagation_run(
+        "-",
+        "-",
+        transmission=table,
+        site_altitude=2156,
+        pathlen=28,
+        seed=123,
+        telescopes=str(telescope),
+        envelope=f"{ENVELOPE_FACTOR}={envelope}" if thinned else None,
+        mode=None if thinned else "weighted",
+    )
+    to_simtel = cli.obdeect(
+        "stream",
+        "to-simtel",
+        camera_map=camera_map,
+        scaled_factor=ENVELOPE_FACTOR if thinned else None,
+        o="-",
+    )
     return [
-        ("from_corsika", ["obdeect", "stream", "from-corsika", source]),
+        ("from_corsika", cli.from_corsika(source)),
         ("propagation", propagation),
         (
             "trace_stream",
-            [
-                "obdeect",
-                "ray-tracing",
-                "trace-stream",
-                "--model",
+            cli.trace_stream(
                 model,
-                "--seed",
-                co.SEED,
-                "--threads",
-                threads,
-                "--telescopes",
-                str(telescope),
-                "--pointing-zenith-deg",
-                co.ZENITH_DEG,
-                "--pointing-azimuth-deg",
-                co.AZIMUTH_DEG,
-                "--telescope-transmission",
-                "full",
-                "-i",
                 "-",
-                "-o",
                 "-",
-            ],
+                seed=co.SEED,
+                threads=threads,
+                telescopes=str(telescope),
+                pointing_zenith_deg=co.ZENITH_DEG,
+                pointing_azimuth_deg=co.AZIMUTH_DEG,
+                telescope_transmission="full",
+            ),
         ),
         ("to_simtel", to_simtel),
         ("sim_telarray", sim_argv),

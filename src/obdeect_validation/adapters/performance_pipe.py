@@ -31,6 +31,7 @@ from obdeect_validation.adapters import (
     performance_budget,
     performance_chain,
 )
+from obdeect_validation.adapters import obdeect_cli as cli
 
 REPS = 3
 
@@ -46,7 +47,7 @@ def pipes(native: Path, work: Path) -> dict[str, list[tuple[str, list]]]:
             ("cat", ["cat", native]),
             (
                 "to_simtel",
-                ["obdeect", "stream", "to-simtel", "-o", work / "roundtrip.iact"],
+                cli.obdeect("stream", "to-simtel", o=work / "roundtrip.iact"),
             ),
         ],
     }
@@ -110,7 +111,7 @@ def main() -> None:
     )
     native = work / "showers.gst"
     common.command(
-        ["obdeect", "stream", "from-corsika", source],
+        cli.from_corsika(source),
         work / "from-corsika.log",
         stdout_file=native,
     )

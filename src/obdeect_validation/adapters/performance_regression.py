@@ -65,6 +65,7 @@ from pathlib import Path
 import numpy as np
 
 from obdeect_validation.adapters import common, performance
+from obdeect_validation.adapters import obdeect_cli as cli
 
 REPS = 5
 FLOOR = 0.05
@@ -461,23 +462,14 @@ def _compile_models(work: Path) -> dict[str, Path]:
     for name in MODEL_NAMES:
         output = work / f"model-{name}.json"
         common.command(
-            [
-                "obdeect",
-                "ray-tracing",
-                "compile",
-                "--simulation-models",
-                str(common.models_root()),
-                "--model",
-                name,
-                "--version",
-                MODEL_VERSION,
-                "--seed",
-                str(MODEL_SEED),
-                "--zenith-deg",
-                str(MODEL_ZENITH_DEG),
-                "--output",
+            cli.compile_model(
                 str(output),
-            ],
+                name,
+                MODEL_VERSION,
+                seed=str(MODEL_SEED),
+                zenith_deg=str(MODEL_ZENITH_DEG),
+                simulation_models=str(common.models_root()),
+            ),
             work / f"compile-{name}.log",
         )
         models[name] = output
@@ -486,23 +478,32 @@ def _compile_models(work: Path) -> dict[str, Path]:
 
 def flasher_argv(output: Path) -> tuple[str, ...]:
     """sources run flasher: a dish flasher in front of the camera, a disc target of FLASHER_CAMERA_RADIUS_M."""
-    return (
-        "obdeect", "sources", "run", "flasher",
-        "--type", "dish",
-        "--observation-level", str(int(OBSERVATION_LEVEL_M)),
-        "--seed", "1",
-        "--atmosphere-id", "1",
-        "--position", "0,0,16",
-        "--camera-radius", str(FLASHER_CAMERA_RADIUS_M),
-        "--spectrum", "fixed:wavelength_nm=400",
-        "--angular", "isotropic",
-        "--events", "1",
-        "--photons", str(FLASHER_PHOTONS),
-        "--bunch-size", "1",
-        "--set", "run.frame=sky",
-        "--set", "events[0].emissions[0].to_plane_z0=false",
-        "-o", str(output),
-    )  # fmt: skip
+    return tuple(
+        cli.obdeect(
+            "sources",
+            "run",
+            "flasher",
+            type="dish",
+            observation_level=str(int(OBSERVATION_LEVEL_M)),
+            seed="1",
+            atmosphere_id="1",
+            position="0,0,16",
+            camera_radius=str(FLASHER_CAMERA_RADIUS_M),
+            spectrum="fixed:wavelength_nm=400",
+            angular="isotropic",
+            events="1",
+            photons=str(FLASHER_PHOTONS),
+            bunch_size="1",
+            extra=(
+                "--set",
+                "run.frame=sky",
+                "--set",
+                "events[0].emissions[0].to_plane_z0=false",
+                "-o",
+                str(output),
+            ),
+        )
+    )
 
 
 def prepare(work: Path) -> dict[str, Stage]:
@@ -553,29 +554,21 @@ def prepare(work: Path) -> dict[str, Stage]:
             "propagation",
             (
                 Child(
-                    (
-                        "obdeect",
-                        "propagation",
-                        "run",
-                        "--transmission",
-                        transmission,
-                        "--pathlen",
-                        "0",
-                        "--profile",
-                        profile,
-                        "--site-altitude",
-                        str(int(OBSERVATION_LEVEL_M)),
-                        "--seed",
-                        str(SEED_PROPAGATION),
-                        "--wavelength-range",
-                        str(WAVELENGTHS_NM[0]),
-                        str(WAVELENGTHS_NM[1]),
-                        "--threads",
-                        "1",
-                        "-i",
-                        str(sky_wide),
-                        "-o",
-                        str(propagation_out),
+                    tuple(
+                        cli.propagation_run(
+                            str(sky_wide),
+                            str(propagation_out),
+                            transmission=transmission,
+                            pathlen="0",
+                            profile=profile,
+                            site_altitude=str(int(OBSERVATION_LEVEL_M)),
+                            seed=str(SEED_PROPAGATION),
+                            wavelength_range=(
+                                str(WAVELENGTHS_NM[0]),
+                                str(WAVELENGTHS_NM[1]),
+                            ),
+                            threads="1",
+                        )
                     ),
                     "propagation.log",
                 ),
@@ -586,26 +579,17 @@ def prepare(work: Path) -> dict[str, Stage]:
             "propagation_scattering",
             (
                 Child(
-                    (
-                        "obdeect",
-                        "propagation",
-                        "run",
-                        "--scattering",
-                        scattering,
-                        "--transmission",
-                        transmission,
-                        "--pathlen",
-                        "0",
-                        "--site-altitude",
-                        str(int(OBSERVATION_LEVEL_M)),
-                        "--seed",
-                        str(SEED_PROPAGATION),
-                        "--threads",
-                        "1",
-                        "-i",
-                        str(sky_scatter),
-                        "-o",
-                        str(scattered_out),
+                    tuple(
+                        cli.propagation_run(
+                            str(sky_scatter),
+                            str(scattered_out),
+                            scattering=scattering,
+                            transmission=transmission,
+                            pathlen="0",
+                            site_altitude=str(int(OBSERVATION_LEVEL_M)),
+                            seed=str(SEED_PROPAGATION),
+                            threads="1",
+                        )
                     ),
                     "scattering.log",
                 ),
@@ -616,27 +600,20 @@ def prepare(work: Path) -> dict[str, Stage]:
             "trace_stream",
             (
                 Child(
-                    (
-                        "obdeect",
-                        "ray-tracing",
-                        "trace-stream",
-                        *model_args,
-                        "--seed",
-                        str(SEED_TRACE),
-                        "--threads",
-                        "1",
-                        "--telescopes",
-                        telescopes,
-                        "--pointing-zenith-deg",
-                        str(POINTING_ZENITH_DEG),
-                        "--pointing-azimuth-deg",
-                        str(POINTING_AZIMUTH_DEG),
-                        "--telescope-transmission",
-                        "full",
-                        "-i",
-                        str(sphere),
-                        "-o",
-                        str(camera_out),
+                    tuple(
+                        cli.obdeect(
+                            "ray-tracing",
+                            "trace-stream",
+                            *model_args,
+                            seed=str(SEED_TRACE),
+                            threads="1",
+                            telescopes=telescopes,
+                            pointing_zenith_deg=str(POINTING_ZENITH_DEG),
+                            pointing_azimuth_deg=str(POINTING_AZIMUTH_DEG),
+                            telescope_transmission="full",
+                            i=str(sphere),
+                            o=str(camera_out),
+                        )
                     ),
                     "trace-stream.log",
                 ),
@@ -647,18 +624,18 @@ def prepare(work: Path) -> dict[str, Stage]:
             "stream",
             (
                 Child(
-                    ("obdeect", "stream", "cat", str(ground)),
+                    tuple(cli.obdeect("stream", "cat", str(ground))),
                     "cat.log",
                     stdout=str(cat_out),
                 ),
                 Child(
-                    (
-                        "obdeect",
-                        "stream",
-                        "to-simtel",
-                        "-o",
-                        str(simtel_out),
-                        str(ground),
+                    tuple(
+                        cli.obdeect(
+                            "stream",
+                            "to-simtel",
+                            o=str(simtel_out),
+                            extra=(str(ground),),
+                        )
                     ),
                     "to-simtel.log",
                 ),

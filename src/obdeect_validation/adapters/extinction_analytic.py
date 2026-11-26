@@ -6,11 +6,15 @@ from pathlib import Path
 from obdeect_validation.adapters import common
 
 
-def main():
+def main() -> None:
+    common.results_main(_analyse, __doc__.splitlines()[0])
+
+
+def _analyse(root: Path):
     from obdeect.propagation import TransmissionTable
 
     # All sampled emission heights lie on this constant optical-depth plateau.
-    path = Path("constant-optical-depth.dat")
+    path = root / "constant-optical-depth.dat"
     path.write_text("# H2= 2.000, H1= 3.000 4.000\n400 0.5 0.5\n")
     table = TransmissionTable(str(path), 2000.0)
     samples = []
@@ -29,16 +33,15 @@ def main():
                     "candidate": actual,
                 }
             )
-    common.write_json("samples.json", samples)
-    _plot(samples, Path("extinction-analytic.png"))
-    common.write_results(
-        {
-            "sample_count": len(samples),
-            "max_transmission_absolute_error": max(
-                abs(s["candidate"] - s["reference"]) for s in samples
-            ),
-        }
-    )
+    common.write_json(root / "samples.json", samples)
+    _plot(samples, root / "extinction-analytic.png")
+    metrics = {
+        "sample_count": len(samples),
+        "max_transmission_absolute_error": max(
+            abs(s["candidate"] - s["reference"]) for s in samples
+        ),
+    }
+    return metrics, None
 
 
 def _plot(samples, path):

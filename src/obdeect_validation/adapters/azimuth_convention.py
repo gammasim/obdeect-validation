@@ -121,6 +121,7 @@ from pathlib import Path
 import numpy as np
 
 from obdeect_validation.adapters import common, readers
+from obdeect_validation.adapters import obdeect_cli as cli
 
 #: Zenith of the directions in degrees (the zenith of the motion from straight down).
 ZENITH_DEG = 30.0
@@ -205,6 +206,11 @@ def astro_unit(zenith_deg: float, azimuth_deg: float) -> np.ndarray:
     )
 
 
+def _installed(argv: list) -> list:
+    """argv of cli.obdeect with the obdeect executable found on PATH (common.tool) as argv[0]."""
+    return [common.tool("obdeect"), *argv[1:]]
+
+
 class Preset:
     """A preset run: how to call it and what its zenith/azimuth mean (see the docstring)."""
 
@@ -228,67 +234,124 @@ class Preset:
 
 
 def _muon_argv(zenith, azimuth):
-    return [
-        "sources", "run", "muon", "--observation-level", "2150",
-        "--wavelength-min", "300", "--wavelength-max", "600", "--n-minus-one", "2.9e-4",
-        "--telescope-radius", "12.5", "--start-height", "10000",
-        "--zenith", str(zenith), "--azimuth", str(azimuth), "--events", "1",
-        "--seed", str(SEED),
-    ]  # fmt: skip
+    return cli.obdeect(
+        "sources",
+        "run",
+        "muon",
+        observation_level="2150",
+        wavelength_min="300",
+        wavelength_max="600",
+        n_minus_one="2.9e-4",
+        telescope_radius="12.5",
+        start_height="10000",
+        zenith=str(zenith),
+        azimuth=str(azimuth),
+        events="1",
+        seed=str(SEED),
+    )
 
 
 def _shower_argv(zenith, azimuth):
-    return [
-        "sources", "run", "shower", "--observation-level", "2150",
-        "--wavelength-min", "300", "--wavelength-max", "600", "--n-minus-one", "2.9e-4",
-        "--telescope-radius", "12.5", "--start-height", "10000",
-        "--zenith", str(zenith), "--azimuth", str(azimuth),
-        "--step", "100", "--nmax", "100", "--xmax", "600", "--x0", "-50", "--gh-lambda", "70",
-        "--atmosphere-depth0", "800", "--scale-height", "8000",
-        "--fluorescence-yield", str(SHOWER_FLUORESCENCE_YIELD),
-        "--fluorescence-spectrum", "fixed:wavelength_nm=337",
-        "--seed", str(SEED),
-    ]  # fmt: skip
+    return cli.obdeect(
+        "sources",
+        "run",
+        "shower",
+        observation_level="2150",
+        wavelength_min="300",
+        wavelength_max="600",
+        n_minus_one="2.9e-4",
+        telescope_radius="12.5",
+        start_height="10000",
+        zenith=str(zenith),
+        azimuth=str(azimuth),
+        step="100",
+        nmax="100",
+        xmax="600",
+        x0="-50",
+        gh_lambda="70",
+        atmosphere_depth0="800",
+        scale_height="8000",
+        fluorescence_yield=str(SHOWER_FLUORESCENCE_YIELD),
+        fluorescence_spectrum="fixed:wavelength_nm=337",
+        seed=str(SEED),
+    )
 
 
 def _laser_argv(zenith, azimuth):
-    return [
-        "sources", "run", "laser-beam", "--observation-level", "2150",
-        "--laser-position", "200,0,3000", "--beam-zenith", str(zenith),
-        "--beam-azimuth", str(azimuth), "--divergence", "0.001", "--pulse-energy", "1e-3",
-        "--wavelength-nm", "355", "--telescope-radius", "12.5", "--rows", "200",
-        "--allow-direct-beam", "--seed", str(SEED),
-    ]  # fmt: skip
+    return cli.obdeect(
+        "sources",
+        "run",
+        "laser-beam",
+        observation_level="2150",
+        laser_position="200,0,3000",
+        beam_zenith=str(zenith),
+        beam_azimuth=str(azimuth),
+        divergence="0.001",
+        pulse_energy="1e-3",
+        wavelength_nm="355",
+        telescope_radius="12.5",
+        rows="200",
+        allow_direct_beam=True,
+        seed=str(SEED),
+    )
 
 
 def _lidar_argv(zenith, azimuth):
-    return [
-        "sources", "run", "lidar", "--observation-level", "2000",
-        "--satellite-altitude", "400000", "--satellite-offset", "1000,0",
-        "--beam-zenith", str(zenith), "--beam-azimuth", str(azimuth), "--divergence", "0.01",
-        "--pulse-energy", "1e-3", "--wavelength-nm", "355", "--telescope-radius", "12.5",
-        "--start-height", "100000", "--rows", "128", "--allow-direct-beam", "--seed", str(SEED),
-    ]  # fmt: skip
+    return cli.obdeect(
+        "sources",
+        "run",
+        "lidar",
+        observation_level="2000",
+        satellite_altitude="400000",
+        satellite_offset="1000,0",
+        beam_zenith=str(zenith),
+        beam_azimuth=str(azimuth),
+        divergence="0.01",
+        pulse_energy="1e-3",
+        wavelength_nm="355",
+        telescope_radius="12.5",
+        start_height="100000",
+        rows="128",
+        allow_direct_beam=True,
+        seed=str(SEED),
+    )
 
 
 def _beam_scan_argv(zenith, azimuth):
-    return [
-        "sources", "run", "beam-scan", "--observation-level", "2150",
-        "--spectrum", "fixed:wavelength_nm=400", "--photons-per-position", "1e4",
-        "--camera-radius", "1.5", "--scan-start", "-1", "-1", "--scan-extent-x", "1",
-        "--scan-extent-y", "1", "--scan-step", "1", "--height", "100",
-        "--beam-zenith", str(zenith), "--beam-azimuth", str(azimuth), "--seed", str(SEED),
-    ]  # fmt: skip
+    return cli.obdeect(
+        "sources",
+        "run",
+        "beam-scan",
+        observation_level="2150",
+        spectrum="fixed:wavelength_nm=400",
+        photons_per_position="1e4",
+        camera_radius="1.5",
+        scan_start=("-1", "-1"),
+        scan_extent_x="1",
+        scan_extent_y="1",
+        scan_step="1",
+        height="100",
+        beam_zenith=str(zenith),
+        beam_azimuth=str(azimuth),
+        seed=str(SEED),
+    )
 
 
 def _night_sky_argv(zenith, azimuth):
-    return [
-        "sources", "run", "night-sky", "--observation-level", "2150",
-        "--spectrum", "uniform:low_nm=300,high_nm=600", "--photons", "1e5",
-        "--viewcone-deg", "2", "--telescope-position", "0,0,0", "--telescope-radius", "12.5",
-        "--telescope-zenith", str(zenith), "--telescope-azimuth", str(azimuth),
-        "--seed", str(SEED),
-    ]  # fmt: skip
+    return cli.obdeect(
+        "sources",
+        "run",
+        "night-sky",
+        observation_level="2150",
+        spectrum="uniform:low_nm=300,high_nm=600",
+        photons="1e5",
+        viewcone_deg="2",
+        telescope_position="0,0,0",
+        telescope_radius="12.5",
+        telescope_zenith=str(zenith),
+        telescope_azimuth=str(azimuth),
+        seed=str(SEED),
+    )
 
 
 PRESETS = (
@@ -306,9 +369,7 @@ def measure_preset(preset: Preset, azimuth_deg: float, root: Path) -> dict:
     """Run one preset at one azimuth, read its photons and return the measured direction."""
     tag = f"{preset.name}-az{int(azimuth_deg)}"
     out = root / f"{tag}.pst"
-    common.command(
-        [common.tool("obdeect"), *preset.argv(azimuth_deg, out)], root / f"{tag}.log"
-    )
+    common.command(_installed(preset.argv(azimuth_deg, out)), root / f"{tag}.log")
     _, data = readers.read_native(
         out, keys=("cx", "cy", "cz", "w"), require_events=False
     )
@@ -398,7 +459,7 @@ def corsika_file(path: Path, root: Path) -> dict:
     stem = path.name.removesuffix(".iact")
     stream = root / f"{stem}.pst"
     common.command(
-        [common.tool("obdeect"), "stream", "from-corsika", str(path)],
+        _installed(cli.from_corsika(str(path))),
         root / f"{stem}-from-corsika.log",
         stdout_file=stream,
     )

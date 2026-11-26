@@ -12,7 +12,6 @@ Limits: exact equality for every stream and every camera event. Any difference i
 comparison uses the photo-electron arrays and the trigger flags of the sim_telarray output.
 """
 
-import argparse
 from pathlib import Path
 
 from obdeect_validation.adapters import atmosphere_chain as atm
@@ -20,39 +19,27 @@ from obdeect_validation.adapters import chain_optics as optics
 from obdeect_validation.adapters import chain_showers as cs
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import obdeect_cli as cli
 
 LST, MST, VERSION = "LSTN-01", "MSTN-01", "7.0.0"
 ZENITH_DEG, AZIMUTH_DEG, SEED = 20, 180, 5
 PROPAGATION_SEED = 123
 TELESCOPE = "1"  # the camera map of to-simtel covers telescope 1 only
 MIN_PHOTONS = 1000
+TRACE_OPTIONS = {
+    "seed": SEED,
+    "threads": 2,
+    "telescopes": TELESCOPE,
+    "pointing_zenith_deg": ZENITH_DEG,
+    "pointing_azimuth_deg": AZIMUTH_DEG,
+}
 
 
-def trace_consumer(model, output, seed=SEED):
+def trace_consumer(model, output):
     """argv builder of a trace-stream consumer reading the FIFO and writing output."""
 
     def build(fifo):
-        return [
-            "obdeect",
-            "ray-tracing",
-            "trace-stream",
-            "--model",
-            model,
-            "--seed",
-            seed,
-            "--threads",
-            2,
-            "--telescopes",
-            TELESCOPE,
-            "--pointing-zenith-deg",
-            ZENITH_DEG,
-            "--pointing-azimuth-deg",
-            AZIMUTH_DEG,
-            "-i",
-            fifo,
-            "-o",
-            output,
-        ]
+        return cli.trace_stream(model, fifo, output, **TRACE_OPTIONS)
 
     return build
 
@@ -60,23 +47,7 @@ def trace_consumer(model, output, seed=SEED):
 def compile_model(root, name, zenith):
     model = root / f"{name}.json"
     common.command(
-        [
-            "obdeect",
-            "ray-tracing",
-            "compile",
-            "--simulation-models",
-            common.models_root(),
-            "--model",
-            name,
-            "--version",
-            VERSION,
-            "--seed",
-            1,
-            "--zenith-deg",
-            zenith,
-            "--output",
-            model,
-        ],
+        cli.compile_model(model, name, VERSION, zenith_deg=zenith),
         root / f"compile-{name}.log",
     )
     return model
@@ -91,57 +62,16 @@ def full_run(root, name, source, cut, band, model):
     )
     stages = [
         e2e.run_stage(
-            ["obdeect", "stream", "from-corsika", source],
+            cli.from_corsika(source),
             log=root / f"{name}-from-corsika.log",
             output=native,
         ),
         e2e.run_stage(
-            [
-                "obdeect",
-                "propagation",
-                "run",
-                "--transmission",
-                cut,
-                "--pathlen",
-                "0",
-                "--site-altitude",
-                atm.SITE_ALTITUDE_M,
-                "--seed",
-                PROPAGATION_SEED,
-                "--mode",
-                "weighted",
-                "--wavelength-range",
-                band[0],
-                band[1],
-                "-i",
-                native,
-                "-o",
-                prop,
-            ],
+            cli.weighted_propagation(cut, band, native, prop, seed=PROPAGATION_SEED),
             log=root / f"{name}-propagation.log",
         ),
         e2e.run_stage(
-            [
-                "obdeect",
-                "ray-tracing",
-                "trace-stream",
-                "--model",
-                model,
-                "--seed",
-                SEED,
-                "--threads",
-                2,
-                "--telescopes",
-                TELESCOPE,
-                "--pointing-zenith-deg",
-                ZENITH_DEG,
-                "--pointing-azimuth-deg",
-                AZIMUTH_DEG,
-                "-i",
-                prop,
-                "-o",
-                out,
-            ],
+            cli.trace_stream(model, prop, out, **TRACE_OPTIONS),
             log=root / f"{name}-trace.log",
         ),
     ]
@@ -172,16 +102,13 @@ def camera_difference(left, right):
 def camera_output(root, traced, name, config, extra, camera_rotation):
     iact = root / f"{name}.iact"
     common.command(
-        [
-            "obdeect",
+        cli.obdeect(
             "stream",
             "to-simtel",
-            "--camera-map",
-            optics.camera_map(root, camera_rotation),
-            "-o",
-            iact,
-            traced,
-        ],
+            camera_map=optics.camera_map(root, camera_rotation),
+            o=iact,
+            extra=[traced],
+        ),
         root / f"{name}-to-simtel.log",
     )
     return iact, cs.simulate(
@@ -189,8 +116,7 @@ def camera_output(root, traced, name, config, extra, camera_rotation):
     )
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def add_arguments(parser):
     parser.add_argument(
         "--input",
         type=Path,
@@ -202,8 +128,9 @@ def main():
         required=True,
         help="sim_telarray config generated by simtools for LSTN-01 7.0.0 (CTAO.cfg)",
     )
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+
+
+def analyse(root, args):
     source = args.input.resolve()
     config = args.config.resolve()
     config_dir = config.parent
@@ -241,34 +168,13 @@ def main():
     stages = {}
     native = root / "native.gst"
     stages["from-corsika"] = e2e.run_stage(
-        ["obdeect", "stream", "from-corsika", source],
+        cli.from_corsika(source),
         log=root / "from-corsika.log",
         output=native,
     )
     prop = root / "prop.gst"
     stages["propagation"] = e2e.run_stage(
-        [
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            cut,
-            "--pathlen",
-            "0",
-            "--site-altitude",
-            atm.SITE_ALTITUDE_M,
-            "--seed",
-            PROPAGATION_SEED,
-            "--mode",
-            "weighted",
-            "--wavelength-range",
-            band[0],
-            band[1],
-            "-i",
-            native,
-            "-o",
-            prop,
-        ],
+        cli.weighted_propagation(cut, band, native, prop, seed=PROPAGATION_SEED),
         log=root / "propagation.log",
     )
     lst_model = compile_model(root, LST, ZENITH_DEG)
@@ -350,10 +256,14 @@ def main():
         e2e.describe(s) for s in stages_b[len(consumers_b) + 1 :]
     ]
     details["stage_verdicts"] = {name: e2e.describe(s) for name, s in stages.items()}
-    common.write_results(metrics, details, root)
     e2e.summary_figure(
         root / "summary.png", metrics, "fan-out (tee branches, models from one stream)"
     )
+    return metrics, details
+
+
+def main():
+    common.results_main(analyse, __doc__.split("\n")[0], add_arguments=add_arguments)
 
 
 if __name__ == "__main__":

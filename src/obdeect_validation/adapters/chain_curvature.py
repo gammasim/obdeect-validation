@@ -35,6 +35,7 @@ from obdeect_validation.adapters import atmosphere_chain as chain
 from obdeect_validation.adapters import chain_showers, common, curved_showers
 from obdeect_validation.adapters import curvature_corsika_extinction as curved
 from obdeect_validation.adapters import curved_extinction as ce
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters.curvature_corsika_extinction import MissingInputError
 
 SITE_ALTITUDE_M = chain.SITE_ALTITUDE_M
@@ -42,7 +43,6 @@ SIGMA = 5.0
 RATIO_FLOOR = 0.01
 DETECTED = "Detected"
 NOT_ABSORBED = "Not absorbed/max. Q.E."
-SIMTEL_DEFINES = ("-DCTA_NORTH", "-DLST1", "-DNUM_TELESCOPES=3")
 QE_TABLE = "cfg/CTA/qe_lst1_20200318_high+low.dat"  # LST-1 config: first column = high-QE pixels
 MIRROR_TABLE = (
     "cfg/CTA/ref_LST_2020-04-23.dat"  # LST mirror reflectivity, column 2 (fraction)
@@ -139,24 +139,6 @@ class DetectionWeights:
         return quantum * reflectivity * window
 
 
-def run_simtel(work, input_file, name, zenith_deg, extra=()):
-    """sim_telarray on one input with the telescopes pointing at the shower zenith (as chain_showers)."""
-    return common.sim_telarray(
-        work,
-        input_file,
-        name,
-        {
-            "maximum_telescopes": 3,
-            "altitude": SITE_ALTITUDE_M,
-            "telescope_theta": zenith_deg,
-            "telescope_phi": 180,
-            "Bypass_Optics": 0,
-        },
-        defines=SIMTEL_DEFINES,
-        extra=tuple(extra),
-    )
-
-
 def stage_total(stats, stage) -> float:
     """Photons (or p.e.) of one 'Photon statistics' stage summed over telescopes."""
     if stage not in stats:
@@ -234,27 +216,28 @@ def analyse(root, source, zenith, table, cut_path, zero_path, weights) -> dict:
 
     work = Path(root) / f"gamma-{zenith:g}deg"
     work.mkdir(parents=True, exist_ok=True)
-    reference = run_simtel(work, source, "reference", zenith)
-    run_simtel(
+    reference = chain_showers.simulate(
+        work, source, "reference", zenith=zenith, altitude=SITE_ALTITUDE_M
+    )
+    chain_showers.simulate(
         work,
         source,
         "unit",
-        zenith,
+        zenith=zenith,
+        altitude=SITE_ALTITUDE_M,
         extra=["-C", f"atmospheric_transmission={zero_path}"],
     )
     summary, propagated = curved.propagate(
         work, source, cut_path, band, "corsika", "candidate"
     )
     candidate_input = work / "candidate.iact"
-    common.command(
-        ["obdeect", "stream", "to-simtel", propagated, "-o", candidate_input],
-        work / "to-simtel.log",
-    )
-    candidate = run_simtel(
+    common.command(cli.to_simtel(propagated, candidate_input), work / "to-simtel.log")
+    candidate = chain_showers.simulate(
         work,
         candidate_input,
         "candidate",
-        zenith,
+        zenith=zenith,
+        altitude=SITE_ALTITUDE_M,
         extra=["-C", f"atmospheric_transmission={zero_path}"],
     )
 

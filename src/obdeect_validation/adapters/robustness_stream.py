@@ -11,15 +11,14 @@ Limits (exact, no tolerance):
     must end the pipeline without a hang.
 """
 
-import argparse
 import struct
 from pathlib import Path
 
-from obdeect_validation.adapters import atmosphere_chain as atm
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import obdeect_cli as cli
 
-LST, VERSION, ZENITH_DEG, AZIMUTH_DEG, SEED = "LSTN-01", "7.0.0", 20, 180, 5
+SEED, ZENITH_DEG, AZIMUTH_DEG = 5, 20, 180
 PROPAGATION_SEED = 123
 HEADER = struct.Struct("<IHHQ")
 MAGIC = 0x52545347
@@ -90,35 +89,24 @@ def variant(source, destination, change):
 
 
 def trace_argv(model, stream_in, stream_out):
-    return [
-        "obdeect",
-        "ray-tracing",
-        "trace-stream",
-        "--model",
+    return cli.trace_stream(
         model,
-        "--seed",
-        SEED,
-        "--threads",
-        2,
-        "--telescopes",
-        "1",
-        "--pointing-zenith-deg",
-        ZENITH_DEG,
-        "--pointing-azimuth-deg",
-        AZIMUTH_DEG,
-        "-i",
         stream_in,
-        "-o",
         stream_out,
-    ]
+        seed=SEED,
+        threads=2,
+        telescopes="1",
+        pointing_zenith_deg=ZENITH_DEG,
+        pointing_azimuth_deg=AZIMUTH_DEG,
+    )
 
 
 def chain_argvs(model, camera_map):
     """cat | trace | to-simtel, every stage on stdin/stdout."""
     return [
-        ["obdeect", "stream", "cat", "-"],
+        cli.obdeect("stream", "cat", "-"),
         trace_argv(model, "-", "-"),
-        ["obdeect", "stream", "to-simtel", "--camera-map", camera_map, "-o", "-", "-"],
+        cli.obdeect("stream", "to-simtel", camera_map=camera_map, o="-", extra=["-"]),
     ]
 
 
@@ -145,7 +133,7 @@ def run_trace(root, name, stream, model, timeout=300):
     """cat | trace-stream: the photons delivered for the photon comparisons."""
     out = root / f"{name}.trace.gst"
     stages = e2e.pipeline(
-        [["obdeect", "stream", "cat", "-"], trace_argv(model, "-", "-")],
+        [cli.obdeect("stream", "cat", "-"), trace_argv(model, "-", "-")],
         stdin=stream,
         output=out,
         log_dir=root / f"{name}.trace-stages",
@@ -154,77 +142,28 @@ def run_trace(root, name, stream, model, timeout=300):
     return stages, out
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def add_input(parser):
     parser.add_argument(
         "--input",
         type=Path,
         default=common.VALIDATION / "inputs/gamma-20deg-20-100GeV.iact",
     )
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+
+
+def analyse(root, args):
     source = args.input.resolve()
-    band = atm.cherenkov_band(
-        source.with_suffix(".corsika.log").read_text(errors="replace")
-    )
-    cut = root / "cut-transmission.dat"
-    cut.write_text(
-        atm.cut_table(common.TRANSMISSION_TABLE.read_text(), atm.MAX_LAMBDA_NM)
-    )
-    camera_map = root / "camera-map.txt"
-    camera_map.write_text("1 1 0.0\n")
-    model = root / "model.json"
-    common.command(
-        [
-            "obdeect",
-            "ray-tracing",
-            "compile",
-            "--simulation-models",
-            common.models_root(),
-            "--model",
-            LST,
-            "--version",
-            VERSION,
-            "--seed",
-            1,
-            "--zenith-deg",
-            ZENITH_DEG,
-            "--output",
-            model,
-        ],
-        root / "compile.log",
-    )
+    chain = cli.prepare_chain(root, source, zenith_deg=ZENITH_DEG)
+    model, camera_map = chain.model, chain.camera_map
     native = root / "native.gst"
     prop = root / "prop.gst"
     setup = [
         e2e.run_stage(
-            ["obdeect", "stream", "from-corsika", source],
-            log=root / "from-corsika.log",
-            output=native,
+            cli.from_corsika(source), log=root / "from-corsika.log", output=native
         ),
         e2e.run_stage(
-            [
-                "obdeect",
-                "propagation",
-                "run",
-                "--transmission",
-                cut,
-                "--pathlen",
-                "0",
-                "--site-altitude",
-                atm.SITE_ALTITUDE_M,
-                "--seed",
-                PROPAGATION_SEED,
-                "--mode",
-                "weighted",
-                "--wavelength-range",
-                band[0],
-                band[1],
-                "-i",
-                native,
-                "-o",
-                prop,
-            ],
+            cli.weighted_propagation(
+                chain.cut, chain.band, native, prop, seed=PROPAGATION_SEED
+            ),
             log=root / "propagation.log",
         ),
     ]
@@ -318,7 +257,7 @@ def main():
                 metrics[f"{name}_photons_out"] = len(rows["x"]) if "x" in rows else 0
 
     early = e2e.pipeline(
-        [["obdeect", "stream", "cat", "-"], ["head", "-c", "4096"]],
+        [cli.obdeect("stream", "cat", "-"), ["head", "-c", "4096"]],
         stdin=prop,
         output=root / "early.bin",
         log_dir=root / "early-stages",
@@ -326,10 +265,14 @@ def main():
     )
     details["early_exit_verdicts"] = [e2e.describe(s) for s in early]
     metrics["early_exit_hang"] = int(any(s.timed_out for s in early))
-    common.write_results(metrics, details, root)
     e2e.summary_figure(
         root / "summary.png", metrics, "robustness (damaged and unusual streams)"
     )
+    return metrics, details
+
+
+def main():
+    common.results_main(analyse, __doc__.split("\n")[0], add_arguments=add_input)
 
 
 if __name__ == "__main__":

@@ -59,7 +59,7 @@ import numpy as np
 from scipy import stats
 from scipy.special import ndtr
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 
 SEED = 20261123
 PHOTONS = 200_000
@@ -634,11 +634,6 @@ def read_stream(path: Path) -> dict:
     return data
 
 
-def ulp32(values: np.ndarray) -> np.ndarray:
-    """Float32 spacing at each value (in double)."""
-    return np.spacing(np.abs(values).astype(np.float32)).astype(float)
-
-
 def ground_expected(sky: dict) -> dict:
     """Sky rows that hit the telescope sphere: entry point, path and time (smallest root)."""
     p = np.array(SOURCE_POSITION_M, dtype=float)
@@ -722,7 +717,10 @@ def level_part(root: Path) -> tuple[dict, dict]:
             np.max(np.abs(np.linalg.norm(g_pos, axis=1) - TELESCOPE_RADIUS_M))
         )
         ground_time_ulp = float(
-            np.max(np.abs(ground["t"].astype(float) - expect["t"]) / ulp32(expect["t"]))
+            np.max(
+                np.abs(ground["t"].astype(float) - expect["t"])
+                / streams.ulp32(expect["t"], floor=0.0)
+            )
         )
         ground_zem_dev = float(
             np.max(

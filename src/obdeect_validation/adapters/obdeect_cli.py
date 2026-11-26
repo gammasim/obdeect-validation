@@ -13,6 +13,9 @@ converted to strings: ``common.command`` and ``endtoend_common.pipeline`` do tha
 For an option name that is not a Python identifier (or must be repeated, such as ``--set``), pass
 ``extra=[...]``: those arguments are appended as they are.
 
+``input_argument(parser)`` adds the ``--input`` option of the chain cases (CORSIKA IACT file,
+default the 20-100 GeV gamma showers).
+
 ``prepare_chain`` makes the inputs every air-shower chain case starts from: the Cherenkov band of
 the CORSIKA run, the transmission table cut below sim_telarray's MAX_LAMBDA, a one-telescope camera
 map and the compiled LSTN-01 model.
@@ -34,9 +37,12 @@ def _flag(name: str) -> str:
     return "--" + name.replace("_", "-")
 
 
-def obdeect(*command: Any, extra=(), **options: Any) -> list:
-    """["obdeect", *command, options..., *extra] (see the module docstring)."""
-    argv: list = ["obdeect", *command]
+def obdeect(*command: Any, extra=(), executable="obdeect", **options: Any) -> list:
+    """[executable, *command, options..., *extra] (see the module docstring).
+
+    executable: "obdeect" (found on PATH when run) or a resolved path such as common.tool("obdeect").
+    """
+    argv: list = [executable, *command]
     for name, value in options.items():
         if value is None or value is False:
             continue
@@ -112,6 +118,15 @@ def to_simtel(i, o, **options) -> list:
     return obdeect("stream", "to-simtel", i, o=o, **options)
 
 
+#: CORSIKA input of the air-shower chain cases.
+SHOWERS_20_100 = common.VALIDATION / "inputs/gamma-20deg-20-100GeV.iact"
+
+
+def input_argument(parser, default=SHOWERS_20_100) -> None:
+    """Add --input (CORSIKA IACT file, a Path) to an argparse parser."""
+    parser.add_argument("--input", type=Path, default=default)
+
+
 @dataclass
 class Chain:
     """Inputs of the standard air-shower chain (see prepare_chain)."""
@@ -120,7 +135,7 @@ class Chain:
     source: Path
     band: tuple[float, float]
     cut: Path
-    camera_map: Path
+    camera_map: Path | None
     model: Path | None
 
 
@@ -132,13 +147,13 @@ def prepare_chain(
     version: str = "7.0.0",
     zenith_deg=None,
     compile_seed=1,
-    camera_map_text: str = "1 1 0.0\n",
+    camera_map_text: str | None = "1 1 0.0\n",
 ) -> Chain:
     """Band, cut table, camera map and (model not None) compiled model of the standard chain in root.
 
     The band comes from <source>.corsika.log; the cut table is common.TRANSMISSION_TABLE cut at
     atm.MAX_LAMBDA_NM (cut-transmission.dat); the camera map is camera-map.txt; the model is
-    model.json, compiled with compile.log.
+    model.json, compiled with compile.log. camera_map_text None: no camera map (Chain.camera_map None).
     """
     root, source = Path(root), Path(source)
     band = atm.cherenkov_band(
@@ -148,8 +163,10 @@ def prepare_chain(
     cut.write_text(
         atm.cut_table(common.TRANSMISSION_TABLE.read_text(), atm.MAX_LAMBDA_NM)
     )
-    camera_map = root / "camera-map.txt"
-    camera_map.write_text(camera_map_text)
+    camera_map = None
+    if camera_map_text is not None:
+        camera_map = root / "camera-map.txt"
+        camera_map.write_text(camera_map_text)
     model_path = None
     if model is not None:
         model_path = root / "model.json"

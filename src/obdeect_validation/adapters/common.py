@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import subprocess
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Any
 
@@ -149,29 +150,45 @@ def tool(name: str) -> str:
     return path
 
 
-def command(argv, log, cwd=None, stdout_file=None, *, check=True, stdout=None) -> int:
+def command(
+    argv, log, cwd=None, stdout_file=None, *, check=True, stdout=None, stdin_file=None
+) -> int:
     """Run argv; stdout and stderr go to log (stdout to stdout_file, or to stdout, e.g.
-    subprocess.DEVNULL, when given). Returns the exit status.
+    subprocess.DEVNULL, when given); stdin_file is read as standard input. Returns the exit status.
 
     check: raise RuntimeError with the log tail when the command fails. Every adapter runs its
     commands through this function, endtoend_common.pipeline (pipes, timeouts) or
     performance.run_timed (CPU time and peak RSS).
     """
     argv = [str(arg) for arg in argv]
-    with Path(log).open("wb") as log_stream:
+    with (
+        Path(log).open("wb") as log_stream,
+        Path(stdin_file).open("rb") if stdin_file else nullcontext() as stdin,
+    ):
         if stdout_file:
             with Path(stdout_file).open("wb") as output:
                 process = subprocess.run(
-                    argv, cwd=cwd, stdout=output, stderr=log_stream, check=False
+                    argv,
+                    cwd=cwd,
+                    stdin=stdin,
+                    stdout=output,
+                    stderr=log_stream,
+                    check=False,
                 )
         elif stdout is not None:
             process = subprocess.run(
-                argv, cwd=cwd, stdout=stdout, stderr=log_stream, check=False
+                argv,
+                cwd=cwd,
+                stdin=stdin,
+                stdout=stdout,
+                stderr=log_stream,
+                check=False,
             )
         else:
             process = subprocess.run(
                 argv,
                 cwd=cwd,
+                stdin=stdin,
                 stdout=log_stream,
                 stderr=subprocess.STDOUT,
                 check=False,

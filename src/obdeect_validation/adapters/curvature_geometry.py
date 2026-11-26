@@ -47,7 +47,7 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, endtoend_common, streams
 
 EARTH_RADIUS_M = 6371315.0
 FLAT_RADIUS_M = 1e12
@@ -85,25 +85,33 @@ LATERAL_SHIFT_KM = 5.0
 LIMITS = {
     "max_zem_error_m": (
         5e-3,
-        "zem is stored as float32: half an ulp is 2.4e-4 m at 5 km a.s.l. (the highest emission "
-        "altitude used). The limit is 20 times that and about 1/400 of the curvature shift it "
-        "tests (1.96 m at 5 km lateral), so it resolves the sphere and not the storage.",
+        (
+            "zem is stored as float32: half an ulp is 2.4e-4 m at 5 km a.s.l. (the highest emission "
+            "altitude used). The limit is 20 times that and about 1/400 of the curvature shift it "
+            "tests (1.96 m at 5 km lateral), so it resolves the sphere and not the storage."
+        ),
     ),
     "max_position_error_m": (
         1e-3,
-        "G positions are float32 with magnitudes below 2.5e4 m: half an ulp is at most 9.8e-4 m "
-        "there, so the limit is the float32 storage, not a physical tolerance.",
+        (
+            "G positions are float32 with magnitudes below 2.5e4 m: half an ulp is at most 9.8e-4 m "
+            "there, so the limit is the float32 storage, not a physical tolerance."
+        ),
     ),
     "max_time_error_ns": (
         2e-3,
-        "times are float32 with magnitudes below 2^15 ns (about 2.7e4 ns here): half an ulp is "
-        "9.8e-4 ns; the limit is twice that.",
+        (
+            "times are float32 with magnitudes below 2^15 ns (about 2.7e4 ns here): half an ulp is "
+            "9.8e-4 ns; the limit is twice that."
+        ),
     ),
     "flat_limit_max_difference": (
         1e-3,
-        "difference of the R = 1e12 m spherical run and the plane-parallel run in x, y and zem "
-        "[m]: one float32 ulp at 8 to 16 km (9.8e-4 m). The physical 1/R residual is below "
-        "1e-6 m for these geometries.",
+        (
+            "difference of the R = 1e12 m spherical run and the plane-parallel run in x, y and zem "
+            "[m]: one float32 ulp at 8 to 16 km (9.8e-4 m). The physical 1/R residual is below "
+            "1e-6 m for these geometries."
+        ),
     ),
     "dropped_count_mismatch": (
         0,
@@ -111,9 +119,11 @@ LIMITS = {
     ),
     "lateral_shift_relative_error": (
         1e-2,
-        "relative error of the zem shift at 5 km lateral distance against d^2 / (2R). The "
-        "closed form differs from d^2 / (2R) by (z + H) / R, about 1e-3 at these heights, so "
-        "1 % is ten times that.",
+        (
+            "relative error of the zem shift at 5 km lateral distance against d^2 / (2R). The "
+            "closed form differs from d^2 / (2R) by (z + H) / R, about 1e-3 at these heights, so "
+            "1 % is ten times that."
+        ),
     ),
     "sample_count": (
         1296,
@@ -202,67 +212,44 @@ def lateral_shift_closed_form(
 
 
 def _write_input(path: Path, curvature_applied: int, photons, telescopes) -> None:
-    from obdeect import stream
-
-    writer = stream.Writer(str(path), "obdeect-validation")
-    writer.write(
-        "run",
-        {
-            "run_number": 1,
-            "observation_level_m": SITE_M,
-            "telescope_x_m": [t[1] for t in telescopes],
-            "telescope_y_m": [t[2] for t in telescopes],
-            "telescope_z_m": [t[3] for t in telescopes],
-            "telescope_r_m": [12.0] * len(telescopes),
-            "refraction_applied": 0,
-            "wavelength_min_nm": 300.0,
-            "wavelength_max_nm": 600.0,
-            "curvature_applied": curvature_applied,
-        },
-    )
-    writer.write("event", {"event_number": 1})
-    for telescope_id, _, _, _ in telescopes:
-        writer.write("telescope", {"telescope_id": telescope_id, "frame": 0})
-        n = len(photons)
-        arrays = {
-            "x": np.array([p["x"] for p in photons], dtype=np.float32),
-            "y": np.array([p["y"] for p in photons], dtype=np.float32),
-            "z": np.array([p["z"] for p in photons], dtype=np.float32),
-            "cx": np.array([p["cx"] for p in photons], dtype=np.float32),
-            "cy": np.array([p["cy"] for p in photons], dtype=np.float32),
-            "cz": np.array([p["cz"] for p in photons], dtype=np.float32),
-            "t": np.zeros(n, dtype=np.float32),
-            "w": np.ones(n, dtype=np.float32),
-        }
-        writer.write_photons(telescope_id, 0, 0, arrays)
-        writer.write(
-            "telescope_end", {"telescope_id": telescope_id, "photons": float(n)}
-        )
-    writer.write("event_end", {})
-    writer.write("run_end", {})
-    writer.close()
+    n = len(photons)
+    arrays = {
+        "x": np.array([p["x"] for p in photons], dtype=np.float32),
+        "y": np.array([p["y"] for p in photons], dtype=np.float32),
+        "z": np.array([p["z"] for p in photons], dtype=np.float32),
+        "cx": np.array([p["cx"] for p in photons], dtype=np.float32),
+        "cy": np.array([p["cy"] for p in photons], dtype=np.float32),
+        "cz": np.array([p["cz"] for p in photons], dtype=np.float32),
+        "t": np.zeros(n, dtype=np.float32),
+        "w": np.ones(n, dtype=np.float32),
+    }
+    run = {
+        "run_number": 1,
+        "observation_level_m": SITE_M,
+        "telescope_x_m": [t[1] for t in telescopes],
+        "telescope_y_m": [t[2] for t in telescopes],
+        "telescope_z_m": [t[3] for t in telescopes],
+        "telescope_r_m": [12.0] * len(telescopes),
+        "refraction_applied": 0,
+        "wavelength_min_nm": 300.0,
+        "wavelength_max_nm": 600.0,
+        "curvature_applied": curvature_applied,
+    }
+    blocks = [(telescope_id, arrays) for telescope_id, _, _, _ in telescopes]
+    streams.write_stream(path, "obdeect-validation", run, blocks)
 
 
 def _read_output(path: Path):
     """Per telescope id: arrays x, y, t, zem (float64) of the kept photons, in stream order."""
-    from obdeect.stream import Reader
-
-    blocks: dict[int, dict[str, list]] = {}
-    for record in Reader(str(path)):
-        if record["type"] != "photons":
-            continue
-        block = blocks.setdefault(
-            int(record["telescope_id"]), {k: [] for k in ("x", "y", "t", "zem")}
-        )
-        for key in block:
-            block[key].append(np.asarray(record["columns"][key], dtype=np.float64))
-    return {
-        telescope: {
-            key: np.concatenate(values) if values else np.empty(0)
-            for key, values in block.items()
+    rows = endtoend_common.photon_rows(path)
+    blocks = {}
+    for telescope in dict.fromkeys(rows["telescope"].tolist()):
+        on_telescope = rows["telescope"] == telescope
+        blocks[telescope] = {
+            key: np.asarray(rows[key][on_telescope], dtype=np.float64)
+            for key in ("x", "y", "t", "zem")
         }
-        for telescope, block in blocks.items()
-    }
+    return blocks
 
 
 def _run(propagation, source, output, radius, curvature, **kwargs):
@@ -280,25 +267,31 @@ def _run(propagation, source, output, radius, curvature, **kwargs):
     )
 
 
-def main() -> None:
+def analyse(root: Path) -> tuple[dict, dict]:
     from obdeect import propagation
 
     telescopes = telescope_table()
     photons = photon_table()
     reaching = [p for p in photons if not p["upward"]]
     upward = [p for p in photons if p["upward"]]
-    _write_input(Path("in-sky.pst"), 0, photons, telescopes)
+    _write_input(root / "in-sky.pst", 0, photons, telescopes)
 
     summary = _run(
-        propagation, "in-sky.pst", "spherical.pst", EARTH_RADIUS_M, "spherical"
+        propagation,
+        root / "in-sky.pst",
+        root / "spherical.pst",
+        EARTH_RADIUS_M,
+        "spherical",
     )
     flat_summary = _run(
-        propagation, "in-sky.pst", "flat.pst", FLAT_RADIUS_M, "spherical"
+        propagation, root / "in-sky.pst", root / "flat.pst", FLAT_RADIUS_M, "spherical"
     )
-    plane_summary = _run(propagation, "in-sky.pst", "plane.pst", EARTH_RADIUS_M, "none")
-    curved = _read_output(Path("spherical.pst"))
-    flat = _read_output(Path("flat.pst"))
-    plane = _read_output(Path("plane.pst"))
+    plane_summary = _run(
+        propagation, root / "in-sky.pst", root / "plane.pst", EARTH_RADIUS_M, "none"
+    )
+    curved = _read_output(root / "spherical.pst")
+    flat = _read_output(root / "flat.pst")
+    plane = _read_output(root / "plane.pst")
 
     # Column arrays of the reaching photons (input order), float64 from the stored float32.
     x_in = np.array([p["x"] for p in reaching], dtype=np.float64)
@@ -385,7 +378,6 @@ def main() -> None:
         ],
         "time_reference": "t_out = s / c, s = (z - z_t) / sqrt(1 - cx^2 - cy^2)",
     }
-    common.write_results(metrics, details)
     _plot(
         x_in,
         y_in,
@@ -393,8 +385,9 @@ def main() -> None:
         zem_expected,
         zem_flat,
         first["zem"],
-        Path("curvature-geometry.png"),
+        root / "curvature-geometry.png",
     )
+    return metrics, details
 
 
 def _plot(x_in, y_in, z_in, zem_expected, zem_flat, zem_obdeect, path: Path) -> None:
@@ -432,4 +425,4 @@ def _plot(x_in, y_in, z_in, zem_expected, zem_flat, zem_obdeect, path: Path) -> 
 
 
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

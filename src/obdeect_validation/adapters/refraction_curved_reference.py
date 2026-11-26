@@ -479,7 +479,7 @@ def build_geometry(R: float) -> tuple[list[dict], list[dict]]:
     return samples, stored
 
 
-def main() -> None:
+def analyse(root: Path) -> tuple[dict, dict]:
     profile = profile_path()
     nu_earth = NuProfile(profile)
     nu_flat = nu_earth
@@ -487,30 +487,30 @@ def main() -> None:
     samples, stored_earth = build_geometry(EARTH_RADIUS_M)
     _, stored_flat = build_geometry(PLANE_RADIUS_M)
 
-    write_stream("earth-spherical.pst", stored_earth, {})
+    write_stream(root / "earth-spherical.pst", stored_earth, {})
     write_stream(
-        "earth-spherical-refracted.pst", stored_earth, {"refraction_applied": 1}
+        root / "earth-spherical-refracted.pst", stored_earth, {"refraction_applied": 1}
     )
-    write_stream("flat-spherical.pst", stored_flat, {})
-    write_stream("flat-none.pst", stored_flat, {})
+    write_stream(root / "flat-spherical.pst", stored_flat, {})
+    write_stream(root / "flat-none.pst", stored_flat, {})
 
     out_earth = run_obdeect(
-        "earth-spherical.pst",
-        "earth-spherical-out.pst",
+        root / "earth-spherical.pst",
+        root / "earth-spherical-out.pst",
         "spherical",
         EARTH_RADIUS_M,
         profile,
     )
     out_straight = run_obdeect(
-        "earth-spherical-refracted.pst",
-        "earth-straight-out.pst",
+        root / "earth-spherical-refracted.pst",
+        root / "earth-straight-out.pst",
         "spherical",
         EARTH_RADIUS_M,
         profile,
     )
     out_dispersion = run_obdeect(
-        "earth-spherical.pst",
-        "earth-dispersion-out.pst",
+        root / "earth-spherical.pst",
+        root / "earth-dispersion-out.pst",
         "spherical",
         EARTH_RADIUS_M,
         profile,
@@ -518,24 +518,26 @@ def main() -> None:
     )
     dispersed_outputs = {DISPERSION_REFERENCE_NM: out_dispersion}
     for wavelength_nm in (300.0, 700.0):
-        input_path = f"earth-dispersion-{int(wavelength_nm)}.pst"
+        input_path = root / f"earth-dispersion-{int(wavelength_nm)}.pst"
         write_stream(input_path, stored_earth, {}, wavelength_nm=wavelength_nm)
         dispersed_outputs[wavelength_nm] = run_obdeect(
             input_path,
-            f"earth-dispersion-{int(wavelength_nm)}-out.pst",
+            root / f"earth-dispersion-{int(wavelength_nm)}-out.pst",
             "spherical",
             EARTH_RADIUS_M,
             profile,
             dispersion=True,
         )
     out_flat = run_obdeect(
-        "flat-spherical.pst",
-        "flat-spherical-out.pst",
+        root / "flat-spherical.pst",
+        root / "flat-spherical-out.pst",
         "spherical",
         PLANE_RADIUS_M,
         profile,
     )
-    out_none = run_obdeect("flat-none.pst", "flat-none-out.pst", "none", None, profile)
+    out_none = run_obdeect(
+        root / "flat-none.pst", root / "flat-none-out.pst", "none", None, profile
+    )
 
     rows, plane_rows = [], []
     scale_errors, time_norm, straight_norm, plane_norm = [], [], [], []
@@ -673,7 +675,7 @@ def main() -> None:
         convergence(nu_earth, EARTH_RADIUS_M, SITE_ALTITUDE_M, stored_earth),
         convergence(nu_flat, PLANE_RADIUS_M, SITE_ALTITUDE_M, stored_flat),
     )
-    _plot(rows, Path("refraction-curved-ray.png"))
+    _plot(rows, root / "refraction-curved-ray.png")
     metrics = {
         "sample_count": len(rows),
         "max_shift_error_m": max(shift_abs),
@@ -697,8 +699,8 @@ def main() -> None:
         "samples": rows,
         "plane_limit": plane_rows,
     }
-    common.write_results(metrics, details)
+    return metrics, details
 
 
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

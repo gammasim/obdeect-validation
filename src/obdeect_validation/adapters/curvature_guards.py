@@ -23,7 +23,8 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters.refraction_curved_reference import (
     SITE_ALTITUDE_M,
     profile_path,
@@ -177,15 +178,7 @@ def _run_metadata(key) -> dict:
 
 def write_stream(path, frame: str, key, n: int = 40, seed: int = 7) -> None:
     """Tiny stream: n photons per telescope (ground frame G or sky frame), one telescope."""
-    from obdeect.stream import Writer
-
     rng = np.random.default_rng(seed)
-    writer = Writer(str(path), "obdeect-validation")
-    writer.write("run", _run_metadata(key))
-    writer.write("event", {"event_number": 1})
-    writer.write(
-        "telescope", {"telescope_id": 1, "frame": 1 if frame == "ground" else 0}
-    )
     cx = rng.uniform(-0.3, 0.3, n)
     cy = rng.uniform(-0.3, 0.3, n)
     if frame == "ground":
@@ -209,50 +202,40 @@ def write_stream(path, frame: str, key, n: int = 40, seed: int = 7) -> None:
             "t": rng.uniform(0, 10, n),
             "w": np.ones(n),
         }
-    writer.write_photons(
-        1,
-        1 if frame == "ground" else 0,
-        0,
-        {
-            name: np.asarray(values, dtype=np.float32)
-            for name, values in columns.items()
-        },
+    columns = {
+        name: np.asarray(values, dtype=np.float32) for name, values in columns.items()
+    }
+    streams.write_stream(
+        path,
+        "obdeect-validation",
+        _run_metadata(key),
+        [(1, columns)],
+        frame=1 if frame == "ground" else 0,
     )
-    writer.write("telescope_end", {"telescope_id": 1, "photons": float(n)})
-    writer.write("event_end", {})
-    writer.write("run_end", {})
-    writer.close()
 
 
 def _cli_command(case: dict, stream: Path, output: Path) -> list[str]:
-    obdeect = shutil.which("obdeect")
-    head = (
-        [obdeect, "propagation", "run"]
-        if obdeect
-        else [sys.executable, "-m", "obdeect.stream.cli", "propagation", "run"]
-    )
     extra = case["extra"] or {}
-    argv = [
-        *head,
-        "--transmission",
-        str(TRANSMISSION),
-        "--pathlen",
-        "0",
-        "--site-altitude",
-        str(SITE_ALTITUDE_M),
-        "--seed",
-        str(SEED),
-    ]
-    if case["curvature"] is not None:
-        argv += ["--curvature", case["curvature"]]
+    options = {
+        "transmission": str(TRANSMISSION),
+        "pathlen": "0",
+        "site_altitude": str(SITE_ALTITUDE_M),
+        "seed": str(SEED),
+        "curvature": case["curvature"],
+    }
     if extra.get("profile"):
-        argv += ["--profile", str(profile_path())]
+        options["profile"] = str(profile_path())
     if extra.get("scattering"):
-        argv += ["--scattering", str(SCATTERING), "--scattering-points", "8"]
+        options["scattering"] = str(SCATTERING)
+        options["scattering_points"] = "8"
     if "earth_radius" in extra:
-        argv += ["--earth-radius-m", repr(extra["earth_radius"])]
-    argv += ["-i", str(stream), "-o", str(output)]
-    return [str(arg) for arg in argv]
+        options["earth_radius_m"] = repr(extra["earth_radius"])
+    # cli.obdeect starts with the name "obdeect": replace it by the executable found on PATH, or
+    # run the stream module with this interpreter when obdeect is not installed as a command.
+    obdeect = shutil.which("obdeect")
+    head = [obdeect] if obdeect else [sys.executable, "-m", "obdeect.stream.cli"]
+    argv = cli.propagation_run(stream, output, **options)
+    return [str(arg) for arg in [*head, *argv[1:]]]
 
 
 def run_cli(case: dict, stream: Path, output: Path) -> dict:
@@ -295,8 +278,7 @@ def run_api(case: dict, stream: Path, output: Path) -> dict:
     return {"outcome": "ok", "message": ""}
 
 
-def main() -> None:
-    root = Path.cwd()
+def analyse(root: Path) -> tuple[dict, dict]:
     streams_dir = root / "streams"
     streams_dir.mkdir(exist_ok=True)
     rows = []
@@ -345,10 +327,8 @@ def main() -> None:
         "guard_unexpected_outcome_count": unexpected,
         "guard_message_mismatch_count": mismatch,
     }
-    common.write_results(
-        metrics, {"cases": rows, "limits": "documented curvature rules"}
-    )
+    return metrics, {"cases": rows, "limits": "documented curvature rules"}
 
 
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

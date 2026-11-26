@@ -9,6 +9,7 @@ astropy = pytest.importorskip("astropy")
 import astropy.units as u  # noqa: E402
 from astropy.table import QTable  # noqa: E402
 
+from obdeect_validation.adapters import common  # noqa: E402
 from obdeect_validation.adapters import simtools_validate_optics as adapter  # noqa: E402
 
 LIMITS = {"psf_cm": 0.02, "eff_area": 0.01, "eff_flen": 0.002}
@@ -165,7 +166,7 @@ def test_execute_writes_application_config_outputs_and_compares_paired_offsets(
         configs.append(written)
         return SimpleNamespace(returncode=0)
 
-    monkeypatch.setattr(adapter.subprocess, "run", fake_run)
+    monkeypatch.setattr(common.subprocess, "run", fake_run)
     monkeypatch.setattr(
         adapter,
         "_table",
@@ -239,7 +240,7 @@ def test_execute_rejects_mismatched_offset_pairing(monkeypatch, tmp_path: Path) 
         ]
     )
     monkeypatch.setattr(
-        adapter.subprocess,
+        common.subprocess,
         "run",
         lambda *_args, **_kwargs: SimpleNamespace(returncode=0),
     )

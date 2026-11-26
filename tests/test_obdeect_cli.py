@@ -3,7 +3,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from obdeect_validation.adapters import common, obdeect_cli as cli, streams
+from obdeect_validation.adapters import common, streams
+from obdeect_validation.adapters import obdeect_cli as cli
 
 
 def test_obdeect_maps_options_to_flags_in_keyword_order():

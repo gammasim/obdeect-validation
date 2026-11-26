@@ -27,14 +27,14 @@ the plane). The kept photons have P(r < R | kept) = 1 - c(R).
 
 from __future__ import annotations
 
-import argparse
 import math
 from pathlib import Path
 
 import numpy as np
 from scipy import stats
 
-from obdeect_validation.adapters import common, plotting
+from obdeect_validation.adapters import common, plotting, streams
+from obdeect_validation.adapters import obdeect_cli as cli
 
 C_M_NS = 0.299792458
 SEED = 20261123
@@ -129,22 +129,13 @@ def beam_direction(zenith_deg: float, azimuth_deg: float) -> np.ndarray:
 
 def read_photons(path) -> dict:
     """Photon columns (float32, as stored) of a stream, plus the run_end not_on_plane count."""
-    from obdeect.stream import Reader
-
-    columns = {name: [] for name in TIME_KEYS}
-    run_end = None
-    for record in Reader(str(path)):
-        if record["type"] == "photons":
-            for name in TIME_KEYS:
-                columns[name].append(np.asarray(record["columns"][name]))
-        elif record["type"] == "run_end":
-            run_end = record["metadata"]
+    stream = streams.read_stream(path)
     data = {
-        name: np.concatenate(parts) if parts else np.empty(0, dtype=np.float32)
-        for name, parts in columns.items()
+        name: stream.columns.get(name, np.empty(0, dtype=np.float32))
+        for name in TIME_KEYS
     }
     data["run_end_not_on_plane"] = (
-        int(run_end.get("not_on_plane", -1)) if run_end else -1
+        int(stream.run_end.get("not_on_plane", -1)) if stream.run_end else -1
     )
     return data
 
@@ -359,33 +350,22 @@ def laser_argv(
     out: Path, zenith: float, azimuth: float, divergence: float, **extra
 ) -> list:
     """obdeect sources run laser-beam with the upward-beam options (rows, energy fixed)."""
-    argv = [
-        "obdeect",
+    return cli.obdeect(
         "sources",
         "run",
         "laser-beam",
-        "--observation-level",
-        str(LASER_OBSERVATION_M),
-        "--laser-position",
-        ",".join(str(v) for v in LASER_POSITION_M),
-        "--beam-zenith",
-        str(zenith),
-        "--beam-azimuth",
-        str(azimuth),
-        "--divergence",
-        str(divergence),
-        "--pulse-energy",
-        "1e-3",
-        "--wavelength-nm",
-        "355",
-        "--telescope-radius",
-        "12.5",
-        "--rows",
-        str(LASER_ROWS),
-    ]
-    for key, value in extra.items():
-        argv += [f"--{key.replace('_', '-')}", str(value)]
-    return argv + ["-o", str(out)]
+        observation_level=str(LASER_OBSERVATION_M),
+        laser_position=",".join(str(v) for v in LASER_POSITION_M),
+        beam_zenith=str(zenith),
+        beam_azimuth=str(azimuth),
+        divergence=str(divergence),
+        pulse_energy="1e-3",
+        wavelength_nm="355",
+        telescope_radius="12.5",
+        rows=str(LASER_ROWS),
+        **{key: str(value) for key, value in extra.items()},
+        o=str(out),
+    )
 
 
 def run_laser(root: Path, name: str, argv: list) -> dict:
@@ -733,10 +713,8 @@ def run_all(
     return metrics, details, arrays
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
+def analyse(root: Path) -> tuple[dict, dict]:
+    """All parts in root, with the two plots; returns (metrics, details) (see common.results_main)."""
     metrics, details, arrays = run_all(root)
     cases = {
         "above": {"height_m": HEIGHT_M, "_r": arrays["r_above"]},
@@ -744,7 +722,11 @@ def main() -> None:
     }
     plot_radial(root / "isotropic-radial.png", cases, PHOTONS)
     plot_plane_wave(root / "plane-wave-targets.png", arrays["targets"])
-    common.write_results(metrics, details, root)
+    return metrics, details
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

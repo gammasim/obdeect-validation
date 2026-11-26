@@ -26,14 +26,13 @@ Sections (gates in cases/propagation/sphere-extinction.json):
 
 from __future__ import annotations
 
-import argparse
 import math
 from pathlib import Path
 
 import numpy as np
 from scipy.integrate import quad
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 from obdeect_validation.adapters import upward_common as uc
 
 SEED = 20261128
@@ -136,14 +135,7 @@ def spherical_chord_depth(wl, q_rel, direction, length) -> tuple[float, float]:
 
 
 def read_rows(path) -> dict:
-    from obdeect.stream import Reader
-
-    columns: dict[str, list] = {}
-    for record in Reader(str(path)):
-        if record["type"] == "photons":
-            for name, values in record["columns"].items():
-                columns.setdefault(name, []).append(np.asarray(values))
-    return {k: np.concatenate(v) for k, v in columns.items()} if columns else {}
+    return streams.read_columns(path)
 
 
 def ids_of(wavelength) -> np.ndarray:
@@ -520,13 +512,13 @@ def evaluate(paths: dict) -> tuple[dict, dict]:
     return metrics, details
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
+def analyse(root: Path) -> tuple[dict, dict]:
     paths, _ = run_all(root)
-    metrics, details = evaluate(paths)
-    common.write_results(metrics, details, root)
+    return evaluate(paths)
+
+
+def main() -> None:
+    common.results_main(analyse, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

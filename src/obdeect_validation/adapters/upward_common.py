@@ -28,6 +28,7 @@ from scipy.integrate import quad
 from scipy.interpolate import CubicSpline
 
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import streams
 
 ROOT = Path(__file__).resolve().parents[3]
 PROFILE = ROOT / "fixtures/atmprof_ecmwf_north_winter_fixed.dat"
@@ -231,8 +232,6 @@ def write_stream(
     chunk per photon with first_index = that index (the photon keeps its identity when rows are
     shuffled). Without it the rows are numbered 0..n-1 in file order.
     """
-    from obdeect.stream import Writer
-
     run = {
         "run_number": 1,
         "observation_level_m": plane_site_m,
@@ -246,26 +245,20 @@ def write_stream(
     if curvature_applied is not None:
         run["curvature_applied"] = curvature_applied
     run.update(run_extra or {})
-    with Writer(str(path), "obdeect validation: upward propagation") as writer:
+    producer = "obdeect validation: upward propagation"
+    if indices is None:
+        return streams.write_stream(path, producer, run, blocks, chunk_rows=chunk_rows)
+    from obdeect.stream import Writer
+
+    with Writer(str(path), producer) as writer:
         writer.write("run", run)
         writer.write("event", {"event_number": 1})
         for telescope_id, columns in blocks:
             rows = len(columns["x"])
             writer.write("telescope", {"telescope_id": telescope_id, "frame": 0})
-            if indices is not None:
-                for row, index in enumerate(indices[telescope_id]):
-                    piece = {
-                        k: np.asarray(v)[row : row + 1] for k, v in columns.items()
-                    }
-                    writer.write_photons(telescope_id, 0, int(index), piece)
-            else:
-                step = chunk_rows or rows
-                for first in range(0, rows, step):
-                    piece = {
-                        k: np.asarray(v)[first : first + step]
-                        for k, v in columns.items()
-                    }
-                    writer.write_photons(telescope_id, 0, first, piece)
+            for row, index in enumerate(indices[telescope_id]):
+                piece = {k: np.asarray(v)[row : row + 1] for k, v in columns.items()}
+                writer.write_photons(telescope_id, 0, int(index), piece)
             writer.write(
                 "telescope_end", {"telescope_id": telescope_id, "photons": float(rows)}
             )
@@ -274,12 +267,7 @@ def write_stream(
     return path
 
 
-def read_rows(path) -> dict:
-    """Photon rows of a stream (photon_rows): event, telescope, index and float32 columns."""
-    return e2e.photon_rows(path)
-
-
-def ulp32(values) -> np.ndarray:
-    """float32 spacing at the magnitude of each value, floored at 1 (a metre or a ns): the rounding unit."""
-    magnitude = np.maximum(np.abs(np.asarray(values, dtype=np.float64)), 1.0)
-    return np.spacing(magnitude.astype(np.float32)).astype(np.float64)
+#: Photon rows of a stream (endtoend_common.photon_rows): event, telescope, index and columns.
+read_rows = e2e.photon_rows
+#: float32 rounding unit at each value, floored at 1 (streams.ulp32).
+ulp32 = streams.ulp32

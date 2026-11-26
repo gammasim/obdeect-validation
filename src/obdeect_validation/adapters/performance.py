@@ -33,6 +33,7 @@ from eventio import EventIOFile
 from eventio.iact import IACTFile
 
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 
 REPS = 3
 INPUT = common.VALIDATION / "inputs/gamma-20deg-100-3000GeV-100showers.iact"
@@ -149,7 +150,7 @@ def run_timed(argv, log, cwd=None, stdout_file=None):
 def stream_weight(path):
     """Photon count and bunch weight sum of a native photon stream, from obdeect's own summary."""
     text = subprocess.run(
-        ["obdeect", "stream", "cat", "--summary", str(path)],
+        cli.obdeect("stream", "cat", summary=True, extra=(str(path),)),
         capture_output=True,
         text=True,
         check=True,
@@ -250,7 +251,7 @@ def cpu_model():
 
 def host_info():
     version = subprocess.run(
-        ["obdeect", "--version"], capture_output=True, text=True, check=False
+        cli.obdeect("--version"), capture_output=True, text=True, check=False
     ).stdout.strip()
     return {
         "nproc": len(os.sched_getaffinity(0))
@@ -482,14 +483,7 @@ def main():
         done["to_simtel"] = measure(
             "to_simtel",
             lambda: run(
-                [
-                    "obdeect",
-                    "stream",
-                    "to-simtel",
-                    stream,
-                    "-o",
-                    work / "roundtrip.iact",
-                ],
+                cli.to_simtel(stream, work / "roundtrip.iact"),
                 work / "to-simtel.log",
             ),
             stream_in,
@@ -515,30 +509,17 @@ def main():
         done["propagation"] = measure(
             "propagation",
             lambda: run(
-                [
-                    "obdeect",
-                    "propagation",
-                    "run",
-                    "--transmission",
-                    inputs["atmosphere"],
-                    "--site-altitude",
-                    2156,
-                    "--pathlen",
-                    28,
-                    "--seed",
-                    123,
-                    "--mode",
-                    "weighted",
-                    "--wavelength-range",
-                    250,
-                    700,
-                    "--telescopes",
-                    ",".join(map(str, co.TELESCOPES)),
-                    "-i",
+                cli.propagation_run(
                     stream,
-                    "-o",
                     propagated,
-                ],
+                    transmission=inputs["atmosphere"],
+                    site_altitude=2156,
+                    pathlen=28,
+                    seed=123,
+                    mode="weighted",
+                    wavelength_range=(250, 700),
+                    telescopes=",".join(map(str, co.TELESCOPES)),
+                ),
                 work / "propagation.log",
             ),
             stream_in,
@@ -551,27 +532,16 @@ def main():
         done["propagation_envelope"] = measure(
             "propagation_envelope",
             lambda: run(
-                [
-                    "obdeect",
-                    "propagation",
-                    "run",
-                    "--transmission",
-                    inputs["atmosphere"],
-                    "--site-altitude",
-                    2156,
-                    "--pathlen",
-                    28,
-                    "--seed",
-                    123,
-                    "--envelope",
-                    f"{chain.ENVELOPE_FACTOR}={envelope['envelope']}",
-                    "--telescopes",
-                    ",".join(map(str, co.TELESCOPES)),
-                    "-i",
+                cli.propagation_run(
                     stream,
-                    "-o",
                     enveloped,
-                ],
+                    transmission=inputs["atmosphere"],
+                    site_altitude=2156,
+                    pathlen=28,
+                    seed=123,
+                    envelope=f"{chain.ENVELOPE_FACTOR}={envelope['envelope']}",
+                    telescopes=",".join(map(str, co.TELESCOPES)),
+                ),
                 work / "propagation-envelope.log",
             ),
             stream_in,
@@ -601,29 +571,17 @@ def main():
         done["trace_stream"] = measure(
             "trace_stream",
             lambda: run(
-                [
-                    "obdeect",
-                    "ray-tracing",
-                    "trace-stream",
-                    "--model",
+                cli.trace_stream(
                     model,
-                    "--seed",
-                    co.SEED,
-                    "--threads",
-                    1,
-                    "--telescopes",
-                    ",".join(map(str, co.TELESCOPES)),
-                    "--pointing-zenith-deg",
-                    co.ZENITH_DEG,
-                    "--pointing-azimuth-deg",
-                    co.AZIMUTH_DEG,
-                    "--telescope-transmission",
-                    "full",
-                    "-i",
                     propagated,
-                    "-o",
                     traced,
-                ],
+                    seed=co.SEED,
+                    threads=1,
+                    telescopes=",".join(map(str, co.TELESCOPES)),
+                    pointing_zenith_deg=co.ZENITH_DEG,
+                    pointing_azimuth_deg=co.AZIMUTH_DEG,
+                    telescope_transmission="full",
+                ),
                 work / "trace-stream.log",
             ),
             trace_in,

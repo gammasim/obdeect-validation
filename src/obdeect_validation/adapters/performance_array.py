@@ -72,6 +72,9 @@ from obdeect_validation.adapters import (
     performance,
 )
 from obdeect_validation.adapters import (
+    obdeect_cli as cli,
+)
+from obdeect_validation.adapters import (
     performance_chain as pc,
 )
 
@@ -127,23 +130,14 @@ def camera_map(root, telescope, rotation):
 
 def compile_argv(models, element, model_path):
     """obdeect optical model of one element, with the pointing zenith (needed for the MSTs)."""
-    return [
-        "obdeect",
-        "ray-tracing",
-        "compile",
-        "--simulation-models",
-        models,
-        "--model",
-        element,
-        "--version",
-        VERSION,
-        "--seed",
-        co.SEED,
-        "--zenith-deg",
-        ZENITH_DEG,
-        "--output",
+    return cli.compile_model(
         model_path,
-    ]
+        element,
+        VERSION,
+        seed=co.SEED,
+        zenith_deg=ZENITH_DEG,
+        simulation_models=models,
+    )
 
 
 def reference_options(atmosphere):
@@ -439,7 +433,7 @@ def tee_pipe(telescopes, branches):
                 propagation_stage[0],
                 with_telescopes(propagation_stage[1], telescopes),
             ),
-            ("tee", ["obdeect", "stream", "tee", *fifos.values()]),
+            ("tee", cli.obdeect("stream", "tee", *fifos.values())),
         ]
         logs = {
             "from_corsika": first["logs"]["from_corsika"],

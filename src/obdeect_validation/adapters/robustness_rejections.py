@@ -57,6 +57,7 @@ import numpy as np
 
 from obdeect_validation.adapters import common
 from obdeect_validation.adapters import endtoend_common as e2e
+from obdeect_validation.adapters import obdeect_cli as cli
 
 PRODUCER = "robustness-rejections"
 TIMEOUT = 120.0
@@ -363,7 +364,7 @@ def reader_accepts(stream, workdir, name):
 
 def cat_accepts(stream, workdir, name):
     stage = run_command(
-        ["obdeect", "stream", "cat", str(stream)],
+        cli.obdeect("stream", "cat", str(stream)),
         workdir,
         f"{name}.cat",
         output=workdir / f"{name}.cat.out",
@@ -375,16 +376,13 @@ def to_simtel_accepts(stream, camera_map, workdir, name):
     map_path = workdir / f"{name}.camera-map.txt"
     map_path.write_text(camera_map)
     stage = run_command(
-        [
-            "obdeect",
+        cli.obdeect(
             "stream",
             "to-simtel",
-            "--camera-map",
-            str(map_path),
-            "-o",
-            str(workdir / f"{name}.iact"),
-            str(stream),
-        ],
+            camera_map=str(map_path),
+            o=str(workdir / f"{name}.iact"),
+            extra=[str(stream)],
+        ),
         workdir,
         f"{name}.to-simtel",
     )
@@ -559,7 +557,7 @@ def scenario_corsika_reopen(workdir, results):
         path = workdir / f"{name}.iact"
         path.write_bytes(b"".join(blocks))
         stage = run_command(
-            ["obdeect", "stream", "from-corsika", str(path)],
+            cli.from_corsika(str(path)),
             workdir,
             f"{name}.from-corsika",
             output=workdir / f"{name}.pst",
@@ -603,25 +601,17 @@ def scenario_write_failure(workdir, results):
     camera_map = workdir / "wf-camera-map.txt"
     camera_map.write_text(CAMERA_MAP_C)
     commands = {
-        "to-simtel": lambda out: [
-            "obdeect",
+        "to-simtel": lambda out: cli.obdeect(
             "stream",
             "to-simtel",
-            "--camera-map",
-            str(camera_map),
-            "-o",
-            out,
-            str(camera),
-        ],
-        "to-grisu": lambda out: [
-            "obdeect",
-            "stream",
-            "to-grisu",
-            "-o",
-            out,
-            str(ground),
-        ],
-        "cat": lambda out: ["obdeect", "stream", "cat", str(camera)],
+            camera_map=str(camera_map),
+            o=out,
+            extra=[str(camera)],
+        ),
+        "to-grisu": lambda out: cli.obdeect(
+            "stream", "to-grisu", o=out, extra=[str(ground)]
+        ),
+        "cat": lambda out: cli.obdeect("stream", "cat", str(camera)),
     }
     for name, argv_for in commands.items():
         control = run_command(
@@ -732,8 +722,7 @@ def summarize(results):
     return metrics
 
 
-def main():
-    workdir = Path.cwd()
+def analyse(workdir: Path) -> tuple[dict, dict]:
     results: list[dict] = []
     details: dict = {"skipped": []}
 
@@ -755,7 +744,11 @@ def main():
         if r["role"] == "variant" and r["accepted"]
     ]
     details["results"] = results
-    common.write_results(metrics, details, workdir)
+    return metrics, details
+
+
+def main():
+    common.results_main(analyse, __doc__.splitlines()[0])
 
 
 if __name__ == "__main__":

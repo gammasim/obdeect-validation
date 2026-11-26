@@ -16,10 +16,10 @@ run_key_missing_count (absent run keys or run records, per route), curved_log_pa
 
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 
 from obdeect_validation.adapters import common, curved_showers
+from obdeect_validation.adapters import obdeect_cli as cli
 from obdeect_validation.adapters.common import command
 
 CURVED_INPUT = "/validation/inputs/" + curved_showers.shower_name(
@@ -51,7 +51,7 @@ def routes_for(shower, root: Path, label: str) -> dict:
     """Run metadata per conversion route: the CLI, and the Python API when importable."""
     native = root / f"{label}.cli.gst"
     command(
-        ["obdeect", "stream", "from-corsika", shower],
+        cli.from_corsika(shower),
         root / f"{label}.cli.from-corsika.log",
         stdout_file=native,
     )
@@ -127,12 +127,8 @@ def evaluate(items: list[dict]) -> tuple[dict, dict]:
     return metrics, details
 
 
-def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--curved", default=CURVED_INPUT, type=Path)
-    parser.add_argument("--flat", default=FLAT_INPUT, type=Path)
-    args = parser.parse_args(argv)
-    root = Path.cwd().resolve()
+def analyse(root: Path, args) -> tuple[dict, dict]:
+    root = root.resolve()
     items = []
     for kind, shower in (("curved", args.curved), ("flat", args.flat)):
         shower = shower.resolve()
@@ -146,10 +142,22 @@ def main(argv=None) -> int:
                 "log": str(log),
             }
         )
-    metrics, details = evaluate(items)
-    common.write_results(metrics, details)
-    return 0
+    return evaluate(items)
+
+
+def add_arguments(parser):
+    parser.add_argument("--curved", default=CURVED_INPUT, type=Path)
+    parser.add_argument("--flat", default=FLAT_INPUT, type=Path)
+
+
+def main(argv=None) -> None:
+    common.results_main(
+        analyse,
+        __doc__.splitlines()[0],
+        add_arguments=add_arguments,
+        argv=argv,
+    )
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

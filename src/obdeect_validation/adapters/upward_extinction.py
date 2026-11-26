@@ -17,7 +17,6 @@ Case propagation.upward-extinction. Upward photons (cz > 0) below the telescope,
 
 from __future__ import annotations
 
-import argparse
 import itertools
 import math
 from pathlib import Path
@@ -45,7 +44,6 @@ FLAT_RADIUS_M = 1.0e12
 WAVELENGTH_RANGE_NM = (400.0, 600.0)
 MAX_ZENITH_DEG = 60.0  # plane-parallel and spherical samples
 EMISSION_MAX_M = 2990.0
-C_SITE_M = uc.SITE_M
 
 
 def version() -> str:
@@ -259,6 +257,7 @@ def analyse(root: Path) -> tuple[dict, dict]:
             "obd_sph": w_sph,
         },
     }
+    plot(root / "upward-extinction.png", details)
     return metrics, details
 
 
@@ -302,14 +301,5 @@ def plot(path: Path, details: dict) -> None:
     plotting.save(fig, path)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.parse_args()
-    root = Path.cwd()
-    metrics, details = analyse(root)
-    plot(root / "upward-extinction.png", details)
-    common.write_results(metrics, details, root)
-
-
 if __name__ == "__main__":
-    main()
+    common.results_main(analyse, __doc__.splitlines()[0])

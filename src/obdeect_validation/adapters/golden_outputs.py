@@ -66,6 +66,7 @@ from pathlib import Path
 
 from obdeect_validation.adapters import atmosphere_chain as atm
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 
 EVENTIO_SHA256 = "287be6668e14c9da931fabf89b8573e2902cba1561b1e34ee1a6acab1efd0a0e"
 GOLDEN_DIR = common.VALIDATION / "fixtures/golden"
@@ -94,24 +95,16 @@ class Pipeline:
 
 def _trace(model, source, output):
     return Stage(
-        (
-            "obdeect",
-            "ray-tracing",
-            "trace-stream",
-            "--model",
-            f"{model}.json",
-            "--seed",
-            "7",
-            "--threads",
-            "1",
-            "--pointing-zenith-deg",
-            "20",
-            "--pointing-azimuth-deg",
-            "180",
-            "-i",
-            source,
-            "-o",
-            output,
+        tuple(
+            cli.trace_stream(
+                f"{model}.json",
+                source,
+                output,
+                seed="7",
+                threads="1",
+                pointing_zenith_deg="20",
+                pointing_azimuth_deg="180",
+            )
         ),
         output,
     )
@@ -119,17 +112,15 @@ def _trace(model, source, output):
 
 def _to_simtel(source, camera_map, output):
     return Stage(
-        (
-            "obdeect",
-            "stream",
-            "to-simtel",
-            "--camera-map",
-            camera_map,
-            "--atmprof",
-            "atmprof.dat",
-            "-o",
-            output,
-            source,
+        tuple(
+            cli.obdeect(
+                "stream",
+                "to-simtel",
+                camera_map=camera_map,
+                atmprof="atmprof.dat",
+                o=output,
+                extra=[source],
+            )
         ),
         output,
     )
@@ -138,53 +129,36 @@ def _to_simtel(source, camera_map, output):
 def _point_source(
     position, photons, seed, output, telescope_radius, events=2, frame=None
 ):
-    argv = [
-        "obdeect",
+    argv = cli.obdeect(
         "sources",
         "run",
         "point-source",
-        "--observation-level",
-        "2156",
-        "--spectrum",
-        "fixed:wavelength_nm=400",
-        "--position",
-        position,
-        "--photons",
-        photons,
-        "--events",
-        str(events),
-        "--telescope-radius",
-        telescope_radius,
-        "--seed",
-        str(seed),
-    ]
-    if frame:
-        argv += ["--set", f"run.frame={frame}"]
-    argv += ["-o", output]
+        observation_level="2156",
+        spectrum="fixed:wavelength_nm=400",
+        position=position,
+        photons=photons,
+        events=str(events),
+        telescope_radius=telescope_radius,
+        seed=str(seed),
+        set=f"run.frame={frame}" if frame else None,
+        o=output,
+    )
     return Stage(tuple(argv), output)
 
 
 def _propagation(source, output, *, site, transmission, seed, extra=()):
     return Stage(
-        (
-            "obdeect",
-            "propagation",
-            "run",
-            "--transmission",
-            transmission,
-            "--pathlen",
-            "0",
-            "--site-altitude",
-            site,
-            "--seed",
-            str(seed),
-            "--threads",
-            "1",
-            *extra,
-            "-i",
-            source,
-            "-o",
-            output,
+        tuple(
+            cli.obdeect(
+                "propagation",
+                "run",
+                transmission=transmission,
+                pathlen="0",
+                site_altitude=site,
+                seed=str(seed),
+                threads="1",
+                extra=[*extra, "-i", source, "-o", output],
+            )
         ),
         output,
     )
@@ -197,22 +171,15 @@ PIPELINES = (
         "compile",
         tuple(
             Stage(
-                (
-                    "obdeect",
-                    "ray-tracing",
-                    "compile",
-                    "--simulation-models",
-                    "{models}",
-                    "--model",
-                    model,
-                    "--version",
-                    MODEL_VERSION,
-                    "--seed",
-                    "11",
-                    "--zenith-deg",
-                    "20",
-                    "--output",
-                    f"{model}.json",
+                tuple(
+                    cli.compile_model(
+                        f"{model}.json",
+                        model,
+                        MODEL_VERSION,
+                        seed="11",
+                        zenith_deg="20",
+                        simulation_models="{models}",
+                    )
                 ),
                 f"{model}.json",
             )
@@ -279,16 +246,14 @@ PIPELINES = (
                 extra=PROFILE,
             ),
             Stage(
-                (
-                    "obdeect",
-                    "propagation",
-                    "to-sky",
-                    "--profile",
-                    "atmprof.dat",
-                    "-i",
-                    "flat-dispersion.pst",
-                    "-o",
-                    "sky-from-ground.pst",
+                tuple(
+                    cli.obdeect(
+                        "propagation",
+                        "to-sky",
+                        profile="atmprof.dat",
+                        i="flat-dispersion.pst",
+                        o="sky-from-ground.pst",
+                    )
                 ),
                 "sky-from-ground.pst",
             ),
@@ -299,7 +264,7 @@ PIPELINES = (
         "corsika",
         (
             Stage(
-                ("obdeect", "stream", "from-corsika", "corsika.eventio"),
+                tuple(cli.from_corsika("corsika.eventio")),
                 "corsika.pst",
                 stdout="corsika.pst",
             ),
@@ -311,13 +276,13 @@ PIPELINES = (
                 seed=3,
             ),
             Stage(
-                (
-                    "obdeect",
-                    "stream",
-                    "to-grisu",
-                    "-o",
-                    "corsika.grisu",
-                    "corsika-prop.pst",
+                tuple(
+                    cli.obdeect(
+                        "stream",
+                        "to-grisu",
+                        o="corsika.grisu",
+                        extra=["corsika-prop.pst"],
+                    )
                 ),
                 "corsika.grisu",
             ),
@@ -328,21 +293,15 @@ PIPELINES = (
         (
             _point_source("0,0,2000", "1e8", 9, "events12.pst", "12.5"),
             Stage(
-                (
-                    "obdeect",
-                    "propagation",
-                    "run",
-                    "--no-extinction",
-                    "--site-altitude",
-                    "2156",
-                    "--seed",
-                    "9",
-                    "--threads",
-                    "1",
-                    "-i",
-                    "events12.pst",
-                    "-o",
-                    "events12-prop.pst",
+                tuple(
+                    cli.propagation_run(
+                        "events12.pst",
+                        "events12-prop.pst",
+                        no_extinction=True,
+                        site_altitude="2156",
+                        seed="9",
+                        threads="1",
+                    )
                 ),
                 "events12-prop.pst",
             ),

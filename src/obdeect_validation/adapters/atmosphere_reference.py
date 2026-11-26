@@ -43,6 +43,10 @@ def _plot(samples, path) -> None:
 
 
 def main() -> None:
+    common.results_main(_analyse, __doc__.splitlines()[0])
+
+
+def _analyse(root: Path):
     from obdeect.propagation import AtmosphereProfile, RefractionTables, refract
 
     profile_path = Path(
@@ -121,8 +125,8 @@ def main() -> None:
                 "bent": bool(bent[i]),
             }
         )
-    common.write_json("samples.json", samples)
-    _plot(samples, Path("atmosphere-reference.png"))
+    common.write_json(root / "samples.json", samples)
+    _plot(samples, root / "atmosphere-reference.png")
     dx_error = max(abs(s["candidate_dx_m"] - s["corsika_dx_m"]) for s in samples)
     cx_error = max(abs(s["candidate_cx"] - s["corsika_cx"]) for s in samples)
     dt_error = max(abs(s["candidate_dt_ns"] - s["corsika_dt_ns"]) for s in samples)
@@ -133,7 +137,7 @@ def main() -> None:
         "max_displacement_absolute_error_m": dx_error,
         "max_travel_time_absolute_error_ns": dt_error,
     }
-    common.write_results(metrics)
+    return metrics, None
 
 
 if __name__ == "__main__":

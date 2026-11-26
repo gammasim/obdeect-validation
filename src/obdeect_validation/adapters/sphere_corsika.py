@@ -33,7 +33,7 @@ from pathlib import Path
 
 import numpy as np
 
-from obdeect_validation.adapters import common
+from obdeect_validation.adapters import common, streams
 from obdeect_validation.adapters import upward_common as uc
 
 FIXTURE = uc.ROOT / "fixtures/sphere/photons3d.iact"
@@ -212,12 +212,9 @@ def reference_rows(run: dict) -> list[dict]:
 def ulp_error(got, want) -> np.ndarray:
     """|got - want| in float32 spacings of want (spacing floored at 1 unit), per element."""
     want32 = np.asarray(want, dtype=np.float32)
-    spacing = np.spacing(np.maximum(np.abs(want32), 1.0).astype(np.float32)).astype(
-        np.float64
-    )
-    return (
-        np.abs(np.asarray(got, dtype=np.float64) - want32.astype(np.float64)) / spacing
-    )
+    return np.abs(
+        np.asarray(got, dtype=np.float64) - want32.astype(np.float64)
+    ) / streams.ulp32(want)
 
 
 def read_stream(path) -> dict:
@@ -361,17 +358,6 @@ def plane_reference(rows: list[dict]) -> list[dict]:
     return out
 
 
-def status(argv, log: Path) -> int:
-    """Exit status of argv; its stderr goes to log (no exception on failure)."""
-    with Path(log).open("wb") as stream:
-        return subprocess.run(
-            [str(a) for a in argv],
-            stdout=subprocess.DEVNULL,
-            stderr=stream,
-            check=False,
-        ).returncode
-
-
 def run_all(root: Path) -> tuple[dict, dict]:
     tool = common.tool("obdeect")
     pst = root / "photons3d.pst"
@@ -391,7 +377,12 @@ def run_all(root: Path) -> tuple[dict, dict]:
 
     # to-simtel: the full fixture is refused; the downward on-sphere subset converts to the plane.
     full_log = root / "to-simtel-full.log"
-    full_status = status([tool, "stream", "to-simtel", pst], full_log)
+    full_status = common.command(
+        [tool, "stream", "to-simtel", pst],
+        full_log,
+        check=False,
+        stdout=subprocess.DEVNULL,
+    )
     refused_full = int(
         full_status != 0 and "inside the telescope sphere" in full_log.read_text()
     )

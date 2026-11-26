@@ -18,7 +18,6 @@ is not read by sim_telarray for the atmosphere (no extinction stage in sim_telar
 expected name is given by the case.
 """
 
-import argparse
 import gzip
 from pathlib import Path
 
@@ -93,8 +92,7 @@ def run_comparison(
     return metrics, details
 
 
-def main():
-    parser = argparse.ArgumentParser()
+def _add_arguments(parser):
     parser.add_argument(
         "--reference", type=Path, required=True, help="direct chain sim_telarray output"
     )
@@ -119,9 +117,10 @@ def main():
         required=True,
         help="reduced event file of the reference run",
     )
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
-    metrics, details = run_comparison(
+
+
+def analyse(root, args):
+    return run_comparison(
         args.reference.resolve(),
         args.candidate.resolve(),
         args.candidate_log.resolve(),
@@ -129,7 +128,10 @@ def main():
         root,
         args.reduced.resolve(),
     )
-    common.write_results(metrics, details, root)
+
+
+def main():
+    common.results_main(analyse, __doc__.splitlines()[0], add_arguments=_add_arguments)
 
 
 if __name__ == "__main__":

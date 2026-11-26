@@ -6,7 +6,6 @@ Variants: the same stream through cat/tee/stdin pipes must give identical photon
 event and telescope (canonical digest of photons sorted by all columns, bit-exact).
 """
 
-import argparse
 import hashlib
 import subprocess
 from pathlib import Path
@@ -16,6 +15,7 @@ from obdeect.stream import Reader
 
 from obdeect_validation.adapters import chain_showers as chain
 from obdeect_validation.adapters import common
+from obdeect_validation.adapters import obdeect_cli as cli
 
 
 def run_stdin(argv, stdin_path, stdout_path, log):
@@ -72,25 +72,25 @@ def variants(root, source, native):
         "tee": root / "var-tee.gst",
         "from_corsika_stdin": root / "var-from-corsika-stdin.gst",
     }
-    chain.command(
-        ["obdeect", "stream", "cat", native],
+    common.command(
+        cli.obdeect("stream", "cat", native),
         root / "var-cat-file.log",
         stdout_file=outputs["cat_file"],
     )
     run_stdin(
-        ["obdeect", "stream", "cat", "-"],
+        cli.obdeect("stream", "cat", "-"),
         native,
         outputs["cat_stdin"],
         root / "var-cat-stdin.log",
     )
     run_stdin(
-        ["obdeect", "stream", "tee", outputs["tee"]],
+        cli.obdeect("stream", "tee", outputs["tee"]),
         native,
         root / "var-tee-stdout.gst",
         root / "var-tee.log",
     )
     run_stdin(
-        ["obdeect", "stream", "from-corsika", "-"],
+        cli.from_corsika("-"),
         source,
         outputs["from_corsika_stdin"],
         root / "var-from-corsika.log",
@@ -104,14 +104,14 @@ def variants(root, source, native):
     )
     to_simtel_stdin = root / "var-to-simtel-stdin.iact"
     run_stdin(
-        ["obdeect", "stream", "to-simtel", "-o", to_simtel_stdin, "-"],
+        cli.obdeect("stream", "to-simtel", o=to_simtel_stdin, extra=["-"]),
         native,
         "/dev/null",
         root / "var-to-simtel.log",
     )
     to_simtel_file = root / "var-to-simtel-file.iact"
-    chain.command(
-        ["obdeect", "stream", "to-simtel", native, "-o", to_simtel_file],
+    common.command(
+        cli.to_simtel(native, to_simtel_file),
         root / "var-to-simtel-file.log",
     )
     photons, _ = chain.compare_photons(to_simtel_file, to_simtel_stdin)
@@ -128,28 +128,34 @@ def variants(root, source, native):
     return metrics
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, required=True, help="CORSIKA IACT file")
-    args = parser.parse_args()
-    root = Path.cwd().resolve()
+def analyse(root: Path, args) -> tuple[dict, dict]:
+    root = root.resolve()
     source = args.input.resolve()
     native, metrics, fields, a, b = chain.roundtrip(root, source)
     metrics.update(variants(root, source, native))
-    common.write_results(
-        metrics,
-        {
-            "codec_per_field_normalized_error": fields,
-            "reference_event_ids": list(a),
-            "candidate_event_ids": list(b),
-            "variant_commands": [
-                "stream cat FILE",
-                "stream cat -",
-                "stream tee FILE",
-                "stream from-corsika -",
-                "stream to-simtel -o FILE -",
-            ],
-        },
+    return metrics, {
+        "codec_per_field_normalized_error": fields,
+        "reference_event_ids": list(a),
+        "candidate_event_ids": list(b),
+        "variant_commands": [
+            "stream cat FILE",
+            "stream cat -",
+            "stream tee FILE",
+            "stream from-corsika -",
+            "stream to-simtel -o FILE -",
+        ],
+    }
+
+
+def add_arguments(parser):
+    parser.add_argument("--input", type=Path, required=True, help="CORSIKA IACT file")
+
+
+def main():
+    common.results_main(
+        analyse,
+        "CORSIKA IACT round trip and stream command variants",
+        add_arguments=add_arguments,
     )
 
 
